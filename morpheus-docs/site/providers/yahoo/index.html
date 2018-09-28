@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="Xavier Witdouck">
+        
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>Yahoo Finance - Morpheus</title>
+        <link href="../../css/bootstrap-custom.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome-4.5.0.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="../../css/highlight.css">
+        <link href="../.././css/morpheus.css" rel="stylesheet">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.5.0/styles/default.min.css" rel="stylesheet">
+        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+        <![endif]-->
+	
+	<script src="../../js/jquery-1.10.2.min.js"></script>
+        <script src="../../js/bootstrap-3.0.3.min.js"></script>
+        <script src="../../js/highlight.pack.js"></script> 
+    </head>
+
+    <body>
+
+        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+
+        <!-- Collapsed navigation -->
+        <div class="navbar-header">
+            <!-- Expander button -->
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="../..">Morpheus</a>
+        </div>
+
+        <!-- Expanded navigation -->
+        <div class="navbar-collapse collapse">
+                <!-- Main navigation -->
+                <ul class="nav navbar-nav">
+                    <li >
+                        <a href="../..">Overview</a>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Array <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            
+<li >
+    <a href="../../array/overview/">Overview</a>
+</li>
+                            
+<li >
+    <a href="../../array/performance/">Performance</a>
+</li>
+                        </ul>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">DataFrame <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            
+<li >
+    <a href="../../frame/construction/">Construction</a>
+</li>
+                            
+<li >
+    <a href="../../frame/access/">Accessing</a>
+</li>
+                            
+<li >
+    <a href="../../frame/reshaping/">Reshaping</a>
+</li>
+                            
+<li >
+    <a href="../../frame/filtering/">Filtering</a>
+</li>
+                            
+<li >
+    <a href="../../frame/sorting/">Sorting</a>
+</li>
+                            
+<li >
+    <a href="../../frame/grouping/">Grouping</a>
+</li>
+                            
+<li >
+    <a href="../../frame/finding/">Finding</a>
+</li>
+                            
+<li >
+    <a href="../../frame/writing/">Writing</a>
+</li>
+                            
+<li >
+    <a href="../../frame/performance/">Performance</a>
+</li>
+                        </ul>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Analysis <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            
+<li >
+    <a href="../../analysis/statistics/">Descriptive Statistics</a>
+</li>
+                            
+  <li class="dropdown-submenu">
+    <a href="#">Linear Regression</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../regression/ols/">Ordinary Least Squares</a>
+</li>
+            
+<li >
+    <a href="../../regression/wls/">Weighted Least Squares</a>
+</li>
+            
+<li >
+    <a href="../../regression/gls/">Generalized Least Squares</a>
+</li>
+    </ul>
+  </li>
+                            
+<li >
+    <a href="../../analysis/pca/">Principal Component Analysis</a>
+</li>
+                            
+<li >
+    <a href="../../analysis/linearalgebra/">Linear Algebra</a>
+</li>
+                            
+<li >
+    <a href="../../analysis/timeseries/">Time Series Analysis</a>
+</li>
+                            
+  <li class="dropdown-submenu">
+    <a href="#">Examples</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../examples/mpt/">Modern Portfolio Theory</a>
+</li>
+    </ul>
+  </li>
+                        </ul>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Visualization <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            
+  <li class="dropdown-submenu">
+    <a href="#">Charts</a>
+    <ul class="dropdown-menu">
+            
+<li >
+    <a href="../../viz/charts/overview/">Overview</a>
+</li>
+            
+<li >
+    <a href="../../viz/charts/embed/">Embedding (HTML)</a>
+</li>
+            
+<li >
+    <a href="../../viz/charts/gallery1/">Gallery (Google)</a>
+</li>
+            
+<li >
+    <a href="../../viz/charts/gallery2/">Gallery (JFree)</a>
+</li>
+    </ul>
+  </li>
+                            
+<li >
+    <a href="../../viz/tables/overview/">Tables</a>
+</li>
+                        </ul>
+                    </li>
+                    <li class="dropdown active">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Data Sources <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            
+<li >
+    <a href="../quandl/">Quandl</a>
+</li>
+                            
+<li >
+    <a href="../fred/">Federal Reserve</a>
+</li>
+                            
+<li >
+    <a href="../google/">Google Finance</a>
+</li>
+                            
+<li class="active">
+    <a href="./">Yahoo Finance</a>
+</li>
+                            
+<li >
+    <a href="../world-bank/">World Bank</a>
+</li>
+                        </ul>
+                    </li>
+                </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+                        <i class="fa fa-search"></i> Search
+                    </a>
+                </li>
+                    <li >
+                        <a rel="next" href="../google/">
+                            <i class="fa fa-arrow-left"></i> Previous
+                        </a>
+                    </li>
+                    <li >
+                        <a rel="prev" href="../world-bank/">
+                            Next <i class="fa fa-arrow-right"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://github.com/zavtech/morpheus-core">
+                                <i class="fa fa-github"></i>GitHub
+                        </a>
+                    </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+        <div class="container">
+                <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+        <li class="main active"><a href="#disclaimer">Disclaimer</a></li>
+        <li class="main "><a href="#yahoo-finance">Yahoo Finance</a></li>
+            <li><a href="#introduction">Introduction</a></li>
+        <li class="main "><a href="#data-access">Data Access</a></li>
+            <li><a href="#historical-quotes">Historical Quotes</a></li>
+            <li><a href="#asset-returns">Asset Returns</a></li>
+            <li><a href="#latest-quotes">Latest Quotes</a></li>
+            <li><a href="#option-quotes">Option Quotes</a></li>
+            <li><a href="#key-statistics">Key Statistics</a></li>
+            <li><a href="#portfolio-analysis">Portfolio Analysis</a></li>
+    </ul>
+</div></div>
+                <div class="col-md-9" role="main">
+
+<h2 id="disclaimer">Disclaimer</h2>
+<p><strong>THIS PROJECT IS NOT AFFILIATED OR ENDORSED BY YAHOO AND IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR 
+PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES 
+OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. DATA EXTRACTED USING THIS LIBRARY IS FOR PERSONAL 
+NON-PROFESSIONAL USE AND MUST CONFORM TO YAHOO'S TERMS AND CONDITIONS</strong></p>
+<h2 id="yahoo-finance">Yahoo Finance</h2>
+<h3 id="introduction">Introduction</h3>
+<p><a href="https://finance.yahoo.com">Yahoo Finance</a> is an excellent source of free market data and analytics covering both 
+domestic and international markets. While not aimed at a professional user, it does offer a rich source of information 
+that is invaluable to the <strong>individual investor</strong> at a price that cannot be beat, namely free! The Morpheus adapter 
+for Yahoo Finance provides users a programmatic mechanism to capture some of this data for further analysis which
+may be helpful for informing your own investment decisions. </p>
+<p>Yahoo Finance does not provide any officially supported APIs, so this adapter is essentially reverse engineered 
+from the actions one can affect on the website itself. For that reason, the adapter could break at anytime, and 
+could take some time to fix or perhaps become unsupportable altogether. Accordingly, the suggestion is to only 
+rely on this code for personal non critical research projects.</p>
+<h2 id="data-access">Data Access</h2>
+<p>The Morpheus Yahoo Finance adapter includes various <code>DataFrameSource</code> implementations that provide access to
+<strong>asset prices, asset returns, equity fundamentals, option prices and FX rates</strong> using <code>DataFrames</code>. In particular, 
+daily <a href="https://finance.yahoo.com/quote/BLK/history?p=BLK">historical quote</a> bars (Open, High, Low, Close, Volume) in 
+both <strong>dividend adjusted</strong> and <strong>unadjusted</strong> formats are available, as well as <strong>intraday delayed quotes</strong> while markets 
+are trading. For those of you interested in <a href="https://finance.yahoo.com/quote/BLK/options?p=BLK">option</a> markets, 
+expiry dates given an underlying ticker are accessible along with intraday delayed quotes which include an <strong>implied 
+volatility estimate</strong>. Finally, equity fundamental data can be accessed programmatically from the key <a href="https://finance.yahoo.com/quote/BLK/key-statistics?p=BLK">statistics page</a>
+of any security accessible on the site.</p>
+<p>The following sections provide some useful examples of how to leverage the API and illustrate some commonly used 
+techniques for analyzing portfolios of investment securities. Firstly, to leverage the library in your project, the 
+following dependency should be included in your build tool of choice.</p>
+<pre><code class="xml">&lt;dependency&gt;
+    &lt;groupId&gt;com.zavtech&lt;/groupId&gt;
+    &lt;artifactId&gt;morpheus-yahoo&lt;/artifactId&gt;
+    &lt;version&gt;${VERSION}&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre>
+
+<p>There are two ways to integrate with the library, either via a convenience API which involves instantiating an 
+instance of the <code>YahooFinance</code> class or by using the various <code>DataFrameSource</code> implementations directly. In the 
+latter case, the sources should be pre-registered in some initializer as follows.</p>
+<?prettify?>
+
+<pre><code class="java">static {
+    DataFrameSource.register(new YahooOptionSource());
+    DataFrameSource.register(new YahooQuoteHistorySource());
+    DataFrameSource.register(new YahooQuoteLiveSource());
+    DataFrameSource.register(new YahooReturnSource());
+    DataFrameSource.register(new YahooStatsSource());
+}
+</code></pre>
+
+<h3 id="historical-quotes">Historical Quotes</h3>
+<p>For most securities represented on Yahoo Finance, it is possible to download historical quote bars into
+a CSV file, and Morpheus leverages this same interface to capture <strong>Open, High, Low, Close and Volume</strong> data 
+in a <code>DataFrame</code>. Historical price quotes are most often used to compute asset returns, so Yahoo presents these 
+historical prices in both <strong>dividend and split adjusted</strong> terms making it easy to compute returns that incorporate 
+these affects. The code below downloads split adjusted end of day quotes over the past 10 years for <a href="https://finance.yahoo.com/quote/BLK/history?p=BLK">BlackRock</a>, 
+and plots the close price series.  </p>
+<?prettify?>
+
+<pre><code class="java">String ticker = &quot;BLK&quot;;
+YahooQuoteHistorySource source = DataFrameSource.lookup(YahooQuoteHistorySource.class);
+
+//Load end-of-day quote bars and select close price series
+DataFrame&lt;LocalDate,YahooField&gt; closePrices = source.read(options -&gt; {
+    options.withStartDate(LocalDate.now().minusYears(10));
+    options.withEndDate(LocalDate.now());
+    options.withDividendAdjusted(true);
+    options.withTicker(ticker);
+}).cols().select(YahooField.PX_CLOSE);
+
+//Create area plot of close prices
+Chart.create().asSwing().withAreaPlot(closePrices, false, chart -&gt; {
+    chart.plot().axes().domain().label().withText(&quot;Date&quot;);
+    chart.plot().axes().range(0).label().withText(&quot;Close Price&quot;);
+    chart.title().withText(ticker + &quot;: Close Prices (Last 10 Years)&quot;);
+    chart.legend().off();
+    chart.show();
+});
+</code></pre>
+
+<p align="center">
+    <img class="chart" src="../../images/yahoo/blk_prices_1.png"/>
+</p>
+
+<p>In the example we requested dividend adjusted prices which are convenient for computing returns, however
+these are artificially changed and do not reflect actual observed prices at the time. To query for <strong>unadjusted</strong> 
+prices simply pass <code>false</code> as the last parameter to <code>getQuoteBars()</code>. The code below pulls both adjusted and 
+unadjusted prices, then selects the close prices from each frame and plots them for comparison. BlackRock is a 
+high paying dividend stock, so we would expect to see material differences in the two price series.</p>
+<?prettify?>
+
+<pre><code class="java">String ticker = &quot;BLK&quot;;
+YahooQuoteHistorySource source = DataFrameSource.lookup(YahooQuoteHistorySource.class);
+
+//Load both adjusted and unadjusted quotes
+DataFrame&lt;LocalDate,String&gt; frame = DataFrame.combineFirst(
+    Stream.of(&quot;Adjusted&quot;, &quot;Unadjusted&quot;).map(style -&gt; source.read(options -&gt; {
+        options.withStartDate(LocalDate.now().minusYears(10));
+        options.withEndDate(LocalDate.now());
+        options.withDividendAdjusted(style.equals(&quot;Adjusted&quot;));
+        options.withTicker(ticker);
+    }).cols().select(YahooField.PX_CLOSE).cols().mapKeys(column -&gt; style))
+);
+
+//Plot close prices from both these series
+Chart.create().asSwing().withLinePlot(frame, chart -&gt; {
+    chart.plot().axes().domain().label().withText(&quot;Date&quot;);
+    chart.plot().axes().range(0).label().withText(&quot;Close Price&quot;);
+    chart.title().withText(ticker + &quot;: Adjusted &amp; Unadjusted Close Prices&quot;);
+    chart.legend().bottom();
+    chart.show();
+});
+</code></pre>
+
+<p align="center">
+    <img class="chart" src="../../images/yahoo/blk_prices_2.png"/>
+</p>
+
+<p><a href="https://finance.yahoo.com/chart/NFLX">Netflix</a> currently does not pay a dividend, so if we ran this code for NFLX, 
+the two series should be coincident.</p>
+<p align="center">
+    <img class="chart" src="../../images/yahoo/nflx_prices_1.png"/>
+</p>
+
+<h3 id="asset-returns">Asset Returns</h3>
+<p>Investment decisions fundamentally boil down to making a judgement call regarding future asset returns, and the likely
+volatility of those returns over the investment horizon. While Yahoo Finance does not provide an API to directly download
+asset returns, the ability to capture dividend and split adjusted prices makes it very easy to compute returns. The Morpheus
+adapter for Yahoo Finance provides an API to calculate <strong>daily</strong>, <strong>weekly</strong>, <strong>monthly</strong> and <strong>cumulative</strong> returns as 
+demonstrated in the following sections.</p>
+<h4 id="cumulative-returns">Cumulative Returns</h4>
+<p>Consider 6 major asset classes, namely Emerging Market Equities, Real-Estate, International Equities (outside US), Commodities,
+Large Blend and Fixed Income. The returns for these asset classes can be proxied using well known liquid ETFs from the likes
+of <a href="https://investor.vanguard.com/home/">Vanguard</a>, <a href="https://www.blackrock.com/">BlackRock</a> or <a href="https://www.ssga.com/home.html">State Street Global Advisors</a> 
+among others. For this example, let's use the following tickers.</p>
+<table>
+<thead>
+<tr>
+<th>Ticker</th>
+<th>Name</th>
+<th>Provider</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>VWO</td>
+<td>Vanguard FTSE Emerging Markets ETF</td>
+<td>Vanguard</td>
+<td><a href="https://finance.yahoo.com/quote/VWO/profile?p=VWO">Details</a></td>
+</tr>
+<tr>
+<td>VNQ</td>
+<td>Vanguard REIT ETF</td>
+<td>Vanguard</td>
+<td><a href="https://finance.yahoo.com/quote/VNQ/profile?p=VNQ">Details</a></td>
+</tr>
+<tr>
+<td>VEA</td>
+<td>Vanguard FTSE Developed Markets ETF</td>
+<td>Vanguard</td>
+<td><a href="https://finance.yahoo.com/quote/VEA/profile?p=VEA">Details</a></td>
+</tr>
+<tr>
+<td>DBC</td>
+<td>PowerShares DB Commodity Tracking ETF</td>
+<td>Powershares</td>
+<td><a href="https://finance.yahoo.com/quote/DBC/profile?p=DBC">Details</a></td>
+</tr>
+<tr>
+<td>VTI</td>
+<td>Vanguard Total Stock Market ETF</td>
+<td>Vanguard</td>
+<td><a href="https://finance.yahoo.com/quote/DBC/profile?p=VTI">Details</a></td>
+</tr>
+<tr>
+<td>BND</td>
+<td>Vanguard Total Bond Market ETF</td>
+<td>Vanguard</td>
+<td><a href="https://finance.yahoo.com/quote/BND/profile?p=BND">Details</a></td>
+</tr>
+</tbody>
+</table>
+<p>The code below demonstrates how to use the <code>YahooReturnSource</code> to calculate <strong>cumulative returns</strong> for these tickers including 
+the effect of any splits and dividend payments. To make the plot more user friendly, we re-label the columns as asset class 
+names rather than the ticker symbols.</p>
+<?prettify?>
+
+<pre><code class="java">YahooReturnSource source = DataFrameSource.lookup(YahooReturnSource.class);
+DataFrame&lt;LocalDate,String&gt; returns = source.read(options -&gt; {
+    options.withStartDate(LocalDate.now().minusYears(10));
+    options.withEndDate(LocalDate.now());
+    options.withTickers(&quot;VWO&quot;, &quot;VNQ&quot;, &quot;VEA&quot;, &quot;DBC&quot;, &quot;VTI&quot;, &quot;BND&quot;);
+    options.cumulative();
+}).cols().mapKeys(column -&gt; {
+    switch (column.key()) {
+        case &quot;VWO&quot;: return &quot;EM Equities&quot;;
+        case &quot;VNQ&quot;: return &quot;Real-estate&quot;;
+        case &quot;VEA&quot;: return &quot;Foreign Equity&quot;;
+        case &quot;DBC&quot;: return &quot;Commodities&quot;;
+        case &quot;VTI&quot;: return &quot;Large Blend&quot;;
+        case &quot;BND&quot;: return &quot;Fixed Income&quot;;
+        default:    return column.key();
+    }
+}).applyDoubles(v -&gt; {
+    return v.getDouble() * 100d;
+});
+
+Chart.create().asSwing().withLinePlot(returns, chart -&gt; {
+    chart.title().withText(&quot;Major Asset Class Cumulative Returns Last 10 Years (ETF Proxies)&quot;);
+    chart.plot().axes().domain().label().withText(&quot;Date&quot;);
+    chart.plot().axes().range(0).label().withText(&quot;Return&quot;);
+    chart.plot().axes().range(0).format().withPattern(&quot;0.##'%';-0.##'%'&quot;);
+    chart.legend().on().bottom();
+    chart.show();
+});
+</code></pre>
+
+<p>Some of the potential take aways from this chart are as follows:</p>
+<ul>
+<li><strong>Fixed Income</strong> returns are much less volatile than the other asset classes in the plot.</li>
+<li>Everything except Fixed Income got crushed in the 2007/2008 <strong>Global Financial Crisis (GFC)</strong></li>
+<li><strong>Commodities</strong> have been a terrible investment over the past 10 years.</li>
+<li><strong>EM</strong> &amp; <strong>International</strong> Equities have only recently gone positive over the past 10 years.</li>
+<li>VTI, the <strong>broadest</strong> of all the funds, has out performed over the past 10 years.</li>
+</ul>
+<p align="center">
+    <img class="chart" src="../../images/yahoo/asset_returns_1.png"/>
+</p>
+
+<h4 id="smoothed-returns">Smoothed Returns</h4>
+<p>On a day-to-day basis, market prices are extremely noisy and for the most part completely random. It is often useful to 
+remove some of this noise by smoothing the returns, which in turn develops a more stable signal which can be consumed by 
+a systematic investment process. The Morpheus adapter supports smoothing returns based on an <a href="https://en.wikipedia.org/wiki/Exponential_smoothing">Exponential Weighted Moving Average</a> 
+(EWMA) which is a commonly used technique in signal processing.</p>
+<p>The code below generates cumulative returns for the <strong>S&amp;P 500 Index</strong> tracker with ticker symbol <a href="https://finance.yahoo.com/quote/SPY?p=SPY">SPY</a>, 
+and smooths the data with various half-lives, namely 0, 5, 10, 30 and 60 business days. A 0 day half-life is interpreted as 
+no smoothing, so this simply yields the raw data. The smoothed signal is computed as follows:</p>
+<p>$$ S_{t} = \alpha x_{t} + (1 - \alpha) S_{t-1} \ for \ t &gt; 0 \ and \ where \ S_{0} = x_{0} $$</p>
+<p>There are various ways to compute \( \alpha \), but in Morpheus we calculate it based on a half-life as follows:</p>
+<p>$$ \alpha = 1 - e^{log(0.5) / halfLife} $$</p>
+<?prettify?>
+
+<pre><code class="java">String ticker = &quot;SPY&quot;;
+YahooReturnSource source = DataFrameSource.lookup(YahooReturnSource.class);
+Array&lt;Integer&gt; halfLives = Array.of(0, 5, 10, 30, 60);
+DataFrame&lt;LocalDate,String&gt; frame = DataFrame.combineFirst(halfLives.map(halfLife -&gt; {
+    return source.read(options -&gt; {
+        options.withStartDate(LocalDate.now().minusYears(5));
+        options.withEndDate(LocalDate.now());
+        options.withTickers(ticker);
+        options.withEmaHalfLife(halfLife.getInt());
+        options.cumulative();
+    }).cols().replaceKey(ticker, String.format(&quot;%s(%s)&quot;, ticker, halfLife.getInt()));
+}));
+
+Chart.create().withLinePlot(frame.applyDoubles(v -&gt; v.getDouble() * 100d), chart -&gt; {
+    chart.title().withText(String.format(&quot;%s EWMA Smoothed Returns With Various Half-Lives&quot;, ticker));
+    chart.plot().axes().domain().label().withText(&quot;Date&quot;);
+    chart.plot().axes().range(0).label().withText(&quot;Return&quot;);
+    chart.plot().axes().range(0).format().withPattern(&quot;0.##'%';-0.##'%'&quot;);
+    chart.legend().on().bottom();
+    chart.show();
+});
+</code></pre>
+
+<p>It's clear from the plot below that the larger the half-life the more smoothing is applied, which makes sense
+based on the expression for half-life above.</p>
+<p align="center">
+    <img class="chart" src="../../images/yahoo/spy_returns_1.png"/>
+</p>
+
+<h4 id="return-distribution">Return Distribution</h4>
+<p>Many of the statistical techniques in modern finance are predicated on the assumption that asset returns are <strong>normally 
+distributed</strong>. However, it is often the case that returns are not normal, which is why during the GFC many funds experienced 
+greater than -6 sigma events one day after the next. While returns are not normal, the statistical techniques that are commonly 
+used are still a reasonable engineering approximation when markets are <em>not</em> under stress. When they are under stress, all bets 
+are off (no pun intended), which can lead to bad outcomes for investors.</p>
+<p>The code below computes daily returns for the S&amp;P 500 ETF tracker with ticker symbol SPY over the past 20 years, and then generates 
+a histogram of these returns using 200 bins. In addition, the mean and standard deviation of these daily returns are calculated. 
+They are then used to compute a normal probability density function which is scaled appropriately and then overlaid on the chart. </p>
+<?prettify?>
+
+<pre><code class="java">String ticker = &quot;SPY&quot;;
+YahooReturnSource source = DataFrameSource.lookup(YahooReturnSource.class);
+DataFrame&lt;LocalDate,String&gt; returns = source.read(options -&gt; {
+    options.withStartDate(LocalDate.now().minusYears(20));
+    options.withEndDate(LocalDate.now());
+    options.withTickers(ticker);
+}).applyDoubles(v -&gt; {
+    return v.getDouble() * 1d;
+});
+
+double binCount = 200;
+double min = returns.stats().min();
+double max = returns.stats().max();
+double mean = returns.stats().mean();
+double stdDev = returns.stats().stdDev();
+double bound = Math.max(Math.abs(min), Math.abs(max));
+double scale = ((max - min) / binCount) * returns.stats().count();
+DataFrame&lt;Double,String&gt; normDist = normal(&quot;NDIST&quot;, -bound, bound, (int)binCount, mean, stdDev, scale);
+
+Chart.create().withHistPlot(returns, (int)binCount, chart -&gt; {
+    chart.title().withText(ticker + &quot;: Daily Return Frequency Distribution&quot;);
+    chart.subtitle().withText(ticker + &quot; Returns over past 20 years&quot;);
+    chart.plot().&lt;String&gt;data().add(normDist);
+    chart.plot().style(&quot;NDIST&quot;).withColor(Color.BLACK).withLineWidth(2f);
+    chart.plot().render(1).withLines(false, false);
+    chart.plot().axes().domain().label().withText(&quot;Return&quot;);
+    chart.plot().axes().domain().format().withPattern(&quot;0.00'%';-0.00'%'&quot;);
+    chart.plot().axes().range(0).label().withText(&quot;Frequency&quot;);
+    chart.show();
+});
+</code></pre>
+
+<p>A couple of features regarding the fit standout immediately, namely that the actual distribution has a <strong>higher central peak</strong> and
+the <strong>shoulders are a bit narrower</strong>. The standard deviation of SPY daily returns over the past 20 years comes out to be 1.239%, and
+the plot suggests that the fit is a reasonable approximation between +/-3%, or say a little less than <strong>+/-2.5 standard deviations 
+(2.5 sigma)</strong>. The fitted distribution predicts that a -2.5 sigma event, or a one day drop in the S&amp;P 500 of approximately -3.1% has 
+a probability of 0.5733%, which on the assumption of <strong>252 trading days a year</strong> is likely to happen once in 175 days or about 1.44 
+times per year. This is not inconsistent with the actual frequency distribution as shown in the second plot below, which is zoomed 
+into the left side of the distribution inorder to magnify this part of the plot.</p>
+<p align="center">
+    <img class="chart" src="../../images/yahoo/return_dist_1.png"/>
+</p>
+
+<p align="center">
+    <img class="chart" src="../../images/yahoo/return_dist_2.png"/>
+</p>
+
+<p>Where the normal distribution is a wholly <strong>inadequate model</strong> is in the space beyond +/- 2.5 sigma. As mentioned earlier, many funds 
+experienced -6 sigma events or greater during the global financial crisis, day after day. The S&amp;P 500 fitted distribution presented
+above suggests that such an extreme event is likely to occur with a probability of 8.2934E-8% implying it <strong>should only happen once
+in 4,784,799 years!</strong>  The plot below zooms into the left tail of the distribution demonstrating that extreme events occur far more
+frequently than a normal distribution would suggest.</p>
+<p align="center">
+    <img class="chart" src="../../images/yahoo/return_dist_3.png"/>
+</p>
+
+<p>In the above example we leverage a function called <code>normal()</code> to generate a scaled normal distribution that we can superimpose on 
+the plot to get a sense of how well the return histogram fits such a model. The code below simply generates a normal curve given 
+the mean, standard deviation of the daily returns, with an appropriate scale factor to fit the histogram.</p>
+<p>$$ f(x | \mu, \sigma^2) = \frac{1}{\sqrt{2 \pi \sigma^2}} e^{-\frac{(x - \mu)^2}{2 \sigma^2}} $$</p>
+<?prettify?>
+
+<pre><code class="java">/**
+ * Returns a single column DataFrame containing values generated from a normal distribution probability density function
+ * @param label     the column key for the PDF series
+ * @param lower     the lower bound for PDF
+ * @param upper     the upper bound for PDF
+ * @param count     the number of values to include
+ * @param mean      the mean for the distribution
+ * @param sigma     the standard deviation for the distribution
+ * @return          the DataFrame of Normal PDF values
+ */
+@SuppressWarnings(&quot;unchecked&quot;)
+&lt;C&gt; DataFrame&lt;Double,C&gt; normal(C label, double lower, double upper, int count, double mean, double sigma, double scale) {
+    final double stepSize = (upper - lower) / (double)count;
+    final Range&lt;Double&gt; xValues = Range.of(lower, upper, stepSize);
+    return DataFrame.of(xValues, (Class&lt;C&gt;)label.getClass(), columns -&gt; {
+        columns.add(label, xValues.map(x -&gt; {
+            final double part1 = 1d / (sigma * Math.sqrt(2d * Math.PI));
+            final double part2 = Math.exp(-Math.pow(x - mean, 2d) / (2d * Math.pow(sigma, 2d)));
+            return part1 * part2;
+        }));
+    }).applyDoubles(v -&gt; {
+        return v.getDouble() * scale;
+    });
+}
+</code></pre>
+
+<h4 id="return-distribution-smoothed">Return Distribution (Smoothed)</h4>
+<p>Consider the same setup as in the prior example, but in this case we look at the frequency distribution of daily returns after they 
+have been <strong>exponentially smoothed</strong> with a 20 day half-life. De-noising the returns does not yield a better fit, and the positive 
+skew in the distribution becomes more apparent. In addition, while there is a positive skew, it is also clear that smoothing the
+returns highlights far <strong>more negative extreme events</strong> than positive events.</p>
+<p align="center">
+    <img class="chart" src="../../images/yahoo/return_dist_4.png"/>
+</p>
+
+<?prettify?>
+
+<pre><code class="java">String ticker = &quot;SPY&quot;;
+int halfLife = 20;
+YahooReturnSource source = DataFrameSource.lookup(YahooReturnSource.class);
+DataFrame&lt;LocalDate,String&gt; returns = source.read(options -&gt; {
+    options.withStartDate(LocalDate.now().minusYears(10));
+    options.withEndDate(LocalDate.now());
+    options.withTickers(ticker);
+    options.withEmaHalfLife(halfLife);
+}).applyDoubles(v -&gt; {
+    return v.getDouble() * 100d;
+});
+
+double binCount = 200;
+double min = returns.stats().min();
+double max = returns.stats().max();
+double mean = returns.stats().mean();
+double stdDev = returns.stats().stdDev();
+double bound = Math.max(Math.abs(min), Math.abs(max));
+double scale = ((max - min) / binCount) * returns.stats().count();
+DataFrame&lt;Double,String&gt; normDist = normal(&quot;NDIST&quot;, -bound, bound, (int)binCount, mean, stdDev, scale);
+
+Chart.create().withHistPlot(returns, (int)binCount, chart -&gt; {
+    chart.title().withText(String.format(&quot;%s: Smoothed Daily Return Distribution (HL: %s)&quot;, ticker, halfLife));
+    chart.plot().&lt;String&gt;data().add(normDist);
+    chart.plot().style(&quot;NDIST&quot;).withColor(Color.BLACK).withLineWidth(2f);
+    chart.plot().render(1).withLines(false, false);
+    chart.plot().axes().domain().label().withText(&quot;Return&quot;);
+    chart.plot().axes().domain().format().withPattern(&quot;0.00'%';-0.00'%'&quot;);
+    chart.plot().axes().range(0).label().withText(&quot;Frequency&quot;);
+    chart.show();
+});
+</code></pre>
+
+<h3 id="latest-quotes">Latest Quotes</h3>
+<p>Accessing a snapshot of the most recent data for one or more securities can be done via a single call using the <code>YahooQuoteLiveSource</code>
+as shown below. In this example, we request the most recent data for several tickers, and we are presented with a <code>DataFrame</code> 
+containing all available fields as columns. When accessing this data outside of market hours, fields such as the bid/ask price 
+and size will often show NaN values. The resulting <code>DataFrame</code> is keyed by the security ticker along the row axis and <code>YahooField</code> 
+along the column axis allowing fast access to elements of the frame. </p>
+<?prettify?>
+
+<pre><code class="java">YahooQuoteLiveSource source = DataFrameSource.lookup(YahooQuoteLiveSource.class);
+DataFrame&lt;String, YahooField&gt; quotes = source.read(options -&gt; {
+    options.withTickers(&quot;AAPL&quot;, &quot;BLK&quot;, &quot;NFLX&quot;, &quot;ORCL&quot;, &quot;GS&quot;, &quot;C&quot;, &quot;GOOGL&quot;, &quot;MSFT&quot;, &quot;AMZN&quot;);
+});
+</code></pre>
+
+<pre class="frame">
+ Index  |  TICKER  |               NAME                |   PX_BID   |  PX_BID_SIZE  |   PX_ASK   |  PX_ASK_SIZE  |    PX_VOLUME    |  PX_CHANGE  |  PX_CHANGE_PERCENT  |  PX_LAST_DATE  |  PX_LAST_TIME  |  PX_LAST   |  PX_LAST_SIZE  |   PX_LOW   |  PX_HIGH   |  PX_PREVIOUS_CLOSE  |  PX_OPEN   |  EXCHANGE  |  AVG_DAILY_VOLUME  |  TRADE_DATE  |  DIVIDEND_PER_SHARE  |    EPS    |  EPS_ESTIMATE  |  EPS_NEXT_YEAR  |  EPS_NEXT_QUARTER  |   FLOAT_SHARES    |  FIFTY_TWO_WEEK_LOW  |  ANNUALISED_GAIN  |     MARKET_CAP      |       EBITDA       |  PRICE_SALES_RATIO  |  PRICE_BOOK_RATIO  |  EX_DIVIDEND_DATE  |  PRICE_EARNINGS_RATIO  |  DIVIDEND_PAY_DATE  |  PEG_RATIO  |  PRICE_EPS_RATIO_CURRENT_YEAR  |  PRICE_EPS_RATIO_NEXT_YEAR  |  SHORT_RATIO  |
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  AAPL  |    AAPL  |                       Apple Inc.  |  160.9400  |    1500.0000  |  161.0000  |     800.0000  |  71714046.0000  |    -0.6400  |            -0.0040  |    2017-09-12  |      16:00:00  |  160.8600  |      100.0000  |  158.7700  |  163.9600  |           161.5000  |  162.6100  |       NMS  |     26754500.0000  |        null  |              2.5200  |   8.8100  |        9.0200  |        10.8900  |            3.8400  |  5031913000.0000  |            104.0800  |              NaN  |  830880000000.0000  |  70210000000.0000  |             3.7300  |            6.3000  |        2017-08-10  |               18.2600  |         2017-08-17  |     1.5900  |                       17.8300  |                    14.7700  |       1.9000  |
+   BLK  |     BLK  |                  BlackRock, Inc.  |       NaN  |          NaN  |       NaN  |          NaN  |    333885.0000  |     4.5300  |             0.0107  |    2017-09-12  |      16:02:00  |  428.5700  |    38358.0000  |  424.6900  |  428.7000  |           424.0400  |  426.1400  |       NYQ  |       513127.0000  |        null  |             10.0000  |  20.8300  |       21.8200  |        24.9100  |            5.8200  |   123755000.0000  |            336.8400  |              NaN  |   69520000000.0000  |   5060000000.0000  |             5.9700  |            2.3300  |        2017-08-31  |               20.5700  |         2017-09-22  |     1.3700  |                       19.6400  |                    17.2000  |       3.1800  |
+  NFLX  |    NFLX  |                    Netflix, Inc.  |  185.0600  |     500.0000  |  185.6700  |     200.0000  |   6689568.0000  |     3.4100  |             0.0188  |    2017-09-12  |      16:00:00  |  185.1500  |   199365.0000  |  180.6400  |  185.3300  |           181.7400  |  182.5500  |       NMS  |      7144270.0000  |        null  |                 NaN  |   0.8200  |        1.1900  |         2.0200  |            0.3100  |   424846000.0000  |             93.2600  |              NaN  |   79940000000.0000  |    706920000.0000  |             7.7000  |           25.2100  |              null  |              225.2400  |               null  |     1.9700  |                      155.5900  |                    91.6600  |       3.0700  |
+  ORCL  |    ORCL  |               Oracle Corporation  |       NaN  |          NaN  |       NaN  |          NaN  |  13352387.0000  |     0.2800  |             0.0053  |    2017-09-12  |      16:01:00  |   52.7700  |   839129.0000  |   52.4700  |   52.8900  |            52.4900  |   52.6400  |       NYQ  |     13043800.0000  |        null  |              0.7600  |   2.2100  |        2.9500  |         3.1900  |            0.6900  |  3009105000.0000  |             37.6200  |              NaN  |  218290000000.0000  |  14670000000.0000  |             5.7600  |            4.0300  |        2017-07-17  |               23.8800  |         2017-08-02  |     1.9400  |                       17.8900  |                    16.5400  |       1.8400  |
+    GS  |      GS  |  Goldman Sachs Group, Inc. (The)  |       NaN  |          NaN  |       NaN  |          NaN  |   3745841.0000  |     4.8900  |             0.0221  |    2017-09-12  |      16:00:00  |  225.9500  |   160193.0000  |  222.0200  |  227.6900  |           221.0600  |  222.5400  |       NYQ  |      3043750.0000  |        null  |              3.0000  |  19.0700  |       18.2300  |        19.9700  |            5.0400  |   350537000.0000  |            157.7700  |              NaN  |   87720000000.0000  |            0.0000  |             2.6600  |            1.1400  |        2017-08-29  |               11.8500  |         2017-09-28  |     1.0600  |                       12.3900  |                    11.3100  |       1.2700  |
+     C  |       C  |                  Citigroup, Inc.  |       NaN  |          NaN  |       NaN  |          NaN  |  15495439.0000  |     1.0800  |             0.0160  |    2017-09-12  |      16:00:00  |   68.7900  |  1090112.0000  |   68.1000  |   69.2500  |            67.7100  |   68.2200  |       NYQ  |     16707800.0000  |        null  |              0.8000  |   4.9900  |        5.2200  |         5.9600  |            1.2900  |  2721749000.0000  |             45.1600  |              NaN  |  187420000000.0000  |            0.0000  |             2.8700  |            0.8800  |        2017-08-03  |               13.7700  |         2017-08-25  |     1.2700  |                       13.1800  |                    11.5400  |       0.0200  |
+ GOOGL  |   GOOGL  |                    Alphabet Inc.  |  946.0100  |     100.0000  |  947.2300  |     100.0000  |   1284787.0000  |     3.3600  |             0.0036  |    2017-09-12  |      16:00:00  |  946.6500  |   113174.0000  |  937.5000  |  948.0900  |           943.2900  |  946.9200  |       NMS  |      1773140.0000  |        null  |                 NaN  |  27.5900  |       30.5900  |        39.9900  |            9.6000  |   600581000.0000  |            743.5900  |              NaN  |  655910000000.0000  |  32250000000.0000  |             6.5800  |            4.4100  |              null  |               34.3100  |               null  |     1.6200  |                       30.9500  |                    23.6700  |       1.4500  |
+  MSFT  |    MSFT  |            Microsoft Corporation  |   74.6800  |     500.0000  |   74.9300  |     100.0000  |  14394850.0000  |    -0.0800  |            -0.0011  |    2017-09-12  |      16:00:00  |   74.6800  |  1682458.0000  |   74.3700  |   75.2400  |            74.7600  |   74.7600  |       NMS  |     22427700.0000  |        null  |              1.5600  |   2.7100  |        3.1700  |         3.5600  |            0.8300  |  7595028000.0000  |             55.9800  |              NaN  |  575200000000.0000  |  30430000000.0000  |             6.4000  |            7.9600  |        2017-08-15  |               27.5600  |         2017-09-14  |     2.3500  |                       23.5600  |                    20.9800  |       1.9500  |
+  AMZN  |    AMZN  |                 Amazon.com, Inc.  |  982.8700  |     100.0000  |  985.0000  |     200.0000  |   2481066.0000  |     4.6200  |             0.0047  |    2017-09-12  |      16:00:00  |  982.5800  |    99104.0000  |  975.5200  |  984.6700  |           977.9600  |  983.2700  |       NMS  |      3773170.0000  |        null  |                 NaN  |   3.9300  |        3.9900  |         8.1800  |            1.7700  |   400088000.0000  |            710.1000  |              NaN  |  472010000000.0000  |  12300000000.0000  |             3.1300  |           20.2200  |              null  |              249.8900  |               null  |     6.3700  |                      246.2600  |                   120.1200  |       1.2100  |
+</pre>
+
+<p>Data from this frame can be accessed in a <strong>type safe</strong> manner as follows:</p>
+<?prettify?>
+
+<pre><code class="java">String name = quotes.data().getValue(&quot;AAPL&quot;, YahooField.NAME);
+double closePrice = quotes.data().getDouble(&quot;AAPL&quot;, YahooField.PX_LAST);
+LocalDate date = quotes.data().getValue(&quot;AAPL&quot;, YahooField.PX_LAST_DATE);
+</code></pre>
+
+<p>Usually not all these fields are desired so specific fields can be requested as follows:</p>
+<?prettify?>
+
+<pre><code class="java">YahooQuoteLiveSource source = DataFrameSource.lookup(YahooQuoteLiveSource.class);
+DataFrame&lt;String, YahooField&gt; quotes = source.read(options -&gt; {
+    options.withTickers(&quot;AAPL&quot;, &quot;BLK&quot;, &quot;NFLX&quot;, &quot;ORCL&quot;, &quot;GS&quot;, &quot;C&quot;, &quot;GOOGL&quot;, &quot;MSFT&quot;, &quot;AMZN&quot;);
+    options.withFields(
+        YahooField.PX_LAST,
+        YahooField.PX_BID,
+        YahooField.PX_ASK,
+        YahooField.PX_VOLUME,
+        YahooField.PX_CHANGE,
+        YahooField.PX_LAST_DATE,
+        YahooField.PX_LAST_TIME
+    );
+});
+</code></pre>
+
+<pre class="frame">
+ Index  |  PX_LAST   |   PX_BID   |   PX_ASK   |    PX_VOLUME    |  PX_CHANGE  |  PX_LAST_DATE  |  PX_LAST_TIME  |
+------------------------------------------------------------------------------------------------------------------
+  AAPL  |  160.8600  |  160.9400  |  161.0000  |  71714046.0000  |    -0.6400  |    2017-09-12  |      16:00:00  |
+   BLK  |  428.5700  |       NaN  |       NaN  |    333885.0000  |     4.5300  |    2017-09-12  |      16:02:00  |
+  NFLX  |  185.1500  |  185.0600  |  185.6700  |   6689568.0000  |     3.4100  |    2017-09-12  |      16:00:00  |
+  ORCL  |   52.7700  |       NaN  |       NaN  |  13352387.0000  |     0.2800  |    2017-09-12  |      16:01:00  |
+    GS  |  225.9500  |       NaN  |       NaN  |   3745841.0000  |     4.8900  |    2017-09-12  |      16:00:00  |
+     C  |   68.7900  |       NaN  |       NaN  |  15495439.0000  |     1.0800  |    2017-09-12  |      16:00:00  |
+ GOOGL  |  946.6500  |  946.0100  |  947.2300  |   1284787.0000  |     3.3600  |    2017-09-12  |      16:00:00  |
+  MSFT  |   74.6800  |   74.6800  |   74.9300  |  14394850.0000  |    -0.0800  |    2017-09-12  |      16:00:00  |
+  AMZN  |  982.5800  |  982.8700  |  985.0000  |   2481066.0000  |     4.6200  |    2017-09-12  |      16:00:00  |
+</pre>
+
+<h3 id="option-quotes">Option Quotes</h3>
+<p>Market data for listed <a href="https://en.wikipedia.org/wiki/Option_(finance)">Options</a> on equities and ETFs is also accessible from 
+Yahoo Finance (for example, listed options on Apple can be accessed <a href="https://finance.yahoo.com/quote/AAPL/options?p=AAPL">here</a>). 
+It is not clear that Yahoo provides a CSV API for this data, so the Morpheus Adapter screen scrapes the relevant information from 
+the HTML page, which obviously makes it somewhat sensitive to changes in the page style.</p>
+<p>The code below demonstrates how to query for the <strong>expiry dates</strong> on options given the underlying security symbol. It then
+selects the next upcoming expiry date, and queries for all options, including <strong>calls and puts</strong> for this expiry.</p>
+<?prettify?>
+
+<pre><code class="java">String ticker = &quot;SPY&quot;;
+YahooFinance yahoo = new YahooFinance();
+Set&lt;LocalDate&gt; expiryDates = yahoo.getOptionExpiryDates(ticker);
+LocalDate nextExpiry = expiryDates.iterator().next();
+DataFrame&lt;String,YahooField&gt; optionQuotes = yahoo.getOptionQuotes(ticker, nextExpiry);
+</code></pre>
+
+<p><strong>Calls and puts</strong> can easily be separated by filtering the Morpheus <code>DataFrame</code> in the usual fashion as shown below.</p>
+<?prettify?>
+
+<pre><code class="java">//Select rows representing CALL options
+DataFrame&lt;String,YahooField&gt; calls = optionQuotes.rows().select(row -&gt; {
+    final String type = row.getValue(YahooField.OPTION_TYPE);
+    return type.equalsIgnoreCase(&quot;Call&quot;);
+});
+</code></pre>
+
+<pre class="frame">
+       Index         |  TICKER  |  OPTION_TYPE  |  EXPIRY_DATE  |  PX_STRIKE  |  PX_LAST   |  PX_CHANGE  |  PX_CHANGE_PERCENT  |   PX_BID   |   PX_ASK   |  PX_VOLUME   |  OPEN_INTEREST  |  IMPLIED_VOLATILITY  |
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ SPY170915C00050000  |     SPY  |         CALL  |   2017-09-15  |    50.0000  |  187.5000  |     0.0000  |                NaN  |  186.0900  |  189.2100  |      1.0000  |         0.0000  |              0.0000  |
+ SPY170915C00055000  |     SPY  |         CALL  |   2017-09-15  |    55.0000  |  195.0100  |     3.0300  |             0.0158  |  193.1200  |  197.1800  |     56.0000  |       686.0000  |             10.7500  |
+ SPY170915C00060000  |     SPY  |         CALL  |   2017-09-15  |    60.0000  |  190.0900  |     3.1200  |             0.0167  |  188.1200  |  192.1300  |     38.0000  |       617.0000  |              9.7188  |
+ SPY170915C00065000  |     SPY  |         CALL  |   2017-09-15  |    65.0000  |  185.1500  |     5.5800  |             0.0311  |  183.1200  |  187.2600  |     52.0000  |       390.0000  |             10.0625  |
+ SPY170915C00070000  |     SPY  |         CALL  |   2017-09-15  |    70.0000  |  180.1100  |     2.2700  |             0.0128  |  178.0000  |  182.2000  |     67.0000  |       142.0000  |              8.0625  |
+ SPY170915C00075000  |     SPY  |         CALL  |   2017-09-15  |    75.0000  |  175.0800  |     6.3200  |             0.0374  |  173.0000  |  177.0300  |     18.0000  |       138.0000  |             13.9258  |
+ SPY170915C00080000  |     SPY  |         CALL  |   2017-09-15  |    80.0000  |  170.0800  |     6.1700  |             0.0376  |  168.0000  |  172.2500  |     25.0000  |        59.0000  |              7.8125  |
+ SPY170915C00085000  |     SPY  |         CALL  |   2017-09-15  |    85.0000  |  165.1500  |     6.0600  |             0.0381  |  163.0000  |  167.0900  |     13.0000  |       182.0000  |             12.6523  |
+ SPY170915C00090000  |     SPY  |         CALL  |   2017-09-15  |    90.0000  |  160.0800  |     8.3800  |             0.0552  |  158.0000  |  162.2200  |      8.0000  |       180.0000  |              6.7500  |
+ SPY170915C00095000  |     SPY  |         CALL  |   2017-09-15  |    95.0000  |  155.0800  |     6.1700  |             0.0414  |  153.0000  |  157.2000  |      4.0000  |        55.0000  |              6.1875  |
+</pre>
+
+<?prettify?>
+
+<pre><code class="java">//Select rows representing PUT options
+DataFrame&lt;String,YahooField&gt; puts = optionQuotes.rows().select(row -&gt; {
+    final String type = row.getValue(YahooField.OPTION_TYPE);
+    return type.equalsIgnoreCase(&quot;Put&quot;);
+});
+</code></pre>
+
+<pre class="frame">
+       Index         |  TICKER  |  OPTION_TYPE  |  EXPIRY_DATE  |  PX_STRIKE  |  PX_LAST  |  PX_CHANGE  |  PX_CHANGE_PERCENT  |  PX_BID  |  PX_ASK  |  PX_VOLUME   |  OPEN_INTEREST  |  IMPLIED_VOLATILITY  |
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ SPY170915P00055000  |     SPY  |          PUT  |   2017-09-15  |    55.0000  |   0.0200  |     0.0000  |                NaN  |  0.0000  |  0.0100  |     10.0000  |      2250.0000  |              8.5000  |
+ SPY170915P00060000  |     SPY  |          PUT  |   2017-09-15  |    60.0000  |   0.0200  |     0.0000  |                NaN  |  0.0000  |  0.0100  |     50.0000  |      1912.0000  |              8.0000  |
+ SPY170915P00065000  |     SPY  |          PUT  |   2017-09-15  |    65.0000  |   0.0100  |     0.0000  |                NaN  |  0.0000  |  0.0100  |     10.0000  |      4117.0000  |              7.7500  |
+ SPY170915P00070000  |     SPY  |          PUT  |   2017-09-15  |    70.0000  |   0.0100  |     0.0000  |                NaN  |  0.0000  |  0.0100  |      5.0000  |      8582.0000  |              7.2500  |
+ SPY170915P00075000  |     SPY  |          PUT  |   2017-09-15  |    75.0000  |   0.0100  |     0.0000  |                NaN  |  0.0000  |  0.0100  |      1.0000  |      5598.0000  |              6.8750  |
+ SPY170915P00080000  |     SPY  |          PUT  |   2017-09-15  |    80.0000  |   0.0100  |     0.0000  |                NaN  |  0.0000  |  0.0100  |    150.0000  |      3061.0000  |              6.5000  |
+ SPY170915P00085000  |     SPY  |          PUT  |   2017-09-15  |    85.0000  |   0.0100  |     0.0000  |                NaN  |  0.0000  |  0.0100  |     14.0000  |      5525.0000  |              6.1250  |
+ SPY170915P00090000  |     SPY  |          PUT  |   2017-09-15  |    90.0000  |   0.0100  |     0.0000  |                NaN  |  0.0000  |  0.0100  |      2.0000  |      5638.0000  |              5.8750  |
+ SPY170915P00095000  |     SPY  |          PUT  |   2017-09-15  |    95.0000  |   0.0100  |     0.0000  |                NaN  |  0.0000  |  0.0100  |     50.0000  |     22290.0000  |              5.5000  |
+ SPY170915P00100000  |     SPY  |          PUT  |   2017-09-15  |   100.0000  |   0.0100  |     0.0000  |                NaN  |  0.0000  |  0.0100  |     99.0000  |     19382.0000  |              5.2500  |
+</pre>
+
+<h4 id="volatility-smile">Volatility Smile</h4>
+<p>One of the most influential inputs to the famous <a href="https://en.wikipedia.org/wiki/Black%E2%80%93Scholes_model">Black-Scholes-Merton</a> 
+option pricing model concerns the future volatility of the returns on the underlying asset. In fact, volatility is so fundamental to 
+option pricing that certain types of option contracts are quoted in volatility units rather than price. Black-Scholes assumes that 
+the volatility of the underlying returns are constant over the term in question, and it also assumes that other characteristics of 
+the option such as the moneyness (how far in or out-of-the-money the option might be), do not influence estimates of future volatility.</p>
+<p>In reality, this does not appear to be the case based on observed market prices. A commonly used visualization in option trading is 
+called the <strong>Option Volatility Smile</strong>, which plots <strong>implied volatilities</strong> of options with different <strong>strike prices</strong> for the same 
+expiry date. According to Black-Scholes, these curves should be flat, but in reality they form more of a curve in the shape of a 
+person smiling. That is, implied volatilities for <strong>at-the-money</strong> options tend to be lower than for deep <strong>in-the-money</strong> or deep 
+<strong>out-the-money</strong> options.</p>
+<p>The plot below illustrates the volatility smiles for options on the S&amp;P 500 ETF with ticker symbol SPY which has been generated
+using the Morpheus Yahoo Finance adapter. While various <strong>outliers</strong> appear to exist, the smile pattern is pretty clear. These outliers 
+are likely to be explained by low volume at the strike prices in question, so the calculated implied volatilities are stale at those
+points. The other possibility is a mis-pricing of some options at these strikes, but that is fairly unlikely as such differences would 
+be quickly arbitraged away. The code to generate this plot is also shown below.</p>
+<p align="center">
+    <img class="chart" src="../../images/yahoo/option_call_smile.png"/>
+</p>
+
+<?prettify?>
+
+<pre><code class="java">String ticker = &quot;SPY&quot;;
+//Instantiate Yahoo convenience adapter
+YahooFinance yahoo = new YahooFinance();
+//Select last price for underlying
+double lastPrice = yahoo.getLiveQuotes(Array.of(ticker)).data().getDouble(0, YahooField.PX_LAST);
+//Select call options with strike price within 10% of current market price and non zero vol
+DataFrame&lt;String,YahooField&gt; options = yahoo.getOptionQuotes(ticker).rows().select(row -&gt; {
+    final String type = row.getValue(YahooField.OPTION_TYPE);
+    if (!type.equalsIgnoreCase(&quot;CALL&quot;)) {
+        return false;
+    } else {
+        final double strike = row.getDouble(YahooField.PX_STRIKE);
+        final double impliedVol = row.getDouble(YahooField.IMPLIED_VOLATILITY);
+        return impliedVol &gt; 0 &amp;&amp; strike &gt; lastPrice * 0.9d &amp;&amp; strike &lt; lastPrice * 1.1d;
+    }
+});
+
+//Select all distinct expiry dates for quotes
+Array&lt;LocalDate&gt; expiryDates = options.colAt(YahooField.EXPIRY_DATE).distinct();
+//Creates frames for each expiry including only strike price and implied-vol columns
+Array&lt;DataFrame&lt;Integer,String&gt;&gt; frames = expiryDates.map(v -&gt; {
+    final LocalDate expiry = v.getValue();
+    final DataFrame&lt;String,YahooField&gt; calls = options.rows().select(row -&gt; {
+        final LocalDate date = row.getValue(YahooField.EXPIRY_DATE);
+        return expiry.equals(date);
+    });
+    return DataFrame.of(Range.of(0, calls.rowCount()), String.class, columns -&gt; {
+        columns.add(&quot;Strike&quot;, calls.colAt(YahooField.PX_STRIKE).toArray());
+        columns.add(expiry.toString(), calls.colAt(YahooField.IMPLIED_VOLATILITY).toArray().applyDoubles(x -&gt; {
+            return x.getDouble() * 100d;
+        }));
+    });
+});
+
+//Create plot of N frames each for a different expiry
+Chart.create().asSwing().withLinePlot(frames.getValue(0), &quot;Strike&quot;, chart -&gt; {
+    for (int i=1; i&lt;frames.length(); ++i) {
+        DataFrame&lt;Integer,String&gt; data = frames.getValue(i);
+        chart.plot().&lt;String&gt;data().add(data, &quot;Strike&quot;);
+        chart.plot().render(i).withLines(true, false);
+    }
+    chart.plot().render(0).withLines(true, false);
+    chart.plot().axes().domain().label().withText(&quot;Strike Price&quot;);
+    chart.plot().axes().range(0).label().withText(&quot;Implied Volatility&quot;);
+    chart.plot().axes().range(0).format().withPattern(&quot;0.00'%';-0.00'%'&quot;);
+    chart.title().withText(&quot;SPY Call Option Implied Volatility Smiles&quot;);
+    chart.legend().on().right();
+    chart.show();
+});
+</code></pre>
+
+<p>We can use a slightly modified version of this code to run the analysis for all <strong>PUT options</strong>, the results of 
+which are plotted below. The same smile pattern is evident, as are the existence of outliers, which is most likely due 
+to the lack of transactions at the strikes in question. Another take-away from these plots is that deep <strong>in-the-money</strong>
+options are more expensive from an implied volatility perspective than deep <strong>out-the-money</strong> options as the smile
+does not appear to be symmetric in nature.</p>
+<p align="center">
+    <img class="chart" src="../../images/yahoo/option_put_smile.png"/>
+</p>
+
+<h3 id="key-statistics">Key Statistics</h3>
+<p>Various <strong>financial, trading</strong> and <strong>valuation statistics</strong> are made available by Yahoo Finance on the <a href="https://finance.yahoo.com/quote/AAPL/key-statistics?p=AAPL">Statistics</a>
+page for each applicable security. The Morpheus adapter provides a programmatic mechanism to extract this data into
+a <code>DataFrame</code> which allows for easy cross sectional comparisons between companies. Only current values are available
+via this interface, historical values are not supported. The code below demonstrates how to extract these statistics
+for various companies, and then transposes and prints the <code>DataFrame</code> to standard out.</p>
+<?prettify?>
+
+<pre><code class="java">YahooFinance yahoo = new YahooFinance();
+Array&lt;String&gt; tickers = Array.of(&quot;AAPL&quot;, &quot;ORCL&quot;, &quot;BLK&quot;, &quot;GS&quot;, &quot;NFLX&quot;, &quot;AMZN&quot;, &quot;FB&quot;);
+DataFrame&lt;String,YahooField&gt; stats = yahoo.getStatistics(tickers);
+stats.transpose().out().print(200, formats -&gt; {
+    final SmartFormat smartFormat = new SmartFormat();
+    formats.setPrinter(Object.class, Printer.forObject(smartFormat::format));
+});
+</code></pre>
+
+<pre class="frame">
+           Index            |     BLK      |     NFLX     |     AAPL     |     ORCL     |      GS      |      FB      |     AMZN     |
+--------------------------------------------------------------------------------------------------------------------------------------
+                MARKET_CAP  |    69.4700B  |    78.7300B  |   825.8200B  |   201.6200B  |    87.4300B  |   498.4800B  |   474.0300B  |
+               PE_TRAILING  |     20.5800  |    221.8400  |     18.1500  |     22.0500  |     11.8100  |     38.4200  |    250.9600  |
+                PE_FORWARD  |      1.4000  |      1.9800  |      1.4500  |      1.9800  |      1.0900  |      1.2100  |      6.6200  |
+         PRICE_SALES_RATIO  |      6.0300  |      7.7300  |      3.6900  |      5.3400  |      2.7100  |     15.0300  |      3.1600  |
+          PRICE_BOOK_RATIO  |      2.3500  |     25.2900  |      6.2400  |      3.7400  |      1.1600  |      7.4900  |     20.4000  |
+           FISCAL_YEAR_END  |  2016-12-31  |  2016-12-31  |  2016-09-24  |  2017-05-31  |  2016-12-31  |  2016-12-31  |  2016-12-31  |
+       MOST_RECENT_QUARTER  |  2017-06-30  |  2017-06-30  |  2017-07-01  |  2017-05-31  |  2017-06-30  |  2017-06-30  |  2017-06-30  |
+             PROFIT_MARGIN  |      0.2992  |      0.0355  |      0.2087  |      0.2474  |      0.2644  |      0.3966  |      0.0128  |
+          OPERATING_MARGIN  |      0.4205  |      0.0633  |      0.2684  |      0.3519  |      0.3618  |      0.4666  |      0.0231  |
+          RETURN_ON_ASSETS  |      0.0138  |      0.0287  |      0.1152  |      0.0671  |      0.0095  |      0.1493  |      0.0283  |
+          RETURN_ON_EQUITY  |      0.1174  |      0.1310  |      0.3603  |      0.1830  |      0.0980  |      0.2251  |      0.0967  |
+               REVENUE_TTM  |    11.5200B  |    10.1900B  |   223.5100B  |    37.7300B  |    32.2500B  |    33.1700B  |   150.1200B  |
+         REVENUE_PER_SHARE  |     70.5300  |     23.6900  |     42.4000  |      9.1700  |     77.9100  |     11.5000  |    314.7300  |
+       REVENUE_GROWTH_QTLY  |      0.0570  |      0.3230  |      0.0720  |      0.0280  |     -0.0060  |      0.4480  |      0.2480  |
+              GROSS_PROFIT  |    10.9500B  |     2.8000B  |    84.2600B  |    30.2600B  |    30.6100B  |    23.8500B  |    47.7200B  |
+                EBITDA_TTM  |     5.0600B  |   706.9200M  |    70.2100B  |    14.6700B  |         NaN  |    18.0800B  |    12.3000B  |
+               EPS_DILUTED  |     20.8300  |      0.8200  |      8.8100  |      2.2100  |     19.0700  |      4.4700  |      3.9300  |
+      EARNINGS_GRWOTH_QTLY  |      0.0860  |      0.6100  |      0.1180  |      0.1490  |      0.0050  |      0.7060  |     -0.7700  |
+                      BETA  |      1.6800  |      0.6300  |      1.4300  |      1.1400  |      1.4400  |      0.5400  |      1.3800  |
+                  CASH_MRQ  |     6.2500B  |     2.1600B  |    77.0100B  |    66.0800B  |   732.4800B  |    35.4500B  |    21.4500B  |
+            CASH_PER_SHARE  |     38.5300  |      5.0100  |     14.9100  |     15.9700  |     1.8868K  |     12.2100  |     44.6500  |
+                  DEBT_MRQ  |     4.9700B  |     4.8400B  |   108.6000B  |    57.9100B  |   404.4600B  |         NaN  |    23.6200B  |
+      DEBT_OVER_EQUITY_MRQ  |     16.6300  |    155.3900  |     82.0100  |    106.7500  |    463.8500  |         NaN  |    101.7500  |
+             CURRENT_RATIO  |      1.2300  |      1.3100  |      1.3900  |      3.0800  |      1.8000  |     12.3100  |      1.0100  |
+      BOOK_VALUE_PER_SHARE  |    182.2100  |      7.2100  |     25.6100  |     13.0200  |    194.4100  |     22.9200  |     48.3600  |
+       OPERATING_CASH_FLOW  |     3.3900B  |    -1.9000B  |    64.0700B  |    14.1300B  |   -15.8300B  |    19.3800B  |    17.0600B  |
+    LEVERED_FREE_CASH_FLOW  |     3.4500B  |     5.8300B  |    40.6200B  |     9.6300B  |         NaN  |    10.2200B  |    11.1500B  |
+                ADV_3MONTH  |   505.7900K  |     6.9300M  |    26.7900M  |    13.1800M  |     3.0200M  |    16.4700M  |     3.6400M  |
+                 ADV_10DAY  |   435.9500K  |     5.6800M  |    34.1000M  |    14.5700M  |     3.3800M  |    13.0400M  |     2.7500M  |
+        SHARES_OUTSTANDING  |   160.9800M  |   431.7500M  |     5.1700B  |     4.1400B  |   388.2100M  |     2.3700B  |   480.3800M  |
+              SHARES_FLOAT  |   123.7600M  |   424.8500M  |     5.0300B  |     3.0100B  |   350.5400M  |     2.3400B  |   400.0900M  |
+     OWNER_PERCENT_INSIDER  |      0.0361  |      0.0182  |      0.0008  |      0.2725  |      0.0179  |      0.0175  |      0.1677  |
+ OWNER_PERCENT_INSTITUTION  |      0.8775  |      0.8284  |      0.6247  |      0.5984  |      0.7931  |      0.7244  |      0.6234  |
+              SHARES_SHORT  |     2.0600M  |    27.8500M  |    40.3100M  |    31.8300M  |     4.5400M  |    20.2500M  |     4.7200M  |
+        SHARES_SHORT_RATIO  |      3.1800  |      3.0700  |      1.9000  |      1.8400  |      1.2700  |      0.9700  |      1.2100  |
+        SHARES_SHORT_PRIOR  |     2.3100M  |    25.7400M  |    39.1500M  |    35.7800M  |     4.3500M  |    21.8400M  |     5.0600M  |
+              DIVIDEND_FWD  |     10.0000  |         NaN  |      2.5200  |      0.7600  |      3.0000  |         NaN  |         NaN  |
+        DIVIDEND_FWD_YIELD  |      0.0235  |         NaN  |      0.0158  |      0.0144  |      0.0139  |         NaN  |         NaN  |
+         DIVIDEND_TRAILING  |      9.5800  |         NaN  |      2.3400  |      0.6400  |      2.7000  |         NaN  |         NaN  |
+   DIVIDEND_TRAILING_YIELD  |      0.0225  |         NaN  |      0.0148  |      0.0121  |      0.0119  |         NaN  |         NaN  |
+     DIVIDEND_PAYOUT_RATIO  |      0.4599  |         NaN  |      0.2650  |      0.2896  |      0.1421  |         NaN  |         NaN  |
+         DIVIDEND_PAY_DATE  |  2017-09-22  |        null  |  2017-08-17  |  2017-08-02  |  2017-09-28  |        null  |        null  |
+          DIVIDEND_EX_DATE  |  2017-08-31  |        null  |  2017-08-10  |  2017-07-17  |  2017-05-30  |        null  |        null  |
+           LAST_SPLIT_DATE  |  2007-06-05  |  2015-07-15  |  2014-06-09  |  2000-10-13  |        null  |        null  |  1999-09-02  |
+</pre>
+
+<p>The code below demonstrates how to generate a plot of a small subset of the profitability and return metrics for a number
+of prominent financial services and technology firms.</p>
+<?prettify?>
+
+<pre><code class="java">YahooFinance yahoo = new YahooFinance();
+Array&lt;String&gt; tickers = Array.of(&quot;BLK&quot;, &quot;GS&quot;, &quot;MS&quot;, &quot;JPM&quot;, &quot;C&quot;, &quot;BAC&quot;, &quot;AAPL&quot;, &quot;NVDA&quot;, &quot;GOOGL&quot;);
+DataFrame&lt;String,YahooField&gt; data = yahoo.getStatistics(tickers);
+DataFrame&lt;String,YahooField&gt; stats = data.cols().select(
+    YahooField.PROFIT_MARGIN,
+    YahooField.OPERATING_MARGIN,
+    YahooField.RETURN_ON_ASSETS,
+    YahooField.RETURN_ON_EQUITY
+).applyDoubles(v -&gt; {
+    return v.getDouble() * 100d;
+});
+
+Chart.create().withBarPlot(stats.transpose(), false, chart -&gt; {
+    chart.title().withText(&quot;Profitability &amp; Return Metrics&quot;);
+    chart.plot().axes().domain().label().withText(&quot;Statistic&quot;);
+    chart.plot().axes().range(0).label().withText(&quot;Value&quot;);
+    chart.plot().axes().range(0).format().withPattern(&quot;0.00'%';-0.00'%'&quot;);
+    chart.legend().right().on();
+    chart.show();
+});
+</code></pre>
+
+<p align="center">
+    <img class="chart" src="../../images/yahoo/asset_stats.png"/>
+</p>
+
+<h3 id="portfolio-analysis">Portfolio Analysis</h3>
+<p>There are several examples of how to use the Yahoo Finance adapter to analyze and construct portfolios of risky assets
+in the section on <a href="../../../examples/mpt/">Modern Portfolio Theory</a>.</p></div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright (C) 2014-2017 Xavier Witdouck</p>
+            <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>var base_url = '../..';</script>
+        <script data-main="../../mkdocs/js/search.js" src="../../mkdocs/js/require.js"></script>
+        <script src="../../js/base.js"></script>
+        <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.5.0/highlight.min.js"></script>
+        <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+        <script src="http://www.zavtech.com/morpheus/docs/javascript/analytics.js"></script><div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">Search</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form role="form">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
