@@ -11,13 +11,13 @@
     <modules>
         <module>morpheus-core/pom.xml</module>
         <module>morpheus-viz/pom.xml</module>
-        <!--module>morpheus-json/pom.xml</module-->
-        <!--module>morpheus-excel/pom.xml</module-->
-        <!--module>morpheus-db/pom.xml</module-->
+        <module>morpheus-excel/pom.xml</module>
         <module>morpheus-docs/pom.xml</module>
         <module>morpheus-quandl/pom.xml</module>
         <module>morpheus-jblas/pom.xml</module>
         <module>morpheus-worldbank/pom.xml</module>
+        <!--module>morpheus-json/pom.xml</module>
+        <module>morpheus-db/pom.xml</module-->
     </modules>
 
     <name>morpheus</name>
@@ -27,9 +27,9 @@
 
     <developers>
         <developer>
-            <id>zavmail@gmail.com</id>
+            <id>zav@d3xsystems.com</id>
             <name>Xavier Witdouck</name>
-            <email>zavmail@gmail.com</email>
+            <email>zav@d3xsystems.com</email>
             <timezone>Europe/London</timezone>
         </developer>
     </developers>
@@ -40,7 +40,7 @@
     </organization>
 
     <scm>
-        <url>https://github.com/zavtech/morpheus-core.git</url>
+        <url>https://github.com/d3xsystems/morpheus.git</url>
     </scm>
 
     <distributionManagement>
@@ -64,6 +64,25 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
+
+    <dependencies>
+
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>6.13.1</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.16.22</version>
+            <scope>provided</scope>
+        </dependency>
+
+    </dependencies>
 
 
     <profiles>
@@ -101,12 +120,12 @@
                             <nohelp>true</nohelp>
                             <author>true</author>
                             <bottom>
-                                <![CDATA[Copyright 2014-2017, <a href="http://www.zavtech.com">Xavier Witdouck<a>]]></bottom>
+                                <![CDATA[Copyright 2014-2018, <a href="https://www.d3xsystems.com">D3X Systems<a>]]></bottom>
                             <additionalparam>-Xdoclint:none</additionalparam>
                             <excludePackageNames>
-                                com.zavtech.morpheus.reference,
-                                com.zavtech.morpheus.reference.regress,
-                                com.zavtech.morpheus.reference.algebra
+                                com.d3x.morpheus.reference,
+                                com.d3x.morpheus.reference.regress,
+                                com.d3x.morpheus.reference.algebra
                             </excludePackageNames>
                         </configuration>
                         <executions>
@@ -151,17 +170,6 @@
         </profile>
     </profiles>
 
-
-    <dependencies>
-
-        <dependency>
-            <groupId>org.testng</groupId>
-            <artifactId>testng</artifactId>
-            <version>6.13.1</version>
-            <scope>test</scope>
-        </dependency>
-
-    </dependencies>
 
     <build>
         <pluginManagement>
