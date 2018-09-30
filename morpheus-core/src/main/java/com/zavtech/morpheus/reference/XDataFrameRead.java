@@ -34,14 +34,13 @@ import com.zavtech.morpheus.source.*;
  */
 class XDataFrameRead implements DataFrameRead {
 
-    /**
+    /*
      * Static initializer
      */
     static {
         DataFrameSource.register(new CsvSource<>());
         DataFrameSource.register(new JsonSource<>());
         DataFrameSource.register(new DbSource<>());
-        DataFrameSource.register(new ExcelSource<>());
     }
 
     /**
@@ -75,24 +74,6 @@ class XDataFrameRead implements DataFrameRead {
     @SuppressWarnings("unchecked")
     public <R> DataFrame<R,String> csv(Consumer<CsvSourceOptions<R>> configurator) {
         return DataFrameSource.lookup(CsvSource.class).read(configurator);
-    }
-
-    @Override
-    public <R> DataFrame<R, String> excel(InputStream is) {
-        return excel(options -> options.setInputStream(is));
-    }
-
-    @Override
-    public <R> DataFrame<R,String> excel(URL url) { return excel(options -> options.setURL(url)); }
-
-
-    @Override
-    public <R> DataFrame<R,String> excel(String resource) { return excel(options -> options.setResource(resource)); }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public <R> DataFrame<R,String> excel(Consumer<ExcelSourceOptions<R>> configurator) {
-        return DataFrameSource.lookup(ExcelSource.class).read(configurator);
     }
 
     @Override

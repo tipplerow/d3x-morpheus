@@ -598,6 +598,16 @@ public interface Array<T> extends Iterable<T>, Serializable, Cloneable {
     }
 
     /**
+     * Returns an empty array reference
+     * @return      an empty array
+     */
+    @SuppressWarnings("unchecked")
+    static <V> Array<V> empty() {
+        return (Array<V>)Array.of(Object.class, 0, 1F).readOnly();
+    }
+
+
+    /**
      * Returns a newly created memory mapped array of the type specified
      * A temporary file will be created for this array which will be deleted on JVM exit
      * @param type          the element type for array

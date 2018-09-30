@@ -227,6 +227,14 @@ public class ArrayBuilder<T> {
     }
 
     /**
+     * Returns the current size for this builder
+     * @return      the current size for builder
+     */
+    public int size() {
+        return index;
+    }
+
+    /**
      * Returns true if the data typeCode is a match for the current array typeCode
      * @param dataType  the data typeCode class
      * @return          true if match

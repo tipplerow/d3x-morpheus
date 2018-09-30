@@ -400,6 +400,20 @@ public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperation
     }
 
     /**
+     * Returns a source of the type specified
+     * @param type  the source type to initialize
+     * @param <T>   the source data type
+     * @return      the source instance
+     */
+    static <T extends DataFrameSource> T source(Class<T> type) {
+        try {
+            return type.getDeclaredConstructor().newInstance();
+        } catch (Exception ex) {
+            throw new DataFrameException("Failed to initialize DataFrame source for type: " + type, ex);
+        }
+    }
+
+    /**
      * Returns an empty DataFrame with zero length rows and columns
      * @param <R>           the row key type
      * @param <C>           the column key type
