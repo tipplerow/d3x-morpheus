@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2014-2017 Xavier Witdouck
+/*
+ * Copyright (C) 2014-2018 D3X Systems - All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,10 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.zavtech.morpheus.quandl;
+package com.d3x.morpheus.quandl;
 
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import com.zavtech.morpheus.frame.DataFrame;
+import com.zavtech.morpheus.index.Index;
 
 /**
  * @author Xavier Witdouck
@@ -25,28 +31,27 @@ import java.util.Map;
  */
 public enum QuandlField {
 
-    NAME,
-    DESCRIPTION,
-    DATABASE_CODE,
-    DATASET_CODE,
-    DATASET_COUNT,
-    DOWNLOADS,
-    PREMIUM,
-    IMAGE_URL,
-    LAST_REFRESH_TIME,
-    START_DATE,
-    END_DATE,
-    DATASET_TYPE,
-    FREQUENCY,
-    DATABASE_ID,
-    DATASET_ID,
-    COLUMN_NAMES,
-    FAVOURITE,
-    URL_NAME;
+    NAME(String.class),
+    DESCRIPTION(String.class),
+    DATABASE_CODE(String.class),
+    DATASET_CODE(String.class),
+    DATASET_COUNT(String.class),
+    DOWNLOADS(int.class),
+    PREMIUM(boolean.class),
+    IMAGE_URL(String.class),
+    LAST_REFRESH_TIME(ZonedDateTime.class),
+    START_DATE(LocalDate.class),
+    END_DATE(LocalDate.class),
+    DATASET_TYPE(String.class),
+    FREQUENCY(String.class),
+    DATABASE_ID(int.class),
+    COLUMN_NAMES(List.class),
+    FAVOURITE(boolean.class),
+    URL_NAME(String.class);
 
     public static final Map<String,QuandlField> fieldMap = new HashMap<>();
 
-    /**
+    /*
      * Static initializer
      */
     static {
@@ -65,6 +70,56 @@ public enum QuandlField {
         fieldMap.put("favorite", QuandlField.FAVOURITE);
         fieldMap.put("url_name", QuandlField.URL_NAME);
     }
+
+
+    private Class<?> type;
+
+    /**
+     * Constructor
+     * @param type  the data type for this field
+     */
+    QuandlField(Class<?> type) {
+        this.type = type;
+    }
+
+
+    /**
+     * Returns the data type for this field
+     * @return  the data type for field
+     */
+    public Class<?> getType() {
+        return type;
+    }
+
+
+    /**
+     * Returns a newly created empty DataFrame for dataset meta-data
+     * @param rowType       the row type for frame
+     * @param initialSize   the initial row capacity for frame
+     * @return              the newly created frame
+     */
+    static <T> DataFrame<T,QuandlField> frame(Class<T> rowType, int initialSize, QuandlField... fields) {
+        return DataFrame.of(Index.of(rowType, initialSize), QuandlField.class, columns -> {
+            for (QuandlField field : fields) {
+                columns.add(field, field.getType());
+            }
+        });
+    }
+
+    /**
+     * Returns a newly created empty DataFrame for dataset meta-data
+     * @param rowType       the row type for frame
+     * @param initialSize   the initial row capacity for frame
+     * @return              the newly created frame
+     */
+    static <T> DataFrame<T,QuandlField> frame(Class<T> rowType, int initialSize, List<QuandlField> fields) {
+        return DataFrame.of(Index.of(rowType, initialSize), QuandlField.class, columns -> {
+            for (QuandlField field : fields) {
+                columns.add(field, field.getType());
+            }
+        });
+    }
+
 
     /**
      * Returns the QuandlField representation for the name specified
