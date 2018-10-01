@@ -1,13 +1,13 @@
 <div>
     <p align="right">
-        <a href="https://www.d3xsystems.com/morpheus">
+        <a href="https://www.d3xsystems.com">
             <img src="https://www.d3xsystems.com/images/common/d3x.svg" height="40px"/>
         </a>
     </p>
 </div>
 <div>
     <p align="left">
-        <a href="https://www.d3xsystems.com">
+        <a href="https://www.d3xsystems.com/morpheus">
             <img src="https://www.d3xsystems.com/images/common/morpheus-logo.svg" height="50px"/>
         </a>
     </p>
