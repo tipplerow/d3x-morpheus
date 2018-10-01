@@ -19,7 +19,6 @@ import java.util.function.Consumer;
 
 import com.zavtech.morpheus.sink.CsvSinkOptions;
 import com.zavtech.morpheus.sink.DbSinkOptions;
-import com.zavtech.morpheus.sink.JsonSinkOptions;
 
 /**
  * An interface that can be used to write a DataFrame to an output device for storage or network transfer.
@@ -41,12 +40,6 @@ public interface DataFrameWrite<R,C> {
      * @param configurator  the configurator to apply CSV options
      */
     void csv(Consumer<CsvSinkOptions<R>> configurator);
-
-    /**
-     * Writes the DataFrame associated with this function to JSON output
-     * @param configurator  the configurator to apply JSON options
-     */
-    void json(Consumer<JsonSinkOptions> configurator);
 
     /**
      * Writes the DataFrame associated with this function to an output device

@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2014-2017 Xavier Witdouck
+/*
+ * Copyright (C) 2014-2018 D3X Systems - All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,76 +13,101 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.zavtech.morpheus.source;
+package com.d3x.morpheus.json;
 
 import java.io.BufferedInputStream;
-import java.io.IOException;
+import java.io.Closeable;
+import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
-
 import com.zavtech.morpheus.array.Array;
 import com.zavtech.morpheus.array.ArrayBuilder;
 import com.zavtech.morpheus.array.ArrayType;
 import com.zavtech.morpheus.frame.DataFrame;
 import com.zavtech.morpheus.frame.DataFrameException;
-import com.zavtech.morpheus.frame.DataFrameSource;
 import com.zavtech.morpheus.util.Asserts;
+import com.zavtech.morpheus.util.IO;
+import com.zavtech.morpheus.util.Resource;
 import com.zavtech.morpheus.util.text.Formats;
 import com.zavtech.morpheus.util.text.parser.Parser;
 
 /**
- * A DataFrameSource implementation that services JsonRequests.
- *
- * @param <R>   the row key type
- * @param <C>   the column key type
+ * A source used to load a DataFrame from JSON content
  *
  * <p><strong>This is open source software released under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 License</a></strong></p>
  *
  * @author  Xavier Witdouck
  */
-public class JsonSource <R,C> extends DataFrameSource<R,C,JsonSourceOptions<R,C>> {
+public class JsonSource {
 
-    private Formats formats;
-    private JsonReader reader;
-    private List<Array<?>> dataList;
-    private ArrayBuilder<R> rowKeyBuilder;
-    private ArrayBuilder<C> colKeyBuilder;
-    private JsonSourceOptions<R,C> options;
 
     /**
-     * Constructor
+     * Returns a DataFrame loaded from JSON in the resource specified
+     * @param file  the resource to load from
+     * @return      the loaded DataFrame
+     * @throws DataFrameException   if frame fails to load from json
      */
-    public JsonSource() {
-        super();
+    public <R,C> DataFrame<R,C> read(File file) throws DataFrameException {
+        return read(o -> o.setFile(file));
     }
 
 
-    @Override
-    public DataFrame<R,C> read(Consumer<JsonSourceOptions<R, C>> configurator) throws DataFrameException {
-        return new JsonSource<R,C>().apply(configurator);
+    /**
+     * Returns a DataFrame loaded from JSON in the resource specified
+     * @param url  the resource to load from
+     * @return      the loaded DataFrame
+     * @throws DataFrameException   if frame fails to load from json
+     */
+    public <R,C> DataFrame<R,C> read(URL url) throws DataFrameException {
+        return read(o -> o.setURL(url));
     }
 
     /**
-     * Private read method given this source is currently written with state
+     * Returns a DataFrame loaded from JSON in the resource specified
+     * @param is  the resource to load from
+     * @return      the loaded DataFrame
+     * @throws DataFrameException   if frame fails to load from json
+     */
+    public <R,C> DataFrame<R,C> read(InputStream is) throws DataFrameException {
+        return read(o -> o.setInputStream(is));
+    }
+
+    /**
+     * Returns a DataFrame loaded from JSON in the resource specified
+     * @param resource  the resource to load from
+     * @return      the loaded DataFrame
+     * @throws DataFrameException   if frame fails to load from json
+     */
+    public <R,C> DataFrame<R,C> read(String resource) throws DataFrameException {
+        return read(o -> o.setResource(Resource.of(resource)));
+    }
+
+
+    /**
+     * Returns a DataFrame loaded from JSON as specified by the options
      * @param configurator      the options configurator
      * @return                  the loaded DataFrame
      * @throws DataFrameException   if frame fails to load from json
      */
-    private DataFrame<R,C> apply(Consumer<JsonSourceOptions<R,C>> configurator) throws DataFrameException {
-        this.options = initOptions(new JsonSourceOptions<>(), configurator);
-        try (InputStream is = options.getResource().toInputStream()) {
-            this.formats = options.getFormats();
-            this.reader = createReader(is);
-            this.reader.beginObject();
+    public <R,C> DataFrame<R,C> read(Consumer<Options<R,C>> configurator) throws DataFrameException {
+        final Options<R,C> options = new Options<>();
+        configurator.accept(options);
+        try {
+            final JsonReader reader = options.getReader();
+            reader.beginObject();
             if (reader.hasNext()) {
                 final String rootName = reader.nextName();
                 if (!rootName.equalsIgnoreCase("DataFrame")) {
@@ -98,63 +123,55 @@ public class JsonSource <R,C> extends DataFrameSource<R,C,JsonSourceOptions<R,C>
                         } else if (name.equalsIgnoreCase("colCount")) {
                             colCount = reader.nextInt();
                         } else if (name.equalsIgnoreCase("rowKeys")) {
-                            readRowKeys(rowCount);
+                            readRowKeys(options, rowCount);
                         } else if (name.equalsIgnoreCase("columns")) {
-                            readColumns(rowCount, colCount);
+                            readColumns(options, rowCount, colCount);
                         }
                     }
                 }
             }
             reader.endObject();
-            return createFrame();
+            return createFrame(options);
         } catch (DataFrameException ex) {
             throw ex;
         } catch (Exception ex) {
             throw new DataFrameException("Failed to load DataFrame for request: " + options, ex);
+        } finally {
+            IO.close(options);
         }
     }
 
     /**
      * Returns a newly created DataFrame from the contents that has been read from JSON
+     * @param options   the json options
      * @return      the newly created DataFrame
      */
-    private DataFrame<R,C> createFrame() {
-        final Array<R> rowKeys = rowKeyBuilder.toArray();
-        final Array<C> colKeys = colKeyBuilder.toArray();
+    private <R,C> DataFrame<R,C> createFrame(Options<R,C> options) {
+        final Array<R> rowKeys = options.rowKeyBuilder.toArray();
+        final Array<C> colKeys = options.colKeyBuilder.toArray();
         final Class<C> colType = colKeys.type();
         return DataFrame.of(rowKeys, colType, columns -> {
             for (int i=0; i<colKeys.length(); ++i) {
                 final C colKey = colKeys.getValue(i);
-                final Array<?> array = dataList.get(i);
+                final Array<?> array = options.dataList.get(i);
                 columns.add(colKey, array);
             }
         });
     }
 
-    /**
-     * Returns a newly created JsonReader
-     * @param is        the input stream
-     * @return          the JsonReader
-     * @throws IOException  if there is an I/O exception
-     */
-    private JsonReader createReader(InputStream is) throws IOException {
-        final String encoding = options.getCharset().name();
-        if (is instanceof BufferedInputStream) {
-            return new JsonReader(new InputStreamReader(is, encoding));
-        } else {
-            return new JsonReader(new InputStreamReader(new BufferedInputStream(is), encoding));
-        }
-    }
 
     /**
      * Reads row keys from the stream
+     * @param options   the json options
      * @param rowCount  the row count for frame
      */
     @SuppressWarnings("unchecked")
-    private void readRowKeys(int rowCount) {
+    private <R,C> void readRowKeys(Options<R,C> options, int rowCount) {
         try {
+            final Formats formats = options.formats;
+            final JsonReader reader = options.reader;
             reader.beginObject();
-            rowKeyBuilder = ArrayBuilder.of(rowCount);
+            options.rowKeyBuilder = ArrayBuilder.of(rowCount);
             Parser<R> parser = formats.getParserOrFail(Object.class);
             final Map<String,Class<?>> typeMap = getTypeMap(formats);
             while (reader.hasNext()) {
@@ -169,7 +186,7 @@ public class JsonSource <R,C> extends DataFrameSource<R,C,JsonSourceOptions<R,C>
                     while (reader.hasNext()) {
                         final String value = reader.nextString();
                         final R key = parser.apply(value);
-                        rowKeyBuilder.add(key);
+                        options.rowKeyBuilder.add(key);
                     }
                     reader.endArray();
                 }
@@ -188,11 +205,13 @@ public class JsonSource <R,C> extends DataFrameSource<R,C,JsonSourceOptions<R,C>
      * @param colCount      the column count
      */
     @SuppressWarnings("unchecked")
-    private void readColumns(int rowCount, int colCount) {
+    private <R,C> void readColumns(Options<R,C> options, int rowCount, int colCount) {
         try {
-            this.reader.beginArray();
-            this.dataList = new ArrayList<>(colCount);
-            this.colKeyBuilder = ArrayBuilder.of(colCount);
+            options.reader.beginArray();
+            options.dataList = new ArrayList<>(colCount);
+            options.colKeyBuilder = ArrayBuilder.of(colCount);
+            final JsonReader reader = options.reader;
+            final Formats formats = options.formats;
             final Map<String,Class<?>> typeMap = getTypeMap(formats);
             while (reader.hasNext()) {
                 reader.beginObject();
@@ -211,7 +230,7 @@ public class JsonSource <R,C> extends DataFrameSource<R,C,JsonSourceOptions<R,C>
                         keyTypeName = reader.nextString();
                         final Class<?> keyType = typeMap.get(keyTypeName);
                         final C colKey = (C)formats.getParserOrFail(keyType).apply(key);
-                        this.colKeyBuilder.add(colKey);
+                        options.colKeyBuilder.add(colKey);
                     } else if (name.equalsIgnoreCase("dataType")) {
                         final String dataTypeName = reader.nextString();
                         dataClass = typeMap.get(dataTypeName);
@@ -275,8 +294,8 @@ public class JsonSource <R,C> extends DataFrameSource<R,C,JsonSourceOptions<R,C>
                             }
                         }
                         final Array<?> array = dataBuilder.toArray();
-                        this.dataList.add(array);
-                        this.reader.endArray();
+                        options.dataList.add(array);
+                        options.reader.endArray();
                     }
                 }
                 reader.endObject();
@@ -306,5 +325,84 @@ public class JsonSource <R,C> extends DataFrameSource<R,C,JsonSourceOptions<R,C>
         });
         return typeMap;
     }
+
+
+    /**
+     * The options for this source
+     * @param <R>   the row key type
+     * @param <C>   the column key type
+     */
+    public static class Options<R,C> implements Closeable {
+
+        private JsonReader reader;
+        private List<Array<?>> dataList;
+        private ArrayBuilder<R> rowKeyBuilder;
+        private ArrayBuilder<C> colKeyBuilder;
+        /** The resource to load frame from */
+        @lombok.Setter @lombok.Getter private Resource resource;
+        /** The formats used to parse JSON values */
+        @lombok.Setter @lombok.Getter private Formats formats;
+        /** The character encoding for content */
+        @lombok.Setter @lombok.Getter private Charset charset;
+        /** The optional row predicate to filter rows */
+        @lombok.Setter @lombok.Getter private Predicate<R> rowPredicate;
+        /** The optional column predicate to filter columns */
+        @lombok.Setter @lombok.Getter private Predicate<C> colPredicate;
+
+        /**
+         * Constructor
+         */
+        public Options() {
+            this.formats = new Formats();
+            this.charset = StandardCharsets.UTF_8;
+        }
+
+        /**
+         * Sets the input file for these options
+         * @param file  the input file
+         */
+        public void setFile(File file) {
+            this.resource = Resource.of(file);
+        }
+
+        /**
+         * Sets the input URL for these options
+         * @param url   the input url
+         */
+        public void setURL(URL url) {
+            this.resource = Resource.of(url);
+        }
+
+        /**
+         * Applies to resource to load CSV content from
+         * @param inputStream   the input stream to load from
+         */
+        public void setInputStream(InputStream inputStream) {
+            this.resource = Resource.of(inputStream);
+        }
+
+        /**
+         * Returns the reader for these options
+         * @return  the reader for options
+         */
+        private synchronized JsonReader getReader() {
+            if (reader != null) {
+                return reader;
+            } else if (resource == null) {
+                throw new DataFrameException("No resource specified to load JSON");
+            } else {
+                final InputStream is = resource.toInputStream();
+                final BufferedInputStream bis = new BufferedInputStream(is);
+                this.reader = new JsonReader(new InputStreamReader(bis, charset));
+                return reader;
+            }
+        }
+
+        @Override
+        public void close() {
+            IO.close(reader);
+        }
+    }
+
 
 }

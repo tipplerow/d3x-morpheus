@@ -39,7 +39,6 @@ class XDataFrameRead implements DataFrameRead {
      */
     static {
         DataFrameSource.register(new CsvSource<>());
-        DataFrameSource.register(new JsonSource<>());
         DataFrameSource.register(new DbSource<>());
     }
 
@@ -74,32 +73,6 @@ class XDataFrameRead implements DataFrameRead {
     @SuppressWarnings("unchecked")
     public <R> DataFrame<R,String> csv(Consumer<CsvSourceOptions<R>> configurator) {
         return DataFrameSource.lookup(CsvSource.class).read(configurator);
-    }
-
-    @Override
-    public <R, C> DataFrame<R, C> json(File file) {
-        return json(options -> options.setFile(file));
-    }
-
-    @Override
-    public <R, C> DataFrame<R, C> json(URL url) {
-        return json(options -> options.setURL(url));
-    }
-
-    @Override
-    public <R, C> DataFrame<R, C> json(InputStream is) {
-        return json(options -> options.setInputStream(is));
-    }
-
-    @Override
-    public <R,C> DataFrame<R,C> json(String resource) {
-        return json(options -> options.setResource(resource));
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public <R,C> DataFrame<R,C> json(Consumer<JsonSourceOptions<R,C>> configurator) {
-        return DataFrameSource.lookup(JsonSource.class).read(configurator);
     }
 
     @Override

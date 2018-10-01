@@ -22,7 +22,6 @@ import java.util.function.Consumer;
 
 import com.zavtech.morpheus.source.CsvSourceOptions;
 import com.zavtech.morpheus.source.DbSourceOptions;
-import com.zavtech.morpheus.source.JsonSourceOptions;
 
 /**
  * An interface used to read a DataFrame stored in various formats from some underlying storage devices.
@@ -72,51 +71,6 @@ public interface DataFrameRead {
      * @return              the resulting DataFrame
      */
     <R> DataFrame<R,String> csv(Consumer<CsvSourceOptions<R>> configurator);
-
-    /**
-     * Reads a DataFrame from a JSON file
-     * @param file      the input file
-     * @param <R>       the row key type
-     * @param <C>       the column key type
-     * @return          the resulting DataFrame
-     */
-    <R,C> DataFrame<R,C> json(File file);
-
-    /**
-     * Reads a DataFrame from a JSON file
-     * @param url       the input url
-     * @param <R>       the row key type
-     * @param <C>       the column key type
-     * @return          the resulting DataFrame
-     */
-    <R,C> DataFrame<R,C> json(URL url);
-
-    /**
-     * Reads a DataFrame from a JSON file
-     * @param is        the input stream to read from
-     * @param <R>       the row key type
-     * @param <C>       the column key type
-     * @return          the resulting DataFrame
-     */
-    <R,C> DataFrame<R,C> json(InputStream is);
-
-    /**
-     * Reads a DataFrame from a JSON resource
-     * @param resource      a file name or URL
-     * @param <R>           the row key type
-     * @param <C>           the column key type
-     * @return              the resulting DataFrame
-     */
-    <R,C> DataFrame<R,C> json(String resource);
-
-    /**
-     * Reads a DataFrame from a JSON resource based on the options configurator
-     * @param configurator  the configurator for JSON options
-     * @param <R>           the row key type
-     * @param <C>           the column key type
-     * @return              the resulting DataFrame
-     */
-    <R,C> DataFrame<R,C> json(Consumer<JsonSourceOptions<R,C>> configurator);
 
     /**
      * Reads a DataFrame from a database based on the options configurator
