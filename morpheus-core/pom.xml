@@ -23,18 +23,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.eclipse.collections</groupId>
-            <artifactId>eclipse-collections-api</artifactId>
-            <version>9.1.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.eclipse.collections</groupId>
-            <artifactId>eclipse-collections</artifactId>
-            <version>9.1.0</version>
-        </dependency>
-
-        <dependency>
             <groupId>net.sf.trove4j</groupId>
             <artifactId>trove4j</artifactId>
             <version>3.0.3</version>
@@ -43,8 +31,7 @@
         <dependency>
             <groupId>com.univocity</groupId>
             <artifactId>univocity-parsers</artifactId>
-            <version>2.5.9</version>
-            <type>jar</type>
+            <version>2.7.6</version>
         </dependency>
 
     </dependencies>
