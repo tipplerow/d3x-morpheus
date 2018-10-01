@@ -18,7 +18,6 @@ package com.zavtech.morpheus.frame;
 import java.util.function.Consumer;
 
 import com.zavtech.morpheus.sink.CsvSinkOptions;
-import com.zavtech.morpheus.sink.DbSinkOptions;
 
 /**
  * An interface that can be used to write a DataFrame to an output device for storage or network transfer.
@@ -28,12 +27,6 @@ import com.zavtech.morpheus.sink.DbSinkOptions;
  * @author  Xavier Witdouck
  */
 public interface DataFrameWrite<R,C> {
-
-    /**
-     * Writes the DataFrame associated with this function to a SQL database
-     * @param configurator  the configurator to apply DB options
-     */
-    void db(Consumer<DbSinkOptions<R,C>> configurator);
 
     /**
      * Writes the DataFrame associated with this function to CSV output

@@ -23,6 +23,12 @@
         </dependency>
 
         <dependency>
+            <groupId>com.d3xsystems</groupId>
+            <artifactId>morpheus-json</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
             <version>6.8.7</version>

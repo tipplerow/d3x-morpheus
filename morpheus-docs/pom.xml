@@ -25,6 +25,12 @@
 
     <dependency>
       <groupId>com.d3xsystems</groupId>
+      <artifactId>morpheus-db</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.d3xsystems</groupId>
       <artifactId>morpheus-worldbank</artifactId>
       <version>${project.version}</version>
     </dependency>

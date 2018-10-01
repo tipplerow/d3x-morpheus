@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2014-2017 Xavier Witdouck
+/*
+ * Copyright (C) 2014-2018 D3X Systems - All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.zavtech.morpheus.sink;
+package com.d3x.morpheus.db;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -38,7 +38,6 @@ import com.zavtech.morpheus.frame.DataFrame;
 import com.zavtech.morpheus.frame.DataFrameCursor;
 import com.zavtech.morpheus.frame.DataFrameException;
 import com.zavtech.morpheus.frame.DataFrameRow;
-import com.zavtech.morpheus.frame.DataFrameSink;
 import com.zavtech.morpheus.frame.DataFrameValue;
 import com.zavtech.morpheus.util.Collect;
 import com.zavtech.morpheus.util.Initialiser;
@@ -53,11 +52,11 @@ import com.zavtech.morpheus.util.sql.SQLType;
  *
  * @author  Xavier Witdouck
  */
-public class DbSink<R,C> implements DataFrameSink<R,C,DbSinkOptions<R,C>> {
+public class DbSink {
 
     private static final Map<Class<?>,SQLType> sqlTypeMap = new HashMap<>();
 
-    /**
+    /*
      * Static initializer
      */
     static {
@@ -85,8 +84,8 @@ public class DbSink<R,C> implements DataFrameSink<R,C,DbSinkOptions<R,C>> {
     }
 
 
-    @Override()
-    public void write(DataFrame<R,C> frame, Consumer<DbSinkOptions<R,C>> configurator) {
+
+    public <R,C> void write(DataFrame<R,C> frame, Consumer<DbSinkOptions<R,C>> configurator) {
         Objects.requireNonNull(frame, "DataFrame cannot be null");
         Objects.requireNonNull(configurator, "The options consumer cannot be null");
         final DbSinkOptions<R,C> options = Initialiser.apply(new DbSinkOptions<>(), configurator);
@@ -110,7 +109,7 @@ public class DbSink<R,C> implements DataFrameSink<R,C,DbSinkOptions<R,C>> {
      * @param options   the sink options
      * @throws DataFrameException   if this operation fails
      */
-    private void createTable(DataFrame<R,C> frame, DbSinkOptions<R,C> options) {
+    private <R,C> void createTable(DataFrame<R,C> frame, DbSinkOptions<R,C> options) {
         final Connection conn = options.getConnection();
         final String tableName = options.getTableName();
         try (Statement stmt = conn.createStatement()) {
@@ -135,7 +134,7 @@ public class DbSink<R,C> implements DataFrameSink<R,C,DbSinkOptions<R,C>> {
      * @param options   the sink options
      * @throws DataFrameException   if this operation fails
      */
-    private void insertData(DataFrame<R,C> frame, DbSinkOptions<R,C> options) {
+    private <R,C> void insertData(DataFrame<R,C> frame, DbSinkOptions<R,C> options) {
         final List<ColumnAdapter> columnList = getColumnAdapters(frame, options);
         final String insertSql = getInsertSql(columnList, options);
         System.out.println("Insert SQL: " + insertSql);
@@ -171,7 +170,7 @@ public class DbSink<R,C> implements DataFrameSink<R,C,DbSinkOptions<R,C>> {
      * @param options       the DB sink options
      * @return              the sql insert statement
      */
-    private String getInsertSql(List<ColumnAdapter> columnList, DbSinkOptions<R,C> options) {
+    private <R,C> String getInsertSql(List<ColumnAdapter> columnList, DbSinkOptions<R,C> options) {
         final String tableName = options.getTableName();
         final List<String> colNames = columnList.stream().map(c -> "\"" + c.colName + "\"").collect(Collectors.toList());
         final List<String> params = IntStream.range(0, colNames.size()).mapToObj(i -> "?").collect(Collectors.toList());
@@ -187,7 +186,7 @@ public class DbSink<R,C> implements DataFrameSink<R,C,DbSinkOptions<R,C>> {
      * @return          the apply of column type info
      */
     @SuppressWarnings("unchecked")
-    private List<ColumnAdapter> getColumnAdapters(DataFrame<R,C> frame, DbSinkOptions<R,C> options) {
+    private <R,C> List<ColumnAdapter> getColumnAdapters(DataFrame<R,C> frame, DbSinkOptions<R,C> options) {
         final Connection conn = options.getConnection();
         final String tableName = options.getTableName();
         final SQLPlatform platform = options.getPlatform().orElseThrow(() -> new IllegalStateException("No SQL platform specified in options"));
@@ -225,7 +224,7 @@ public class DbSink<R,C> implements DataFrameSink<R,C,DbSinkOptions<R,C>> {
      * @param options   the sink options
      * @return          the create table statement
      */
-    private String getCreateTableSql(DataFrame<R,C> frame, DbSinkOptions<R,C> options) {
+    private <R,C> String getCreateTableSql(DataFrame<R,C> frame, DbSinkOptions<R,C> options) {
         final SQLPlatform platform = options.getPlatform().orElseThrow(() -> new IllegalStateException("No SQL platform configured on options"));
         final StringBuilder ddl = new StringBuilder();
         ddl.append("CREATE TABLE ");
@@ -317,7 +316,7 @@ public class DbSink<R,C> implements DataFrameSink<R,C,DbSinkOptions<R,C>> {
     /**
      * A convenience base class for building an adapter that maps DataFrame content to a SQL column of a well defined type
      */
-    private abstract class ColumnAdapter {
+    private abstract class ColumnAdapter<R,C> {
 
         String colName;
         SQLType colType;
@@ -350,7 +349,7 @@ public class DbSink<R,C> implements DataFrameSink<R,C,DbSinkOptions<R,C>> {
     /**
      * A ColumnAdapter implementation that applies a row key from a DataFrameRow to the INSERT PreparedStatement
      */
-    private class RowKeyAdapter extends ColumnAdapter {
+    private class RowKeyAdapter<R,C> extends ColumnAdapter<R,C> {
 
         private SQLType rowKeyType;
         private Class<?> rowKeyClass;
@@ -372,7 +371,7 @@ public class DbSink<R,C> implements DataFrameSink<R,C,DbSinkOptions<R,C>> {
         }
 
         @Override
-        void apply(PreparedStatement stmt, int stmtIndex, DataFrameRow<R, C> row) {
+        void apply(PreparedStatement stmt, int stmtIndex, DataFrameRow<R,C> row) {
             final R rowKey = row.key();
             try {
                 switch (rowKeyType) {
@@ -401,7 +400,7 @@ public class DbSink<R,C> implements DataFrameSink<R,C,DbSinkOptions<R,C>> {
     /**
      * A ColumnAdapter implementation that applies a value extracted from a DataFrameRow to the INSERT PreparedStatement
      */
-    private class ValueAdapter extends ColumnAdapter {
+    private class ValueAdapter<R,C> extends ColumnAdapter<R,C> {
 
         private DataFrameCursor<R,C> cursor;
         private Function1<DataFrameValue<R,C>,?> mapper;

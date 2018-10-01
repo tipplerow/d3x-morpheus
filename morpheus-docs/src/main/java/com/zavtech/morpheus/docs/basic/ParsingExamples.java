@@ -81,6 +81,7 @@ public class ParsingExamples {
             options.setColNamePredicate(Predicates.in("Date", "Weight", "Price"));
         });
 
+        /*
 
         //Parse a file, or classpath resource from Morpheus JSON format
         DataFrame<LocalDate,String> frame7 = DataFrame.read().json("/temp/data.json");
@@ -93,6 +94,7 @@ public class ParsingExamples {
             options.setRowPredicate(rowKey -> rowKey.getDayOfWeek() == DayOfWeek.MONDAY);
             options.setColPredicate(columns::contains);
         });
+        */
 
         return null;
     }

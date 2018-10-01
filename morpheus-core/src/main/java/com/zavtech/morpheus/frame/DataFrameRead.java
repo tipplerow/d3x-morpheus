@@ -21,7 +21,6 @@ import java.net.URL;
 import java.util.function.Consumer;
 
 import com.zavtech.morpheus.source.CsvSourceOptions;
-import com.zavtech.morpheus.source.DbSourceOptions;
 
 /**
  * An interface used to read a DataFrame stored in various formats from some underlying storage devices.
@@ -71,13 +70,5 @@ public interface DataFrameRead {
      * @return              the resulting DataFrame
      */
     <R> DataFrame<R,String> csv(Consumer<CsvSourceOptions<R>> configurator);
-
-    /**
-     * Reads a DataFrame from a database based on the options configurator
-     * @param configurator  the configurator for DB options
-     * @param <R>           the row key type
-     * @return              the resulting DataFrame
-     */
-    <R> DataFrame<R,String> db(Consumer<DbSourceOptions<R>> configurator);
 
 }

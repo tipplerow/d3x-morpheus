@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2017 Xavier Witdouck
+ * Copyright (C) 2014-2018 D3X Systems - All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.zavtech.morpheus.source;
+package com.d3x.morpheus.db;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -44,7 +44,7 @@ import com.zavtech.morpheus.util.sql.SQLType;
  *
  * @author  Xavier Witdouck
  */
-public class DbSource<R> extends DataFrameSource<R,String,DbSourceOptions<R>> {
+public class DbSource {
 
 
     /**
@@ -55,9 +55,10 @@ public class DbSource<R> extends DataFrameSource<R,String,DbSourceOptions<R>> {
     }
 
 
-    @Override
-    public DataFrame<R, String> read(Consumer<DbSourceOptions<R>> configurator) throws DataFrameException {
-        final DbSourceOptions<R> options = initOptions(new DbSourceOptions<>(), configurator);
+
+    public <R> DataFrame<R, String> read(Consumer<DbSourceOptions<R>> configurator) throws DataFrameException {
+        final DbSourceOptions<R> options = new DbSourceOptions<>();
+        configurator.accept(options);
         try (Connection conn = options.getConnection()) {
             conn.setAutoCommit(options.isAutoCommit());
             conn.setReadOnly(options.isReadOnly());
@@ -78,7 +79,7 @@ public class DbSource<R> extends DataFrameSource<R,String,DbSourceOptions<R>> {
      * @throws DataFrameException if data frame construction from result set fails
      */
     @SuppressWarnings("unchecked")
-    private DataFrame<R,String> read(ResultSet resultSet, DbSourceOptions<R> request) throws DataFrameException {
+    private <R> DataFrame<R,String> read(ResultSet resultSet, DbSourceOptions<R> request) throws DataFrameException {
         try {
             final int rowCapacity = request.getRowCapacity();
             final SQLPlatform platform = getPlatform(resultSet);
@@ -137,7 +138,7 @@ public class DbSource<R> extends DataFrameSource<R,String,DbSourceOptions<R>> {
      * @param columnList    the column list
      * @return              the newly created DataFrame
      */
-    private DataFrame<R,String> createFrame(Iterable<R> rowKeys, List<ColumnInfo> columnList) {
+    private <R> DataFrame<R,String> createFrame(Iterable<R> rowKeys, List<ColumnInfo> columnList) {
         return DataFrame.of(rowKeys, String.class, columns -> {
             for (ColumnInfo colInfo : columnList) {
                 final String colName = colInfo.name;
@@ -156,7 +157,7 @@ public class DbSource<R> extends DataFrameSource<R,String,DbSourceOptions<R>> {
      * @return              the array of column information
      * @throws SQLException if there is a database access error
      */
-    private List<ColumnInfo> getColumnInfo(ResultSetMetaData metaData, SQLPlatform platform, DbSourceOptions<R> request) throws SQLException {
+    private <R> List<ColumnInfo> getColumnInfo(ResultSetMetaData metaData, SQLPlatform platform, DbSourceOptions<R> request) throws SQLException {
         final int rowCapacity = request.getRowCapacity();
         final int columnCount = metaData.getColumnCount();
         final List<ColumnInfo> columnInfoList = new ArrayList<>(columnCount);

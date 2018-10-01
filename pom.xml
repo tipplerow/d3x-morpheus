@@ -11,13 +11,13 @@
     <modules>
         <module>morpheus-core/pom.xml</module>
         <module>morpheus-viz/pom.xml</module>
+        <module>morpheus-db/pom.xml</module>
+        <module>morpheus-json/pom.xml</module>
         <module>morpheus-excel/pom.xml</module>
         <module>morpheus-docs/pom.xml</module>
         <module>morpheus-quandl/pom.xml</module>
         <module>morpheus-jblas/pom.xml</module>
         <module>morpheus-worldbank/pom.xml</module>
-        <module>morpheus-json/pom.xml</module>
-        <!--module>morpheus-db/pom.xml</module-->
     </modules>
 
     <name>morpheus</name>
@@ -123,9 +123,9 @@
                                 <![CDATA[Copyright 2014-2018, <a href="https://www.d3xsystems.com">D3X Systems<a>]]></bottom>
                             <additionalparam>-Xdoclint:none</additionalparam>
                             <excludePackageNames>
-                                com.d3x.morpheus.reference,
-                                com.d3x.morpheus.reference.regress,
-                                com.d3x.morpheus.reference.algebra
+                                com.com.d3x.morpheus.reference,
+                                com.com.d3x.morpheus.reference.regress,
+                                com.com.d3x.morpheus.reference.algebra
                             </excludePackageNames>
                         </configuration>
                         <executions>

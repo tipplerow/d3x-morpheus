@@ -17,9 +17,9 @@
 
 <suite name="Suite1" verbose="1" >
 
-    <test name="Excel Tests">
+    <test name="DB Tests">
         <packages>
-            <package name="com.com.d3x.morpheus.io.*"/>
+            <package name="com.com.d3x.morpheus.db.*"/>
         </packages>
     </test>
 
