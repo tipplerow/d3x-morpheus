@@ -1,9 +1,9 @@
 <div class="row">
     <div class="col-md-6">
-        <img src="https://www.d3xsystems.com/images/common/morpheus-logo.svg" style="max-height:30px;"/>
+        <img src="https://www.d3xsystems.com/images/common/morpheus-logo.svg" height="30px" style="max-height:30px;"/>
     </div>
     <div class="col-md-6">
-        <img src="https://www.d3xsystems.com/images/common/d3x.svg" style="max-height:30px;"/>
+        <img src="https://www.d3xsystems.com/images/common/d3x.svg" height="30px" style="max-height:30px;"/>
     </div>
 </div>
 
@@ -278,7 +278,7 @@ charts as well as HTML5 browser based charts via the same programmatic interface
 see the section on visualization [here](./viz/charts/overview/), and the code [here](https://github.com/zavtech/morpheus-viz).
 
 <div class="smallChart">
-    <img class="smallChart" src="./images/gallery/chart-1.png"/>
+    <img class="smallChart" src="./morpheus-docs/docs/images/gallery/chart-1.png"/>
 </div>
 <div class="smallChart">
     <img class="smallChart" src="./images/gallery/chart-2.png"/>
