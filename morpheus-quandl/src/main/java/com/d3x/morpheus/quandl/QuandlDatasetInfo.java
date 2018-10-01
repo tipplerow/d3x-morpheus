@@ -27,7 +27,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import com.zavtech.morpheus.frame.DataFrame;
+import com.d3x.morpheus.frame.DataFrame;
 
 /**
  * A class that captures meta-data for a specific dataset in a Qunadl database

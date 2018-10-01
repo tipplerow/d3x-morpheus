@@ -1,12 +1,28 @@
+<!--
+  ~ Copyright (C) 2014-2018 D3X Systems - All Rights Reserved
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        
+
         <meta name="author" content="Xavier Witdouck">
-        
+
         <link rel="shortcut icon" href="../../img/favicon.ico">
         <title>Ordinary Least Squares - Morpheus</title>
         <link href="../../css/bootstrap-custom.min.css" rel="stylesheet">
@@ -20,10 +36,10 @@
             <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
             <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
         <![endif]-->
-	
+
 	<script src="../../js/jquery-1.10.2.min.js"></script>
         <script src="../../js/bootstrap-3.0.3.min.js"></script>
-        <script src="../../js/highlight.pack.js"></script> 
+        <script src="../../js/highlight.pack.js"></script>
     </head>
 
     <body>
@@ -53,11 +69,11 @@
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Array <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            
+
 <li >
     <a href="../../array/overview/">Overview</a>
 </li>
-                            
+
 <li >
     <a href="../../array/performance/">Performance</a>
 </li>
@@ -66,39 +82,39 @@
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">DataFrame <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            
+
 <li >
     <a href="../../frame/construction/">Construction</a>
 </li>
-                            
+
 <li >
     <a href="../../frame/access/">Accessing</a>
 </li>
-                            
+
 <li >
     <a href="../../frame/reshaping/">Reshaping</a>
 </li>
-                            
+
 <li >
     <a href="../../frame/filtering/">Filtering</a>
 </li>
-                            
+
 <li >
     <a href="../../frame/sorting/">Sorting</a>
 </li>
-                            
+
 <li >
     <a href="../../frame/grouping/">Grouping</a>
 </li>
-                            
+
 <li >
     <a href="../../frame/finding/">Finding</a>
 </li>
-                            
+
 <li >
     <a href="../../frame/writing/">Writing</a>
 </li>
-                            
+
 <li >
     <a href="../../frame/performance/">Performance</a>
 </li>
@@ -107,45 +123,45 @@
                     <li class="dropdown active">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Analysis <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            
+
 <li >
     <a href="../../analysis/statistics/">Descriptive Statistics</a>
 </li>
-                            
+
   <li class="dropdown-submenu">
     <a href="#">Linear Regression</a>
     <ul class="dropdown-menu">
-            
+
 <li class="active">
     <a href="./">Ordinary Least Squares</a>
 </li>
-            
+
 <li >
     <a href="../wls/">Weighted Least Squares</a>
 </li>
-            
+
 <li >
     <a href="../gls/">Generalized Least Squares</a>
 </li>
     </ul>
   </li>
-                            
+
 <li >
     <a href="../../analysis/pca/">Principal Component Analysis</a>
 </li>
-                            
+
 <li >
     <a href="../../analysis/linearalgebra/">Linear Algebra</a>
 </li>
-                            
+
 <li >
     <a href="../../analysis/timeseries/">Time Series Analysis</a>
 </li>
-                            
+
   <li class="dropdown-submenu">
     <a href="#">Examples</a>
     <ul class="dropdown-menu">
-            
+
 <li >
     <a href="../../examples/mpt/">Modern Portfolio Theory</a>
 </li>
@@ -156,29 +172,29 @@
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Visualization <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            
+
   <li class="dropdown-submenu">
     <a href="#">Charts</a>
     <ul class="dropdown-menu">
-            
+
 <li >
     <a href="../../viz/charts/overview/">Overview</a>
 </li>
-            
+
 <li >
     <a href="../../viz/charts/embed/">Embedding (HTML)</a>
 </li>
-            
+
 <li >
     <a href="../../viz/charts/gallery1/">Gallery (Google)</a>
 </li>
-            
+
 <li >
     <a href="../../viz/charts/gallery2/">Gallery (JFree)</a>
 </li>
     </ul>
   </li>
-                            
+
 <li >
     <a href="../../viz/tables/overview/">Tables</a>
 </li>
@@ -187,23 +203,23 @@
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Data Sources <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            
+
 <li >
     <a href="../../providers/quandl/">Quandl</a>
 </li>
-                            
+
 <li >
     <a href="../../providers/fred/">Federal Reserve</a>
 </li>
-                            
+
 <li >
     <a href="../../providers/google/">Google Finance</a>
 </li>
-                            
+
 <li >
     <a href="../../providers/yahoo/">Yahoo Finance</a>
 </li>
-                            
+
 <li >
     <a href="../../providers/world-bank/">World Bank</a>
 </li>
@@ -255,25 +271,25 @@
 
 <h2 id="ordinary-least-squares-ols">Ordinary Least Squares (OLS)</h2>
 <h3 id="introduction">Introduction</h3>
-<p><a href="https://en.wikipedia.org/wiki/Regression_analysis">Regression analysis</a> is a statistical technique used to fit a model expressed in 
-terms of one or more variables to some data. In particular, it allows one to analyze the relationship of a dependent variable (also 
-referred to as the regressand) on one or more independent or predictor variables (also referred to as regressors), and assess how 
+<p><a href="https://en.wikipedia.org/wiki/Regression_analysis">Regression analysis</a> is a statistical technique used to fit a model expressed in
+terms of one or more variables to some data. In particular, it allows one to analyze the relationship of a dependent variable (also
+referred to as the regressand) on one or more independent or predictor variables (also referred to as regressors), and assess how
 influential each of these are.  </p>
-<p>There are many types of regression analysis techniques, however one of the most commonly used is based on fitting data to a linear model, 
-and in particular using an approach called <a href="https://en.wikipedia.org/wiki/Least_squares">Least Squares</a>. The Morpheus API currently supports 
-3 variations of Linear Least Squares regression, namely <a href="https://en.wikipedia.org/wiki/Ordinary_least_squares">Ordinary Least Squares</a> (OLS), 
+<p>There are many types of regression analysis techniques, however one of the most commonly used is based on fitting data to a linear model,
+and in particular using an approach called <a href="https://en.wikipedia.org/wiki/Least_squares">Least Squares</a>. The Morpheus API currently supports
+3 variations of Linear Least Squares regression, namely <a href="https://en.wikipedia.org/wiki/Ordinary_least_squares">Ordinary Least Squares</a> (OLS),
 <a href="https://en.wikipedia.org/wiki/Least_squares#Weighted_least_squares">Weighted Least Squares</a> (WLS) and <a href="https://en.wikipedia.org/wiki/Generalized_least_squares">Generalized Least Squares</a>
 (GLS). The following section reviews some OLS regression theory, and provides an example of how to use the Morhpeus API to apply this technique.</p>
 <h3 id="theory">Theory</h3>
 <p>A linear regression model in matrix form can be expressed as:</p>
 <p>$$ Y = X \beta + \epsilon \ \ \ \ where \ E[\epsilon]=0 \ \ \ \ Var[\epsilon] = \sigma^2 I  $$</p>
-<p>Y represents an <code>nx1</code> vector of regressands, and X represents an <code>nxp</code> design matrix, where <code>n</code> is the number of observations in the data, 
-and <code>p</code> represents the number of parameters to estimate. If the model includes an intercept term, the first column in the design matrix is 
-populated with 1's and therefore the first entry in the <code>px1</code> \(\beta\) vector would represent the intercept value. The <code>nx1</code> \(\epsilon\) 
-vector represents the error or disturbance term, which is assumed to have a conditional mean of 0 and also to be free of any serial correlation 
+<p>Y represents an <code>nx1</code> vector of regressands, and X represents an <code>nxp</code> design matrix, where <code>n</code> is the number of observations in the data,
+and <code>p</code> represents the number of parameters to estimate. If the model includes an intercept term, the first column in the design matrix is
+populated with 1's and therefore the first entry in the <code>px1</code> \(\beta\) vector would represent the intercept value. The <code>nx1</code> \(\epsilon\)
+vector represents the error or disturbance term, which is assumed to have a conditional mean of 0 and also to be free of any serial correlation
 (see section below on the <a href="https://en.wikipedia.org/wiki/Gauss%E2%80%93Markov_theorem">Gauss Markov</a> assumptions).</p>
-<p>A least squares regression model estimates \(\beta\) so as to minimize the sum of the squared error, or \(\epsilon^T\epsilon\). We 
-can use the model equation above to express \(\epsilon^T\epsilon\) in terms of Y and X\(\beta\), differentiate this by \(\beta\), 
+<p>A least squares regression model estimates \(\beta\) so as to minimize the sum of the squared error, or \(\epsilon^T\epsilon\). We
+can use the model equation above to express \(\epsilon^T\epsilon\) in terms of Y and X\(\beta\), differentiate this by \(\beta\),
 set the result to zero since we wish to minimize the squared error, and solve for \(\beta\) as follows:  </p>
 <p>$$ \begin{align}
 \epsilon^T\epsilon &amp;= (Y - X \beta)^T(Y - X \beta) \\
@@ -284,41 +300,41 @@ set the result to zero since we wish to minimize the squared error, and solve fo
 <p>$$ \frac{d\epsilon^T\epsilon}{d\beta} = -2X^T Y + 2X^T X \beta = 0 $$</p>
 <p>This expression can be re-arranged to solve for \(\beta\) and yields the following equation: </p>
 <p>$$ \beta = (X^T X)^{-1} X^T Y $$ </p>
-<p>The value of \(\beta\) can only be <strong>estimated</strong> given some sample data drawn from a population or data generating process, the <em>true</em> value is 
-unknown. We usually refer to the estimate as \(\hat{\beta}\) (beta "hat") in order to distinguish it from the true population value. In addition, 
-when expressing the model in terms of \(\hat{\beta}\), the stochastic term is referred to as <em>residuals</em> rather than <em>errors</em>, and while they 
-are conceptually related, they are <a href="https://en.wikipedia.org/wiki/Errors_and_residuals">not the same thing</a>. Errors represent the deviation of 
-observations from the unknown population line, while residuals represent the deviations from the estimation line, a subtle difference and easily 
+<p>The value of \(\beta\) can only be <strong>estimated</strong> given some sample data drawn from a population or data generating process, the <em>true</em> value is
+unknown. We usually refer to the estimate as \(\hat{\beta}\) (beta "hat") in order to distinguish it from the true population value. In addition,
+when expressing the model in terms of \(\hat{\beta}\), the stochastic term is referred to as <em>residuals</em> rather than <em>errors</em>, and while they
+are conceptually related, they are <a href="https://en.wikipedia.org/wiki/Errors_and_residuals">not the same thing</a>. Errors represent the deviation of
+observations from the unknown population line, while residuals represent the deviations from the estimation line, a subtle difference and easily
 confused. In terms of \(\hat{\beta}\) and residuals <strong>u</strong>, the model is expressed in the usual way. </p>
 <p>$$ Y = X \hat{\beta} + u \ \ \ \ where \ E[u]=0 \ \ \ \ Var[u] = \sigma^2 I  $$</p>
-<p>The residuals are of course still assumed to be consistent with the <a href="https://en.wikipedia.org/wiki/Gauss%E2%80%93Markov_theorem">Gauss Markov</a> 
+<p>The residuals are of course still assumed to be consistent with the <a href="https://en.wikipedia.org/wiki/Gauss%E2%80%93Markov_theorem">Gauss Markov</a>
 assumptions, and so the estimator for \(\hat{\beta}\) is: </p>
 <p>$$ \hat{\beta} = (X^T X)^{-1} X^T Y $$ </p>
 <h3 id="solving">Solving</h3>
 <p>We can solve for \(\hat{\beta}\) directly by calculating the right hand side of the above equation, which is what the Morpheus library does
-by default. There are situations in which this can present numerical stability issues, in which case it may be preferable to solve for \(\hat{\beta}\) 
-by factorizing the design matrix X using a <a href="https://en.wikipedia.org/wiki/QR_decomposition">QR decomposition</a> where Q represents an orthogonal matrix 
-such that \(Q^T Q = I\) and thus \(Q^T = Q^{-1}\), and where R is an upper triangular matrix. The QR decomposition approach is based on the 
+by default. There are situations in which this can present numerical stability issues, in which case it may be preferable to solve for \(\hat{\beta}\)
+by factorizing the design matrix X using a <a href="https://en.wikipedia.org/wiki/QR_decomposition">QR decomposition</a> where Q represents an orthogonal matrix
+such that \(Q^T Q = I\) and thus \(Q^T = Q^{-1}\), and where R is an upper triangular matrix. The QR decomposition approach is based on the
 following reasoning.</p>
 <p>$$ \begin{align}
 X^T Y &amp; = X^T X \hat{\beta}  \\
 \big( QR \big)^T Y &amp; = \big( QR \big)^T \big( QR \big) \hat{\beta} \\
 R^T Q^T Y &amp; = R^T Q^T Q R \hat{\beta} \\
 R^T Q^T Y &amp; = R^T R \hat{\beta} \\
-(R^T)^{-1} R^T Q^T Y &amp; = \big( R^T \big)^{-1} R^T R \hat{\beta} \\ 
+(R^T)^{-1} R^T Q^T Y &amp; = \big( R^T \big)^{-1} R^T R \hat{\beta} \\
 Q^T Y &amp; = R \hat{\beta}
 \end{align} $$</p>
-<p>This can be solved efficiently by <a href="https://en.wikipedia.org/wiki/Triangular_matrix#Forward_and_back_substitution">backward substitution</a> because the R 
-matrix is upper <a href="https://en.wikipedia.org/wiki/Triangular_matrix">triangular</a>, and therefore no inversion of the design matrix is required. The Morpheus 
-library also supports estimating \(\hat{\beta}\) using this technique, which can be configured on a case by case basis via the <code>withSolver()</code> method 
+<p>This can be solved efficiently by <a href="https://en.wikipedia.org/wiki/Triangular_matrix#Forward_and_back_substitution">backward substitution</a> because the R
+matrix is upper <a href="https://en.wikipedia.org/wiki/Triangular_matrix">triangular</a>, and therefore no inversion of the design matrix is required. The Morpheus
+library also supports estimating \(\hat{\beta}\) using this technique, which can be configured on a case by case basis via the <code>withSolver()</code> method
 on the <code>DataFrameLeastSquares</code> interface. </p>
 <h3 id="diagnostics">Diagnostics</h3>
-<p>Just like any other statistical technique, regression analysis is susceptible to <a href="https://en.wikipedia.org/wiki/Sampling_error">sampling error</a>, and 
-it is therefore common to compute the variance of the parameter estimates, as well as their <a href="https://en.wikipedia.org/wiki/Standard_error">standard error</a>, 
-which can then be used for <a href="https://en.wikipedia.org/wiki/Statistical_inference">inferential</a> purposes. In the context of a linear regression, the 
-<a href="https://en.wikipedia.org/wiki/Null_hypothesis">null hypotheses</a> \(H_{0}\), is generally that the model parameters are zero. The parameter standard 
-errors can be used to calculate a <a href="https://en.wikipedia.org/wiki/T-statistic">t-statistic</a> and corresponding <a href="https://en.wikipedia.org/wiki/P-value">p-value</a> 
-in order to decide if \(H_{0}\) can be rejected in favour of the alternative hypothesis, and thus assert that the estimates are statistically 
+<p>Just like any other statistical technique, regression analysis is susceptible to <a href="https://en.wikipedia.org/wiki/Sampling_error">sampling error</a>, and
+it is therefore common to compute the variance of the parameter estimates, as well as their <a href="https://en.wikipedia.org/wiki/Standard_error">standard error</a>,
+which can then be used for <a href="https://en.wikipedia.org/wiki/Statistical_inference">inferential</a> purposes. In the context of a linear regression, the
+<a href="https://en.wikipedia.org/wiki/Null_hypothesis">null hypotheses</a> \(H_{0}\), is generally that the model parameters are zero. The parameter standard
+errors can be used to calculate a <a href="https://en.wikipedia.org/wiki/T-statistic">t-statistic</a> and corresponding <a href="https://en.wikipedia.org/wiki/P-value">p-value</a>
+in order to decide if \(H_{0}\) can be rejected in favour of the alternative hypothesis, and thus assert that the estimates are statistically
 significantly different from zero.</p>
 <p>The variance of \(\hat{\beta}\) with respect to the true population value can be expressed as follows:</p>
 <p>$$ Var(\hat{\beta}) = E[(\hat{\beta} - \beta)(\hat{\beta} - \beta)^T] $$</p>
@@ -394,7 +410,7 @@ documented in the table below. The parameter variance estimates as calculated ab
 </tbody>
 </table>
 <h3 id="gauss-markov-assumptions">Gauss Markov Assumptions</h3>
-<p>The <a href="https://en.wikipedia.org/wiki/Gauss%E2%80%93Markov_theorem">Gauss Markov Theorem</a> states that Ordinary Least Squares is the Best Linear Unbiased 
+<p>The <a href="https://en.wikipedia.org/wiki/Gauss%E2%80%93Markov_theorem">Gauss Markov Theorem</a> states that Ordinary Least Squares is the Best Linear Unbiased
 and Efficient (BLUE) estimator of \(\beta\), conditional on a certain set of assumptions being met. In this context, "best" means that there are
 no other unbiased estimators with a smaller sampling variance than OLS. Unbiased means that that the expectation of \( \hat{\beta}\) is equal to the
 population \(\beta\), or otherwise stated \( E[ \hat{\beta} ] = \beta \). The assumptions that must hold for OLS to be BLUE are as follows:</p>
@@ -439,25 +455,25 @@ is a linear relationship between the independent and dependent variables, it onl
 investigation is not linear in parameters, it can often be transformed so as to render it linear.</p>
 <h4 id="linearly-independent"><strong> Linearly Independent </strong></h4>
 <p>The second assumption that there is no perfect <a href="https://en.wikipedia.org/wiki/Multicollinearity">multicollinearity</a> between the regressors is important, as if
-it exists, the OLS estimator cannot be calculated. Another way of expressing this condition is that one of the independent variables cannot be a function of any 
+it exists, the OLS estimator cannot be calculated. Another way of expressing this condition is that one of the independent variables cannot be a function of any
 of the other independent variables, and therefore the design matrix X must be non-singular, and therefore have full rank.</p>
 <h4 id="strict-exogeneity"><strong> Strict exogeneity </strong></h4>
-<p>The third assumption above states that the disturbance term averages out to zero for any given instance of X, which implies that no observations of the independent 
+<p>The third assumption above states that the disturbance term averages out to zero for any given instance of X, which implies that no observations of the independent
 variables convey any information about the error. Mathematically this is stated as \( E[ \epsilon | X ] = 0 \). This assumption is violated if the independent
-variables are <a href="https://en.wikipedia.org/wiki/Stochastic_process">stochastic</a> in nature, which can arise as a result of <a href="https://en.wikipedia.org/wiki/Errors-in-variables_models">measurement error</a>, or if there is 
+variables are <a href="https://en.wikipedia.org/wiki/Stochastic_process">stochastic</a> in nature, which can arise as a result of <a href="https://en.wikipedia.org/wiki/Errors-in-variables_models">measurement error</a>, or if there is
 <a href="https://en.wikipedia.org/wiki/Endogeneity_(econometrics)">endogeneity</a> in the model.</p>
 <h4 id="spherical-errors"><strong> Spherical Errors </strong></h4>
-<p>The fourth and fifth assumptions relate to the <a href="https://en.wikipedia.org/wiki/Covariance_matrix">covariance matrix</a> of the error term, and specifically states 
-that \(E[ \epsilon \epsilon^T | X] = \sigma^2 I \). There are two key concepts embedded in this statement, the first is that the disturbance term has uniform 
-variance of \(\sigma^2\) regardless of the values of the independent variables, and is referred to as homoscedasticity. In addition, the off diagonal terms of 
-the covariance matrix are assumed to be zero, which suggests there is no serial correlation between errors. Either or both of these assumptions may not hold in 
+<p>The fourth and fifth assumptions relate to the <a href="https://en.wikipedia.org/wiki/Covariance_matrix">covariance matrix</a> of the error term, and specifically states
+that \(E[ \epsilon \epsilon^T | X] = \sigma^2 I \). There are two key concepts embedded in this statement, the first is that the disturbance term has uniform
+variance of \(\sigma^2\) regardless of the values of the independent variables, and is referred to as homoscedasticity. In addition, the off diagonal terms of
+the covariance matrix are assumed to be zero, which suggests there is no serial correlation between errors. Either or both of these assumptions may not hold in
 the real world, in which case a WLS or GLS estimator may prove to be a better, unbiased linear estimator. </p>
 <h3 id="example">Example</h3>
-<p>The Morpheus API defines an interface called <code>DataFrameRegression</code> which exposes a number of methods that support different linear regression techniques, namely 
+<p>The Morpheus API defines an interface called <code>DataFrameRegression</code> which exposes a number of methods that support different linear regression techniques, namely
 OLS, WLS and GLS. There are overloaded methods that take one or more regressors in order to conveniently support simple and multiple linear regression. </p>
-<p>The regression interface, which operates on the column data in a <code>DataFrame</code>, can be accessed by calling the <code>regress()</code> method on the frame. If  a regression in 
+<p>The regression interface, which operates on the column data in a <code>DataFrame</code>, can be accessed by calling the <code>regress()</code> method on the frame. If  a regression in
 the row dimension is required, simply call <code>transpose()</code> on the frame before calling <code>regress()</code>.</p>
-<p>To illustrate an example, consider the same motor vehicle dataset introduced earlier, which can be loaded with the code below. The first 10 rows of this <code>DataFrame</code> 
+<p>To illustrate an example, consider the same motor vehicle dataset introduced earlier, which can be loaded with the code below. The first 10 rows of this <code>DataFrame</code>
 is also included for inspection, and in this exercise we are going to be interested in the <strong>EngineSize</strong> and <strong>Horsepower</strong> columns. </p>
 <?prettify?>
 
@@ -483,8 +499,8 @@ is also included for inspection, and in this exercise we are going to be interes
      8  |         Buick  |     Riviera  |  Midsize  |    26.3000  |  26.3000  |    26.3000  |        19  |           27  |         Driver only  |       Front  |          6  |      3.8000  |         170  |  4800  |          1690  |               No  |             18.8000  |           5  |     198  |        108  |     73  |           41  |            26.5  |            14  |    3495  |      USA  |     Buick Riviera  |
 </pre></div>
 
-<p>Based on our understanding of the factors that influence the power of an internal combustion engine, one might hypothesize that there is a positive and linear 
-relationship between the size of an engine and how much horsepower it produces. . We can use the car dataset to test this hypothesis. First we can use the Morpheus 
+<p>Based on our understanding of the factors that influence the power of an internal combustion engine, one might hypothesize that there is a positive and linear
+relationship between the size of an engine and how much horsepower it produces. . We can use the car dataset to test this hypothesis. First we can use the Morpheus
 library to generate a scatter plot of the data, with <strong>EngineSize</strong> on the x-axis and <strong>Horsepower</strong> on the y-axis as follows:</p>
 <?prettify?>
 
@@ -508,10 +524,10 @@ Chart.create().withScatterPlot(xy, false, x, chart -&gt; {
     <img class="chart" src="../../images/ols/data-frame-ols1.png"/>
 </p>
 
-<p>The scatter plot certainly appears to suggest that there is a positive relationship between <strong>EngineSize</strong> and <strong>Horsepower</strong>. In addition, it seems somewhat 
-linear, however the dispersion appears to get more significant for larger engine sizes, which would be a violation of one of the <a href="https://en.wikipedia.org/wiki/Gauss%E2%80%93Markov_theorem">Gauss Markov</a> 
-assumptions, namely of <a href="https://en.wikipedia.org/wiki/Homoscedasticity">homoscedastic</a> errors. Nevertheless, let us proceed to regress <strong>Horsepower</strong> on 
-<strong>EngineSize</strong> and see what the results look like. The code below runs a single variable regression and simply prints the model results to standard-out 
+<p>The scatter plot certainly appears to suggest that there is a positive relationship between <strong>EngineSize</strong> and <strong>Horsepower</strong>. In addition, it seems somewhat
+linear, however the dispersion appears to get more significant for larger engine sizes, which would be a violation of one of the <a href="https://en.wikipedia.org/wiki/Gauss%E2%80%93Markov_theorem">Gauss Markov</a>
+assumptions, namely of <a href="https://en.wikipedia.org/wiki/Homoscedasticity">homoscedastic</a> errors. Nevertheless, let us proceed to regress <strong>Horsepower</strong> on
+<strong>EngineSize</strong> and see what the results look like. The code below runs a single variable regression and simply prints the model results to standard-out
 for inspection.</p>
 <?prettify?>
 
@@ -526,14 +542,14 @@ frame.regress().ols(regressand, regressor, true, model -&gt; {
 
 <div class="frame"><pre class="frame">
 ==============================================================================================
-                                   Linear Regression Results                                                            
+                                   Linear Regression Results
 ==============================================================================================
 Model:                                   OLS    R-Squared:                            0.5360
 Observations:                             93    R-Squared(adjusted):                  0.5309
 DF Model:                                  1    F-Statistic:                        105.1204
 DF Residuals:                             91    F-Statistic(Prob):                  1.11E-16
 Standard Error:                      35.8717    Runtime(millis)                           48
-Durbin-Watson:                        1.9591                                                
+Durbin-Watson:                        1.9591
 ==============================================================================================
    Index     |  PARAMETER  |  STD_ERROR  |  T_STAT   |   P_VALUE   |  CI_LOWER  |  CI_UPPER  |
 ----------------------------------------------------------------------------------------------
@@ -543,14 +559,14 @@ Durbin-Watson:                        1.9591
 </pre></div>
 
 <p>The regression results yield a slope coefficient of <strong>36.96</strong>, suggesting that for every additional litre of engine capacity, we can expect to add another
-36.96 horsepower. While the <a href="https://en.wikipedia.org/wiki/P-value">p-value</a> associated with the slope coefficient suggests that it is statistically 
-significantly different from zero, it does not tell us about how relevant the parameter is in the regression. In this case we can reasonably surmise 
-that engine size is relevant given our understanding of how an internal combustion engine works and what factors affect output power. Having said that, 
-the coefficient of determination is perhaps lower than one might expect, and the heteroscedasticity of the residuals provides some hint that the model 
-may be incomplete. In particular, <a href="https://en.wikipedia.org/wiki/Omitted-variable_bias">omitted-variable bias</a> may be at play here, in the sense that 
+36.96 horsepower. While the <a href="https://en.wikipedia.org/wiki/P-value">p-value</a> associated with the slope coefficient suggests that it is statistically
+significantly different from zero, it does not tell us about how relevant the parameter is in the regression. In this case we can reasonably surmise
+that engine size is relevant given our understanding of how an internal combustion engine works and what factors affect output power. Having said that,
+the coefficient of determination is perhaps lower than one might expect, and the heteroscedasticity of the residuals provides some hint that the model
+may be incomplete. In particular, <a href="https://en.wikipedia.org/wiki/Omitted-variable_bias">omitted-variable bias</a> may be at play here, in the sense that
 there are other important factors that influence an engine's horsepower that we have not included.</p>
-<p>While the code example above simply prints the model results to standard out, the illustration below demonstrates how to access all the relevant model 
-outputs via the API. The <code>ols()</code> method takes a lambda parameter that consumes the regression model, which is an instance of the <code>DataFrameLeastSquares</code> 
+<p>While the code example above simply prints the model results to standard out, the illustration below demonstrates how to access all the relevant model
+outputs via the API. The <code>ols()</code> method takes a lambda parameter that consumes the regression model, which is an instance of the <code>DataFrameLeastSquares</code>
 interface, and provides all the relevant hooks to access the model inputs and outputs.</p>
 <?prettify?>
 
@@ -609,11 +625,11 @@ Chart.create().withScatterPlot(xy, false, regressor, chart -&gt; {
 </code></pre>
 
 <h3 id="unbiasedness">Unbiasedness</h3>
-<p>An Ordinary Least Squares estimator is said to be <a href="https://en.wikipedia.org/wiki/Bias_of_an_estimator">unbiased</a> in the sense that 
-if you run regressions on many samples of data generated from the same population process, the coefficient estimates from all these samples 
-would be centered on the true population values. To demonstrate this empirically, we can define a population process in 2D space with a known 
-slope and intercept coefficient, and then proceed to generate many samples from this process while adding Gaussian noise to the dependent variable 
-in order to simulate the error term. The code below defines a data generating function that returns a <code>DataFrame</code> of X and Y values initialized 
+<p>An Ordinary Least Squares estimator is said to be <a href="https://en.wikipedia.org/wiki/Bias_of_an_estimator">unbiased</a> in the sense that
+if you run regressions on many samples of data generated from the same population process, the coefficient estimates from all these samples
+would be centered on the true population values. To demonstrate this empirically, we can define a population process in 2D space with a known
+slope and intercept coefficient, and then proceed to generate many samples from this process while adding Gaussian noise to the dependent variable
+in order to simulate the error term. The code below defines a data generating function that returns a <code>DataFrame</code> of X and Y values initialized
 from the population coefficients, while adding white noise scaled according to the standard deviation specified by the <code>sigma</code> parameter.</p>
 <?prettify?>
 
@@ -641,7 +657,7 @@ DataFrame&lt;Integer,String&gt; sample(double alpha, double beta, double startX,
 }
 </code></pre>
 
-<p>To get a sense of the nature of the dataset generated by this function for some chosen set of parameters, we can plot a number 
+<p>To get a sense of the nature of the dataset generated by this function for some chosen set of parameters, we can plot a number
 of samples. The code below plots 4 random samples of this population process with beta = 1.45, alpha = 4.15 and a sigma value of 20.</p>
 <?prettify?>
 
@@ -681,8 +697,8 @@ Chart.show(2, IntStream.range(0, 4).mapToObj(i -&gt; {
     <img class="chart" src="../../images/ols/ols-sample-3.png"/>
 </div>
 
-<p>Given this data generating function, we can produce many samples from a known population process and then proceed to run OLS regressions on 
-these samples. For each run we capture the coefficient estimates, and then plot a histogram of all the recorded estimates to confirm that the 
+<p>Given this data generating function, we can produce many samples from a known population process and then proceed to run OLS regressions on
+these samples. For each run we capture the coefficient estimates, and then plot a histogram of all the recorded estimates to confirm that the
 coefficients are indeed centered on the known population values. The following code performs this procedure for 100,000 regressions, and is
 followed by the resulting plots.</p>
 <?prettify?>
@@ -727,15 +743,15 @@ Array.of(&quot;Beta&quot;, &quot;Alpha&quot;).forEach(coefficient -&gt; {
     <img class="chart" src="../../images/ols/ols-Beta-unbiased.png"/>
 </p>
 
-<p>The alpha and beta histogram plots above clearly show that the distribution of the 100000 estimates of each coefficient are centered on the 
+<p>The alpha and beta histogram plots above clearly show that the distribution of the 100000 estimates of each coefficient are centered on the
 known population values. In the case of the slope coefficient, the known population value is 1.45 and the mean value over the 100000 estimates
 is a good match. Similarly, the intercept estimate mean 4.1266 is very close to the known population value of 4.15.</p>
 <h3 id="consistency">Consistency</h3>
-<p>An OLS estimator is said to be <a href="https://en.wikipedia.org/wiki/Consistent_estimator">consistent</a> in the sense that as the sample size increases, 
-the variance in the coefficient estimates should decrease. This can be demonstrated empirically once again using the data generation function introduced 
-earlier. In this experiment we run a certain number of regressions based on samples generated from a known population process, but we would need to do 
-this multiple times with increasing sample sizes. The code below implements this by running 100,000 regressions for sample sizes ranging from 100 to 500 
-in steps of 100, and captures the coefficient estimates for each run. It then plots histograms for the beta and intercept estimates to illustrate the 
+<p>An OLS estimator is said to be <a href="https://en.wikipedia.org/wiki/Consistent_estimator">consistent</a> in the sense that as the sample size increases,
+the variance in the coefficient estimates should decrease. This can be demonstrated empirically once again using the data generation function introduced
+earlier. In this experiment we run a certain number of regressions based on samples generated from a known population process, but we would need to do
+this multiple times with increasing sample sizes. The code below implements this by running 100,000 regressions for sample sizes ranging from 100 to 500
+in steps of 100, and captures the coefficient estimates for each run. It then plots histograms for the beta and intercept estimates to illustrate the
 narrowing variance as sample size increases.</p>
 <?prettify?>
 

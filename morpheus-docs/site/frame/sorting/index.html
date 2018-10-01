@@ -1,12 +1,28 @@
+<!--
+  ~ Copyright (C) 2014-2018 D3X Systems - All Rights Reserved
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        
+
         <meta name="author" content="Xavier Witdouck">
-        
+
         <link rel="shortcut icon" href="../../img/favicon.ico">
         <title>Sorting - Morpheus</title>
         <link href="../../css/bootstrap-custom.min.css" rel="stylesheet">
@@ -20,10 +36,10 @@
             <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
             <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
         <![endif]-->
-	
+
 	<script src="../../js/jquery-1.10.2.min.js"></script>
         <script src="../../js/bootstrap-3.0.3.min.js"></script>
-        <script src="../../js/highlight.pack.js"></script> 
+        <script src="../../js/highlight.pack.js"></script>
     </head>
 
     <body>
@@ -53,11 +69,11 @@
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Array <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            
+
 <li >
     <a href="../../array/overview/">Overview</a>
 </li>
-                            
+
 <li >
     <a href="../../array/performance/">Performance</a>
 </li>
@@ -66,39 +82,39 @@
                     <li class="dropdown active">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">DataFrame <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            
+
 <li >
     <a href="../construction/">Construction</a>
 </li>
-                            
+
 <li >
     <a href="../access/">Accessing</a>
 </li>
-                            
+
 <li >
     <a href="../reshaping/">Reshaping</a>
 </li>
-                            
+
 <li >
     <a href="../filtering/">Filtering</a>
 </li>
-                            
+
 <li class="active">
     <a href="./">Sorting</a>
 </li>
-                            
+
 <li >
     <a href="../grouping/">Grouping</a>
 </li>
-                            
+
 <li >
     <a href="../finding/">Finding</a>
 </li>
-                            
+
 <li >
     <a href="../writing/">Writing</a>
 </li>
-                            
+
 <li >
     <a href="../performance/">Performance</a>
 </li>
@@ -107,45 +123,45 @@
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Analysis <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            
+
 <li >
     <a href="../../analysis/statistics/">Descriptive Statistics</a>
 </li>
-                            
+
   <li class="dropdown-submenu">
     <a href="#">Linear Regression</a>
     <ul class="dropdown-menu">
-            
+
 <li >
     <a href="../../regression/ols/">Ordinary Least Squares</a>
 </li>
-            
+
 <li >
     <a href="../../regression/wls/">Weighted Least Squares</a>
 </li>
-            
+
 <li >
     <a href="../../regression/gls/">Generalized Least Squares</a>
 </li>
     </ul>
   </li>
-                            
+
 <li >
     <a href="../../analysis/pca/">Principal Component Analysis</a>
 </li>
-                            
+
 <li >
     <a href="../../analysis/linearalgebra/">Linear Algebra</a>
 </li>
-                            
+
 <li >
     <a href="../../analysis/timeseries/">Time Series Analysis</a>
 </li>
-                            
+
   <li class="dropdown-submenu">
     <a href="#">Examples</a>
     <ul class="dropdown-menu">
-            
+
 <li >
     <a href="../../examples/mpt/">Modern Portfolio Theory</a>
 </li>
@@ -156,29 +172,29 @@
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Visualization <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            
+
   <li class="dropdown-submenu">
     <a href="#">Charts</a>
     <ul class="dropdown-menu">
-            
+
 <li >
     <a href="../../viz/charts/overview/">Overview</a>
 </li>
-            
+
 <li >
     <a href="../../viz/charts/embed/">Embedding (HTML)</a>
 </li>
-            
+
 <li >
     <a href="../../viz/charts/gallery1/">Gallery (Google)</a>
 </li>
-            
+
 <li >
     <a href="../../viz/charts/gallery2/">Gallery (JFree)</a>
 </li>
     </ul>
   </li>
-                            
+
 <li >
     <a href="../../viz/tables/overview/">Tables</a>
 </li>
@@ -187,23 +203,23 @@
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Data Sources <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            
+
 <li >
     <a href="../../providers/quandl/">Quandl</a>
 </li>
-                            
+
 <li >
     <a href="../../providers/fred/">Federal Reserve</a>
 </li>
-                            
+
 <li >
     <a href="../../providers/google/">Google Finance</a>
 </li>
-                            
+
 <li >
     <a href="../../providers/yahoo/">Yahoo Finance</a>
 </li>
-                            
+
 <li >
     <a href="../../providers/world-bank/">World Bank</a>
 </li>
@@ -253,17 +269,17 @@
 
 <h3 id="sorting">Sorting</h3>
 <h4 id="introduction">Introduction</h4>
-<p>The Morpheus <code>DataFrame</code> can be sorted in both the row and column dimension, either by the axis keys, or by 
+<p>The Morpheus <code>DataFrame</code> can be sorted in both the row and column dimension, either by the axis keys, or by
 values in one or more columns or rows respectively. In addition, custom sort logic is supported via a user provided
-<code>Comparator</code> that consumes either <code>DataFrameRow</code> or <code>DataFrameColumn</code> objects. Finally, all sort functions are 
+<code>Comparator</code> that consumes either <code>DataFrameRow</code> or <code>DataFrameColumn</code> objects. Finally, all sort functions are
 capable of executing in <strong>parallel</strong> which can lead to dramatic performance improvements on large frames, and some
-results in this regard are presented in the section on performance below. In all cases, an optimized single pivot 
-quick sort is used, with an implementation made available in the excellent <a href="http://fastutil.di.unimi.it/">FastUtil</a> 
+results in this regard are presented in the section on performance below. In all cases, an optimized single pivot
+quick sort is used, with an implementation made available in the excellent <a href="http://fastutil.di.unimi.it/">FastUtil</a>
 library, so a thank you goes out to <a href="http://vigna.di.unimi.it/">Sebastiano Vigna</a>.</p>
 <h4 id="example-data">Example Data</h4>
-<p>In this section, we will continue to use the ATP 2013 dataset that was introduced earlier in the filtering discussion 
+<p>In this section, we will continue to use the ATP 2013 dataset that was introduced earlier in the filtering discussion
 <a href="../filtering/#example-data">here</a>. In some examples a custom frame is created of random double precision values in order to
-demonstrate how to sort columns by row values. The ATP match <code>DataFrame</code> does not have homogeneous types along the rows, and 
+demonstrate how to sort columns by row values. The ATP match <code>DataFrame</code> does not have homogeneous types along the rows, and
 therefore a column sort based on these values is nonsensical. In addition, the section on performance creates much larger frames
 with millions of rows in order to get more measurable timing statistics.</p>
 <p>The unsorted 2103 ATP match <code>DataFrame</code> looks as follows (at least the first 10 rows).</p>
@@ -284,10 +300,10 @@ with millions of rows in order to get more measurable timing statistics.</p>
 
 <h4 id="row-sorting">Row Sorting</h4>
 <h5 id="key-sort">Key Sort</h5>
-<p>There are several overloaded <code>sort()</code> methods on the <code>DataFrameAxis</code> interface, the most basic of which takes a 
+<p>There are several overloaded <code>sort()</code> methods on the <code>DataFrameAxis</code> interface, the most basic of which takes a
 <code>boolean</code> to signal ascending (<code>true</code>) or descending (<code>false</code>) order. The example below illustrates how to sort the ATP
-2013 match frame by descending row key order. In the unsorted frame, the row keys are monotonically increasing 
-integers so the sort effectively reverses the order of the frame revealing the last matches at the top of the 
+2013 match frame by descending row key order. In the unsorted frame, the row keys are monotonically increasing
+integers so the sort effectively reverses the order of the frame revealing the last matches at the top of the
 frame.</p>
 <?prettify?>
 
@@ -315,11 +331,11 @@ frame.out().print(10);
 
 <h5 id="value-sort">Value Sort</h5>
 <p>A more common scenario may be to sort rows according to values in a specific column. Any data type that implements the
-<code>Comparable</code> interface can be sorted in this way (the same applies to sorting by keys as described in the previous section). 
+<code>Comparable</code> interface can be sorted in this way (the same applies to sorting by keys as described in the previous section).
 If the <code>DataFrame</code> happens to have a column of data whose type does not implement <code>Comparable</code> and sorting according to
 this data is required, a user provided <code>Comparator</code> will have to be applied, which is discussed later.</p>
-<p>The example below demonstrates how to sort the 2013 ATP match results by the rank of the eventual winner of the match (<code>WRank</code>). 
-Oddly, there appears to be a player ranked zero (namely Khachanov K.), and thus he appears first. Beyond this anomaly, you find 
+<p>The example below demonstrates how to sort the 2013 ATP match results by the rank of the eventual winner of the match (<code>WRank</code>).
+Oddly, there appears to be a player ranked zero (namely Khachanov K.), and thus he appears first. Beyond this anomaly, you find
 the expected names in the Winner column, namely Djokovic and Nadal.</p>
 <?prettify?>
 
@@ -346,10 +362,10 @@ frame.out().print(10);
 </pre></div>
 
 <h5 id="multidimensional-sort">Multidimensional Sort</h5>
-<p>The <code>DataFrameAxis</code> interface also supports a <strong>multidimensional</strong> sort where the row order is first sorted by the values in one column 
-and then by a second, third and so on. The example below again uses the 2013 ATP match results to sort first by the match <code>Date</code> column 
-(because we expect to find many matches occurring on the same day), and then subsequently by the rank of the eventual winner (<code>WRank</code>). 
-The output below shows the first 10 rows of the sorted frame, with the earliest matches occurring on 2012-10-01 (it appears the ATP tour 
+<p>The <code>DataFrameAxis</code> interface also supports a <strong>multidimensional</strong> sort where the row order is first sorted by the values in one column
+and then by a second, third and so on. The example below again uses the 2013 ATP match results to sort first by the match <code>Date</code> column
+(because we expect to find many matches occurring on the same day), and then subsequently by the rank of the eventual winner (<code>WRank</code>).
+The output below shows the first 10 rows of the sorted frame, with the earliest matches occurring on 2012-10-01 (it appears the ATP tour
 does not follow a calendar year), followed by a WRank sort which is also ascending.</p>
 <?prettify?>
 
@@ -376,15 +392,15 @@ frame.out().print(10);
 </pre></div>
 
 <h5 id="comparator-sort">Comparator Sort</h5>
-<p>If the two row sort mechanisms discussed above are functionally insufficient for your needs, a final <code>sort()</code> method 
-on the <code>DataFrameAxis</code> interface is provided which accepts a user implemented <code>Comparator</code>, allowing for sorting logic 
+<p>If the two row sort mechanisms discussed above are functionally insufficient for your needs, a final <code>sort()</code> method
+on the <code>DataFrameAxis</code> interface is provided which accepts a user implemented <code>Comparator</code>, allowing for sorting logic
 of arbitrary complexity. </p>
-<p>Depending on the implementation of the <code>Comparator</code>, performance may not be quite as good as the two prior use cases as 
-those mechanisms can leverage private access to the internal data structures of the frame. If that proves to be the case, 
+<p>Depending on the implementation of the <code>Comparator</code>, performance may not be quite as good as the two prior use cases as
+those mechanisms can leverage private access to the internal data structures of the frame. If that proves to be the case,
 using parallel sort on a multi-core machine is likely to boost performance significantly (see section below which provides
 some hard numbers on this topic).</p>
 <p>The example below shows how to sort the 2013 ATP match results by a derived value (i.e. one where a column representing
-the sort quantity does not exist on the frame). In this setup we apply a row sort such that rows that have the smallest 
+the sort quantity does not exist on the frame). In this setup we apply a row sort such that rows that have the smallest
 absolute difference between the betting odds on the eventual winner (<code>AvgW</code>) and eventual loser (<code>AvgL</code>) appear first.
 This helps identity matches that as far as the bookmakers are concerned, are simply too close to call.</p>
 <?prettify?>
@@ -417,9 +433,9 @@ frame.out().print(10);
 
 <h4 id="column-sorting">Column Sorting</h4>
 <h5 id="key-sort_1">Key Sort</h5>
-<p>The Morpheus API is almost entirely symmetrical in the row and column dimension, so the sorting mechanisms presented 
-in the previous sections can also be used to sort columns. The first code example below sorts the columns of the 2013 
-ATP match results in ascending order by calling the <code>sort(ascending=true)</code> method on the <code>DataFrameAxis</code> returned 
+<p>The Morpheus API is almost entirely symmetrical in the row and column dimension, so the sorting mechanisms presented
+in the previous sections can also be used to sort columns. The first code example below sorts the columns of the 2013
+ATP match results in ascending order by calling the <code>sort(ascending=true)</code> method on the <code>DataFrameAxis</code> returned
 from <code>DataFrame.cols()</code>.</p>
 <?prettify?>
 
@@ -450,15 +466,15 @@ frame.out().print(10);
 much sense to sort the 2013 ATP match results in this way, and in fact you will get a <code>ClassCastException</code> when a <code>String</code>
 is compared to a <code>Double</code> value by calling its <code>compareTo()</code> method. You could of course implement a custom <code>Comparator</code>
 and sort the columns based on the <code>toString()</code> of all the values, but it's hard to see what the value is in that.</p>
-<p>To demonstrate a column sort based on row data, the following example creates a <code>10x10</code> frame initialized with random double 
-precision values. Given the homogeneity of the types along the rows in this frame, a column sort is a reasonable proposition. 
+<p>To demonstrate a column sort based on row data, the following example creates a <code>10x10</code> frame initialized with random double
+precision values. Given the homogeneity of the types along the rows in this frame, a column sort is a reasonable proposition.
 The column keys in the unsorted frame are <code>C0</code>, <code>C1</code>, <code>C2</code> to <code>C9</code>, and the new order post sort is shown below. </p>
 <?prettify?>
 
 <pre><code class="java">//Create a 10x10 frame initialized with random doubles
 DataFrame&lt;String,String&gt; frame = DataFrame.ofDoubles(
     Range.of(0, 10).map(i -&gt; &quot;R&quot; + i),
-    Range.of(0, 10).map(i -&gt; &quot;C&quot; + i), 
+    Range.of(0, 10).map(i -&gt; &quot;C&quot; + i),
     value -&gt; Math.random() * 100d
 );
 //Sort columns by the data in first row in ascending order
@@ -515,10 +531,10 @@ frame.out().print(10);
 </pre></div>
 
 <h4 id="filters">Filters</h4>
-<p>Slicing or filtering a <code>DataFrame</code> is a common operation and is discussed in some detail <a href="../filtering">here</a>. There are 
-structural immutability constraints on filtered frames, however sorting in both the row and column dimensions is 
+<p>Slicing or filtering a <code>DataFrame</code> is a common operation and is discussed in some detail <a href="../filtering">here</a>. There are
+structural immutability constraints on filtered frames, however sorting in both the row and column dimensions is
 supported.</p>
-<p>The example below first filters the 2013 ATP match results so as to capture all rows in which Novak Djokovic was the victor, 
+<p>The example below first filters the 2013 ATP match results so as to capture all rows in which Novak Djokovic was the victor,
 and then sorts these rows in ascending order according to the rank of the match loser (<code>LRank</code>). In that way, the highest
 rank players he beat appear first, so it is no surprise to see names like Nadal, Murray, Federer and so on.</p>
 <?prettify?>
@@ -549,9 +565,9 @@ filter.out().print(10);
 
 <h4 id="performance">Performance</h4>
 <p>Morpheus has been designed specifically to deal with very large data, and the section on general performance
-which is discussed <a href="">here</a> and <a href="">here</a> describes some of the implementation choices and their rationale. 
-Morpheus is not a traditional Big Data solution in that it is focused on addressing a class of problem that 
-can fit in the memory space of a single operating system process. These days it is not uncommon to find machines 
+which is discussed <a href="">here</a> and <a href="">here</a> describes some of the implementation choices and their rationale.
+Morpheus is not a traditional Big Data solution in that it is focused on addressing a class of problem that
+can fit in the memory space of a single operating system process. These days it is not uncommon to find machines
 with 250GB of physical memory, which can certainly be used to analyze substantial data. A distributed solution
 using Morpheus while possible, is not addressed as part of the framework, at least not at the time of writing.</p>
 <p>Great care has been spent designing efficient data structures that scale well on the Java Virtual Machine, and
@@ -559,16 +575,16 @@ many of the common <code>DataFrame</code> operations can execute in <strong>para
 the fork and join framework introduced in Java 7. Sorting is one such operation.</p>
 <h5 id="sequential-sorting">Sequential Sorting</h5>
 <p>By default, <code>DataFrame</code> functions implement sequential routines unless a concurrent implementation is requested
-by calling the <code>parallel()</code> method on the interface in question. This design has been influenced by the 
+by calling the <code>parallel()</code> method on the interface in question. This design has been influenced by the
 Java 8 Stream API, which is not only fluid to work with, but should also serve to reduce the learning curve
 somewhat (assuming you are familiar with some of these new APIs introduced in JDK 8).</p>
-<p>The test results presented below were performed on a late 2013 Macbook Pro with a 2.6Ghz Core i7 Quad Core 
-processor. Like all benchmarks, they should be taken with a pinch of salt, but the key point to convey here is 
-the substantial gain in performance of the <strong>parallel</strong> sort over the <strong>sequential</strong> while adding no implementation 
+<p>The test results presented below were performed on a late 2013 Macbook Pro with a 2.6Ghz Core i7 Quad Core
+processor. Like all benchmarks, they should be taken with a pinch of salt, but the key point to convey here is
+the substantial gain in performance of the <strong>parallel</strong> sort over the <strong>sequential</strong> while adding no implementation
 complexity to the end user.</p>
 <p>In all cases, these benchmarks execute 10 runs of each scenario, and compute summary statistics on the timimg results,
-namely a <em>min</em>, <em>max</em>, <em>mean</em>, <em>median</em> and <em>standard deviation</em>. This should give adequate time for the Hotspot 
-to perform its magic, and should also give us a sense on the level of dispersion we see across the runs. Obviously 
+namely a <em>min</em>, <em>max</em>, <em>mean</em>, <em>median</em> and <em>standard deviation</em>. This should give adequate time for the Hotspot
+to perform its magic, and should also give us a sense on the level of dispersion we see across the runs. Obviously
 the lower the dispersion, the more confidence we can have in the results.</p>
 <p>The code below is the full benchmark. Before each test run, we call <code>DataFrame.rows().sort(null)</code> which is effectively
 passing a null comparator, and thereby resetting the frame to its original unsorted state. If we didn't do this
@@ -605,15 +621,15 @@ Chart.create().withBarPlot(results, false, chart -&gt; {
 });
 </code></pre>
 
-<p>The results in the chart below show a fairly linear increase in sort times as we progress from a frame with 1 million 
-to 5 million rows. The dispersion in the 10 iterations as measured by the standard deviation is fairly low in all cases, 
+<p>The results in the chart below show a fairly linear increase in sort times as we progress from a frame with 1 million
+to 5 million rows. The dispersion in the 10 iterations as measured by the standard deviation is fairly low in all cases,
 at least as a percentage of the time taken.</p>
 <p align="center">
     <img class="chart" src="../../images/frame/data-frame-row-sort-sequential.png"/>
 </p>
 
 <h5 id="parallel-sorting">Parallel Sorting</h5>
-<p>The sequential benchmark code presented in the previous section can be ever so slightly modified to leverage a parallel 
+<p>The sequential benchmark code presented in the previous section can be ever so slightly modified to leverage a parallel
 sort by ensuring that we call <code>DataFrame.rows().parallel().sort()</code>. The modified code is as follows:</p>
 <?prettify?>
 
@@ -646,10 +662,10 @@ Chart.create().withBarPlot(results, false, chart -&gt; {
 });
 </code></pre>
 
-<p>The plot with the parallel execution results below shows a very significant improvement, and also has lower 
-dispersion in the results. For the largest frame with 5 million rows the <em>median</em> sort time went from around 
-1400 milliseconds in the sequential case to just over 500 milliseconds with the parallel execution. As processor 
-cache sizes increase and ever more cores become available, we can only expect this spread to widen as Moore's 
+<p>The plot with the parallel execution results below shows a very significant improvement, and also has lower
+dispersion in the results. For the largest frame with 5 million rows the <em>median</em> sort time went from around
+1400 milliseconds in the sequential case to just over 500 milliseconds with the parallel execution. As processor
+cache sizes increase and ever more cores become available, we can only expect this spread to widen as Moore's
 Law begins to plateau.</p>
 <p align="center">
     <img class="chart" src="../../images/frame/data-frame-row-sort-parallel.png"/>
@@ -660,7 +676,7 @@ Law begins to plateau.</p>
 with a user provided <code>Comparator</code> as opposed to using the <code>sort()</code> functions that just take a row
 or column key. The example below addresses this question by sorting a frame with 1 million rows
 and using identical logic where in one case we simply sort the rows based on a column key, and
-in the second we provide a <code>Comparator</code> implementation that effectively does the same thing. We 
+in the second we provide a <code>Comparator</code> implementation that effectively does the same thing. We
 also run a sequential and parallel setup for these two cases, so 4 test scenarios in all. For each
 scenario, we run 10 iterations so we can collect some summary statistics. The benchmark code is as
 follows:</p>
@@ -709,7 +725,7 @@ the <code>Comparator</code>. </p>
 </p>
 
 <p>These performance benchmarks are obviously very controlled test cases, and real world performance is likely
-to differ for all kinds of reasons. In addition, at the time of writing the Morpheus Library is at version 1.0, 
+to differ for all kinds of reasons. In addition, at the time of writing the Morpheus Library is at version 1.0,
 so performance improvements are likely to come in follow up releases.</p></div>
         </div>
 

@@ -1,12 +1,28 @@
+<!--
+  ~ Copyright (C) 2014-2018 D3X Systems - All Rights Reserved
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        
+
         <meta name="author" content="Xavier Witdouck">
-        
+
         <link rel="shortcut icon" href="../../img/favicon.ico">
         <title>Construction - Morpheus</title>
         <link href="../../css/bootstrap-custom.min.css" rel="stylesheet">
@@ -20,10 +36,10 @@
             <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
             <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
         <![endif]-->
-	
+
 	<script src="../../js/jquery-1.10.2.min.js"></script>
         <script src="../../js/bootstrap-3.0.3.min.js"></script>
-        <script src="../../js/highlight.pack.js"></script> 
+        <script src="../../js/highlight.pack.js"></script>
     </head>
 
     <body>
@@ -53,11 +69,11 @@
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Array <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            
+
 <li >
     <a href="../../array/overview/">Overview</a>
 </li>
-                            
+
 <li >
     <a href="../../array/performance/">Performance</a>
 </li>
@@ -66,39 +82,39 @@
                     <li class="dropdown active">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">DataFrame <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            
+
 <li class="active">
     <a href="./">Construction</a>
 </li>
-                            
+
 <li >
     <a href="../access/">Accessing</a>
 </li>
-                            
+
 <li >
     <a href="../reshaping/">Reshaping</a>
 </li>
-                            
+
 <li >
     <a href="../filtering/">Filtering</a>
 </li>
-                            
+
 <li >
     <a href="../sorting/">Sorting</a>
 </li>
-                            
+
 <li >
     <a href="../grouping/">Grouping</a>
 </li>
-                            
+
 <li >
     <a href="../finding/">Finding</a>
 </li>
-                            
+
 <li >
     <a href="../writing/">Writing</a>
 </li>
-                            
+
 <li >
     <a href="../performance/">Performance</a>
 </li>
@@ -107,45 +123,45 @@
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Analysis <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            
+
 <li >
     <a href="../../analysis/statistics/">Descriptive Statistics</a>
 </li>
-                            
+
   <li class="dropdown-submenu">
     <a href="#">Linear Regression</a>
     <ul class="dropdown-menu">
-            
+
 <li >
     <a href="../../regression/ols/">Ordinary Least Squares</a>
 </li>
-            
+
 <li >
     <a href="../../regression/wls/">Weighted Least Squares</a>
 </li>
-            
+
 <li >
     <a href="../../regression/gls/">Generalized Least Squares</a>
 </li>
     </ul>
   </li>
-                            
+
 <li >
     <a href="../../analysis/pca/">Principal Component Analysis</a>
 </li>
-                            
+
 <li >
     <a href="../../analysis/linearalgebra/">Linear Algebra</a>
 </li>
-                            
+
 <li >
     <a href="../../analysis/timeseries/">Time Series Analysis</a>
 </li>
-                            
+
   <li class="dropdown-submenu">
     <a href="#">Examples</a>
     <ul class="dropdown-menu">
-            
+
 <li >
     <a href="../../examples/mpt/">Modern Portfolio Theory</a>
 </li>
@@ -156,29 +172,29 @@
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Visualization <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            
+
   <li class="dropdown-submenu">
     <a href="#">Charts</a>
     <ul class="dropdown-menu">
-            
+
 <li >
     <a href="../../viz/charts/overview/">Overview</a>
 </li>
-            
+
 <li >
     <a href="../../viz/charts/embed/">Embedding (HTML)</a>
 </li>
-            
+
 <li >
     <a href="../../viz/charts/gallery1/">Gallery (Google)</a>
 </li>
-            
+
 <li >
     <a href="../../viz/charts/gallery2/">Gallery (JFree)</a>
 </li>
     </ul>
   </li>
-                            
+
 <li >
     <a href="../../viz/tables/overview/">Tables</a>
 </li>
@@ -187,23 +203,23 @@
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Data Sources <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            
+
 <li >
     <a href="../../providers/quandl/">Quandl</a>
 </li>
-                            
+
 <li >
     <a href="../../providers/fred/">Federal Reserve</a>
 </li>
-                            
+
 <li >
     <a href="../../providers/google/">Google Finance</a>
 </li>
-                            
+
 <li >
     <a href="../../providers/yahoo/">Yahoo Finance</a>
 </li>
-                            
+
 <li >
     <a href="../../providers/world-bank/">World Bank</a>
 </li>
@@ -270,9 +286,9 @@ to hold double precision values. The code below illustrates various common const
 data types.</p>
 <?prettify?>
 
-<pre><code class="java">import com.zavtech.morpheus.array.Array;
-import com.zavtech.morpheus.frame.DataFrame;
-import com.zavtech.morpheus.range.Range;
+<pre><code class="java">import com.d3x.morpheus.array.Array;
+import com.d3x.morpheus.frame.DataFrame;
+import com.d3x.morpheus.range.Range;
 
 //Create a list of column keys
 Iterable&lt;Month&gt; months = Array.of(Month.class, Month.values());
@@ -313,25 +329,25 @@ DataFrame&lt;Year,Month&gt; objects = DataFrame.ofValues(Year.of(2014), months);
 
 <h4 id="mixed-column-types">Mixed Column Types</h4>
 <p>The example below demonstrates how to create a <code>DataFrame</code> where each column is configured to hold
-a different data type, similar to the way a SQL table might be structured. In this case, 5 columns 
-are created via calls to <code>columns.add()</code> which takes the column key and the data type for the column. 
-In addition, the column values in this example are initialized with random values via the type specific 
+a different data type, similar to the way a SQL table might be structured. In this case, 5 columns
+are created via calls to <code>columns.add()</code> which takes the column key and the data type for the column.
+In addition, the column values in this example are initialized with random values via the type specific
 <code>applyXXX()</code> methods.</p>
 <?prettify?>
 
 <pre><code class="java">//Create a frame with 5 columns each optimized for a different data type and randomly initialized values
 Random rand = new java.util.Random();
 DataFrame&lt;Year,Month&gt; randomFrame = DataFrame.of(years, Month.class, columns -&gt; {
-    columns.add(Month.JANUARY, Boolean.class).applyBooleans(v -&gt; rand.nextBoolean()); 
-    columns.add(Month.MARCH, Integer.class).applyInts(v -&gt; rand.nextInt());       
-    columns.add(Month.JUNE, Long.class).applyLongs(v -&gt; rand.nextLong());           
-    columns.add(Month.SEPTEMBER, Double.class).applyDoubles(v -&gt; rand.nextDouble());    
+    columns.add(Month.JANUARY, Boolean.class).applyBooleans(v -&gt; rand.nextBoolean());
+    columns.add(Month.MARCH, Integer.class).applyInts(v -&gt; rand.nextInt());
+    columns.add(Month.JUNE, Long.class).applyLongs(v -&gt; rand.nextLong());
+    columns.add(Month.SEPTEMBER, Double.class).applyDoubles(v -&gt; rand.nextDouble());
     columns.add(Month.DECEMBER, Object.class).applyValues(v -&gt; String.valueOf(rand.nextDouble()));
 });
 </code></pre>
 
 <p>On occasion, it might be desirable to create an empty DataFrame which can be expanded over time, by adding
-keys to the frame's row and column axis. Methods are provided to add keys individually or in bulk via 
+keys to the frame's row and column axis. Methods are provided to add keys individually or in bulk via
 <code>Iterable</code> as shown below. When adding columns, the class representing the data type for that column must
 be specified.</p>
 <?prettify?>
@@ -347,12 +363,12 @@ frame.cols().addAll(Array.of(Month.APRIL, Month.JULY), Double.class);
 </code></pre>
 
 <h3 id="from-csv">From CSV</h3>
-<p>The Morpheus library includes an API to initialise a <code>DataFrame</code> from a CSV data source. The parser 
-will attempt to guess the column types from the first N rows in the sample (which is configurable), 
+<p>The Morpheus library includes an API to initialise a <code>DataFrame</code> from a CSV data source. The parser
+will attempt to guess the column types from the first N rows in the sample (which is configurable),
 in the absence of explicitly configured column types. It supports CSV formats with and without a header,
 and can optionally utilize a user provided function to generate the keys for the row axis. If a row key
-generation function is not provided, a sequence of integers will be used by default. The following section 
-illustrates various parsing examples, beginning with simple cases and progressing to more elaborate 
+generation function is not provided, a sequence of integers will be used by default. The following section
+illustrates various parsing examples, beginning with simple cases and progressing to more elaborate
 examples.</p>
 <?prettify?>
 
@@ -434,8 +450,8 @@ DataFrame&lt;LocalDate,String&gt; frame = DataFrame.readCsv(options -&gt; {
 first is to turn on parallel processing and the second is to vary the batch size. The batch size can be
 influential, especially when the parser which converts a raw string from the CSV content to another type is an
 expensive operation. </p>
-<p>The chart below shows some performance statistics comparing parallel versus sequential loading of a 40MB file 
-containing roughly 760,000 rows of CSV content.  While the absolute figures are very machine specific, the relative 
+<p>The chart below shows some performance statistics comparing parallel versus sequential loading of a 40MB file
+containing roughly 760,000 rows of CSV content.  While the absolute figures are very machine specific, the relative
 difference does suggest that parallel loading can make a material improvement on a multi-core machine, which
 is pretty standard issue these days.</p>
 <p align="center">
@@ -445,8 +461,8 @@ is pretty standard issue these days.</p>
 <p>The code to produce this plot is as follows:</p>
 <?prettify?>
 
-<pre><code class="java">import com.zavtech.morpheus.frame.DataFrame;
-import com.zavtech.morpheus.viz.chart.Chart;
+<pre><code class="java">import com.d3x.morpheus.frame.DataFrame;
+import com.d3x.morpheus.viz.chart.Chart;
 
 final String path = &quot;/Users/witdxav/Dropbox/data/fxcm/AUDUSD/2012/AUDUSD-2012.csv&quot;;
 final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern(&quot;yyyy.MM.dd&quot;);
@@ -495,8 +511,8 @@ Chart.create().withBarPlot(timingStats, false, chart -&gt; {
 <p>Morpheus supports both CSV row and column filtering at load time, which can be convenient if you only
 need to analyze a subsection of a very large file. The alternative would be to simply load the entire file,
 and then filter the <code>DataFrame</code>, but this could be very inefficient from a memory perspective. The example
-below demonstrates both row and column filtering of the <strong>Yahoo Finance</strong> quote data set described above, 
-where we limit the extraction to the <strong>Open</strong>, <strong>Close</strong> and <strong>Adj Close</strong> columns, and also to only include 
+below demonstrates both row and column filtering of the <strong>Yahoo Finance</strong> quote data set described above,
+where we limit the extraction to the <strong>Open</strong>, <strong>Close</strong> and <strong>Adj Close</strong> columns, and also to only include
 rows that fall on a <strong>Monday</strong>.</p>
 <?prettify?>
 
@@ -604,15 +620,15 @@ DataFrame&lt;LocalDate,String&gt; frame = DataFrame.readJson(options -&gt; {
 <p>The Morpheus library ships with a <code>DataFrameSource</code> implementation designed to initialize <code>DataFrames</code> from
 the results of a SQL query. The following section illustrates various examples of how the API can be used
 in this regard. </p>
-<p>As a convenience, a static <code>readDb()</code> method exists on the <code>DataFrame</code> class which takes as an argument a 
-function that configures the details of the request. At a minimum, two inputs are required on the request 
-descriptor, namely the database connection (or the details of how to establish a connection), and a SQL 
+<p>As a convenience, a static <code>readDb()</code> method exists on the <code>DataFrame</code> class which takes as an argument a
+function that configures the details of the request. At a minimum, two inputs are required on the request
+descriptor, namely the database connection (or the details of how to establish a connection), and a SQL
 expression. Many other aspects of the request can be tailored, but the most basic example is as follows:</p>
 <?prettify?>
 
-<pre><code class="java">import com.zavtech.morpheus.frame.DataFrame;
+<pre><code class="java">import com.d3x.morpheus.frame.DataFrame;
 
-//Ensure the JDBC driver is loaded 
+//Ensure the JDBC driver is loaded
 Class.forName(&quot;org.h2.Driver&quot;);
 
 //Create a frame from a select statement
@@ -624,14 +640,14 @@ DataFrame&lt;Integer,String&gt; frame = DataFrame.readDb(options -&gt; {
 
 <p>By default, the first column in the SQL <code>ResultSet</code> is used to initialize the row keys of the <code>DataFrame</code>,
 and in the example above, this amounts to the unique id of the Customer record. The API does provide
-for greater control by supporting a user defined function that can be applied to generate the key for 
-each row in the SQL <code>ResultSet</code>. A good example of where this would be necessary is the case of a 
+for greater control by supporting a user defined function that can be applied to generate the key for
+each row in the SQL <code>ResultSet</code>. A good example of where this would be necessary is the case of a
 composite key.</p>
 <?prettify?>
 
 <pre><code class="java">import javax.sql.DataSource;
-import com.zavtech.morpheus.util.Tuple;
-import com.zavtech.morpheus.frame.DataFrame;
+import com.d3x.morpheus.util.Tuple;
+import com.d3x.morpheus.frame.DataFrame;
 
 // Join products and inventory to see what we have where
 javax.sql.DataSource dataSource = getDataSource();
@@ -648,14 +664,14 @@ DataFrame&lt;Tuple,String&gt; frame = DataFrame.readDb(options -&gt; {
 });
 </code></pre>
 
-<p>In the above example, because we have supplied our own function to generate a row key from a record in the 
+<p>In the above example, because we have supplied our own function to generate a row key from a record in the
 <code>ResultSet</code>, we know the resulting frame with be parameterized as <code>&lt;Tuple,String&gt;</code>. By default, frames
 generated from a database query will always have a <code>String</code> based column axis representing the column
 names in the <code>ResultSet</code>, but these can obviously be mapped to some other type post construction.</p>
 <p>It is often desirable to transform data read from a SQL <code>ResultSet</code> so that it can be typed more appropriately
 or modified in some way. The Morpheus API provides the capability to configure column specific extractors
 to perform such transformations. Consider the example below, where we query Customer records which have a
-<code>VARCHAR</code> column used to capture a user's time zone, and we wish to convert this to a <code>ZoneId</code> within 
+<code>VARCHAR</code> column used to capture a user's time zone, and we wish to convert this to a <code>ZoneId</code> within
 the resulting <code>DataFrame</code>. This example also demonstrates a parameterized query where arguments are
 applied using the <code>withParameters()</code> method on the request descriptor.</p>
 <?prettify?>
@@ -663,10 +679,10 @@ applied using the <code>withParameters()</code> method on the request descriptor
 <pre><code class="java">import java.time.LocalDate;
 import java.time.ZoneId;
 import javax.sql.DataSource;
-import com.zavtech.morpheus.frame.DataFrame;
-import com.zavtech.morpheus.util.sql.SQLExtractor;
+import com.d3x.morpheus.frame.DataFrame;
+import com.d3x.morpheus.util.sql.SQLExtractor;
 
-//Convert the user's time zone into a ZoneId 
+//Convert the user's time zone into a ZoneId
 javax.sql.DataSource dataSource = getDataSource();
 DataFrame&lt;Integer,String&gt; frame = DataFrame.readDb(options -&gt; {
     options.withConnection(dataSource);

@@ -1,12 +1,28 @@
+<!--
+  ~ Copyright (C) 2014-2018 D3X Systems - All Rights Reserved
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        
+
         <meta name="author" content="Xavier Witdouck">
-        
+
         <link rel="shortcut icon" href="../../../img/favicon.ico">
         <title>Overview - Morpheus</title>
         <link href="../../../css/bootstrap-custom.min.css" rel="stylesheet">
@@ -20,10 +36,10 @@
             <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
             <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
         <![endif]-->
-	
+
 	<script src="../../../js/jquery-1.10.2.min.js"></script>
         <script src="../../../js/bootstrap-3.0.3.min.js"></script>
-        <script src="../../../js/highlight.pack.js"></script> 
+        <script src="../../../js/highlight.pack.js"></script>
     </head>
 
     <body>
@@ -53,11 +69,11 @@
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Array <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            
+
 <li >
     <a href="../../../array/overview/">Overview</a>
 </li>
-                            
+
 <li >
     <a href="../../../array/performance/">Performance</a>
 </li>
@@ -66,39 +82,39 @@
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">DataFrame <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            
+
 <li >
     <a href="../../../frame/construction/">Construction</a>
 </li>
-                            
+
 <li >
     <a href="../../../frame/access/">Accessing</a>
 </li>
-                            
+
 <li >
     <a href="../../../frame/reshaping/">Reshaping</a>
 </li>
-                            
+
 <li >
     <a href="../../../frame/filtering/">Filtering</a>
 </li>
-                            
+
 <li >
     <a href="../../../frame/sorting/">Sorting</a>
 </li>
-                            
+
 <li >
     <a href="../../../frame/grouping/">Grouping</a>
 </li>
-                            
+
 <li >
     <a href="../../../frame/finding/">Finding</a>
 </li>
-                            
+
 <li >
     <a href="../../../frame/writing/">Writing</a>
 </li>
-                            
+
 <li >
     <a href="../../../frame/performance/">Performance</a>
 </li>
@@ -107,45 +123,45 @@
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Analysis <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            
+
 <li >
     <a href="../../../analysis/statistics/">Descriptive Statistics</a>
 </li>
-                            
+
   <li class="dropdown-submenu">
     <a href="#">Linear Regression</a>
     <ul class="dropdown-menu">
-            
+
 <li >
     <a href="../../../regression/ols/">Ordinary Least Squares</a>
 </li>
-            
+
 <li >
     <a href="../../../regression/wls/">Weighted Least Squares</a>
 </li>
-            
+
 <li >
     <a href="../../../regression/gls/">Generalized Least Squares</a>
 </li>
     </ul>
   </li>
-                            
+
 <li >
     <a href="../../../analysis/pca/">Principal Component Analysis</a>
 </li>
-                            
+
 <li >
     <a href="../../../analysis/linearalgebra/">Linear Algebra</a>
 </li>
-                            
+
 <li >
     <a href="../../../analysis/timeseries/">Time Series Analysis</a>
 </li>
-                            
+
   <li class="dropdown-submenu">
     <a href="#">Examples</a>
     <ul class="dropdown-menu">
-            
+
 <li >
     <a href="../../../examples/mpt/">Modern Portfolio Theory</a>
 </li>
@@ -156,29 +172,29 @@
                     <li class="dropdown active">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Visualization <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            
+
   <li class="dropdown-submenu">
     <a href="#">Charts</a>
     <ul class="dropdown-menu">
-            
+
 <li class="active">
     <a href="./">Overview</a>
 </li>
-            
+
 <li >
     <a href="../embed/">Embedding (HTML)</a>
 </li>
-            
+
 <li >
     <a href="../gallery1/">Gallery (Google)</a>
 </li>
-            
+
 <li >
     <a href="../gallery2/">Gallery (JFree)</a>
 </li>
     </ul>
   </li>
-                            
+
 <li >
     <a href="../../tables/overview/">Tables</a>
 </li>
@@ -187,23 +203,23 @@
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Data Sources <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            
+
 <li >
     <a href="../../../providers/quandl/">Quandl</a>
 </li>
-                            
+
 <li >
     <a href="../../../providers/fred/">Federal Reserve</a>
 </li>
-                            
+
 <li >
     <a href="../../../providers/google/">Google Finance</a>
 </li>
-                            
+
 <li >
     <a href="../../../providers/yahoo/">Yahoo Finance</a>
 </li>
-                            
+
 <li >
     <a href="../../../providers/world-bank/">World Bank</a>
 </li>
@@ -275,22 +291,22 @@
                 <div class="col-md-9" role="main">
 
 <h2 id="introduction">Introduction</h2>
-<p>The Morpheus visualization library defines a <strong>simple chart abstraction API</strong> with adapters supporting both 
+<p>The Morpheus visualization library defines a <strong>simple chart abstraction API</strong> with adapters supporting both
 <a href="http://www.jfree.org/jfreechart/">JFreeChart</a> as well as <a href="https://developers.google.com/chart/">Google Charts</a> (with others
-to follow by popular demand). This design makes it possible to generate interactive <a href="https://en.wikipedia.org/wiki/Swing_(Java)">Java Swing</a> 
-charts as well as HTML5 browser based charts via the same API. By default, the framework is configured to use the JFreeChart 
-adapter, however this can be re-configured on a global basis by calling either <code>htmlMode()</code> or <code>swingMode()</code> as shown 
+to follow by popular demand). This design makes it possible to generate interactive <a href="https://en.wikipedia.org/wiki/Swing_(Java)">Java Swing</a>
+charts as well as HTML5 browser based charts via the same API. By default, the framework is configured to use the JFreeChart
+adapter, however this can be re-configured on a global basis by calling either <code>htmlMode()</code> or <code>swingMode()</code> as shown
 below.</p>
 <?prettify?>
 
-<pre><code class="java">//Switch chart adapter to HTML mode globally 
+<pre><code class="java">//Switch chart adapter to HTML mode globally
 Chart.create().htmlMode();
 
-//Switch chart adapter to SWING mode globally 
+//Switch chart adapter to SWING mode globally
 Chart.create().swingMode();
 </code></pre>
 
-<p>It is also possible to operate in <strong>mixed mode</strong> from within the the same application rather than switching the adapter 
+<p>It is also possible to operate in <strong>mixed mode</strong> from within the the same application rather than switching the adapter
 globally. By explicitly calling <code>asHtml()</code> or <code>asSwing()</code> prior to invoking one of the plotting functions on the <code>Chart</code>
 interface, Html and Swing based charts can be generated from within the same application as shown below.  </p>
 <?prettify?>
@@ -310,20 +326,20 @@ Chart.create().asHtml().withLinePlot(frame, chart -&gt; {
 });
 </code></pre>
 
-<p>The following sections demonstrate how to use the Morpheus charting API, and provide various examples of what kind of 
-charts are supported. The illustrations below are PNG files generated using the JFreeChart adapter, however a <a href="../gallery1">gallery</a> 
-of the same plots generated via the <strong>Google adapter</strong> show just how similar the plots from the two implementations are. 
-While most of the functionality exposed by the Morpheus Charting API are supported by both adapters, there are some gaps 
+<p>The following sections demonstrate how to use the Morpheus charting API, and provide various examples of what kind of
+charts are supported. The illustrations below are PNG files generated using the JFreeChart adapter, however a <a href="../gallery1">gallery</a>
+of the same plots generated via the <strong>Google adapter</strong> show just how similar the plots from the two implementations are.
+While most of the functionality exposed by the Morpheus Charting API are supported by both adapters, there are some gaps
 in the Google adapter which are documented below.</p>
 <h2 id="line-charts">Line Charts</h2>
 <h3 id="single-series">Single Series</h3>
-<p>Consider the <code>DataFrame</code> below with dimensions <code>1000x1</code> which has a row axis of type <code>LocalDate</code> and 1 column of 
-double precision values representing the cumulative sum of an <code>Array</code> of normally distributed random values. The first 
+<p>Consider the <code>DataFrame</code> below with dimensions <code>1000x1</code> which has a row axis of type <code>LocalDate</code> and 1 column of
+double precision values representing the cumulative sum of an <code>Array</code> of normally distributed random values. The first
 10 rows of this frame are printed below.</p>
 <?prettify?>
 
-<pre><code class="java">import com.zavtech.morpheus.array.Array;
-import com.zavtech.morpheus.frame.DataFrame;
+<pre><code class="java">import com.d3x.morpheus.array.Array;
+import com.d3x.morpheus.frame.DataFrame;
 
 int rowCount = 1000;
 LocalDate startDate = LocalDate.of(2013, 1, 1);
@@ -347,9 +363,9 @@ DataFrame&lt;LocalDate,String&gt; frame = DataFrame.of(dates, String.class, colu
  2013-01-09  |  -3.63748847  |
  </pre></div>
 
-<p>To generate an line plot of this series, we can use the dates in the <code>DataFrame</code> row axis as the <strong>x-values</strong>, and 
+<p>To generate an line plot of this series, we can use the dates in the <code>DataFrame</code> row axis as the <strong>x-values</strong>, and
 the numeric values in column <code>A</code> as the range or <strong>y-values</strong>. The <code>withLines()</code> method on the <code>ChartFactory</code> interface
-expects the <code>DataFrame</code> containing the data to plot, and a <code>Consumer</code> which is used to configure various features of 
+expects the <code>DataFrame</code> containing the data to plot, and a <code>Consumer</code> which is used to configure various features of
 the chart. In the example below, we simply display the chart with no further customization by calling <code>show()</code>.</p>
 <?prettify?>
 
@@ -363,9 +379,9 @@ the chart. In the example below, we simply display the chart with no further cus
 </p>
 
 <h3 id="multiple-series">Multiple Series</h3>
-<p>A common scenario is to generate an line plot where the domain or <strong>x-axis</strong> is based on data in a specific column of the frame 
-rather than the <strong>row axis</strong> as in the previous example. This can be done by passing the label of the column to use for 
-the domain axis to the <code>withLines()</code> method. In the example below, we create a similar dataset to above but with dimensions 
+<p>A common scenario is to generate an line plot where the domain or <strong>x-axis</strong> is based on data in a specific column of the frame
+rather than the <strong>row axis</strong> as in the previous example. This can be done by passing the label of the column to use for
+the domain axis to the <code>withLines()</code> method. In the example below, we create a similar dataset to above but with dimensions
 <code>1000x5</code>, and in this case the row axis is simply a sequence of integers with the dates included as a column keyed as <code>DataDate</code>. </p>
 <?prettify?>
 
@@ -412,9 +428,9 @@ DataFrame&lt;Integer,String&gt; frame = DataFrame.of(rowKeys, String.class, colu
 </p>
 
 <h3 id="series-specific-style">Series Specific Style</h3>
-<p>Extending the prior example, below we generate the same <code>1000x5</code> dataset but add an additional column post construction 
-which represents the sum of values in each row. In addition, we add <strong>text</strong> to the chart in the form of a <strong>title</strong>, 
-<strong>subtitle</strong>, <strong>x-axis</strong> and <strong>y-axis</strong> label. Finally, we explicitly configure the chart to render the <code>Total</code> column 
+<p>Extending the prior example, below we generate the same <code>1000x5</code> dataset but add an additional column post construction
+which represents the sum of values in each row. In addition, we add <strong>text</strong> to the chart in the form of a <strong>title</strong>,
+<strong>subtitle</strong>, <strong>x-axis</strong> and <strong>y-axis</strong> label. Finally, we explicitly configure the chart to render the <code>Total</code> column
 in <strong>black</strong>, and using a <strong>thicker</strong> point size to make it distinguishable from the other series.</p>
 <?prettify?>
 
@@ -471,11 +487,11 @@ frame.cols().add(&quot;Total&quot;, Double.class, v -&gt; v.row().stats().sum())
 <p>It is often useful to be able to plot multiple series on the same chart even when those series happen to have very
 different scales. This is supported by the Morpheus charting API in that is is possible to add many <code>DataFrames</code> to
 a single chart, and each frame can be found to its own range axis. </p>
-<p>Below we create a frame similar to prior examples, however we impose a larger scale on series <code>C</code> and <code>D</code> compared 
-with <code>A</code> and <code>B</code>. If we plotted this as a single frame, the scale of <code>C</code> and <code>D</code> would dominate and it would be hard 
-to see changes in <code>A</code> and <code>B</code>. In order to address this, we filter the frame into 2 sets of columns, and bind the 
-second <code>DataFrame</code> to a secondary axis via the <code>setRangeAxis()</code> method. The arguments to this method are the dataset 
-index, and the index of the range axis to bind it to. In principal you can bind as many frames to as many axis, however 
+<p>Below we create a frame similar to prior examples, however we impose a larger scale on series <code>C</code> and <code>D</code> compared
+with <code>A</code> and <code>B</code>. If we plotted this as a single frame, the scale of <code>C</code> and <code>D</code> would dominate and it would be hard
+to see changes in <code>A</code> and <code>B</code>. In order to address this, we filter the frame into 2 sets of columns, and bind the
+second <code>DataFrame</code> to a secondary axis via the <code>setRangeAxis()</code> method. The arguments to this method are the dataset
+index, and the index of the range axis to bind it to. In principal you can bind as many frames to as many axis, however
 this would rapidly become hard to read.</p>
 <?prettify?>
 
@@ -506,13 +522,13 @@ Chart.create().withLinePlot(frame.cols().select(&quot;A&quot;, &quot;B&quot;), c
 </p>
 
 <h3 id="multiple-renderers">Multiple Renderers</h3>
-<p>In the prior example, the idea that multiple <code>DataFrames</code> can be added to a chart was introduced in order to demonstrate 
+<p>In the prior example, the idea that multiple <code>DataFrames</code> can be added to a chart was introduced in order to demonstrate
 how to bind different data series to different axis. This same idea can be used to bind different rendering strategies
 to different series.</p>
 <p>In the example below, we generate a <code>DataFrame</code> with dimensions <code>20x6</code> and then plot this data by filtering the frame
-into 3 pairs of columns and use different rendering strategies to draw each pair of series. The first frame containing 
-columns <code>A</code> and <code>B</code> is plotted with straight <strong>lines</strong> and <strong>shapes</strong> rendered at each datum. The second frame containing 
-columns <code>C</code> and <code>D</code> is plotted with a <strong>spline</strong> renderer thereby yielding the smooth trajectory for these series. Finally, 
+into 3 pairs of columns and use different rendering strategies to draw each pair of series. The first frame containing
+columns <code>A</code> and <code>B</code> is plotted with straight <strong>lines</strong> and <strong>shapes</strong> rendered at each datum. The second frame containing
+columns <code>C</code> and <code>D</code> is plotted with a <strong>spline</strong> renderer thereby yielding the smooth trajectory for these series. Finally,
 the third frame is rendered with <strong>dashed lines</strong> and no shapes at the datum points.</p>
 <?prettify?>
 
@@ -545,9 +561,9 @@ Chart.create().withLinePlot(frame.cols().select(&quot;A&quot;, &quot;B&quot;), c
 
 <h2 id="simple-bar-charts">Simple Bar Charts</h2>
 <h3 id="discrete-domain-axis">Discrete Domain Axis</h3>
-<p>To create bar charts with Morpheus we use an identical API as in the prior examples, but in this case we simply make a 
-call to <code>Chart.ofBars()</code> instead of <code>Chart.ofLines()</code>. Plotting a <code>DataFrame</code> where the <strong>domain axis</strong> is initialized 
-from the <strong>row axis</strong> keys or alternatively a column of data in the frame works the same way. In the example below we 
+<p>To create bar charts with Morpheus we use an identical API as in the prior examples, but in this case we simply make a
+call to <code>Chart.ofBars()</code> instead of <code>Chart.ofLines()</code>. Plotting a <code>DataFrame</code> where the <strong>domain axis</strong> is initialized
+from the <strong>row axis</strong> keys or alternatively a column of data in the frame works the same way. In the example below we
 generate a bar chart based on a <strong>discrete</strong> or <strong>categorical</strong> domain axis using the frame row axis of type <code>Year</code>.
 Generating bar charts based on <strong>continuous</strong> data is also possible and is demonstrated in the next example.</p>
 <?prettify?>
@@ -592,14 +608,14 @@ Chart.create().withBarPlot(data, false, chart -&gt; {
 </p>
 
 <h3 id="continuous-domain-axis">Continuous Domain Axis</h3>
-<p>Bar charts are often used to display <strong>categorical</strong> or <strong>discrete</strong> data, however there are scenarios where a 
-<strong>continuous</strong> variable in the <strong>domain axis</strong> is appropriate. In such cases, the question is how wide to make the bars? 
-In a discrete variable bar chart, the width of the bars is sized so that all content fits on the plot, so it is a 
-function of how many discrete observations and series exist in the data. When creating a bar chart with a continuous 
-variable in the domain, we need to be explicit about how wide we want to make the bars, otherwise they will get 
+<p>Bar charts are often used to display <strong>categorical</strong> or <strong>discrete</strong> data, however there are scenarios where a
+<strong>continuous</strong> variable in the <strong>domain axis</strong> is appropriate. In such cases, the question is how wide to make the bars?
+In a discrete variable bar chart, the width of the bars is sized so that all content fits on the plot, so it is a
+function of how many discrete observations and series exist in the data. When creating a bar chart with a continuous
+variable in the domain, we need to be explicit about how wide we want to make the bars, otherwise they will get
 represented as single vertical line.</p>
-<p>Consider the <code>DataFrame</code> below with dimensions of <code>20x1</code> and a row axis of type <code>LocalDateTime</code> where the row key 
-interval is 10 minutes wide. The data series <code>A</code> is simply initialized to the sum of a randomly generated array of 
+<p>Consider the <code>DataFrame</code> below with dimensions of <code>20x1</code> and a row axis of type <code>LocalDateTime</code> where the row key
+interval is 10 minutes wide. The data series <code>A</code> is simply initialized to the sum of a randomly generated array of
 values, and the first 10 rows of this frame are shown below.</p>
 <?prettify?>
 
@@ -673,7 +689,7 @@ code example below, with a call to <code>withLowerDomainInterval()</code>.</p>
 degree of complexity can be used to change the width of bars, and even make variable width bars on the same plot.</p>
 <h2 id="stacked-bar-charts">Stacked Bar Charts</h2>
 <h3 id="discrete-domain-axis_1">Discrete Domain Axis</h3>
-<p>Stacked bar charts are useful for visualizing the decomposition of some quantity into various sub-categories. For 
+<p>Stacked bar charts are useful for visualizing the decomposition of some quantity into various sub-categories. For
 example, it might be useful to decompose the total revenue of a company into various product and service categories
 to visualize how well balanced revenue sources are. Creating a stacked bar plot with the Morpheus API simply boils
 down to passing <code>true</code> for the second argument of the <code>withBarPlot()</code> function. To illustrate, consider a <code>DataFrame</code>
@@ -740,9 +756,9 @@ DataFrame&lt;Year,String&gt; frame = DataFrame.of(years, String.class, columns -
 
 <h3 id="continuous-domain-axis_1">Continuous Domain Axis</h3>
 <p>Stacked bar charts involving a continuous domain axis are also supported, much the same way as in the simple bar plot example
-discussed earlier. In order to control the <strong>width of the bars</strong>, it is necessary to inject a function that expresses the 
+discussed earlier. In order to control the <strong>width of the bars</strong>, it is necessary to inject a function that expresses the
 domain interval for each datum in the domain. The bar width can be tailored by applying either a lower internal, upper interval
-or both to each observation in the dataset. In the example below we create a <code>DataFrame</code> with datetimes to serve as the domain, 
+or both to each observation in the dataset. In the example below we create a <code>DataFrame</code> with datetimes to serve as the domain,
 and then proceed to make the bars 10 minutes wide by injecting a <strong>lower</strong> domain interval function:</p>
 <?prettify?>
 
@@ -771,15 +787,15 @@ Chart.create().withBarPlot(frame, true, chart -&gt; {
 </p>
 
 <p><strong>Compatibility Note</strong>: The Google Chart adapter <strong>does not</strong> support lower / upper domain interval functions as the underlying library
-only supports the ability to specify inter-bar spacing. Bar plots created by the Google adapter that involve a continuous 
-domain axis, stacked or otherwise, will by default render bars with no spacing between them, which for the most part seems 
+only supports the ability to specify inter-bar spacing. Bar plots created by the Google adapter that involve a continuous
+domain axis, stacked or otherwise, will by default render bars with no spacing between them, which for the most part seems
 like an appropriate strategy for most scenarios. Calling <code>withLowerDomainInterval()</code> or <code>withUpperDomainInterval()</code> with the
-Google adapter will not have any effect on the output. Future support for more customizable HTML charting libraries may 
+Google adapter will not have any effect on the output. Future support for more customizable HTML charting libraries may
 address this limitation.</p>
 <h2 id="histograms">Histograms</h2>
 <h3 id="single-distribution">Single Distribution</h3>
-<p>The Morpheus Charting API includes some convenience functions to plot frequency distributions of column data in a 
-<code>DataFrame</code>. In the example below we generate a single column <code>1000000x1</code> frame of data randomly generated from a 
+<p>The Morpheus Charting API includes some convenience functions to plot frequency distributions of column data in a
+<code>DataFrame</code>. In the example below we generate a single column <code>1000000x1</code> frame of data randomly generated from a
 standard normal distribution. Calling <code>withHistPlot()</code> and indicating the number of bins, 50 in this case, yields
 the plot below.</p>
 <?prettify?>
@@ -801,8 +817,8 @@ Chart.create().withHistPlot(frame, 50, chart -&gt; {
 </p>
 
 <h3 id="multiple-distributions">Multiple Distributions</h3>
-<p>A slight extension of the prior example is to consider a frequency distribution involving multiple series. In this case we 
-create a <code>DataFrame</code> with 4 columns, where each column of 1 million observations is initialized from a normal distribution 
+<p>A slight extension of the prior example is to consider a frequency distribution involving multiple series. In this case we
+create a <code>DataFrame</code> with 4 columns, where each column of 1 million observations is initialized from a normal distribution
 all with a mean of zero but different standard deviations. The different spreads of each series requires bins to be computed
 on a per series basis, as it would not be optimal to create one set of bins across all series. We call the same <code>withHistPlot()</code>
 function as before, and in this example we generate 100 bins per series to yield the plot below.</p>
@@ -834,8 +850,8 @@ Chart.create().withHistPlot(frame, 100, chart -&gt; {
 </p>
 
 <h2 id="scatter-charts">Scatter Charts</h2>
-<p>To demonstrate scatter plots, consider the random data generating function defined below, which yields an <code>nx2</code> 
-<code>DataFrame</code> with a column of <code>X</code> and <code>Y</code> values based on a linear model with noise. The method expects the intercept 
+<p>To demonstrate scatter plots, consider the random data generating function defined below, which yields an <code>nx2</code>
+<code>DataFrame</code> with a column of <code>X</code> and <code>Y</code> values based on a linear model with noise. The method expects the intercept
 (<code>alpha</code>), slope (<code>beta</code>), the standard deviation for the noise term (<code>sigma</code>), the step size for the domain interval
 and the number of data points to generate. The table below illustrates the basic structure of the data.</p>
 <?prettify?>
@@ -880,7 +896,7 @@ private DataFrame&lt;Integer,String&gt; sample(double alpha, double beta, double
 
 <p>The following examples leverage this data generating function to create various scatter plots.</p>
 <h3 id="single-series_1">Single Series</h3>
-<p>The example below generates a 1000 point sample dataset using our data generating function, and creates a scatter plot 
+<p>The example below generates a 1000 point sample dataset using our data generating function, and creates a scatter plot
 via the <code>withScatterPlot()</code> method using the column labelled <code>X</code> for the domain axis. </p>
 <?prettify?>
 
@@ -900,11 +916,11 @@ Chart.create().withScatterPlot(frame, false, &quot;X&quot;, chart -&gt; {
 </p>
 
 <h2 id="multiple-series_1">Multiple Series</h2>
-<p>Below we combine 3 <code>DataFrames</code> using our data generating function and re-label the various <code>Y</code> columns <code>A</code>, 
+<p>Below we combine 3 <code>DataFrames</code> using our data generating function and re-label the various <code>Y</code> columns <code>A</code>,
 <code>B</code> and <code>C</code> respectively so that they are distinct in the combined frame. We plot the result using <code>withScatterPlot()</code>
-in this case, and proceed to set specific colors for each series, and configure the <code>C</code> series to render with a 
+in this case, and proceed to set specific colors for each series, and configure the <code>C</code> series to render with a
 <strong>diamond</strong> shape. Note that when we combine the frames, the 3 versions of the <code>X</code> column collapses into a single
-column in the resulting frame based on a combine first rule. Since all 3 frames have identical x-values, this is 
+column in the resulting frame based on a combine first rule. Since all 3 frames have identical x-values, this is
 immaterial in this case.</p>
 <?prettify?>
 
@@ -934,11 +950,11 @@ Chart.create().withScatterPlot(frame, false, &quot;X&quot;, chart -&gt; {
 <h2 id="multiple-frames">Multiple Frames</h2>
 <p>Consider a scenario where you have results from multiple experiments which you would like to combine in a scatter
 chart, and while the measurements share the same domain (i.e. x-dimension), the actual observations of <code>x</code> are
-not the same across the samples. It is possible to create a single sparse <code>DataFrame</code> with all the results combined, 
+not the same across the samples. It is possible to create a single sparse <code>DataFrame</code> with all the results combined,
 however it is most likely to be more convenient to keep them separate. </p>
-<p>In the example below we generate two <code>DataFrames</code>, each containing two series, and the x-values between the two frames 
-are <strong>not</strong> coincident since we provide a different step size to our data generating function in each case. We can still 
-plot both frames together with very little additional effort, namely by adding the second frame and instructing the chart 
+<p>In the example below we generate two <code>DataFrames</code>, each containing two series, and the x-values between the two frames
+are <strong>not</strong> coincident since we provide a different step size to our data generating function in each case. We can still
+plot both frames together with very little additional effort, namely by adding the second frame and instructing the chart
 to also render it with dots as follows.</p>
 <?prettify?>
 
@@ -974,8 +990,8 @@ Chart.create().withScatterPlot(frame1, false, &quot;X&quot;, chart -&gt; {
 regression model. Both the JFreeChart and Google adapters expose the model equation as a tooltip when hovering over
 any of the data points that make up the trendline. By default, the trend line is rendered in black with a thicker
 line stroke, however this can easily be adjusted using the standard series <code>style()</code> controller.</p>
-<p>In the example below we use the same data generating function introduced earlier, and the only additional call is to the 
-<code>trend()</code> function which accepts the key of the series to which a linear model should be fitted. The resulting plot is shown 
+<p>In the example below we use the same data generating function introduced earlier, and the only additional call is to the
+<code>trend()</code> function which accepts the key of the series to which a linear model should be fitted. The resulting plot is shown
 below with the standard style applied to the regression line.</p>
 <?prettify?>
 
@@ -996,9 +1012,9 @@ Chart.create().withScatterPlot(frame, false, &quot;X&quot;, chart -&gt; {
 
 <h3 id="multiple-frames_1">Multiple Frames</h3>
 <p>Fitting linear trend lines to multiple series or frames follows naturally through the same API as the single model
-example. Below we generate two <code>DataFrames</code> each of which has a non-intersecting set of domain values. By calling the 
-<code>trend()</code> function on the plot and passing the relevant series keys across the two frames, trend lines are generated as 
-expected. Once again, the model equations are exposed via tooltips when hovering over data points that make up the 
+example. Below we generate two <code>DataFrames</code> each of which has a non-intersecting set of domain values. By calling the
+<code>trend()</code> function on the plot and passing the relevant series keys across the two frames, trend lines are generated as
+expected. Once again, the model equations are exposed via tooltips when hovering over data points that make up the
 fitted line.</p>
 <?prettify?>
 
@@ -1033,7 +1049,7 @@ Chart.create().withScatterPlot(frame1, false, &quot;X&quot;, chart -&gt; {
 
 <h2 id="area-charts">Area Charts</h2>
 <p>An area chart is basically the same as a line chart however the area between the domain axis and the line is filled
-with a series specific color. There is one variation on this to note, which is that more often than not, area charts 
+with a series specific color. There is one variation on this to note, which is that more often than not, area charts
 are generated as stacked areas, which is useful to visualize the decomposition of some aggregate quantity. The two
 examples below show a stacked and non-stacked area chart for the identical dataset.</p>
 <?prettify?>
@@ -1061,7 +1077,7 @@ Chart.create().withAreaPlot(frame, true, chart -&gt; {
 </p>
 
 <p>The following code plots the identical dataset but with overlapping areas rather than stacked (which is simply achieved by
-passing <code>stacked=false</code> to the <code>withAreaPlot()</code> method) . Notice the different scale in the y-axis between the two plots, the 
+passing <code>stacked=false</code> to the <code>withAreaPlot()</code> method) . Notice the different scale in the y-axis between the two plots, the
 former being of a larger scale given the aggregate nature of that visualization.</p>
 <?prettify?>
 
@@ -1091,8 +1107,8 @@ Chart.create().withAreaPlot(frame, false, chart -&gt; {
 <h2 id="pie-charts">Pie Charts</h2>
 <p>Pie charts are perhaps the simplest of all the plots, although there are a few customizations that are worth being
 aware of. Generally speaking pie plots are used to illustrate the decomposition of some measurement into different
-categories, and the Morpheus API allows a specific column of a <code>DataFrame</code> to be presented in this way. Pie section 
-labels can be customized to show the actual value of the quantity, its percentage of the total or simply the name of 
+categories, and the Morpheus API allows a specific column of a <code>DataFrame</code> to be presented in this way. Pie section
+labels can be customized to show the actual value of the quantity, its percentage of the total or simply the name of
 the category (which can also be shown via an optional legend).</p>
 <p>Consider a single column <code>DataFrame</code> of random values that we will assume represent some measurement for different
 countries which we have defined as the row keys in terms of their 3-character ISO codes.  </p>
@@ -1118,9 +1134,9 @@ countries which we have defined as the row keys in terms of their 3-character IS
 </pre></div>
 
 <h3 id="default-style">Default Style</h3>
-<p>The simplest pie chart can be generated via the code below, which by default labels the pie sections with the percentage 
-of the total for the column being plotted. In this example we not indicate a specific column in the <code>DataFrame</code> to plot, 
-in which case the <strong>first numeric column</strong> is chosen. Both the Swing version and Google version of this plot includes 
+<p>The simplest pie chart can be generated via the code below, which by default labels the pie sections with the percentage
+of the total for the column being plotted. In this example we not indicate a specific column in the <code>DataFrame</code> to plot,
+in which case the <strong>first numeric column</strong> is chosen. Both the Swing version and Google version of this plot includes
 informative tooltips with additional data as you mouse over each section.</p>
 <?prettify?>
 

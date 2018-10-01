@@ -8,9 +8,9 @@ import java.time.ZoneId;
 import java.util.Date;
 import java.util.stream.Stream;
 
-import com.zavtech.morpheus.frame.DataFrame;
-import com.zavtech.morpheus.util.Asserts;
-import com.zavtech.morpheus.util.Predicates;
+import com.d3x.morpheus.frame.DataFrame;
+import com.d3x.morpheus.util.Asserts;
+import com.d3x.morpheus.util.Predicates;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 

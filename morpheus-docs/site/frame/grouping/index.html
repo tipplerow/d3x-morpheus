@@ -1,12 +1,28 @@
+<!--
+  ~ Copyright (C) 2014-2018 D3X Systems - All Rights Reserved
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        
+
         <meta name="author" content="Xavier Witdouck">
-        
+
         <link rel="shortcut icon" href="../../img/favicon.ico">
         <title>Grouping - Morpheus</title>
         <link href="../../css/bootstrap-custom.min.css" rel="stylesheet">
@@ -20,10 +36,10 @@
             <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
             <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
         <![endif]-->
-	
+
 	<script src="../../js/jquery-1.10.2.min.js"></script>
         <script src="../../js/bootstrap-3.0.3.min.js"></script>
-        <script src="../../js/highlight.pack.js"></script> 
+        <script src="../../js/highlight.pack.js"></script>
     </head>
 
     <body>
@@ -53,11 +69,11 @@
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Array <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            
+
 <li >
     <a href="../../array/overview/">Overview</a>
 </li>
-                            
+
 <li >
     <a href="../../array/performance/">Performance</a>
 </li>
@@ -66,39 +82,39 @@
                     <li class="dropdown active">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">DataFrame <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            
+
 <li >
     <a href="../construction/">Construction</a>
 </li>
-                            
+
 <li >
     <a href="../access/">Accessing</a>
 </li>
-                            
+
 <li >
     <a href="../reshaping/">Reshaping</a>
 </li>
-                            
+
 <li >
     <a href="../filtering/">Filtering</a>
 </li>
-                            
+
 <li >
     <a href="../sorting/">Sorting</a>
 </li>
-                            
+
 <li class="active">
     <a href="./">Grouping</a>
 </li>
-                            
+
 <li >
     <a href="../finding/">Finding</a>
 </li>
-                            
+
 <li >
     <a href="../writing/">Writing</a>
 </li>
-                            
+
 <li >
     <a href="../performance/">Performance</a>
 </li>
@@ -107,45 +123,45 @@
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Analysis <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            
+
 <li >
     <a href="../../analysis/statistics/">Descriptive Statistics</a>
 </li>
-                            
+
   <li class="dropdown-submenu">
     <a href="#">Linear Regression</a>
     <ul class="dropdown-menu">
-            
+
 <li >
     <a href="../../regression/ols/">Ordinary Least Squares</a>
 </li>
-            
+
 <li >
     <a href="../../regression/wls/">Weighted Least Squares</a>
 </li>
-            
+
 <li >
     <a href="../../regression/gls/">Generalized Least Squares</a>
 </li>
     </ul>
   </li>
-                            
+
 <li >
     <a href="../../analysis/pca/">Principal Component Analysis</a>
 </li>
-                            
+
 <li >
     <a href="../../analysis/linearalgebra/">Linear Algebra</a>
 </li>
-                            
+
 <li >
     <a href="../../analysis/timeseries/">Time Series Analysis</a>
 </li>
-                            
+
   <li class="dropdown-submenu">
     <a href="#">Examples</a>
     <ul class="dropdown-menu">
-            
+
 <li >
     <a href="../../examples/mpt/">Modern Portfolio Theory</a>
 </li>
@@ -156,29 +172,29 @@
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Visualization <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            
+
   <li class="dropdown-submenu">
     <a href="#">Charts</a>
     <ul class="dropdown-menu">
-            
+
 <li >
     <a href="../../viz/charts/overview/">Overview</a>
 </li>
-            
+
 <li >
     <a href="../../viz/charts/embed/">Embedding (HTML)</a>
 </li>
-            
+
 <li >
     <a href="../../viz/charts/gallery1/">Gallery (Google)</a>
 </li>
-            
+
 <li >
     <a href="../../viz/charts/gallery2/">Gallery (JFree)</a>
 </li>
     </ul>
   </li>
-                            
+
 <li >
     <a href="../../viz/tables/overview/">Tables</a>
 </li>
@@ -187,23 +203,23 @@
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Data Sources <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            
+
 <li >
     <a href="../../providers/quandl/">Quandl</a>
 </li>
-                            
+
 <li >
     <a href="../../providers/fred/">Federal Reserve</a>
 </li>
-                            
+
 <li >
     <a href="../../providers/google/">Google Finance</a>
 </li>
-                            
+
 <li >
     <a href="../../providers/yahoo/">Yahoo Finance</a>
 </li>
-                            
+
 <li >
     <a href="../../providers/world-bank/">World Bank</a>
 </li>
@@ -252,17 +268,17 @@
 
 <h3 id="grouping">Grouping</h3>
 <h4 id="introduction">Introduction</h4>
-<p>The contents of a Morpheus <code>DataFrame</code> can be grouped in either the row or column dimension making it easy 
-to aggregate and compute summary statistics on these groups. A group is nothing more than a <code>DataFrame</code> filter, 
+<p>The contents of a Morpheus <code>DataFrame</code> can be grouped in either the row or column dimension making it easy
+to aggregate and compute summary statistics on these groups. A group is nothing more than a <code>DataFrame</code> filter,
 so grouping even large frames has fairly modest memory requirements. Grouping functions can operate in
-either sequential mode or parallel mode for improved performance on large frames. Finally, rows or columns 
-can be grouped based on derived data, not just from data that exists in the frame. For example, if a <code>DataFrame</code> 
-contains a column with dates, it is possible to group the data into months without adding an explicit column 
+either sequential mode or parallel mode for improved performance on large frames. Finally, rows or columns
+can be grouped based on derived data, not just from data that exists in the frame. For example, if a <code>DataFrame</code>
+contains a column with dates, it is possible to group the data into months without adding an explicit column
 to capture the month associated with each date (see examples below).</p>
 <h4 id="example-data">Example Data</h4>
-<p>In this section, we will continue to use the ATP 2013 dataset that was introduced earlier in the filtering 
-discussion <a href="../filtering/#example-data">here</a>. This dataset makes for an ideal grouping candidate given the large 
-number of categorical items such as <code>Surface</code>, <code>Tournament</code>, <code>Round</code> and so on. As a reminder, here are the first 
+<p>In this section, we will continue to use the ATP 2013 dataset that was introduced earlier in the filtering
+discussion <a href="../filtering/#example-data">here</a>. This dataset makes for an ideal grouping candidate given the large
+number of categorical items such as <code>Surface</code>, <code>Tournament</code>, <code>Round</code> and so on. As a reminder, here are the first
 10 rows of the 2013 ATP match <code>DataFrame</code>.</p>
 <div class="frame"><pre class="frame">
  Index  |  Location  |        Tournament        |     Date     |  Series  |   Court   |  Surface  |    Round    |  Best of  |     Winner     |     Loser      |  WRank  |  LRank  |  WPts  |  LPts  |  W1  |  L1  |  W2  |  L2  |  W3  |  L3  |  W4  |  L4  |  W5  |  L5  |  Wsets  |  Lsets  |   Comment   |  B365W   |  B365L   |   EXW    |   EXL    |   LBW    |   LBL    |   PSW    |   PSL    |   SJW    |   SJL    |   MaxW   |   MaxL   |   AvgW   |   AvgL   |
@@ -280,9 +296,9 @@ number of categorical items such as <code>Surface</code>, <code>Tournament</code
 </pre></div>
 
 <h4 id="grouping-rows">Grouping Rows</h4>
-<p>Two <code>groupBy()</code> methods exist on the <code>DataFrameAxis</code> interface which can be accessed by calling <code>DataFrame.rows()</code> as 
+<p>Two <code>groupBy()</code> methods exist on the <code>DataFrameAxis</code> interface which can be accessed by calling <code>DataFrame.rows()</code> as
 shown below. The first <code>groupBy()</code> function takes one or more column keys from which to extract data to generate the
-relavant groups, and the second takes a lambda expression which must return a <code>Tuple</code> representing the group for the 
+relavant groups, and the second takes a lambda expression which must return a <code>Tuple</code> representing the group for the
 row presented to it. The following code groups the frame by <code>Surface</code> and then by <code>Round</code>:</p>
 <?prettify?>
 
@@ -302,9 +318,9 @@ DataFrameGrouping.Rows&lt;Integer,String&gt; grouping = frame.rows().groupBy(row
 </code></pre>
 
 <p>This second example demonstrates to some degree what is going on under the hood in the first example, where
-a <code>Tuple</code> that is used to represent the group key is explicitly created in user code. This latter method is useful 
-because it allows for an arbitrary group to be created based on data that may not be present in the <code>DataFrame</code>. 
-Consider the scenario below where we group the ATP tournament data into months by extracting the month from the 
+a <code>Tuple</code> that is used to represent the group key is explicitly created in user code. This latter method is useful
+because it allows for an arbitrary group to be created based on data that may not be present in the <code>DataFrame</code>.
+Consider the scenario below where we group the ATP tournament data into months by extracting the month from the
 tournament date as follows:</p>
 <?prettify?>
 
@@ -397,9 +413,9 @@ There are 19 rows for group (Outdoor,Hard,The Final)
 </code></pre>
 <h5 id="summary-statistics">Summary Statistics</h5>
 <p>The primary motivation for grouping data is very often for aggregation purposes or for computing summary statistics
-on the groups. The <code>stats()</code> method on the <code>DataFrameGrouping</code> interface takes the grouping depth to operate on and 
-returns a standard Morpheus <code>Stats</code> reference that itself produces <code>DataFrames</code> of summary statistics. The stats frames 
-will only include numeric columns on which stats can be calculated. The examples below illustrate the results of computing 
+on the groups. The <code>stats()</code> method on the <code>DataFrameGrouping</code> interface takes the grouping depth to operate on and
+returns a standard Morpheus <code>Stats</code> reference that itself produces <code>DataFrames</code> of summary statistics. The stats frames
+will only include numeric columns on which stats can be calculated. The examples below illustrate the results of computing
 the <code>mean()</code> on groups at different depths. </p>
 <?prettify?>
 
@@ -464,9 +480,9 @@ grouping.stats(2).mean().rows().sort(true).out().print(formats -&gt; {
 
 <h4 id="grouping-columns">Grouping Columns</h4>
 <p>Grouping columns in a <code>DataFrame</code> is entirely analogous to grouping rows as the API is completely symmetrical in the
-row and column dimension. Instead of operating on the <code>DataFrameAxis</code> returned by a call to <code>DataFrame.rows()</code>, you operate 
-on the same interface returned from <code>DataFrame.cols()</code>. The ATP match results served as a good candidate for grouping rows, 
-but is not appropriate for grouping columns as there are few if any repetitions within a given row. Rather than introduce 
+row and column dimension. Instead of operating on the <code>DataFrameAxis</code> returned by a call to <code>DataFrame.rows()</code>, you operate
+on the same interface returned from <code>DataFrame.cols()</code>. The ATP match results served as a good candidate for grouping rows,
+but is not appropriate for grouping columns as there are few if any repetitions within a given row. Rather than introduce
 a new dataset, we can simply transpose the ATP dataset and then group the columns.</p>
 <?prettify?>
 
@@ -489,7 +505,7 @@ loadTennisMatchData(2013).transpose().left(20).out().print(10);
       Loser  |              Giraldo S.  |            Benneteau J.  |            Matosevic M.  |             Mitchell B.  |               Klizan M.  |                  Ito T.  |               Levine J.  |                Kudla D.  |             Harrison R.  |                Baker B.  |                Ebden M.  |             Kunitsyn I.  |                Falla A.  |                Mayer F.  |              Robredo T.  |             Nieminen J.  |               Raonic M.  |               Goffin D.  |               Hewitt L.  |              Millman J.  |Groups for depth 0...
 </pre></div>
 
-<p>With the transposed ATP match results <code>DataFrame</code>, we can now group the columns in much the same way as we grouped the 
+<p>With the transposed ATP match results <code>DataFrame</code>, we can now group the columns in much the same way as we grouped the
 rows. The code below performs a 2-dimensional column grouping based on data in the rows identified by <code>Court</code> and <code>Surface</code>,
 and subsequently prints out the number of columns per group at level 0 and 1.</p>
 <?prettify?>
@@ -515,23 +531,23 @@ There are 826 columns for group (Outdoor,Clay)
 There are 298 columns for group (Outdoor,Grass)
 There are 993 columns for group (Outdoor,Hard)
 </code></pre>
-<p>To avoid repetition, further column grouping examples are omitted as they are identical to the row grouping scenarios 
-illustrated in prior sections. The next section presents and discusses some data on grouping performance of large 
+<p>To avoid repetition, further column grouping examples are omitted as they are identical to the row grouping scenarios
+illustrated in prior sections. The next section presents and discusses some data on grouping performance of large
 <code>DataFrames</code>.</p>
 <h4 id="performance">Performance</h4>
-<p>The performance of the group-by functions on a <code>DataFrame</code> will vary depending on many factors, including 
-but not limited to the number of resulting groups, the depth of the grouping and the cost of extracting the 
-relevant data from rows or columns. As with many <code>DataFrame</code> operations, a <strong>parallel</strong> implementation of grouping 
-can be used to speed up scenarios which involve a large number of records and/or ones in which the code to 
-assemble a group is somewhat costly. This section provides examples of how sequential and parallel grouping 
-performance might be expected to compare in the most common scenarios. The absolute times published below are 
+<p>The performance of the group-by functions on a <code>DataFrame</code> will vary depending on many factors, including
+but not limited to the number of resulting groups, the depth of the grouping and the cost of extracting the
+relevant data from rows or columns. As with many <code>DataFrame</code> operations, a <strong>parallel</strong> implementation of grouping
+can be used to speed up scenarios which involve a large number of records and/or ones in which the code to
+assemble a group is somewhat costly. This section provides examples of how sequential and parallel grouping
+performance might be expected to compare in the most common scenarios. The absolute times published below are
 obviously vary machine specific, and in this case relate to a Macbook Pro with Quad Core-i7 processor.</p>
 <h5 id="example-data_1">Example Data</h5>
-<p>The ATP match data only holds a few thousand records per year which is a little small to gather reasonable group-by 
-performance statistics against (the times will be small and thus sensitive to measurement noise). We will therefore 
-use the the UK house price transaction data made available from the UK Land Registry as introduced in the Morpeus 
-Overview section. This dataset, which contains approximately 1.35 records in 2006, can be loaded using the code below. 
-While the raw data is in CSV format, it does not include a header as the first row, so for convenience we map the 
+<p>The ATP match data only holds a few thousand records per year which is a little small to gather reasonable group-by
+performance statistics against (the times will be small and thus sensitive to measurement noise). We will therefore
+use the the UK house price transaction data made available from the UK Land Registry as introduced in the Morpeus
+Overview section. This dataset, which contains approximately 1.35 records in 2006, can be loaded using the code below.
+While the raw data is in CSV format, it does not include a header as the first row, so for convenience we map the
 default numbered columns to more meaningful names.</p>
 <?prettify?>
 
@@ -587,10 +603,10 @@ static DataFrame&lt;Integer,String&gt; loadHousePrices(int year) {
 </pre></div>
 
 <h5 id="group-count">Group Count</h5>
-<p>The first example attempts to demonstrate the performance impact of an increasing number of groups created by a the 
-group-by operation. In this case we group the rows of the UK property transaction data for 2006 by 5 different columns 
-independently, namely <code>PropertyType</code>, <code>County</code>, <code>Month</code>, <code>District</code>, <code>Town/City</code> and <code>Locality</code>. The group count for these 
-columns is listed below. The expectation is that execution times will increase as the number of groups generated by a group-by 
+<p>The first example attempts to demonstrate the performance impact of an increasing number of groups created by a the
+group-by operation. In this case we group the rows of the UK property transaction data for 2006 by 5 different columns
+independently, namely <code>PropertyType</code>, <code>County</code>, <code>Month</code>, <code>District</code>, <code>Town/City</code> and <code>Locality</code>. The group count for these
+columns is listed below. The expectation is that execution times will increase as the number of groups generated by a group-by
 function increases, which is exactly what we see in the subsequent plot.</p>
 <ul>
 <li><strong>Property Type</strong>: 5 Groups</li>
@@ -641,10 +657,10 @@ Chart.create().withBarPlot(results, false, chart -&gt; {
 </code></pre>
 
 <h5 id="sequential-vs-parallel">Sequential vs Parallel</h5>
-<p>The following example plots the results of a standard 1-dimensional group-by operation on the same chart. The 1.35 
+<p>The following example plots the results of a standard 1-dimensional group-by operation on the same chart. The 1.35
 million rows in the UK house price dataset is grouped by <code>County</code>, which results in 115 distinct groups as indicated
 in the previous section. The timing statistics below seem to indicate the parallel grouping in this scenario was a little
-over twice as fast as the sequential algorithm. This result bodes well as this is the simplest possible group-by scenatio, 
+over twice as fast as the sequential algorithm. This result bodes well as this is the simplest possible group-by scenatio,
 and we would expect the parallel algorithm to perform even better as the grouping complexity increases.</p>
 <p align="center">
     <img class="chart" src="../../images/frame/data-frame-group-by-2.png"/>
@@ -677,7 +693,7 @@ Chart.create().withBarPlot(results, false, chart -&gt; {
 <h5 id="multi-dimensional">Multi-Dimensional</h5>
 <p>The prior examples use 1-dimensional grouping only, so this section looks at the cost of a multi-dimensioal
 group-by on the rows of the UK property transaction data. In order to remove group count as a factor in the second
-dimension, we simply group by the same column twice. This is not particularly useful in reality other than to assess 
+dimension, we simply group by the same column twice. This is not particularly useful in reality other than to assess
 the relative cost of adding the second dimension. Naturally, the group count in the second dimension will always
 be 1.</p>
 <p>The plot below indicates adding another dimension is significant, although using parallel execution can mostly

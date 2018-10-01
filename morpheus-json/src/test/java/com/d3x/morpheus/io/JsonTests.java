@@ -24,8 +24,8 @@ import java.util.UUID;
 
 import com.d3x.morpheus.json.JsonSink;
 import com.d3x.morpheus.json.JsonSource;
-import com.zavtech.morpheus.frame.DataFrame;
-import com.zavtech.morpheus.frame.DataFrameAsserts;
+import com.d3x.morpheus.frame.DataFrame;
+import com.d3x.morpheus.frame.DataFrameAsserts;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 

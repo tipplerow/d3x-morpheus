@@ -1,12 +1,28 @@
+<!--
+  ~ Copyright (C) 2014-2018 D3X Systems - All Rights Reserved
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        
+
         <meta name="author" content="Xavier Witdouck">
-        
+
         <link rel="shortcut icon" href="../../img/favicon.ico">
         <title>Yahoo Finance - Morpheus</title>
         <link href="../../css/bootstrap-custom.min.css" rel="stylesheet">
@@ -20,10 +36,10 @@
             <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
             <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
         <![endif]-->
-	
+
 	<script src="../../js/jquery-1.10.2.min.js"></script>
         <script src="../../js/bootstrap-3.0.3.min.js"></script>
-        <script src="../../js/highlight.pack.js"></script> 
+        <script src="../../js/highlight.pack.js"></script>
     </head>
 
     <body>
@@ -53,11 +69,11 @@
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Array <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            
+
 <li >
     <a href="../../array/overview/">Overview</a>
 </li>
-                            
+
 <li >
     <a href="../../array/performance/">Performance</a>
 </li>
@@ -66,39 +82,39 @@
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">DataFrame <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            
+
 <li >
     <a href="../../frame/construction/">Construction</a>
 </li>
-                            
+
 <li >
     <a href="../../frame/access/">Accessing</a>
 </li>
-                            
+
 <li >
     <a href="../../frame/reshaping/">Reshaping</a>
 </li>
-                            
+
 <li >
     <a href="../../frame/filtering/">Filtering</a>
 </li>
-                            
+
 <li >
     <a href="../../frame/sorting/">Sorting</a>
 </li>
-                            
+
 <li >
     <a href="../../frame/grouping/">Grouping</a>
 </li>
-                            
+
 <li >
     <a href="../../frame/finding/">Finding</a>
 </li>
-                            
+
 <li >
     <a href="../../frame/writing/">Writing</a>
 </li>
-                            
+
 <li >
     <a href="../../frame/performance/">Performance</a>
 </li>
@@ -107,45 +123,45 @@
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Analysis <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            
+
 <li >
     <a href="../../analysis/statistics/">Descriptive Statistics</a>
 </li>
-                            
+
   <li class="dropdown-submenu">
     <a href="#">Linear Regression</a>
     <ul class="dropdown-menu">
-            
+
 <li >
     <a href="../../regression/ols/">Ordinary Least Squares</a>
 </li>
-            
+
 <li >
     <a href="../../regression/wls/">Weighted Least Squares</a>
 </li>
-            
+
 <li >
     <a href="../../regression/gls/">Generalized Least Squares</a>
 </li>
     </ul>
   </li>
-                            
+
 <li >
     <a href="../../analysis/pca/">Principal Component Analysis</a>
 </li>
-                            
+
 <li >
     <a href="../../analysis/linearalgebra/">Linear Algebra</a>
 </li>
-                            
+
 <li >
     <a href="../../analysis/timeseries/">Time Series Analysis</a>
 </li>
-                            
+
   <li class="dropdown-submenu">
     <a href="#">Examples</a>
     <ul class="dropdown-menu">
-            
+
 <li >
     <a href="../../examples/mpt/">Modern Portfolio Theory</a>
 </li>
@@ -156,29 +172,29 @@
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Visualization <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            
+
   <li class="dropdown-submenu">
     <a href="#">Charts</a>
     <ul class="dropdown-menu">
-            
+
 <li >
     <a href="../../viz/charts/overview/">Overview</a>
 </li>
-            
+
 <li >
     <a href="../../viz/charts/embed/">Embedding (HTML)</a>
 </li>
-            
+
 <li >
     <a href="../../viz/charts/gallery1/">Gallery (Google)</a>
 </li>
-            
+
 <li >
     <a href="../../viz/charts/gallery2/">Gallery (JFree)</a>
 </li>
     </ul>
   </li>
-                            
+
 <li >
     <a href="../../viz/tables/overview/">Tables</a>
 </li>
@@ -187,23 +203,23 @@
                     <li class="dropdown active">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Data Sources <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            
+
 <li >
     <a href="../quandl/">Quandl</a>
 </li>
-                            
+
 <li >
     <a href="../fred/">Federal Reserve</a>
 </li>
-                            
+
 <li >
     <a href="../google/">Google Finance</a>
 </li>
-                            
+
 <li class="active">
     <a href="./">Yahoo Finance</a>
 </li>
-                            
+
 <li >
     <a href="../world-bank/">World Bank</a>
 </li>
@@ -255,34 +271,34 @@
                 <div class="col-md-9" role="main">
 
 <h2 id="disclaimer">Disclaimer</h2>
-<p><strong>THIS PROJECT IS NOT AFFILIATED OR ENDORSED BY YAHOO AND IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR 
-PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES 
-OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
-WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. DATA EXTRACTED USING THIS LIBRARY IS FOR PERSONAL 
+<p><strong>THIS PROJECT IS NOT AFFILIATED OR ENDORSED BY YAHOO AND IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
+OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. DATA EXTRACTED USING THIS LIBRARY IS FOR PERSONAL
 NON-PROFESSIONAL USE AND MUST CONFORM TO YAHOO'S TERMS AND CONDITIONS</strong></p>
 <h2 id="yahoo-finance">Yahoo Finance</h2>
 <h3 id="introduction">Introduction</h3>
-<p><a href="https://finance.yahoo.com">Yahoo Finance</a> is an excellent source of free market data and analytics covering both 
-domestic and international markets. While not aimed at a professional user, it does offer a rich source of information 
-that is invaluable to the <strong>individual investor</strong> at a price that cannot be beat, namely free! The Morpheus adapter 
+<p><a href="https://finance.yahoo.com">Yahoo Finance</a> is an excellent source of free market data and analytics covering both
+domestic and international markets. While not aimed at a professional user, it does offer a rich source of information
+that is invaluable to the <strong>individual investor</strong> at a price that cannot be beat, namely free! The Morpheus adapter
 for Yahoo Finance provides users a programmatic mechanism to capture some of this data for further analysis which
 may be helpful for informing your own investment decisions. </p>
-<p>Yahoo Finance does not provide any officially supported APIs, so this adapter is essentially reverse engineered 
-from the actions one can affect on the website itself. For that reason, the adapter could break at anytime, and 
-could take some time to fix or perhaps become unsupportable altogether. Accordingly, the suggestion is to only 
+<p>Yahoo Finance does not provide any officially supported APIs, so this adapter is essentially reverse engineered
+from the actions one can affect on the website itself. For that reason, the adapter could break at anytime, and
+could take some time to fix or perhaps become unsupportable altogether. Accordingly, the suggestion is to only
 rely on this code for personal non critical research projects.</p>
 <h2 id="data-access">Data Access</h2>
 <p>The Morpheus Yahoo Finance adapter includes various <code>DataFrameSource</code> implementations that provide access to
-<strong>asset prices, asset returns, equity fundamentals, option prices and FX rates</strong> using <code>DataFrames</code>. In particular, 
-daily <a href="https://finance.yahoo.com/quote/BLK/history?p=BLK">historical quote</a> bars (Open, High, Low, Close, Volume) in 
-both <strong>dividend adjusted</strong> and <strong>unadjusted</strong> formats are available, as well as <strong>intraday delayed quotes</strong> while markets 
-are trading. For those of you interested in <a href="https://finance.yahoo.com/quote/BLK/options?p=BLK">option</a> markets, 
-expiry dates given an underlying ticker are accessible along with intraday delayed quotes which include an <strong>implied 
+<strong>asset prices, asset returns, equity fundamentals, option prices and FX rates</strong> using <code>DataFrames</code>. In particular,
+daily <a href="https://finance.yahoo.com/quote/BLK/history?p=BLK">historical quote</a> bars (Open, High, Low, Close, Volume) in
+both <strong>dividend adjusted</strong> and <strong>unadjusted</strong> formats are available, as well as <strong>intraday delayed quotes</strong> while markets
+are trading. For those of you interested in <a href="https://finance.yahoo.com/quote/BLK/options?p=BLK">option</a> markets,
+expiry dates given an underlying ticker are accessible along with intraday delayed quotes which include an <strong>implied
 volatility estimate</strong>. Finally, equity fundamental data can be accessed programmatically from the key <a href="https://finance.yahoo.com/quote/BLK/key-statistics?p=BLK">statistics page</a>
 of any security accessible on the site.</p>
-<p>The following sections provide some useful examples of how to leverage the API and illustrate some commonly used 
-techniques for analyzing portfolios of investment securities. Firstly, to leverage the library in your project, the 
+<p>The following sections provide some useful examples of how to leverage the API and illustrate some commonly used
+techniques for analyzing portfolios of investment securities. Firstly, to leverage the library in your project, the
 following dependency should be included in your build tool of choice.</p>
 <pre><code class="xml">&lt;dependency&gt;
     &lt;groupId&gt;com.zavtech&lt;/groupId&gt;
@@ -291,8 +307,8 @@ following dependency should be included in your build tool of choice.</p>
 &lt;/dependency&gt;
 </code></pre>
 
-<p>There are two ways to integrate with the library, either via a convenience API which involves instantiating an 
-instance of the <code>YahooFinance</code> class or by using the various <code>DataFrameSource</code> implementations directly. In the 
+<p>There are two ways to integrate with the library, either via a convenience API which involves instantiating an
+instance of the <code>YahooFinance</code> class or by using the various <code>DataFrameSource</code> implementations directly. In the
 latter case, the sources should be pre-registered in some initializer as follows.</p>
 <?prettify?>
 
@@ -307,10 +323,10 @@ latter case, the sources should be pre-registered in some initializer as follows
 
 <h3 id="historical-quotes">Historical Quotes</h3>
 <p>For most securities represented on Yahoo Finance, it is possible to download historical quote bars into
-a CSV file, and Morpheus leverages this same interface to capture <strong>Open, High, Low, Close and Volume</strong> data 
-in a <code>DataFrame</code>. Historical price quotes are most often used to compute asset returns, so Yahoo presents these 
-historical prices in both <strong>dividend and split adjusted</strong> terms making it easy to compute returns that incorporate 
-these affects. The code below downloads split adjusted end of day quotes over the past 10 years for <a href="https://finance.yahoo.com/quote/BLK/history?p=BLK">BlackRock</a>, 
+a CSV file, and Morpheus leverages this same interface to capture <strong>Open, High, Low, Close and Volume</strong> data
+in a <code>DataFrame</code>. Historical price quotes are most often used to compute asset returns, so Yahoo presents these
+historical prices in both <strong>dividend and split adjusted</strong> terms making it easy to compute returns that incorporate
+these affects. The code below downloads split adjusted end of day quotes over the past 10 years for <a href="https://finance.yahoo.com/quote/BLK/history?p=BLK">BlackRock</a>,
 and plots the close price series.  </p>
 <?prettify?>
 
@@ -340,9 +356,9 @@ Chart.create().asSwing().withAreaPlot(closePrices, false, chart -&gt; {
 </p>
 
 <p>In the example we requested dividend adjusted prices which are convenient for computing returns, however
-these are artificially changed and do not reflect actual observed prices at the time. To query for <strong>unadjusted</strong> 
-prices simply pass <code>false</code> as the last parameter to <code>getQuoteBars()</code>. The code below pulls both adjusted and 
-unadjusted prices, then selects the close prices from each frame and plots them for comparison. BlackRock is a 
+these are artificially changed and do not reflect actual observed prices at the time. To query for <strong>unadjusted</strong>
+prices simply pass <code>false</code> as the last parameter to <code>getQuoteBars()</code>. The code below pulls both adjusted and
+unadjusted prices, then selects the close prices from each frame and plots them for comparison. BlackRock is a
 high paying dividend stock, so we would expect to see material differences in the two price series.</p>
 <?prettify?>
 
@@ -373,7 +389,7 @@ Chart.create().asSwing().withLinePlot(frame, chart -&gt; {
     <img class="chart" src="../../images/yahoo/blk_prices_2.png"/>
 </p>
 
-<p><a href="https://finance.yahoo.com/chart/NFLX">Netflix</a> currently does not pay a dividend, so if we ran this code for NFLX, 
+<p><a href="https://finance.yahoo.com/chart/NFLX">Netflix</a> currently does not pay a dividend, so if we ran this code for NFLX,
 the two series should be coincident.</p>
 <p align="center">
     <img class="chart" src="../../images/yahoo/nflx_prices_1.png"/>
@@ -383,12 +399,12 @@ the two series should be coincident.</p>
 <p>Investment decisions fundamentally boil down to making a judgement call regarding future asset returns, and the likely
 volatility of those returns over the investment horizon. While Yahoo Finance does not provide an API to directly download
 asset returns, the ability to capture dividend and split adjusted prices makes it very easy to compute returns. The Morpheus
-adapter for Yahoo Finance provides an API to calculate <strong>daily</strong>, <strong>weekly</strong>, <strong>monthly</strong> and <strong>cumulative</strong> returns as 
+adapter for Yahoo Finance provides an API to calculate <strong>daily</strong>, <strong>weekly</strong>, <strong>monthly</strong> and <strong>cumulative</strong> returns as
 demonstrated in the following sections.</p>
 <h4 id="cumulative-returns">Cumulative Returns</h4>
 <p>Consider 6 major asset classes, namely Emerging Market Equities, Real-Estate, International Equities (outside US), Commodities,
 Large Blend and Fixed Income. The returns for these asset classes can be proxied using well known liquid ETFs from the likes
-of <a href="https://investor.vanguard.com/home/">Vanguard</a>, <a href="https://www.blackrock.com/">BlackRock</a> or <a href="https://www.ssga.com/home.html">State Street Global Advisors</a> 
+of <a href="https://investor.vanguard.com/home/">Vanguard</a>, <a href="https://www.blackrock.com/">BlackRock</a> or <a href="https://www.ssga.com/home.html">State Street Global Advisors</a>
 among others. For this example, let's use the following tickers.</p>
 <table>
 <thead>
@@ -438,8 +454,8 @@ among others. For this example, let's use the following tickers.</p>
 </tr>
 </tbody>
 </table>
-<p>The code below demonstrates how to use the <code>YahooReturnSource</code> to calculate <strong>cumulative returns</strong> for these tickers including 
-the effect of any splits and dividend payments. To make the plot more user friendly, we re-label the columns as asset class 
+<p>The code below demonstrates how to use the <code>YahooReturnSource</code> to calculate <strong>cumulative returns</strong> for these tickers including
+the effect of any splits and dividend payments. To make the plot more user friendly, we re-label the columns as asset class
 names rather than the ticker symbols.</p>
 <?prettify?>
 
@@ -486,12 +502,12 @@ Chart.create().asSwing().withLinePlot(returns, chart -&gt; {
 </p>
 
 <h4 id="smoothed-returns">Smoothed Returns</h4>
-<p>On a day-to-day basis, market prices are extremely noisy and for the most part completely random. It is often useful to 
-remove some of this noise by smoothing the returns, which in turn develops a more stable signal which can be consumed by 
-a systematic investment process. The Morpheus adapter supports smoothing returns based on an <a href="https://en.wikipedia.org/wiki/Exponential_smoothing">Exponential Weighted Moving Average</a> 
+<p>On a day-to-day basis, market prices are extremely noisy and for the most part completely random. It is often useful to
+remove some of this noise by smoothing the returns, which in turn develops a more stable signal which can be consumed by
+a systematic investment process. The Morpheus adapter supports smoothing returns based on an <a href="https://en.wikipedia.org/wiki/Exponential_smoothing">Exponential Weighted Moving Average</a>
 (EWMA) which is a commonly used technique in signal processing.</p>
-<p>The code below generates cumulative returns for the <strong>S&amp;P 500 Index</strong> tracker with ticker symbol <a href="https://finance.yahoo.com/quote/SPY?p=SPY">SPY</a>, 
-and smooths the data with various half-lives, namely 0, 5, 10, 30 and 60 business days. A 0 day half-life is interpreted as 
+<p>The code below generates cumulative returns for the <strong>S&amp;P 500 Index</strong> tracker with ticker symbol <a href="https://finance.yahoo.com/quote/SPY?p=SPY">SPY</a>,
+and smooths the data with various half-lives, namely 0, 5, 10, 30 and 60 business days. A 0 day half-life is interpreted as
 no smoothing, so this simply yields the raw data. The smoothed signal is computed as follows:</p>
 <p>$$ S_{t} = \alpha x_{t} + (1 - \alpha) S_{t-1} \ for \ t &gt; 0 \ and \ where \ S_{0} = x_{0} $$</p>
 <p>There are various ways to compute \( \alpha \), but in Morpheus we calculate it based on a half-life as follows:</p>
@@ -528,13 +544,13 @@ based on the expression for half-life above.</p>
 </p>
 
 <h4 id="return-distribution">Return Distribution</h4>
-<p>Many of the statistical techniques in modern finance are predicated on the assumption that asset returns are <strong>normally 
-distributed</strong>. However, it is often the case that returns are not normal, which is why during the GFC many funds experienced 
-greater than -6 sigma events one day after the next. While returns are not normal, the statistical techniques that are commonly 
-used are still a reasonable engineering approximation when markets are <em>not</em> under stress. When they are under stress, all bets 
+<p>Many of the statistical techniques in modern finance are predicated on the assumption that asset returns are <strong>normally
+distributed</strong>. However, it is often the case that returns are not normal, which is why during the GFC many funds experienced
+greater than -6 sigma events one day after the next. While returns are not normal, the statistical techniques that are commonly
+used are still a reasonable engineering approximation when markets are <em>not</em> under stress. When they are under stress, all bets
 are off (no pun intended), which can lead to bad outcomes for investors.</p>
-<p>The code below computes daily returns for the S&amp;P 500 ETF tracker with ticker symbol SPY over the past 20 years, and then generates 
-a histogram of these returns using 200 bins. In addition, the mean and standard deviation of these daily returns are calculated. 
+<p>The code below computes daily returns for the S&amp;P 500 ETF tracker with ticker symbol SPY over the past 20 years, and then generates
+a histogram of these returns using 200 bins. In addition, the mean and standard deviation of these daily returns are calculated.
 They are then used to compute a normal probability density function which is scaled appropriately and then overlaid on the chart. </p>
 <?prettify?>
 
@@ -572,10 +588,10 @@ Chart.create().withHistPlot(returns, (int)binCount, chart -&gt; {
 
 <p>A couple of features regarding the fit standout immediately, namely that the actual distribution has a <strong>higher central peak</strong> and
 the <strong>shoulders are a bit narrower</strong>. The standard deviation of SPY daily returns over the past 20 years comes out to be 1.239%, and
-the plot suggests that the fit is a reasonable approximation between +/-3%, or say a little less than <strong>+/-2.5 standard deviations 
-(2.5 sigma)</strong>. The fitted distribution predicts that a -2.5 sigma event, or a one day drop in the S&amp;P 500 of approximately -3.1% has 
-a probability of 0.5733%, which on the assumption of <strong>252 trading days a year</strong> is likely to happen once in 175 days or about 1.44 
-times per year. This is not inconsistent with the actual frequency distribution as shown in the second plot below, which is zoomed 
+the plot suggests that the fit is a reasonable approximation between +/-3%, or say a little less than <strong>+/-2.5 standard deviations
+(2.5 sigma)</strong>. The fitted distribution predicts that a -2.5 sigma event, or a one day drop in the S&amp;P 500 of approximately -3.1% has
+a probability of 0.5733%, which on the assumption of <strong>252 trading days a year</strong> is likely to happen once in 175 days or about 1.44
+times per year. This is not inconsistent with the actual frequency distribution as shown in the second plot below, which is zoomed
 into the left side of the distribution inorder to magnify this part of the plot.</p>
 <p align="center">
     <img class="chart" src="../../images/yahoo/return_dist_1.png"/>
@@ -585,7 +601,7 @@ into the left side of the distribution inorder to magnify this part of the plot.
     <img class="chart" src="../../images/yahoo/return_dist_2.png"/>
 </p>
 
-<p>Where the normal distribution is a wholly <strong>inadequate model</strong> is in the space beyond +/- 2.5 sigma. As mentioned earlier, many funds 
+<p>Where the normal distribution is a wholly <strong>inadequate model</strong> is in the space beyond +/- 2.5 sigma. As mentioned earlier, many funds
 experienced -6 sigma events or greater during the global financial crisis, day after day. The S&amp;P 500 fitted distribution presented
 above suggests that such an extreme event is likely to occur with a probability of 8.2934E-8% implying it <strong>should only happen once
 in 4,784,799 years!</strong>  The plot below zooms into the left tail of the distribution demonstrating that extreme events occur far more
@@ -594,8 +610,8 @@ frequently than a normal distribution would suggest.</p>
     <img class="chart" src="../../images/yahoo/return_dist_3.png"/>
 </p>
 
-<p>In the above example we leverage a function called <code>normal()</code> to generate a scaled normal distribution that we can superimpose on 
-the plot to get a sense of how well the return histogram fits such a model. The code below simply generates a normal curve given 
+<p>In the above example we leverage a function called <code>normal()</code> to generate a scaled normal distribution that we can superimpose on
+the plot to get a sense of how well the return histogram fits such a model. The code below simply generates a normal curve given
 the mean, standard deviation of the daily returns, with an appropriate scale factor to fit the histogram.</p>
 <p>$$ f(x | \mu, \sigma^2) = \frac{1}{\sqrt{2 \pi \sigma^2}} e^{-\frac{(x - \mu)^2}{2 \sigma^2}} $$</p>
 <?prettify?>
@@ -627,8 +643,8 @@ the mean, standard deviation of the daily returns, with an appropriate scale fac
 </code></pre>
 
 <h4 id="return-distribution-smoothed">Return Distribution (Smoothed)</h4>
-<p>Consider the same setup as in the prior example, but in this case we look at the frequency distribution of daily returns after they 
-have been <strong>exponentially smoothed</strong> with a 20 day half-life. De-noising the returns does not yield a better fit, and the positive 
+<p>Consider the same setup as in the prior example, but in this case we look at the frequency distribution of daily returns after they
+have been <strong>exponentially smoothed</strong> with a 20 day half-life. De-noising the returns does not yield a better fit, and the positive
 skew in the distribution becomes more apparent. In addition, while there is a positive skew, it is also clear that smoothing the
 returns highlights far <strong>more negative extreme events</strong> than positive events.</p>
 <p align="center">
@@ -672,9 +688,9 @@ Chart.create().withHistPlot(returns, (int)binCount, chart -&gt; {
 
 <h3 id="latest-quotes">Latest Quotes</h3>
 <p>Accessing a snapshot of the most recent data for one or more securities can be done via a single call using the <code>YahooQuoteLiveSource</code>
-as shown below. In this example, we request the most recent data for several tickers, and we are presented with a <code>DataFrame</code> 
-containing all available fields as columns. When accessing this data outside of market hours, fields such as the bid/ask price 
-and size will often show NaN values. The resulting <code>DataFrame</code> is keyed by the security ticker along the row axis and <code>YahooField</code> 
+as shown below. In this example, we request the most recent data for several tickers, and we are presented with a <code>DataFrame</code>
+containing all available fields as columns. When accessing this data outside of market hours, fields such as the bid/ask price
+and size will often show NaN values. The resulting <code>DataFrame</code> is keyed by the security ticker along the row axis and <code>YahooField</code>
 along the column axis allowing fast access to elements of the frame. </p>
 <?prettify?>
 
@@ -739,9 +755,9 @@ DataFrame&lt;String, YahooField&gt; quotes = source.read(options -&gt; {
 </pre>
 
 <h3 id="option-quotes">Option Quotes</h3>
-<p>Market data for listed <a href="https://en.wikipedia.org/wiki/Option_(finance)">Options</a> on equities and ETFs is also accessible from 
-Yahoo Finance (for example, listed options on Apple can be accessed <a href="https://finance.yahoo.com/quote/AAPL/options?p=AAPL">here</a>). 
-It is not clear that Yahoo provides a CSV API for this data, so the Morpheus Adapter screen scrapes the relevant information from 
+<p>Market data for listed <a href="https://en.wikipedia.org/wiki/Option_(finance)">Options</a> on equities and ETFs is also accessible from
+Yahoo Finance (for example, listed options on Apple can be accessed <a href="https://finance.yahoo.com/quote/AAPL/options?p=AAPL">here</a>).
+It is not clear that Yahoo provides a CSV API for this data, so the Morpheus Adapter screen scrapes the relevant information from
 the HTML page, which obviously makes it somewhat sensitive to changes in the page style.</p>
 <p>The code below demonstrates how to query for the <strong>expiry dates</strong> on options given the underlying security symbol. It then
 selects the next upcoming expiry date, and queries for all options, including <strong>calls and puts</strong> for this expiry.</p>
@@ -804,20 +820,20 @@ DataFrame&lt;String,YahooField&gt; puts = optionQuotes.rows().select(row -&gt; {
 </pre>
 
 <h4 id="volatility-smile">Volatility Smile</h4>
-<p>One of the most influential inputs to the famous <a href="https://en.wikipedia.org/wiki/Black%E2%80%93Scholes_model">Black-Scholes-Merton</a> 
-option pricing model concerns the future volatility of the returns on the underlying asset. In fact, volatility is so fundamental to 
-option pricing that certain types of option contracts are quoted in volatility units rather than price. Black-Scholes assumes that 
-the volatility of the underlying returns are constant over the term in question, and it also assumes that other characteristics of 
+<p>One of the most influential inputs to the famous <a href="https://en.wikipedia.org/wiki/Black%E2%80%93Scholes_model">Black-Scholes-Merton</a>
+option pricing model concerns the future volatility of the returns on the underlying asset. In fact, volatility is so fundamental to
+option pricing that certain types of option contracts are quoted in volatility units rather than price. Black-Scholes assumes that
+the volatility of the underlying returns are constant over the term in question, and it also assumes that other characteristics of
 the option such as the moneyness (how far in or out-of-the-money the option might be), do not influence estimates of future volatility.</p>
-<p>In reality, this does not appear to be the case based on observed market prices. A commonly used visualization in option trading is 
-called the <strong>Option Volatility Smile</strong>, which plots <strong>implied volatilities</strong> of options with different <strong>strike prices</strong> for the same 
-expiry date. According to Black-Scholes, these curves should be flat, but in reality they form more of a curve in the shape of a 
-person smiling. That is, implied volatilities for <strong>at-the-money</strong> options tend to be lower than for deep <strong>in-the-money</strong> or deep 
+<p>In reality, this does not appear to be the case based on observed market prices. A commonly used visualization in option trading is
+called the <strong>Option Volatility Smile</strong>, which plots <strong>implied volatilities</strong> of options with different <strong>strike prices</strong> for the same
+expiry date. According to Black-Scholes, these curves should be flat, but in reality they form more of a curve in the shape of a
+person smiling. That is, implied volatilities for <strong>at-the-money</strong> options tend to be lower than for deep <strong>in-the-money</strong> or deep
 <strong>out-the-money</strong> options.</p>
 <p>The plot below illustrates the volatility smiles for options on the S&amp;P 500 ETF with ticker symbol SPY which has been generated
-using the Morpheus Yahoo Finance adapter. While various <strong>outliers</strong> appear to exist, the smile pattern is pretty clear. These outliers 
+using the Morpheus Yahoo Finance adapter. While various <strong>outliers</strong> appear to exist, the smile pattern is pretty clear. These outliers
 are likely to be explained by low volume at the strike prices in question, so the calculated implied volatilities are stale at those
-points. The other possibility is a mis-pricing of some options at these strikes, but that is fairly unlikely as such differences would 
+points. The other possibility is a mis-pricing of some options at these strikes, but that is fairly unlikely as such differences would
 be quickly arbitraged away. The code to generate this plot is also shown below.</p>
 <p align="center">
     <img class="chart" src="../../images/yahoo/option_call_smile.png"/>
@@ -876,8 +892,8 @@ Chart.create().asSwing().withLinePlot(frames.getValue(0), &quot;Strike&quot;, ch
 });
 </code></pre>
 
-<p>We can use a slightly modified version of this code to run the analysis for all <strong>PUT options</strong>, the results of 
-which are plotted below. The same smile pattern is evident, as are the existence of outliers, which is most likely due 
+<p>We can use a slightly modified version of this code to run the analysis for all <strong>PUT options</strong>, the results of
+which are plotted below. The same smile pattern is evident, as are the existence of outliers, which is most likely due
 to the lack of transactions at the strikes in question. Another take-away from these plots is that deep <strong>in-the-money</strong>
 options are more expensive from an implied volatility perspective than deep <strong>out-the-money</strong> options as the smile
 does not appear to be symmetric in nature.</p>

@@ -30,9 +30,9 @@ import java.util.Set;
 import java.util.function.Function;
 import javax.sql.DataSource;
 
-import com.zavtech.morpheus.frame.DataFrameException;
-import com.zavtech.morpheus.frame.DataFrameSource;
-import com.zavtech.morpheus.util.sql.SQLExtractor;
+import com.d3x.morpheus.frame.DataFrameException;
+import com.d3x.morpheus.frame.DataFrameSource;
+import com.d3x.morpheus.util.sql.SQLExtractor;
 
 /**
  * A DataFrameRequest used to load a DataFrame from a SQL Database.
