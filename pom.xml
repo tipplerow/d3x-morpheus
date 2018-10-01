@@ -16,8 +16,8 @@
         <module>morpheus-quandl/pom.xml</module>
         <module>morpheus-jblas/pom.xml</module>
         <module>morpheus-worldbank/pom.xml</module>
-        <!--module>morpheus-json/pom.xml</module>
-        <module>morpheus-db/pom.xml</module-->
+        <module>morpheus-json/pom.xml</module>
+        <!--module>morpheus-db/pom.xml</module-->
     </modules>
 
     <name>morpheus</name>

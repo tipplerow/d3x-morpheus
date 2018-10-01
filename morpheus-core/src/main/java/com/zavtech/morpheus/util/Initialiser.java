@@ -47,7 +47,7 @@ public class Initialiser {
      */
     public static <T> T apply(Class<T> type, Consumer<T> configurator) {
         try {
-            final T instance = type.newInstance();
+            final T instance = type.getDeclaredConstructor().newInstance();
             configurator.accept(instance);
             return instance;
         } catch (Exception ex) {

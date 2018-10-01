@@ -15,6 +15,7 @@
  */
 package com.zavtech.morpheus.reference;
 
+import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -29,6 +30,7 @@ import com.zavtech.morpheus.array.ArrayType;
 import com.zavtech.morpheus.index.Index;
 import com.zavtech.morpheus.range.Range;
 import com.zavtech.morpheus.util.Predicates;
+import org.testng.annotations.Test;
 
 /**
  * A provider of various kinds of DataFrame configurations used across various tests.
@@ -130,6 +132,30 @@ public class TestDataFrames {
             columns.add("ZonedDateTimeColumn", ZonedDateTime.class).applyValues(v -> ZonedDateTime.now().plusDays(v.rowOrdinal()));
             columns.add("EnumColumn", Month.class).applyValues(v -> LocalDateTime.now().minusDays(v.rowOrdinal()).getMonth());
         });
+    }
+
+
+    @Test(enabled = false)
+    public void test() {
+        createMixedRandomFrame(Integer.class, 1000).write().csv(options -> {
+            options.setFile(new File("frame-with-int-index.csv"));
+        });
+        createMixedRandomFrame(String.class, 1000).write().csv(options -> {
+            options.setFile(new File("frame-with-string-index.csv"));
+        });
+        createMixedRandomFrame(LocalDate.class, 1000).write().csv(options -> {
+            options.setFile(new File("frame-with-local-date-index.csv"));
+        });
+        createMixedRandomFrame(LocalTime.class, 1000).write().csv(options -> {
+            options.setFile(new File("frame-with-local-time-index.csv"));
+        });
+        createMixedRandomFrame(LocalDateTime.class, 1000).write().csv(options -> {
+            options.setFile(new File("frame-with-local-date-time-index.csv"));
+        });
+        createMixedRandomFrame(ZonedDateTime.class, 1000).write().csv(options -> {
+            options.setFile(new File("frame-with-zoned-date-time-index.csv"));
+        });
+
     }
 
 

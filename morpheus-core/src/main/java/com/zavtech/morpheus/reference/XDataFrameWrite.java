@@ -25,8 +25,6 @@ import com.zavtech.morpheus.sink.CsvSink;
 import com.zavtech.morpheus.sink.CsvSinkOptions;
 import com.zavtech.morpheus.sink.DbSink;
 import com.zavtech.morpheus.sink.DbSinkOptions;
-import com.zavtech.morpheus.sink.JsonSink;
-import com.zavtech.morpheus.sink.JsonSinkOptions;
 
 /**
  * The reference implementation of the DataFrameWrite interface to enable DataFrames to be written out to a storage device.
@@ -55,11 +53,6 @@ class XDataFrameWrite<R,C> implements DataFrameWrite<R,C> {
     @Override
     public final void csv(Consumer<CsvSinkOptions<R>> configurator) {
         this.to(new CsvSink<>(), configurator);
-    }
-
-    @Override
-    public final void json(Consumer<JsonSinkOptions> configurator) {
-        this.to(new JsonSink<>(), configurator);
     }
 
     @Override

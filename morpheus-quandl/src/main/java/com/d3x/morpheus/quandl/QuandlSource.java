@@ -45,6 +45,7 @@ import java.util.zip.ZipFile;
 import com.d3x.core.http.client.HttpClient;
 import com.d3x.core.http.client.HttpHeader;
 import com.d3x.core.http.client.HttpResponse;
+import com.d3x.core.util.Json;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
@@ -54,7 +55,6 @@ import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
 import com.zavtech.morpheus.frame.DataFrame;
 import com.zavtech.morpheus.util.IO;
-import com.zavtech.morpheus.util.Json;
 
 import static com.d3x.morpheus.quandl.QuandlField.END_DATE;
 import static com.d3x.morpheus.quandl.QuandlField.LAST_REFRESH_TIME;
@@ -102,10 +102,10 @@ public class QuandlSource {
         this.gson = new GsonBuilder()
             .registerTypeAdapter(QuandlDatasetInfo.class, new QuandlDatasetInfo.Deserializer())
             .registerTypeAdapter(QuandlDatabaseInfo.class, new QuandlDatabaseInfo.Deserializer())
-            .registerTypeAdapter(LocalTime.class, new Json.LocalTimeSerializer(DateTimeFormatter.ISO_LOCAL_TIME))
-            .registerTypeAdapter(LocalDate.class, new Json.LocalDateSerializer(DateTimeFormatter.ISO_LOCAL_DATE))
-            .registerTypeAdapter(LocalDateTime.class, new Json.LocalDateTimeSerializer(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
-            .registerTypeAdapter(ZonedDateTime.class, new Json.ZonedDateTimeSerializer(DateTimeFormatter.ISO_ZONED_DATE_TIME))
+            .registerTypeAdapter(LocalTime.class, new Json.LocalTimeDeserializer(DateTimeFormatter.ISO_LOCAL_TIME))
+            .registerTypeAdapter(LocalDate.class, new Json.LocalDateDeserializer(DateTimeFormatter.ISO_LOCAL_DATE))
+            .registerTypeAdapter(LocalDateTime.class, new Json.LocalDateTimeDeserializer(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
+            .registerTypeAdapter(ZonedDateTime.class, new Json.ZonedDateTimeDeserializer(DateTimeFormatter.ISO_ZONED_DATE_TIME))
             .create();
     }
 

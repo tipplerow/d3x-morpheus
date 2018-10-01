@@ -43,6 +43,12 @@
             <version>1.0.1</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.d3xsystems</groupId>
+            <artifactId>d3x-core-util</artifactId>
+            <version>1.0.1</version>
+        </dependency>
+
     </dependencies>
 
 </project>
