@@ -1,8 +1,3 @@
-<style>
-table.header {
-    width:100%;
-}
-</style>
 <table class="header" width="100%" border="0">
     <tbody>
         <tr>
@@ -15,6 +10,9 @@ table.header {
         </tr>
     </tbody>
 </table>
+<div>
+<hr>
+<div>
 
 ### Introduction
 
