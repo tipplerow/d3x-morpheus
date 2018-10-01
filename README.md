@@ -1,4 +1,9 @@
-<table width="100%" border="0">
+<style>
+table.header {
+    width:100%;
+}
+</style>
+<table class="header" width="100%" border="0">
     <tbody>
         <tr>
             <td align="left">
