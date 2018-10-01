@@ -1,12 +1,15 @@
-<div style="width:100%">
-    <div style="width:50%; float:left;">
-        <img src="https://www.d3xsystems.com/images/common/morpheus-logo.svg" height="50px" align="left"/>
-    </div>
-    <div style="width:50%; float:left;">
-        <img src="https://www.d3xsystems.com/images/common/d3x.svg" height="40px" align="right"/>
-    </div>
-</div>        
-
+<table width="100%" border="0">
+    <tbody>
+        <tr>
+            <td align="left">
+                <img src="https://www.d3xsystems.com/images/common/morpheus-logo.svg" height="50px" align="left"/>
+            </td>
+            <td align="right">
+                <img src="https://www.d3xsystems.com/images/common/d3x.svg" height="40px" align="right"/>
+            </td>
+        </tr>
+    </tbody>
+</table>
 
 ### Introduction
 
