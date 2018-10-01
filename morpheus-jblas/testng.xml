@@ -18,4 +18,10 @@
 
 <suite name="Suite1" verbose="1" >
 
+    <test name="JBLAS Tests">
+        <packages>
+            <package name="com.com.d3x.morpheus.reference.algebra.*"/>
+        </packages>
+    </test>
+
 </suite>
