@@ -34,16 +34,16 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import com.zavtech.morpheus.frame.DataFrame;
-import com.zavtech.morpheus.frame.DataFrameCursor;
-import com.zavtech.morpheus.frame.DataFrameException;
-import com.zavtech.morpheus.frame.DataFrameRow;
-import com.zavtech.morpheus.frame.DataFrameValue;
-import com.zavtech.morpheus.util.Collect;
-import com.zavtech.morpheus.util.Initialiser;
-import com.zavtech.morpheus.util.functions.Function1;
-import com.zavtech.morpheus.util.sql.SQLPlatform;
-import com.zavtech.morpheus.util.sql.SQLType;
+import com.d3x.morpheus.frame.DataFrame;
+import com.d3x.morpheus.frame.DataFrameCursor;
+import com.d3x.morpheus.frame.DataFrameException;
+import com.d3x.morpheus.frame.DataFrameRow;
+import com.d3x.morpheus.frame.DataFrameValue;
+import com.d3x.morpheus.util.Collect;
+import com.d3x.morpheus.util.Initialiser;
+import com.d3x.morpheus.util.functions.Function1;
+import com.d3x.morpheus.util.sql.SQLPlatform;
+import com.d3x.morpheus.util.sql.SQLType;
 
 /**
  * A DataFrameSink implementation that writes DataFrames to a SQL database table.

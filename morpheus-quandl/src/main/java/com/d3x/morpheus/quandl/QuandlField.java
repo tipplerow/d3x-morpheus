@@ -21,8 +21,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.zavtech.morpheus.frame.DataFrame;
-import com.zavtech.morpheus.index.Index;
+import com.d3x.morpheus.frame.DataFrame;
+import com.d3x.morpheus.index.Index;
 
 /**
  * @author Xavier Witdouck

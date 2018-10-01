@@ -22,15 +22,15 @@ import java.io.OutputStreamWriter;
 import java.util.function.Consumer;
 
 import com.google.gson.stream.JsonWriter;
-import com.zavtech.morpheus.array.ArrayType;
-import com.zavtech.morpheus.frame.DataFrame;
-import com.zavtech.morpheus.frame.DataFrameColumn;
-import com.zavtech.morpheus.frame.DataFrameException;
-import com.zavtech.morpheus.util.IO;
-import com.zavtech.morpheus.util.Initialiser;
-import com.zavtech.morpheus.util.Resource;
-import com.zavtech.morpheus.util.text.Formats;
-import com.zavtech.morpheus.util.text.printer.Printer;
+import com.d3x.morpheus.array.ArrayType;
+import com.d3x.morpheus.frame.DataFrame;
+import com.d3x.morpheus.frame.DataFrameColumn;
+import com.d3x.morpheus.frame.DataFrameException;
+import com.d3x.morpheus.util.IO;
+import com.d3x.morpheus.util.Initialiser;
+import com.d3x.morpheus.util.Resource;
+import com.d3x.morpheus.util.text.Formats;
+import com.d3x.morpheus.util.text.printer.Printer;
 
 /**
  * A DataFrameSink implementation that writes a DataFrame out in a Morpheus specific JSON format.

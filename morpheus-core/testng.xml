@@ -4,126 +4,126 @@
 
     <test name="Array Tests">
         <packages>
-            <package name="com.zavtech.morpheus.array.*"/>
+            <package name="com.d3x.morpheus.array.*"/>
         </packages>
     </test>
 
 
     <test name="Index Tests">
         <packages>
-            <package name="com.zavtech.morpheus.index.*"/>
+            <package name="com.d3x.morpheus.index.*"/>
         </packages>
     </test>
 
 
     <test name="Range Tests">
         <packages>
-            <package name="com.zavtech.morpheus.range.*"/>
+            <package name="com.d3x.morpheus.range.*"/>
         </packages>
     </test>
 
 
     <test name="DataFrame IO Tests">
         <packages>
-            <package name="com.zavtech.morpheus.io.*"/>
+            <package name="com.d3x.morpheus.io.*"/>
         </packages>
         <classes>
-            <class name="com.zavtech.morpheus.reference.SerializationTests"/>
+            <class name="com.d3x.morpheus.reference.SerializationTests"/>
         </classes>
     </test>
 
 
     <test name="DataFrame Util Tests">
         <packages>
-            <package name="com.zavtech.morpheus.util.*"/>
+            <package name="com.d3x.morpheus.util.*"/>
         </packages>
     </test>
 
 
     <test name="DataFrame Statistics Tests">
         <classes>
-            <class name="com.zavtech.morpheus.reference.StatsBasicTests"/>
-            <class name="com.zavtech.morpheus.reference.StatsExpandingTests"/>
-            <class name="com.zavtech.morpheus.reference.StatsRollingTests"/>
-            <class name="com.zavtech.morpheus.reference.StatsTest1"/>
-            <class name="com.zavtech.morpheus.reference.CorrelationTests"/>
-            <class name="com.zavtech.morpheus.reference.CovarianceTests"/>
-            <class name="com.zavtech.morpheus.reference.RankTests"/>
+            <class name="com.d3x.morpheus.reference.StatsBasicTests"/>
+            <class name="com.d3x.morpheus.reference.StatsExpandingTests"/>
+            <class name="com.d3x.morpheus.reference.StatsRollingTests"/>
+            <class name="com.d3x.morpheus.reference.StatsTest1"/>
+            <class name="com.d3x.morpheus.reference.CorrelationTests"/>
+            <class name="com.d3x.morpheus.reference.CovarianceTests"/>
+            <class name="com.d3x.morpheus.reference.RankTests"/>
         </classes>
     </test>
 
     <test name="DataFrame Linear Regression Tests">
         <classes>
-            <class name="com.zavtech.morpheus.reference.GLSTests"/>
-            <class name="com.zavtech.morpheus.reference.OLSTests"/>
-            <class name="com.zavtech.morpheus.reference.WLSTests"/>
+            <class name="com.d3x.morpheus.reference.GLSTests"/>
+            <class name="com.d3x.morpheus.reference.OLSTests"/>
+            <class name="com.d3x.morpheus.reference.WLSTests"/>
         </classes>
     </test>
 
 
     <test name="DataFrame Analysis Tests">
         <classes>
-            <class name="com.zavtech.morpheus.reference.PCATests"/>
-            <class name="com.zavtech.morpheus.reference.AlgebraTests"/>
-            <class name="com.zavtech.morpheus.reference.ExpWeightedTests"/>
+            <class name="com.d3x.morpheus.reference.PCATests"/>
+            <class name="com.d3x.morpheus.reference.AlgebraTests"/>
+            <class name="com.d3x.morpheus.reference.ExpWeightedTests"/>
         </classes>
     </test>
 
 
     <test name="DataFrame Row Tests">
         <classes>
-            <class name="com.zavtech.morpheus.reference.RowTests"/>
-            <class name="com.zavtech.morpheus.reference.RowAccessTests"/>
+            <class name="com.d3x.morpheus.reference.RowTests"/>
+            <class name="com.d3x.morpheus.reference.RowAccessTests"/>
         </classes>
     </test>
 
 
     <test name="DataFrame Column Tests">
         <classes>
-            <class name="com.zavtech.morpheus.reference.ColumnTests"/>
-            <class name="com.zavtech.morpheus.reference.ColumnAccessTests"/>
+            <class name="com.d3x.morpheus.reference.ColumnTests"/>
+            <class name="com.d3x.morpheus.reference.ColumnAccessTests"/>
         </classes>
     </test>
 
 
     <test name="DataFrame Access Tests">
         <classes>
-            <class name="com.zavtech.morpheus.reference.AccessTests"/>
-            <class name="com.zavtech.morpheus.reference.ApplyTests"/>
-            <class name="com.zavtech.morpheus.reference.CombineTests"/>
-            <class name="com.zavtech.morpheus.reference.ContentTests"/>
-            <class name="com.zavtech.morpheus.reference.CountTests"/>
-            <class name="com.zavtech.morpheus.reference.DimensionTests"/>
-            <class name="com.zavtech.morpheus.reference.FillTests"/>
-            <class name="com.zavtech.morpheus.reference.IteratorTests"/>
-            <class name="com.zavtech.morpheus.reference.StructureTests"/>
-            <class name="com.zavtech.morpheus.reference.UpdateTests"/>
-            <class name="com.zavtech.morpheus.reference.StreamTests"/>
-            <class name="com.zavtech.morpheus.reference.SelectTests"/>
-            <class name="com.zavtech.morpheus.reference.CopyTests"/>
-            <class name="com.zavtech.morpheus.reference.CreateTests"/>
-            <class name="com.zavtech.morpheus.reference.EqualsTest"/>
+            <class name="com.d3x.morpheus.reference.AccessTests"/>
+            <class name="com.d3x.morpheus.reference.ApplyTests"/>
+            <class name="com.d3x.morpheus.reference.CombineTests"/>
+            <class name="com.d3x.morpheus.reference.ContentTests"/>
+            <class name="com.d3x.morpheus.reference.CountTests"/>
+            <class name="com.d3x.morpheus.reference.DimensionTests"/>
+            <class name="com.d3x.morpheus.reference.FillTests"/>
+            <class name="com.d3x.morpheus.reference.IteratorTests"/>
+            <class name="com.d3x.morpheus.reference.StructureTests"/>
+            <class name="com.d3x.morpheus.reference.UpdateTests"/>
+            <class name="com.d3x.morpheus.reference.StreamTests"/>
+            <class name="com.d3x.morpheus.reference.SelectTests"/>
+            <class name="com.d3x.morpheus.reference.CopyTests"/>
+            <class name="com.d3x.morpheus.reference.CreateTests"/>
+            <class name="com.d3x.morpheus.reference.EqualsTest"/>
         </classes>
     </test>
 
 
     <test name="DataFrame Search Tests">
         <classes>
-            <class name="com.zavtech.morpheus.reference.BinarySearchTests"/>
-            <class name="com.zavtech.morpheus.reference.MinMaxTests"/>
-            <class name="com.zavtech.morpheus.reference.BoundsTests"/>
+            <class name="com.d3x.morpheus.reference.BinarySearchTests"/>
+            <class name="com.d3x.morpheus.reference.MinMaxTests"/>
+            <class name="com.d3x.morpheus.reference.BoundsTests"/>
         </classes>
     </test>
 
 
     <test name="DataFrame Transformation Tests">
         <classes>
-            <class name="com.zavtech.morpheus.reference.ExportTests"/>
-            <class name="com.zavtech.morpheus.reference.FilterTests"/>
-            <class name="com.zavtech.morpheus.reference.GroupingTests"/>
-            <class name="com.zavtech.morpheus.reference.MappingTests"/>
-            <class name="com.zavtech.morpheus.reference.QuoteTests"/>
-            <class name="com.zavtech.morpheus.reference.SortingTests"/>
+            <class name="com.d3x.morpheus.reference.ExportTests"/>
+            <class name="com.d3x.morpheus.reference.FilterTests"/>
+            <class name="com.d3x.morpheus.reference.GroupingTests"/>
+            <class name="com.d3x.morpheus.reference.MappingTests"/>
+            <class name="com.d3x.morpheus.reference.QuoteTests"/>
+            <class name="com.d3x.morpheus.reference.SortingTests"/>
         </classes>
     </test>
 

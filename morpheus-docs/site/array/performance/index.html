@@ -1,12 +1,28 @@
+<!--
+  ~ Copyright (C) 2014-2018 D3X Systems - All Rights Reserved
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        
+
         <meta name="author" content="Xavier Witdouck">
-        
+
         <link rel="shortcut icon" href="../../img/favicon.ico">
         <title>Performance - Morpheus</title>
         <link href="../../css/bootstrap-custom.min.css" rel="stylesheet">
@@ -20,10 +36,10 @@
             <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
             <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
         <![endif]-->
-	
+
 	<script src="../../js/jquery-1.10.2.min.js"></script>
         <script src="../../js/bootstrap-3.0.3.min.js"></script>
-        <script src="../../js/highlight.pack.js"></script> 
+        <script src="../../js/highlight.pack.js"></script>
     </head>
 
     <body>
@@ -53,11 +69,11 @@
                     <li class="dropdown active">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Array <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            
+
 <li >
     <a href="../overview/">Overview</a>
 </li>
-                            
+
 <li class="active">
     <a href="./">Performance</a>
 </li>
@@ -66,39 +82,39 @@
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">DataFrame <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            
+
 <li >
     <a href="../../frame/construction/">Construction</a>
 </li>
-                            
+
 <li >
     <a href="../../frame/access/">Accessing</a>
 </li>
-                            
+
 <li >
     <a href="../../frame/reshaping/">Reshaping</a>
 </li>
-                            
+
 <li >
     <a href="../../frame/filtering/">Filtering</a>
 </li>
-                            
+
 <li >
     <a href="../../frame/sorting/">Sorting</a>
 </li>
-                            
+
 <li >
     <a href="../../frame/grouping/">Grouping</a>
 </li>
-                            
+
 <li >
     <a href="../../frame/finding/">Finding</a>
 </li>
-                            
+
 <li >
     <a href="../../frame/writing/">Writing</a>
 </li>
-                            
+
 <li >
     <a href="../../frame/performance/">Performance</a>
 </li>
@@ -107,45 +123,45 @@
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Analysis <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            
+
 <li >
     <a href="../../analysis/statistics/">Descriptive Statistics</a>
 </li>
-                            
+
   <li class="dropdown-submenu">
     <a href="#">Linear Regression</a>
     <ul class="dropdown-menu">
-            
+
 <li >
     <a href="../../regression/ols/">Ordinary Least Squares</a>
 </li>
-            
+
 <li >
     <a href="../../regression/wls/">Weighted Least Squares</a>
 </li>
-            
+
 <li >
     <a href="../../regression/gls/">Generalized Least Squares</a>
 </li>
     </ul>
   </li>
-                            
+
 <li >
     <a href="../../analysis/pca/">Principal Component Analysis</a>
 </li>
-                            
+
 <li >
     <a href="../../analysis/linearalgebra/">Linear Algebra</a>
 </li>
-                            
+
 <li >
     <a href="../../analysis/timeseries/">Time Series Analysis</a>
 </li>
-                            
+
   <li class="dropdown-submenu">
     <a href="#">Examples</a>
     <ul class="dropdown-menu">
-            
+
 <li >
     <a href="../../examples/mpt/">Modern Portfolio Theory</a>
 </li>
@@ -156,29 +172,29 @@
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Visualization <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            
+
   <li class="dropdown-submenu">
     <a href="#">Charts</a>
     <ul class="dropdown-menu">
-            
+
 <li >
     <a href="../../viz/charts/overview/">Overview</a>
 </li>
-            
+
 <li >
     <a href="../../viz/charts/embed/">Embedding (HTML)</a>
 </li>
-            
+
 <li >
     <a href="../../viz/charts/gallery1/">Gallery (Google)</a>
 </li>
-            
+
 <li >
     <a href="../../viz/charts/gallery2/">Gallery (JFree)</a>
 </li>
     </ul>
   </li>
-                            
+
 <li >
     <a href="../../viz/tables/overview/">Tables</a>
 </li>
@@ -187,23 +203,23 @@
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Data Sources <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            
+
 <li >
     <a href="../../providers/quandl/">Quandl</a>
 </li>
-                            
+
 <li >
     <a href="../../providers/fred/">Federal Reserve</a>
 </li>
-                            
+
 <li >
     <a href="../../providers/google/">Google Finance</a>
 </li>
-                            
+
 <li >
     <a href="../../providers/yahoo/">Yahoo Finance</a>
 </li>
-                            
+
 <li >
     <a href="../../providers/world-bank/">World Bank</a>
 </li>
@@ -253,18 +269,18 @@
                 <div class="col-md-9" role="main">
 
 <h3 id="introduction">Introduction</h3>
-<p>The following sections provide some micro-benchmark timing and memory statistics for various 
-types of Morpheus <code>Arrays</code>. These benchmarks where performed on a 2013 MacBook Pro with a Core 
-i7 2.6Ghz Quad-core CPU, and 16GB of memory. As with all benchmarks, these figures should be 
-taken with a pinch of salt as real-world performance could differ substantially for all sorts 
-of reasons. They are however a reasonable set of observations to compare the relative cost of 
-different operations, and also to get a sense of how the sequential versus parallel execution 
+<p>The following sections provide some micro-benchmark timing and memory statistics for various
+types of Morpheus <code>Arrays</code>. These benchmarks where performed on a 2013 MacBook Pro with a Core
+i7 2.6Ghz Quad-core CPU, and 16GB of memory. As with all benchmarks, these figures should be
+taken with a pinch of salt as real-world performance could differ substantially for all sorts
+of reasons. They are however a reasonable set of observations to compare the relative cost of
+different operations, and also to get a sense of how the sequential versus parallel execution
 of these operations compares.</p>
 <h3 id="native-arrays">Native Arrays</h3>
-<p>Non-primitive Java arrays do not scale particularly well, specifically in terms of their memory 
-consumption, and more importantly, they put a significant burden on the garbage collector. To 
-illustrate this point, consider the plots below which compare the average initialization time 
-(construction and population) of various types of array containing 5 million entries, followed 
+<p>Non-primitive Java arrays do not scale particularly well, specifically in terms of their memory
+consumption, and more importantly, they put a significant burden on the garbage collector. To
+illustrate this point, consider the plots below which compare the average initialization time
+(construction and population) of various types of array containing 5 million entries, followed
 by the subsequent garbage collection times. The lower case <code>boolean</code>, <code>int</code>, <code>long</code> and <code>double</code>
 labels represent primitive array types while the capitalized <code>Boolean</code>, <code>Integer</code>, <code>Long</code> and <code>Double</code>
 represent the boxed versions.</p>
@@ -273,10 +289,10 @@ represent the boxed versions.</p>
 </p>
 
 <p><strong>Figure 1. Expect significant dispersion in initialization times for large non-primitive arrays</strong></p>
-<p>While the variation in initialisation times appears to be fairly significant, the <strong>magnitude</strong> of the 
-garbage collection (GC) times in figure 2 is potentially more concerning. The GC times for 
-primitive arrays barely registers on this chart which is dominated by the results for <code>ZonedDateTime</code>. 
-Primitive arrays are represented by a single object and a contiguous block of memory, so the 
+<p>While the variation in initialisation times appears to be fairly significant, the <strong>magnitude</strong> of the
+garbage collection (GC) times in figure 2 is potentially more concerning. The GC times for
+primitive arrays barely registers on this chart which is dominated by the results for <code>ZonedDateTime</code>.
+Primitive arrays are represented by a single object and a contiguous block of memory, so the
 collector only needs to keep track of one reference when performing its sweep. Clearly this makes
 a profound difference in performance.</p>
 <p align="center">
@@ -285,9 +301,9 @@ a profound difference in performance.</p>
 
 <p><strong>Figure 2. ZonedDateTime has a great API for time zone aware dates, but it comes at a price</strong></p>
 <p>Using the <code>Instrumentation</code> interface introduced in Java 5, we estimate the relative sizes
-of these various array instances, and once again, primitive arrays win hands down. Notice how 
-the <code>Date</code> array consumes more than twice the memory of a primitive <code>long</code> array of the same 
-length, even though its internal state is no more than a single <code>long</code> field representing epoch 
+of these various array instances, and once again, primitive arrays win hands down. Notice how
+the <code>Date</code> array consumes more than twice the memory of a primitive <code>long</code> array of the same
+length, even though its internal state is no more than a single <code>long</code> field representing epoch
 milliseconds. Also, it appears that the boxed versions of the <code>boolean</code>, <code>int</code>, <code>long</code> and <code>double</code>
 arrays use at least 3 times more memory.</p>
 <p align="center">
@@ -300,50 +316,50 @@ which future Java release, if any, will include some of the changes discussed <a
 <hr />
 <h3 id="morpheus-arrays">Morpheus Arrays</h3>
 <h4 id="motivation">Motivation</h4>
-<p>The moral of the story above is that to build high performance systems involving large data, 
-primitive arrays have to be used wherever possible, which is the fundamental design motivation 
+<p>The moral of the story above is that to build high performance systems involving large data,
+primitive arrays have to be used wherever possible, which is the fundamental design motivation
 behind the Morpheus Array package. </p>
-<p>This is by no means an attempt to compete with excellent primitive collections libraries such as 
-<a href="http://trove.starlight-systems.com/">Trove</a> and <a href="https://github.com/goldmansachs/gs-collections">Goldman Sachs Collections</a>, 
-and in fact, sparse implementations of Morpheus arrays use the Trove library internally. The 
-Morpheus Array interface is a much more narrowly focused data structure, whose design was ultimately 
+<p>This is by no means an attempt to compete with excellent primitive collections libraries such as
+<a href="http://trove.starlight-systems.com/">Trove</a> and <a href="https://github.com/goldmansachs/gs-collections">Goldman Sachs Collections</a>,
+and in fact, sparse implementations of Morpheus arrays use the Trove library internally. The
+Morpheus Array interface is a much more narrowly focused data structure, whose design was ultimately
 motivated by the desire to build an efficient in-memory column store called a <code>DataFrame</code>.</p>
-<p>The Morpheus library ships with a number of implementations of the <code>com.zavtech.morpheus.array.Array</code> 
-interface, with support for many commonly used types. Each implementation is designed to unbox an object 
-into an appropriate primitive representation where possible, and box it when it is being read back from 
-the array. So for example, <code>Array&lt;Date&gt;</code> internally contains a primitive array of longs which store epoch 
-millisecond values. <code>Array&lt;String&gt;</code> represents its internal state with a large <code>char</code>array, and unboxes 
+<p>The Morpheus library ships with a number of implementations of the <code>com.d3x.morpheus.array.Array</code>
+interface, with support for many commonly used types. Each implementation is designed to unbox an object
+into an appropriate primitive representation where possible, and box it when it is being read back from
+the array. So for example, <code>Array&lt;Date&gt;</code> internally contains a primitive array of longs which store epoch
+millisecond values. <code>Array&lt;String&gt;</code> represents its internal state with a large <code>char</code>array, and unboxes
 strings to store their contents at an appropriate location within this large <code>char</code> array. Additional
 <code>char</code> arrays are created if the size exceeds Integer.MAX_VALUE.</p>
 <h4 id="design-compromise">Design Compromise</h4>
 <p>This design choice is obviously a compromise in that it introduces a boxing/unboxing cost when reading
-and writing elements against a Morpheus array. While this is true, for the most part it turns out to be 
+and writing elements against a Morpheus array. While this is true, for the most part it turns out to be
 a favorable compromise with more benefits than drawbacks, because it plays to the strengths
-of the Java Virtual Machine. Specifically, it is sympathetic to the fundamental design philosophy 
+of the Java Virtual Machine. Specifically, it is sympathetic to the fundamental design philosophy
 of generational garbage collection algorithms, which assume that most objects die young.</p>
-<p>The plots below compare the same performance statistics discussed in the previous section in order to get 
-a sense of how Morpheus arrays compare to their native counterparts. As expected, the first chart suggests 
+<p>The plots below compare the same performance statistics discussed in the previous section in order to get
+a sense of how Morpheus arrays compare to their native counterparts. As expected, the first chart suggests
 that Morpheus arrays are somewhat slower to initialize, although not alarmingly so. This differential in
-performance is not unexpected, even for the cases where no unboxing is required, as a method call 
+performance is not unexpected, even for the cases where no unboxing is required, as a method call
 is necessary to set the value unlike the [] operator for native arrays. </p>
 <p align="center">
     <img class="chart" src="../../images/native-vs-morpheus-init-times.png"/>
 </p>
 
 <p><strong>Figure 4. Morpheus arrays are slightly slower to initialise, but not alarmingly so - there is payback for the effort</strong></p>
-<p>There is a huge return on the investment made to keep everything as primitives however, and the subsequent 
+<p>There is a huge return on the investment made to keep everything as primitives however, and the subsequent
 garbage collection times for Morpheus arrays is a small fraction compared to non-primitive native arrays.
 Figure 5 is the same plot as figure 4, but including the subsequent GC times to deallocate the array
-created in each test. So while you pay a small performance penalty with respect to initialisation, the 
-massive reduction in the GC load easily offsets this. Considering the <em>magnitude</em> of the native object 
+created in each test. So while you pay a small performance penalty with respect to initialisation, the
+massive reduction in the GC load easily offsets this. Considering the <em>magnitude</em> of the native object
 array GC times, it feels like a good trade.</p>
 <p align="center">
     <img class="chart" src="../../images/native-vs-morpheus-gc-times.png"/>
 </p>
 
 <p><strong>Figure 5. Morpheus arrays which are based on primitives internally, are very friendly to the garbage collector</strong></p>
-<p>There is also a material reduction in the amount of memory required to store Morpheus arrays. Notice the huge 
-drop in memory required to represent a <code>ZonedDateTime</code> array, or at least the equivalent information within a Morpheus 
+<p>There is also a material reduction in the amount of memory required to store Morpheus arrays. Notice the huge
+drop in memory required to represent a <code>ZonedDateTime</code> array, or at least the equivalent information within a Morpheus
 array. Clearly it is not possible to improve on the allocated memory for primitive types, but in these cases
 Morpheus arrays match their native counterparts.</p>
 <p align="center">
@@ -352,28 +368,28 @@ Morpheus arrays match their native counterparts.</p>
 
 <p><strong>Figure 6. Morpheus arrays use significantly less memory than their object counterparts</strong></p>
 <h4 id="iteration-boxing">Iteration &amp; Boxing</h4>
-<p>Significantly reduced memory usage and much faster Garbage Collection times in return for slightly slower 
+<p>Significantly reduced memory usage and much faster Garbage Collection times in return for slightly slower
 initialization appears to be a reasonable compromise. Sadly, that does not fully represent the extent of the
-trade-off here, as iteration times on some Morpheus arrays is likely to be slower, at least in cases where 
-each element access requires boxing. For <code>boolean</code>, <code>int</code>, <code>long</code> and <code>double</code>array types this is obviously 
+trade-off here, as iteration times on some Morpheus arrays is likely to be slower, at least in cases where
+each element access requires boxing. For <code>boolean</code>, <code>int</code>, <code>long</code> and <code>double</code>array types this is obviously
 not an issue, but for other types there is likely to be a cost.</p>
 <p>The results in figure 7 illustrate this performance deficit for a Morpheus <code>LocalDateTime</code> array versus its
-native counterpart. In both sequential and parallel iteration, the boxing cost appears to roughly double 
-the iteration times in these examples. While that sounds bad, consider the results in figure 8, which are for 
-the same test, but in that example the subsequent Garbage Collection times incurred after each test is 
-included. This presents a very different picture. In addition, iterating over a Morpheus array in parallel 
-is trivial and a fluent extension of the API, and in this mode, it appears that you double the performance 
+native counterpart. In both sequential and parallel iteration, the boxing cost appears to roughly double
+the iteration times in these examples. While that sounds bad, consider the results in figure 8, which are for
+the same test, but in that example the subsequent Garbage Collection times incurred after each test is
+included. This presents a very different picture. In addition, iterating over a Morpheus array in parallel
+is trivial and a fluent extension of the API, and in this mode, it appears that you double the performance
 of native sequential execution on a Quad-Core machine. </p>
 <p align="center">
     <img class="chart" src="../../images/native-vs-morpheus-array-sequential-vs-parallel1.png"/>
 </p>
 
 <p><strong>Figure 7. Morpheus boxing &amp; unboxing does come at a cost, but figure 8 shows the payoff</strong></p>
-<p>Including the subsequent GC times after each test paints a very different picture. This also helps to 
-demonstrate the fact that the design compromise in the Morpheus library is sympathetic to the garbage collector, 
-because the boxing of dates during array traversal results in very short lived objects that are stack based. In 
-the native examples, the objects survive far longer and are heap based, thus placing a much bigger burden on 
-the collector. So while the number of objects created in each test is roughly equivalent, the native examples 
+<p>Including the subsequent GC times after each test paints a very different picture. This also helps to
+demonstrate the fact that the design compromise in the Morpheus library is sympathetic to the garbage collector,
+because the boxing of dates during array traversal results in very short lived objects that are stack based. In
+the native examples, the objects survive far longer and are heap based, thus placing a much bigger burden on
+the collector. So while the number of objects created in each test is roughly equivalent, the native examples
 take far longer overall.</p>
 <p align="center">
     <img class="chart" src="../../images/native-vs-morpheus-array-sequential-vs-parallel2.png"/>
@@ -480,17 +496,17 @@ Chart.create().withBarPlot(results, false, chart -&gt; {
 </code></pre>
 
 <h4 id="sorting">Sorting</h4>
-<p>This section compares some performance statistics of sorting large Morpheus arrays versus their 
-native counterparts. The Morpheus library is built around the highly versatile array sorting API 
+<p>This section compares some performance statistics of sorting large Morpheus arrays versus their
+native counterparts. The Morpheus library is built around the highly versatile array sorting API
 in <a href="http://fastutil.di.unimi.it/">FastUtil</a> developed by <a href="http://vigna.di.unimi.it/">Sebastiano Vigna</a>.
-The results below compare performance versus the JDK <code>java.util.Arrays.sort()</code> and <code>parallelSort()</code> 
+The results below compare performance versus the JDK <code>java.util.Arrays.sort()</code> and <code>parallelSort()</code>
 functions, which it has to be said, is not an entirely fair benchmark.</p>
 <p>Firstly, the JDK array sorting algorithm is based on a dual-pivot quick sort whereas FastUtil is based
 on a more traditional single-pivot quick sort. Secondly, the JDK implementation is presented with
 the array directly, allowing everything to be inlined, and also enabling sliced work arrays to
-be constructed as required. FastUtil on the other hand is not presented with the data directly, 
-but interacts with it via an <code>IntComparator</code> and <code>Swapper</code>, which does incur method call over head, 
-but also makes it far more versatile. The JDK sorting functionality is limited to only sorting arrays 
+be constructed as required. FastUtil on the other hand is not presented with the data directly,
+but interacts with it via an <code>IntComparator</code> and <code>Swapper</code>, which does incur method call over head,
+but also makes it far more versatile. The JDK sorting functionality is limited to only sorting arrays
 in their natural order, while FastUtil allows the sorting logic to be fully customized.</p>
 <p>The results in Figure 9 and 10 demonstrate two very different outcomes, the former comparing performance
 on a primitive <code>double</code> array, the latter on an <code>LocalDateTime</code> array (in both cases these arrays are
@@ -503,7 +519,7 @@ do not include any garbage collection costs incurred after the each test is comp
 </p>
 
 <p><strong>Figure 9. Sorting times for an array of 10 million random double precision values</strong></p>
-<p>In the <code>LocalDatTime</code> results below, Morpheus far outperforms the native array because it is only 
+<p>In the <code>LocalDatTime</code> results below, Morpheus far outperforms the native array because it is only
 operating on the internal primitive array of longs. No boxing is required here, so hence the vast
 performance gap. While this is not an entirely fair comparison, it demonstrates the benefits of
 storing everything as primitives. </p>

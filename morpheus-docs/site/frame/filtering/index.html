@@ -1,12 +1,28 @@
+<!--
+  ~ Copyright (C) 2014-2018 D3X Systems - All Rights Reserved
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        
+
         <meta name="author" content="Xavier Witdouck">
-        
+
         <link rel="shortcut icon" href="../../img/favicon.ico">
         <title>Filtering - Morpheus</title>
         <link href="../../css/bootstrap-custom.min.css" rel="stylesheet">
@@ -20,10 +36,10 @@
             <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
             <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
         <![endif]-->
-	
+
 	<script src="../../js/jquery-1.10.2.min.js"></script>
         <script src="../../js/bootstrap-3.0.3.min.js"></script>
-        <script src="../../js/highlight.pack.js"></script> 
+        <script src="../../js/highlight.pack.js"></script>
     </head>
 
     <body>
@@ -53,11 +69,11 @@
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Array <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            
+
 <li >
     <a href="../../array/overview/">Overview</a>
 </li>
-                            
+
 <li >
     <a href="../../array/performance/">Performance</a>
 </li>
@@ -66,39 +82,39 @@
                     <li class="dropdown active">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">DataFrame <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            
+
 <li >
     <a href="../construction/">Construction</a>
 </li>
-                            
+
 <li >
     <a href="../access/">Accessing</a>
 </li>
-                            
+
 <li >
     <a href="../reshaping/">Reshaping</a>
 </li>
-                            
+
 <li class="active">
     <a href="./">Filtering</a>
 </li>
-                            
+
 <li >
     <a href="../sorting/">Sorting</a>
 </li>
-                            
+
 <li >
     <a href="../grouping/">Grouping</a>
 </li>
-                            
+
 <li >
     <a href="../finding/">Finding</a>
 </li>
-                            
+
 <li >
     <a href="../writing/">Writing</a>
 </li>
-                            
+
 <li >
     <a href="../performance/">Performance</a>
 </li>
@@ -107,45 +123,45 @@
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Analysis <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            
+
 <li >
     <a href="../../analysis/statistics/">Descriptive Statistics</a>
 </li>
-                            
+
   <li class="dropdown-submenu">
     <a href="#">Linear Regression</a>
     <ul class="dropdown-menu">
-            
+
 <li >
     <a href="../../regression/ols/">Ordinary Least Squares</a>
 </li>
-            
+
 <li >
     <a href="../../regression/wls/">Weighted Least Squares</a>
 </li>
-            
+
 <li >
     <a href="../../regression/gls/">Generalized Least Squares</a>
 </li>
     </ul>
   </li>
-                            
+
 <li >
     <a href="../../analysis/pca/">Principal Component Analysis</a>
 </li>
-                            
+
 <li >
     <a href="../../analysis/linearalgebra/">Linear Algebra</a>
 </li>
-                            
+
 <li >
     <a href="../../analysis/timeseries/">Time Series Analysis</a>
 </li>
-                            
+
   <li class="dropdown-submenu">
     <a href="#">Examples</a>
     <ul class="dropdown-menu">
-            
+
 <li >
     <a href="../../examples/mpt/">Modern Portfolio Theory</a>
 </li>
@@ -156,29 +172,29 @@
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Visualization <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            
+
   <li class="dropdown-submenu">
     <a href="#">Charts</a>
     <ul class="dropdown-menu">
-            
+
 <li >
     <a href="../../viz/charts/overview/">Overview</a>
 </li>
-            
+
 <li >
     <a href="../../viz/charts/embed/">Embedding (HTML)</a>
 </li>
-            
+
 <li >
     <a href="../../viz/charts/gallery1/">Gallery (Google)</a>
 </li>
-            
+
 <li >
     <a href="../../viz/charts/gallery2/">Gallery (JFree)</a>
 </li>
     </ul>
   </li>
-                            
+
 <li >
     <a href="../../viz/tables/overview/">Tables</a>
 </li>
@@ -187,23 +203,23 @@
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Data Sources <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            
+
 <li >
     <a href="../../providers/quandl/">Quandl</a>
 </li>
-                            
+
 <li >
     <a href="../../providers/fred/">Federal Reserve</a>
 </li>
-                            
+
 <li >
     <a href="../../providers/google/">Google Finance</a>
 </li>
-                            
+
 <li >
     <a href="../../providers/yahoo/">Yahoo Finance</a>
 </li>
-                            
+
 <li >
     <a href="../../providers/world-bank/">World Bank</a>
 </li>
@@ -257,21 +273,21 @@
 
 <h3 id="filtering">Filtering</h3>
 <h4 id="introduction">Introduction</h4>
-<p>Filtering a <code>DataFrame</code> along the row and/or column dimensions is a common requirement in order to easily 
-analyze or operate on a subset of the data.  Applying a filter is a fairly cheap operation because the resulting 
-frame is merely a projection onto its parent, as opposed to being a deep copy. This implies that very little 
-additional memory is required to create filters or slices, and it also means that any data modifications to the 
-filter are in effect applied to the parent. Of course, if a detached copy of the data subset is required, simply 
+<p>Filtering a <code>DataFrame</code> along the row and/or column dimensions is a common requirement in order to easily
+analyze or operate on a subset of the data.  Applying a filter is a fairly cheap operation because the resulting
+frame is merely a projection onto its parent, as opposed to being a deep copy. This implies that very little
+additional memory is required to create filters or slices, and it also means that any data modifications to the
+filter are in effect applied to the parent. Of course, if a detached copy of the data subset is required, simply
 calling <code>DataFrame.copy()</code> on the filter frame will yield the desired result. </p>
-<p>It should also be noted that while the contents of a filter frame can be modified, the structure of the filter is 
-immutable in the row dimension, but can be expanded in the column dimension (see section below titled Immutability 
-that explains these restrictions in more detail). It is of course permissible to further filter an already filtered 
+<p>It should also be noted that while the contents of a filter frame can be modified, the structure of the filter is
+immutable in the row dimension, but can be expanded in the column dimension (see section below titled Immutability
+that explains these restrictions in more detail). It is of course permissible to further filter an already filtered
 frame.</p>
 <h4 id="example-data">Example Data</h4>
-<p>There is a large amount of professional tennis match data available <a href="http://www.tennis-data.co.uk/">here</a> for both 
-the men's (ATP) and women's (WTA) tours. The code examples in this section operate on a dataset containing all match 
-results for the 2013 ATP tour, which can be loaded using the code below. The dataset contains 2631 rows and 41 
-columns, including player statistics, match play statistics, as well as betting odds from various bookies in the UK. 
+<p>There is a large amount of professional tennis match data available <a href="http://www.tennis-data.co.uk/">here</a> for both
+the men's (ATP) and women's (WTA) tours. The code examples in this section operate on a dataset containing all match
+results for the 2013 ATP tour, which can be loaded using the code below. The dataset contains 2631 rows and 41
+columns, including player statistics, match play statistics, as well as betting odds from various bookies in the UK.
 More information on the exact content of this file can be located <a href="http://www.tennis-data.co.uk/notes.txt">here</a></p>
 <?prettify?>
 
@@ -306,13 +322,13 @@ Index  |  Location  |        Tournament        |     Date     |  Series  |   Cou
     9  |  Brisbane  |  Brisbane International  |  2013-01-01  |  ATP250  |  Outdoor  |     Hard  |  1st Round  |        3  |   Dimitrov G.  |      Baker B.  |     48  |     61  |   866  |   756  |   6  |   3  |   7  |   6  |   0  |   0  |   0  |   0  |   0  |   0  |      2  |      0  |  Completed  |   1.36  |    3.0  |   1.4  |   2.8  |  1.44  |  2.62  |  1.38  |   3.3  |   1.4  |  2.75  |  1.45  |  3.55  |  1.39  |  2.87  |
 </pre></div>
 
-<p>Initializing this frame from CSV is fairly straightforward as most of the data can be coerced into the appropriate 
+<p>Initializing this frame from CSV is fairly straightforward as most of the data can be coerced into the appropriate
 type without any intervention, except for the Date column which is expressed in dd/MM/yy format and therefore requires
 a custom parser. We also exclude a number of columns that are of little interest.</p>
 <h4 id="select-rows">Select Rows</h4>
-<p>Filtering along the row dimension of the ATP match results can be achieved by calling one of the over-loaded <code>select()</code> 
-methods available on the row dimension operator, which is accessed with a call to <code>DataFrame.rows()</code>. The <code>select()</code> 
-methods either take the set of row keys to include, or more commonly a lambda expression that applies some logic on 
+<p>Filtering along the row dimension of the ATP match results can be achieved by calling one of the over-loaded <code>select()</code>
+methods available on the row dimension operator, which is accessed with a call to <code>DataFrame.rows()</code>. The <code>select()</code>
+methods either take the set of row keys to include, or more commonly a lambda expression that applies some logic on
 the row entity. For very large frames, parallel processing is also supported with a call to <code>DataFrame.rows().parallel()</code>. </p>
 <p>The code below shows a simple way of filtering the ATP match results to only include the 5 set matches in 2013.</p>
 <?prettify?>
@@ -341,10 +357,10 @@ DataFrame&lt;Integer,String&gt; filter = frame.rows().select(row -&gt; {
 </pre></div>
 
 <h4 id="select-columns">Select Columns</h4>
-<p>The API is completely symmetrical in the row and column dimension, so filtering a frame along the latter axis 
-simply involves a call to <code>select()</code> on the column dimension operator (<code>DataFrame.cols()</code>). The code below 
-demonstrates column filtering where an explicit set of column names are provided rather than using a lambda expression 
-as in the previous row selection example. In this scenario we wish to select all the betting odds that were 
+<p>The API is completely symmetrical in the row and column dimension, so filtering a frame along the latter axis
+simply involves a call to <code>select()</code> on the column dimension operator (<code>DataFrame.cols()</code>). The code below
+demonstrates column filtering where an explicit set of column names are provided rather than using a lambda expression
+as in the previous row selection example. In this scenario we wish to select all the betting odds that were
 available on the eventual winner of the games in 2013.</p>
 <?prettify?>
 
@@ -369,14 +385,14 @@ filter.out().print(10);
 </pre></div>
 
 <h4 id="select-rows-columns">Select Rows &amp; Columns</h4>
-<p>Filtering in the row and column dimension simultaneously is also possible via one of the overloaded <code>select()</code> methods 
+<p>Filtering in the row and column dimension simultaneously is also possible via one of the overloaded <code>select()</code> methods
 available on the <code>DataFrame</code> class itself, which either takes the row and column keys to include, or lambda expressions
-to operate on the row and column entities. Parallel select is also supported by calling the <code>parallel()</code>method on the 
+to operate on the row and column entities. Parallel select is also supported by calling the <code>parallel()</code>method on the
 frame prior to <code>select()</code>.</p>
-<p>Let's investigate which if any of the bookmakers provided more attractive odds in the various finals in 2013. 
-Before we do this, we need to standardize the betting odds so that we can not only make cross-sectional comparisons 
-for a given match, but also across different matches. To do this, we transform all the odds to a <a href="https://en.wikipedia.org/wiki/Standard_score">z-score</a> 
-by first subtracting the mean across the bookmakers, and then dividing by the standard deviation. The code below performs 
+<p>Let's investigate which if any of the bookmakers provided more attractive odds in the various finals in 2013.
+Before we do this, we need to standardize the betting odds so that we can not only make cross-sectional comparisons
+for a given match, but also across different matches. To do this, we transform all the odds to a <a href="https://en.wikipedia.org/wiki/Standard_score">z-score</a>
+by first subtracting the mean across the bookmakers, and then dividing by the standard deviation. The code below performs
 this transformation.</p>
 <?prettify?>
 
@@ -421,10 +437,10 @@ frame.right(14).out().print(10, options -&gt; {
 </pre></div>
 
 <p>Now that we have standardized all the odds, we can try and make an assessment of which bookmaker on average provided
-the most attractive odds. It should be noted that this example is purely to demonstrate API usage, it is not intended to 
+the most attractive odds. It should be noted that this example is purely to demonstrate API usage, it is not intended to
 represent rigorous statistical analysis of this data, so take the results with a huge grain of salt.  This data could
 be fairly noisy, so let's only consider the finals since there is likely to be a higher degree of consensus for those
-matches. We therefore need to filter on a subset of rows (finals only) and also only include odds on the eventual winner 
+matches. We therefore need to filter on a subset of rows (finals only) and also only include odds on the eventual winner
 for brevity.</p>
 <?prettify?>
 
@@ -436,7 +452,7 @@ DataFrame&lt;Integer,String&gt; finalWinnerOdds = frame.select(
 );
 </code></pre>
 
-<p>We can now compute the mean of these columns, which gives us the average z-score for each bookmaker across all 
+<p>We can now compute the mean of these columns, which gives us the average z-score for each bookmaker across all
 the finals in 2013. The code below demonstrates this, and prints the results to std-out with formatting applied.</p>
 <?prettify?>
 
@@ -452,17 +468,17 @@ finalWinnerOdds.cols().stats().mean().out().print(options -&gt; {
   MEAN  |  -0.259  |  -0.583  |  -0.033  |  0.953  |  -0.078  |
 </pre></div>
 
-<p>This naive analysis suggests that using a sample that includes all the ATP finals in 2013, on average, Pinnacles 
+<p>This naive analysis suggests that using a sample that includes all the ATP finals in 2013, on average, Pinnacles
 Sports (PSW) provided the most attractive odds and Expekt (EX) provided the least attractive odds. These standardized
-scores represent the number of standard deviations above / below the mean, and if there was a very high degree of 
+scores represent the number of standard deviations above / below the mean, and if there was a very high degree of
 consensus across the bookmakers, in that the absolute odds were very similar, these figures may not really tell
-us much. Again, this example is to illustrate API usage, it is not intended to draw any far reaching conclusions 
+us much. Again, this example is to illustrate API usage, it is not intended to draw any far reaching conclusions
 on the skills of bookmakers.</p>
 <h4 id="monadic">Monadic</h4>
-<p>The Morpheus API enables data analysis procedures to be chained together in order to facilitate powerful transformations 
-to be applied with fairly little code. To demonstrate, consider an example where we wish to compute the summary statistics 
-(say min, max, mean and std. deviation) on the number of games played in 5 set matches in 2013 across all the tournaments. 
-The first code example below demonstrates a longer form solution where the intermediate frames are explicitly captured as 
+<p>The Morpheus API enables data analysis procedures to be chained together in order to facilitate powerful transformations
+to be applied with fairly little code. To demonstrate, consider an example where we wish to compute the summary statistics
+(say min, max, mean and std. deviation) on the number of games played in 5 set matches in 2013 across all the tournaments.
+The first code example below demonstrates a longer form solution where the intermediate frames are explicitly captured as
 variables, which for a beginner would likely be easier to follow:</p>
 <?prettify?>
 
@@ -619,12 +635,12 @@ frame.right(14).left(10).out().print();
 <p>The <code>DataFrame.rows()</code> and <code>DataFrame.cols()</code> methods return a versatile interface to operate on the row
 and column dimension respectively. The examples above demonstrate how to use the <code>select()</code> method to
 create a <code>DataFrame</code> filter to operate on a subset of the data. A <code>filter()</code> method also exists which
-provides a shortcut to more directly operate on a subset of rows or columns without creating the 
+provides a shortcut to more directly operate on a subset of rows or columns without creating the
 intermediate filter frame.</p>
-<p>The example below demonstrates how to iterate over a subset of rows that represent an upset in a finals match 
+<p>The example below demonstrates how to iterate over a subset of rows that represent an upset in a finals match
 in 2013 according to the average bookmaker odds. Higher odds represent a less likely outcome, so if the
 average odds on the eventual winner of a game were greater than those for the eventual loser, that <em>classifies</em>
-as an upset because the favourite did not prevail. Concurrent iteration is also supported with a call to 
+as an upset because the favourite did not prevail. Concurrent iteration is also supported with a call to
 <code>parallel()</code>, however then order is not guaranteed which may or may not be important.</p>
 <?prettify?>
 
@@ -690,18 +706,18 @@ SJW max odds=17.0, min odds=1.01
 </pre></div>
 
 <h4 id="immutability">Immutability</h4>
-<p>In the introduction, it was suggested that a <code>DataFrame</code> that represents a filter on another frame is structurally 
+<p>In the introduction, it was suggested that a <code>DataFrame</code> that represents a filter on another frame is structurally
 immutable in some cases, in that additional columns cannot always be added (in all cases, additional rows cannot be
-added to a filter). Data mutability on the other hand is supported on a filter, as illustrated by the example where 
+added to a filter). Data mutability on the other hand is supported on a filter, as illustrated by the example where
 we transformed absolute betting odds to a Z-score.  The structural immutability caveats are in explained in this section.</p>
 <h5 id="column-store">Column Store</h5>
-<p>A <code>DataFrame</code> is by default a column store, where each column is represented by a Morpheus array. When filtering such 
-a frame, it is not possible to add rows to the filter frame, but adding columns is supported. The reason for this 
-restriction is because the filter frame shares its content with the parent it was created from, so adding rows would 
-result in also modifying the column arrays of the parent frame, which would lead to all sorts of issues. The filter 
-frame does have a completely independent column axis however, so it is possible to add additional columns without this 
+<p>A <code>DataFrame</code> is by default a column store, where each column is represented by a Morpheus array. When filtering such
+a frame, it is not possible to add rows to the filter frame, but adding columns is supported. The reason for this
+restriction is because the filter frame shares its content with the parent it was created from, so adding rows would
+result in also modifying the column arrays of the parent frame, which would lead to all sorts of issues. The filter
+frame does have a completely independent column axis however, so it is possible to add additional columns without this
 having any impact on the parent.</p>
-<p>The following example demonstrates how an additional column can be added to the filter frame after we have selected all 
+<p>The following example demonstrates how an additional column can be added to the filter frame after we have selected all
 matches in which Novak Djokovic was the victor. Here we add an additional column to store the the total number of games
 that Novak won in each match.</p>
 <?prettify?>
@@ -760,7 +776,7 @@ frame.right(10).out().print(10);
 </pre></div>
 
 <p>In contrast, if we attempt to add rows to the filter frame, we will get a <code>DataFrameException</code> because modifying
-the shared column arrays would impact the parent from which the filter was created. Let's attempt to add 5 more 
+the shared column arrays would impact the parent from which the filter was created. Let's attempt to add 5 more
 rows as follows:</p>
 <?prettify?>
 
@@ -774,10 +790,10 @@ filter.rows().addAll(rowKeys);
 </code></pre>
 
 <pre>
-com.zavtech.morpheus.frame.DataFrameException: Cannot add keys to a sliced axis of a DataFrame
-    at com.zavtech.morpheus.reference.XDataFrameContent.addRows(XDataFrameContent.java:300)
-    at com.zavtech.morpheus.reference.XDataFrameRows.addAll(XDataFrameRows.java:96)
-    at com.zavtech.morpheus.reference.XDataFrameRows.addAll(XDataFrameRows.java:89)
+com.d3x.morpheus.frame.DataFrameException: Cannot add keys to a sliced axis of a DataFrame
+    at com.d3x.morpheus.reference.XDataFrameContent.addRows(XDataFrameContent.java:300)
+    at com.d3x.morpheus.reference.XDataFrameRows.addAll(XDataFrameRows.java:96)
+    at com.d3x.morpheus.reference.XDataFrameRows.addAll(XDataFrameRows.java:89)
 </pre>
 
 <p>If we create a deep copy of the filter frame, then we end up with a completely new data structure
@@ -817,12 +833,12 @@ copy.tail(10).out().print();
 of a <code>DataFrame</code>. While a frame is by design a column store, when you call <code>transpose()</code> to switch
 the row and column axis, it effectively becomes row major. This implementation choice was made
 so that creating a transpose frame is extremely cheap, and requires almost no additional memory.</p>
-<p>A transposed <code>DataFrame</code> is structurally immutable in both the row and column dimensions, which 
-is a design choice that may be relaxed at some point in the future. If structural changes to a 
+<p>A transposed <code>DataFrame</code> is structurally immutable in both the row and column dimensions, which
+is a design choice that may be relaxed at some point in the future. If structural changes to a
 transpose is a requirement, a copy will need to be created, which will then yield a column store
 data structure with the data still in its transposed state.</p>
-<p>In the case of a frame with mixed column types, like the ATP match results, one should be aware that 
-transposing it and then creating a copy will result in a frame that is much less memory efficient 
+<p>In the case of a frame with mixed column types, like the ATP match results, one should be aware that
+transposing it and then creating a copy will result in a frame that is much less memory efficient
 than the non-transposed original. The reason for this is that the copied transpose frame will have
 column arrays of type <code>Object</code> in order to cater to the non-homogeneous types for each column, and
 thereby introduce object header overhead as well as significantly higher garbage collection times.</p>
@@ -853,14 +869,14 @@ transpose.cols().add(transpose.colCount()+1, Double.class);
 </pre></div>
 
 <pre>
-com.zavtech.morpheus.frame.DataFrameException: This DataFrame is configured as a row store, transpose() first
-    at com.zavtech.morpheus.reference.XDataFrameContent.addColumn(XDataFrameContent.java:326)
-    at com.zavtech.morpheus.reference.XDataFrameColumns.lambda$null$14(XDataFrameColumns.java:216)
+com.d3x.morpheus.frame.DataFrameException: This DataFrame is configured as a row store, transpose() first
+    at com.d3x.morpheus.reference.XDataFrameContent.addColumn(XDataFrameContent.java:326)
+    at com.d3x.morpheus.reference.XDataFrameColumns.lambda$null$14(XDataFrameColumns.java:216)
     at java.util.LinkedHashMap$LinkedKeySet.forEach(LinkedHashMap.java:555)
-    at com.zavtech.morpheus.reference.XDataFrameColumns.lambda$addColumns$15(XDataFrameColumns.java:213)
+    at com.d3x.morpheus.reference.XDataFrameColumns.lambda$addColumns$15(XDataFrameColumns.java:213)
     at java.util.function.Function.lambda$andThen$6(Function.java:88)
     at java.util.function.Function.lambda$andThen$6(Function.java:88)
-    at com.zavtech.morpheus.reference.XDataFrameColumns.add(XDataFrameColumns.java:88)
+    at com.d3x.morpheus.reference.XDataFrameColumns.add(XDataFrameColumns.java:88)
 </pre></div>
         </div>
 

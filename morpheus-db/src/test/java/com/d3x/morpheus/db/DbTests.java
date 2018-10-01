@@ -35,9 +35,9 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import com.zavtech.morpheus.frame.DataFrame;
-import com.zavtech.morpheus.range.Range;
-import com.zavtech.morpheus.util.functions.Function1;
+import com.d3x.morpheus.frame.DataFrame;
+import com.d3x.morpheus.range.Range;
+import com.d3x.morpheus.util.functions.Function1;
 
 /**
  * A unit test for database access

@@ -1,12 +1,28 @@
+<!--
+  ~ Copyright (C) 2014-2018 D3X Systems - All Rights Reserved
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        
+
         <meta name="author" content="Xavier Witdouck">
-        
+
         <link rel="shortcut icon" href="../../img/favicon.ico">
         <title>Principal Component Analysis - Morpheus</title>
         <link href="../../css/bootstrap-custom.min.css" rel="stylesheet">
@@ -20,10 +36,10 @@
             <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
             <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
         <![endif]-->
-	
+
 	<script src="../../js/jquery-1.10.2.min.js"></script>
         <script src="../../js/bootstrap-3.0.3.min.js"></script>
-        <script src="../../js/highlight.pack.js"></script> 
+        <script src="../../js/highlight.pack.js"></script>
     </head>
 
     <body>
@@ -53,11 +69,11 @@
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Array <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            
+
 <li >
     <a href="../../array/overview/">Overview</a>
 </li>
-                            
+
 <li >
     <a href="../../array/performance/">Performance</a>
 </li>
@@ -66,39 +82,39 @@
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">DataFrame <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            
+
 <li >
     <a href="../../frame/construction/">Construction</a>
 </li>
-                            
+
 <li >
     <a href="../../frame/access/">Accessing</a>
 </li>
-                            
+
 <li >
     <a href="../../frame/reshaping/">Reshaping</a>
 </li>
-                            
+
 <li >
     <a href="../../frame/filtering/">Filtering</a>
 </li>
-                            
+
 <li >
     <a href="../../frame/sorting/">Sorting</a>
 </li>
-                            
+
 <li >
     <a href="../../frame/grouping/">Grouping</a>
 </li>
-                            
+
 <li >
     <a href="../../frame/finding/">Finding</a>
 </li>
-                            
+
 <li >
     <a href="../../frame/writing/">Writing</a>
 </li>
-                            
+
 <li >
     <a href="../../frame/performance/">Performance</a>
 </li>
@@ -107,45 +123,45 @@
                     <li class="dropdown active">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Analysis <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            
+
 <li >
     <a href="../statistics/">Descriptive Statistics</a>
 </li>
-                            
+
   <li class="dropdown-submenu">
     <a href="#">Linear Regression</a>
     <ul class="dropdown-menu">
-            
+
 <li >
     <a href="../../regression/ols/">Ordinary Least Squares</a>
 </li>
-            
+
 <li >
     <a href="../../regression/wls/">Weighted Least Squares</a>
 </li>
-            
+
 <li >
     <a href="../../regression/gls/">Generalized Least Squares</a>
 </li>
     </ul>
   </li>
-                            
+
 <li class="active">
     <a href="./">Principal Component Analysis</a>
 </li>
-                            
+
 <li >
     <a href="../linearalgebra/">Linear Algebra</a>
 </li>
-                            
+
 <li >
     <a href="../timeseries/">Time Series Analysis</a>
 </li>
-                            
+
   <li class="dropdown-submenu">
     <a href="#">Examples</a>
     <ul class="dropdown-menu">
-            
+
 <li >
     <a href="../../examples/mpt/">Modern Portfolio Theory</a>
 </li>
@@ -156,29 +172,29 @@
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Visualization <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            
+
   <li class="dropdown-submenu">
     <a href="#">Charts</a>
     <ul class="dropdown-menu">
-            
+
 <li >
     <a href="../../viz/charts/overview/">Overview</a>
 </li>
-            
+
 <li >
     <a href="../../viz/charts/embed/">Embedding (HTML)</a>
 </li>
-            
+
 <li >
     <a href="../../viz/charts/gallery1/">Gallery (Google)</a>
 </li>
-            
+
 <li >
     <a href="../../viz/charts/gallery2/">Gallery (JFree)</a>
 </li>
     </ul>
   </li>
-                            
+
 <li >
     <a href="../../viz/tables/overview/">Tables</a>
 </li>
@@ -187,23 +203,23 @@
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Data Sources <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            
+
 <li >
     <a href="../../providers/quandl/">Quandl</a>
 </li>
-                            
+
 <li >
     <a href="../../providers/fred/">Federal Reserve</a>
 </li>
-                            
+
 <li >
     <a href="../../providers/google/">Google Finance</a>
 </li>
-                            
+
 <li >
     <a href="../../providers/yahoo/">Yahoo Finance</a>
 </li>
-                            
+
 <li >
     <a href="../../providers/world-bank/">World Bank</a>
 </li>
@@ -254,11 +270,11 @@
                 <div class="col-md-9" role="main">
 
 <h2 id="principal-component-analysis">Principal Component Analysis</h2>
-<p><a href="https://en.wikipedia.org/wiki/Principal_component_analysis">Principal Component Analysis</a> (PCA) is a statistical tool 
-used in data analysis and also for building predictive models. The technique involves transforming a dataset into a new 
-<a href="https://en.wikipedia.org/wiki/Basis_(linear_algebra)">basis</a> whereby the transformed data is uncorrelated. The transformed 
-basis, which can be represented by an <a href="https://en.wikipedia.org/wiki/Orthogonal_matrix">orthogonal matrix</a>, defines the 
-Principal Components of the original dataset. These basis vectors are usually ordered so that the first principal component 
+<p><a href="https://en.wikipedia.org/wiki/Principal_component_analysis">Principal Component Analysis</a> (PCA) is a statistical tool
+used in data analysis and also for building predictive models. The technique involves transforming a dataset into a new
+<a href="https://en.wikipedia.org/wiki/Basis_(linear_algebra)">basis</a> whereby the transformed data is uncorrelated. The transformed
+basis, which can be represented by an <a href="https://en.wikipedia.org/wiki/Orthogonal_matrix">orthogonal matrix</a>, defines the
+Principal Components of the original dataset. These basis vectors are usually ordered so that the first principal component
 is the one that accounts for the largest variance in the data, and the last component accounts for the least variance.</p>
 <p>PCA is also often referred to as a <a href="https://en.wikipedia.org/wiki/Dimensionality_reduction">dimensional reduction</a> technique
 in the sense that by dropping components that account for a negligible amount of variance in the original data, we can linearly
@@ -266,24 +282,24 @@ map the data into a lower dimensional space without loosing material information
 in the data represents the essential dynamics we are trying to understand, so dropping dimensions with negligible variance
 results in minimal loss of information.</p>
 <p>The following sections introduces some PCA theory, and then proceeds to illustrate an example of how to use the Morpheus API
-to perform PCA on a dataset. Only a superficial overview of the theory is covered below, so for a more detailed treatment of 
+to perform PCA on a dataset. Only a superficial overview of the theory is covered below, so for a more detailed treatment of
 the topic I would suggest a Google search, or perhaps <a href="https://www.cs.princeton.edu/picasso/mats/PCA-Tutorial-Intuition_jp.pdf">this</a>
 tutorial as a primer.</p>
 <h2 id="theory">Theory</h2>
 <p>As a data analysis technique, PCA begins with the definition of our data which in general can be described in two dimensions,
-namely the number of observations and the number of measurements. Such data can be represented by an <code>nxp</code> matrix where <code>n</code> 
+namely the number of observations and the number of measurements. Such data can be represented by an <code>nxp</code> matrix where <code>n</code>
 represents the number of observations for each measurement, and <code>p</code> represents the number of measurements being recorded. </p>
-<p>The dimensions in which we record the observations that constitute our data are assumed to be a naive basis, since we do not 
-actually understand the true dynamics of the system we are investigating (hence the analysis). Having said that, our hope is 
-that while our measurements may be recorded in a naive basis, they are informative enough so that we can compute a new basis 
-that maximises the signal to noise ratio and removes any redundancy in the data, enabling us to better understand its true 
+<p>The dimensions in which we record the observations that constitute our data are assumed to be a naive basis, since we do not
+actually understand the true dynamics of the system we are investigating (hence the analysis). Having said that, our hope is
+that while our measurements may be recorded in a naive basis, they are informative enough so that we can compute a new basis
+that maximises the signal to noise ratio and removes any redundancy in the data, enabling us to better understand its true
 dynamics. </p>
-<p>With this in mind, let us assume that there exists an <a href="https://en.wikipedia.org/wiki/Orthogonal_matrix">orthogonal matrix</a> 
-V of dimensions <code>pxp</code> that can transform our data X into Y such that the covariance matrix of Y (denoted by \(\Sigma_{y}\)) 
+<p>With this in mind, let us assume that there exists an <a href="https://en.wikipedia.org/wiki/Orthogonal_matrix">orthogonal matrix</a>
+V of dimensions <code>pxp</code> that can transform our data X into Y such that the covariance matrix of Y (denoted by \(\Sigma_{y}\))
 is diagonal.</p>
 <p>$$ X V = Y $$</p>
-<p>The question then is how to find V? We can tackle this by working backwards based on our desire that the transformed data Y 
-has a diagonal covariance matrix, given our motivation to remove noise and redundancy from our dataset. Assuming that Y is 
+<p>The question then is how to find V? We can tackle this by working backwards based on our desire that the transformed data Y
+has a diagonal covariance matrix, given our motivation to remove noise and redundancy from our dataset. Assuming that Y is
 <strong>centered</strong> or <strong>demeaned</strong>, we can define the covariance of Y as follows:</p>
 <p>$$ \Sigma_{Y} = \frac{1}{n-1} Y^T Y $$</p>
 <p>Given our transform \(X V = Y \) we can express the covariance of Y in terms V and X as follows:</p>
@@ -298,17 +314,17 @@ has a diagonal covariance matrix, given our motivation to remove noise and redun
 <p>$$ \Sigma_{Y} = V^T A V $$</p>
 <p>In the next section, we illustrate how we can choose \(V\) such that we diagonalize \(\Sigma_{Y}\). </p>
 <h3 id="eigen-decomposition">Eigen Decomposition</h3>
-<p>Based on our earlier discussion, we know that we need to choose a transform matrix V such that \(V^TAV = D\) where \(D\) 
-is a diagonal matrix. Given that \(A\) is symmetric, we know that we can factorize it using an <a href="https://en.wikipedia.org/wiki/Eigendecomposition_of_a_matrix">Eigendecomposition</a> 
-into an orthogonal matrix of its <a href="https://en.wikipedia.org/wiki/Eigenvalues_and_eigenvectors">eigenvectors</a> and a diagonal 
+<p>Based on our earlier discussion, we know that we need to choose a transform matrix V such that \(V^TAV = D\) where \(D\)
+is a diagonal matrix. Given that \(A\) is symmetric, we know that we can factorize it using an <a href="https://en.wikipedia.org/wiki/Eigendecomposition_of_a_matrix">Eigendecomposition</a>
+into an orthogonal matrix of its <a href="https://en.wikipedia.org/wiki/Eigenvalues_and_eigenvectors">eigenvectors</a> and a diagonal
 matrix of its <a href="https://en.wikipedia.org/wiki/Eigenvalues_and_eigenvectors">eigenvalues</a>:</p>
 <p>$$ A = Q \Lambda Q^{-1} $$</p>
-<p>In this factorization the column vectors of \(Q\) are the eigenvectors of \(A\) and the diagonal elements of \(\Lambda\) 
-are the eigenvalues of \(A\). Recall that an eigenvector of a matrix is one which is only scaled and not rotated when operated 
-on by that matrix. This is otherwise stated as \(Av = \lambda v \) where \(v\) is an <code>px1</code> eigenvector of A and \(\lambda\) is 
-the corresponding eigenvalue, which is a scalar. We can therefore expand this to say that \(A Q = Q \Lambda \) which then 
+<p>In this factorization the column vectors of \(Q\) are the eigenvectors of \(A\) and the diagonal elements of \(\Lambda\)
+are the eigenvalues of \(A\). Recall that an eigenvector of a matrix is one which is only scaled and not rotated when operated
+on by that matrix. This is otherwise stated as \(Av = \lambda v \) where \(v\) is an <code>px1</code> eigenvector of A and \(\lambda\) is
+the corresponding eigenvalue, which is a scalar. We can therefore expand this to say that \(A Q = Q \Lambda \) which then
 implies that \(A = Q \Lambda Q^{-1}\).</p>
-<p>If we choose our matrix \(V = Q\) and noting that Q is an orthogonal matrix such that \(Q^{-1} = Q^T \) we can plug these back 
+<p>If we choose our matrix \(V = Q\) and noting that Q is an orthogonal matrix such that \(Q^{-1} = Q^T \) we can plug these back
 into the expression for the covariance matrix of Y to yield the following:</p>
 <p>$$ \begin{align}
 \Sigma_{Y} &amp;= V^T A V \\
@@ -318,37 +334,37 @@ into the expression for the covariance matrix of Y to yield the following:</p>
  &amp;= \Lambda \\
 \end{align} $$</p>
 <p>By choosing the transform matrix V to be the eigenvectors of \(A \) (which in essence is the covariance matrix of our data
-on the assumption that \(X\) is centered), we end up diagonalizing the covariance matrix of the transformed dataset, which is 
-the ultimate objective of our PCA. These eigenvectors essentially define the new basis along which variance in the data is maximised, 
-and the corresponding eigenvalues define the magnitude of this variance. As noted earlier, the eigenvectors or principal components 
-are usually ordered so that the first component accounts for the largest variance (ie the largest eigenvalue), and the last component 
+on the assumption that \(X\) is centered), we end up diagonalizing the covariance matrix of the transformed dataset, which is
+the ultimate objective of our PCA. These eigenvectors essentially define the new basis along which variance in the data is maximised,
+and the corresponding eigenvalues define the magnitude of this variance. As noted earlier, the eigenvectors or principal components
+are usually ordered so that the first component accounts for the largest variance (ie the largest eigenvalue), and the last component
 accounts for the smallest variance (ie the smallest eigenvalue).</p>
 <h3 id="singular-value-decomposition">Singular Value Decomposition</h3>
-<p>The previous section demonstrated that an eigen decomposition of the covariance matrix of \(X\) yields the set of eigenvectors \(V\) 
+<p>The previous section demonstrated that an eigen decomposition of the covariance matrix of \(X\) yields the set of eigenvectors \(V\)
 that define the principal axes of our data. When we transform our data using \(V\) the resulting dataset has a diagonal covariance
 matrix which reflects that our new basis maximises the signal to noise ratio and/or removes any redundancy.</p>
 <p>The Morpheus library supports solving PCA in this way, but by default, it performs a <a href="https://en.wikipedia.org/wiki/Singular_value_decomposition">Singular Value Decomposition</a>
 (SVD) of the <strong>centered</strong> or <strong>demeaned</strong> data in \(X\), as this generally offers better numerical stability and also tends to be faster
 then an eigendecomposition of the covariance matrix of \(X\). An SVD of \(X\) on the assumption that \(X\) is centered yields</p>
 <p>$$ X = U S V^T $$</p>
-<p>where S is a diagonal matrix of singular values, and the columns of \(U\) and \(V\) are called the left-singular vectors and right-singular 
-vectors of \(X\) , respectively. If we substitute the SVD decomposition into the expression for the covariance of \(X\) as below, we can 
-see that the solution is essentially equivalent to above, however in this case the eigenvalues are equivalent to the square of the singular 
+<p>where S is a diagonal matrix of singular values, and the columns of \(U\) and \(V\) are called the left-singular vectors and right-singular
+vectors of \(X\) , respectively. If we substitute the SVD decomposition into the expression for the covariance of \(X\) as below, we can
+see that the solution is essentially equivalent to above, however in this case the eigenvalues are equivalent to the square of the singular
 values divided by \(n-1\).</p>
 <p>$$ \begin{align}
 \Sigma_{X} &amp;= \frac{1}{n-1} X^T X \\
  &amp;= \frac{1}{n-1} (U S V^T)^T(U S V^T) \\
- &amp;= \frac{1}{n-1} VSU^TUSV^T \\ 
+ &amp;= \frac{1}{n-1} VSU^TUSV^T \\
  &amp;= \frac{1}{n-1} VS^2V^T \\
 \end{align} $$</p>
 <h2 id="example">Example</h2>
 <h3 id="data-model">Data Model</h3>
-<p>In this example, we demonstrate the use of Principal Component Analysis as a dimensional reduction technique, and in particular 
-we apply it to the problem of image compression. Consider the photo below of my dog who is called <a href="http://www.urbandictionary.com/define.php?term=poppet">Poppet</a>, 
-which is 504 pixels wide and 360 pixels high. The pixels that make up this image can be thought of as a <code>360x504</code> matrix, where the elements 
+<p>In this example, we demonstrate the use of Principal Component Analysis as a dimensional reduction technique, and in particular
+we apply it to the problem of image compression. Consider the photo below of my dog who is called <a href="http://www.urbandictionary.com/define.php?term=poppet">Poppet</a>,
+which is 504 pixels wide and 360 pixels high. The pixels that make up this image can be thought of as a <code>360x504</code> matrix, where the elements
 represent the color of each pixel. It is most common in computer graphics to represent such an image using the <a href="https://en.wikipedia.org/wiki/RGBA_color_space">RGBA Color Space</a>
-where each pixel is defined by a <a href="https://en.wikipedia.org/wiki/32-bit">32-bit</a> integer which has encoded within it four 8-bit 
-values representing its red, green, blue and alpha intensity.  Since each component within the RGBA value is represented by an 
+where each pixel is defined by a <a href="https://en.wikipedia.org/wiki/32-bit">32-bit</a> integer which has encoded within it four 8-bit
+values representing its red, green, blue and alpha intensity.  Since each component within the RGBA value is represented by an
 8-bit sequence, they have a range between 0 and 255 in base-10.</p>
 <div style="text-align:center;">
     <img src="../../images/pca/poppet.jpg" width="249" height="178"/>
@@ -371,22 +387,22 @@ DataFrame&lt;Integer,Integer&gt; rgbFrame = DataFrame.ofInts(rowCount, colCount,
 });
 </code></pre>
 
-<p>Given that each pixel is represented by a 32-bit RGBA value, we can decompose the <code>360x504</code> matrix into a <code>360x504x4</code> cube of data, 
+<p>Given that each pixel is represented by a 32-bit RGBA value, we can decompose the <code>360x504</code> matrix into a <code>360x504x4</code> cube of data,
 or a <code>360x504x3</code> cube if we ignore the alpha channel on the assumption that each pixel is 100% opaque (which is a reasonable assumption
-in this case). In order to decompose the matrix into the red, green and blue components we need to perform some <a href="https://en.wikipedia.org/wiki/Bitwise_operation">bitwise operations</a>. 
-In this example, we load the target image using <code>java.awt.image.BufferedImage</code> which exposes the 32-bit RGB values in the form 
-illustrated below, where the first 8 most significant bits represent the alpha channel, the next 8 represent the red value, followed 
+in this case). In order to decompose the matrix into the red, green and blue components we need to perform some <a href="https://en.wikipedia.org/wiki/Bitwise_operation">bitwise operations</a>.
+In this example, we load the target image using <code>java.awt.image.BufferedImage</code> which exposes the 32-bit RGB values in the form
+illustrated below, where the first 8 most significant bits represent the alpha channel, the next 8 represent the red value, followed
 by green and then blue.</p>
 <div style="text-align:center;">
     <img src="../../images/pca/argb-channels.png"/>
 </div>
 
-<p>To extract the 8-bit value representing the red intensity, we first need to shift our string of bits 16 places to the right so that 
-the 8-bits representing the value of red appear in bit positions 0-7 (which before the shift represented the blue intensity). With our 
-bit string now in this form, we can bitwise AND it with a base-10 value of 255 or <code>0xFF</code> in hexadecimal so that all bits in positions 
-8-31 become zero, leaving only the value of our red intensity. Similarly, to extract the value of green, we right shift our RGBA bit 
-string by 8, and then bitwise AND with <code>0xFF</code>. In the case of extracting blue, no bit shifting is required and we simply bitwise AND 
-with <code>0xFF</code>. The code below generates 3 separate frames to capture the red, green and blue intensities by performing the bitwise 
+<p>To extract the 8-bit value representing the red intensity, we first need to shift our string of bits 16 places to the right so that
+the 8-bits representing the value of red appear in bit positions 0-7 (which before the shift represented the blue intensity). With our
+bit string now in this form, we can bitwise AND it with a base-10 value of 255 or <code>0xFF</code> in hexadecimal so that all bits in positions
+8-31 become zero, leaving only the value of our red intensity. Similarly, to extract the value of green, we right shift our RGBA bit
+string by 8, and then bitwise AND with <code>0xFF</code>. In the case of extracting blue, no bit shifting is required and we simply bitwise AND
+with <code>0xFF</code>. The code below generates 3 separate frames to capture the red, green and blue intensities by performing the bitwise
 operations just described.</p>
 <?prettify?>
 
@@ -396,12 +412,12 @@ DataFrame&lt;Integer,Integer&gt; blue = rgbFrame.mapToDoubles(v -&gt; v.getInt()
 </code></pre>
 
 <h3 id="explained-variance">Explained Variance</h3>
-<p>Now that we know how to decompose our image into three <code>360x504</code> frames representing the red, green and blue intensity of our image 
-pixels, we can perform Principal Component Analysis on each <code>DataFrame</code>, and assess the results. Since PCA is all about transforming data 
-into a new basis in which the variance is maximised, it is often useful to get a sense of how much of the variance in the data is explained 
-by the first N components. The code below uses the <code>rgbFrame</code> initialized above, extracts the red, green and blue components, performs 
-PCA on each of these frames, and then collects the percent of variance explained by the respective principal components. This data is 
-then trimmed to only include the first 10 components, which is then plotted using a bar chart. Note that in this example we <strong>transpose</strong> 
+<p>Now that we know how to decompose our image into three <code>360x504</code> frames representing the red, green and blue intensity of our image
+pixels, we can perform Principal Component Analysis on each <code>DataFrame</code>, and assess the results. Since PCA is all about transforming data
+into a new basis in which the variance is maximised, it is often useful to get a sense of how much of the variance in the data is explained
+by the first N components. The code below uses the <code>rgbFrame</code> initialized above, extracts the red, green and blue components, performs
+PCA on each of these frames, and then collects the percent of variance explained by the respective principal components. This data is
+then trimmed to only include the first 10 components, which is then plotted using a bar chart. Note that in this example we <strong>transpose</strong>
 the <code>DataFrame</code> before calling the <code>pca()</code> method as the Morpheus library assumes that the data is an <code>nxp</code> matrix where <code>n &gt;= p</code>.</p>
 <?prettify?>
 
@@ -436,8 +452,8 @@ Chart.create().withBarPlot(chartData.rows().mapKeys(r -&gt; String.valueOf(r.ord
 });
 </code></pre>
 
-<p>We can see from this chart that in the case of the red frame, the first principal component explains around 45% of the variance, for 
-green it is just under 35% and for blue it is just over 25%. The percentage of the variance explained by subsequent components drops 
+<p>We can see from this chart that in the case of the red frame, the first principal component explains around 45% of the variance, for
+green it is just under 35% and for blue it is just over 25%. The percentage of the variance explained by subsequent components drops
 off fairly monotonically, and by the time we get to the fifth component, only about 5% of the variance is captured for each of the
 colors.</p>
 <div style="text-align:center;">
@@ -446,8 +462,8 @@ colors.</p>
 
 <h3 id="dimensional-reduction">Dimensional Reduction</h3>
 <p>As per the earlier discussion on PCA theory, we established that the eigenvectors of the covariance matrix of our data are the principal
-axes, and when combined as the columns of a matrix, serve as a transformation into the new basis. If we let \(X_i\) represent our <code>nxp</code> 
-input dataset of either red, green or blue intensities, and \(V_i\) our matrix of <code>pxp</code> eigenvectors of the covariance matrix of \(X_i\), 
+axes, and when combined as the columns of a matrix, serve as a transformation into the new basis. If we let \(X_i\) represent our <code>nxp</code>
+input dataset of either red, green or blue intensities, and \(V_i\) our matrix of <code>pxp</code> eigenvectors of the covariance matrix of \(X_i\),
 we can write the transform as follows (where \(i\) is either red, green or blue).</p>
 <p>$$ X_i V_i = Y_i $$</p>
 <p>This projection of the original data onto the new basis are called the <strong>principal component scores</strong>, and are directly accessible from
@@ -470,10 +486,10 @@ red.pca().apply(true, model -&gt; {
 <p>Since we know that \(V_i\) is an orthogonal matrix by design, once we have transformed to the new basis of \(Y_i\) we can transform
 back to the original basis by taking the dot product of \(Y_i\) with \(V_i^T\) as follows:</p>
 <p>$$ X_i = Y_i V_i^T $$</p>
-<p>The eigenvectors that constitute the columns of \(V_i\) are arranged so that the first column is associated with the highest eigenvalue, 
-and the last column with the lowest eigenvalue (recall that the eigenvalue represents the variance in the direction of the corresponding 
-eigenvector). Given that much of the variance in the data will be explained by the leading eigenvectors, we consider truncating \(V_i\) 
-by only retaining the first N columns. In this case, we can re-write the above expression using a tilde over \(V_i\) and \(Y_i\) to 
+<p>The eigenvectors that constitute the columns of \(V_i\) are arranged so that the first column is associated with the highest eigenvalue,
+and the last column with the lowest eigenvalue (recall that the eigenvalue represents the variance in the direction of the corresponding
+eigenvector). Given that much of the variance in the data will be explained by the leading eigenvectors, we consider truncating \(V_i\)
+by only retaining the first N columns. In this case, we can re-write the above expression using a tilde over \(V_i\) and \(Y_i\) to
 indicate that some information has been lost in this new transform due to the truncation of \(V_i\).</p>
 <p>$$ X_i \tilde{V_i} = \tilde{Y_i} $$ </p>
 <p>The Morpheus API provides an over-loaded <code>getScores()</code> method on <code>DataFramePCA.Model</code> where we can generate \(\tilde{Y_i}\) by selecting
@@ -492,7 +508,7 @@ red.pca().apply(true, model -&gt; {
 });
 </code></pre>
 
-<p>Given the truncated scores in the form of \(\tilde{Y_i}\), it turns out that we can project these scores back onto the original basis 
+<p>Given the truncated scores in the form of \(\tilde{Y_i}\), it turns out that we can project these scores back onto the original basis
 using \(\tilde{V_i}^T\) much in the same way as described earlier. If we right multiply \(\tilde{Y_i}\) by \(\tilde{V_i}^T\)
 we get back <code>nxp</code> data since \(\tilde{Y_i}\) is <code>nxk</code> and \(\tilde{V_i}^T\) is <code>kxp</code>, and yields an estimate of our original data
 we now call \(\tilde{X_i}\) </p>
@@ -513,16 +529,16 @@ red.pca().apply(true, model -&gt; {
 });
 </code></pre>
 
-<p>We have established that it is possible to reconstitute an estimate of our original data \(X_i\), which we called \(\tilde{X_i}\), 
-from the principal component scores and a subset of the principal axes associated with the highest variance. The next question is how 
-many columns of \(V_i\) need to be retained to ensure \(\tilde{X_i}\) is a reasonable representation of the original data? There 
-is no hard rule in this regard, however a common rule of thumb is to select enough components to ensure that 90% of the variance is 
-captured. Having said that, each problem will be unique, and it will often be useful to generate an eigen spectrum plot as shown above 
+<p>We have established that it is possible to reconstitute an estimate of our original data \(X_i\), which we called \(\tilde{X_i}\),
+from the principal component scores and a subset of the principal axes associated with the highest variance. The next question is how
+many columns of \(V_i\) need to be retained to ensure \(\tilde{X_i}\) is a reasonable representation of the original data? There
+is no hard rule in this regard, however a common rule of thumb is to select enough components to ensure that 90% of the variance is
+captured. Having said that, each problem will be unique, and it will often be useful to generate an eigen spectrum plot as shown above
 to draw some conclusion as to a reasonable initial estimate.</p>
-<p>In the case of our image of Poppet, we will demonstrate the effect of retaining an increasing number of principal axes in \(V_i\) 
-to compute principal component scores, and then to project this back onto the original basis. The images below show a range of scenarios 
-where we project the image using only 5 components all the way through to 70 components. Note that this is still a small subset of the 
-total number of components, namely 360 in this case, but it is clear that once we include up to 50 components, the transformed image 
+<p>In the case of our image of Poppet, we will demonstrate the effect of retaining an increasing number of principal axes in \(V_i\)
+to compute principal component scores, and then to project this back onto the original basis. The images below show a range of scenarios
+where we project the image using only 5 components all the way through to 70 components. Note that this is still a small subset of the
+total number of components, namely 360 in this case, but it is clear that once we include up to 50 components, the transformed image
 is almost indistinguishable from the original, at least to the human eye.</p>
 <table>
     <tr>
@@ -598,9 +614,9 @@ is almost indistinguishable from the original, at least to the human eye.</p>
 </table>
 
 <p>The final image in the table above is essentially the same as the original since we retain all components and so \(V_i {V_i}^T = I \)
-given that we know \(V_i\) is an orthogonal matrix by design. The code to generate this array of images is shown below. Here we load the 
-original image into a Morpheus <code>DataFrame</code>, and then proceed to decompose it into red, green and blue components, perform PCA on each color, 
-project the image as described above using only a subset of the principal axes associated with highest variance, and then record the resulting 
+given that we know \(V_i\) is an orthogonal matrix by design. The code to generate this array of images is shown below. Here we load the
+original image into a Morpheus <code>DataFrame</code>, and then proceed to decompose it into red, green and blue components, perform PCA on each color,
+project the image as described above using only a subset of the principal axes associated with highest variance, and then record the resulting
 projection back out as an image file. </p>
 <?prettify?>
 
@@ -660,12 +676,12 @@ Array.of(5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 360).forEach(nCo
 </code></pre>
 
 <h3 id="compression-story">Compression Story</h3>
-<p>The dimensions of our original input data \(X_i\) is <code>504x360</code> which generates a covariance matrix with dimensions <code>360x360</code>. 
-Performing PCA on this data yields a set of <code>360</code> eigenvectors each of the same length, implying that the non-truncated version of 
-\(V_i\) is also <code>360x360</code>. If we decide to only keep the first <code>k</code> columns of \(V_i\) to create \(\tilde{V_i}\), then the resulting 
-dimensions of \(\tilde{Y_i}\) will be <code>504xk</code>. If <code>k</code> can be significantly smaller than <code>360</code> (the height of the original image) then 
-\(\tilde{Y_i}\) would require much less storage space. We obviously also need to store \(\tilde{V_i}\) so that we can reconstitute 
-our estimate of the data \(\tilde{X_i}\), but the expectation is that <code>k</code> can be small enough so that the storage required for two 
+<p>The dimensions of our original input data \(X_i\) is <code>504x360</code> which generates a covariance matrix with dimensions <code>360x360</code>.
+Performing PCA on this data yields a set of <code>360</code> eigenvectors each of the same length, implying that the non-truncated version of
+\(V_i\) is also <code>360x360</code>. If we decide to only keep the first <code>k</code> columns of \(V_i\) to create \(\tilde{V_i}\), then the resulting
+dimensions of \(\tilde{Y_i}\) will be <code>504xk</code>. If <code>k</code> can be significantly smaller than <code>360</code> (the height of the original image) then
+\(\tilde{Y_i}\) would require much less storage space. We obviously also need to store \(\tilde{V_i}\) so that we can reconstitute
+our estimate of the data \(\tilde{X_i}\), but the expectation is that <code>k</code> can be small enough so that the storage required for two
 smaller matrices is less than that required for the original image. </p>
 <p>In our example, the original image requires <code>181,440</code> 32-bit RGBA values given it has dimensions of <code>504x360</code> pixels. The table below
 summarizes the total number of elements required to store \(\tilde{Y_i}\) and \(\tilde{V_i}\) for various values of k ranging

@@ -1,12 +1,28 @@
+<!--
+  ~ Copyright (C) 2014-2018 D3X Systems - All Rights Reserved
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        
+
         <meta name="author" content="Xavier Witdouck">
-        
+
         <link rel="shortcut icon" href="../../img/favicon.ico">
         <title>Performance - Morpheus</title>
         <link href="../../css/bootstrap-custom.min.css" rel="stylesheet">
@@ -20,10 +36,10 @@
             <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
             <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
         <![endif]-->
-	
+
 	<script src="../../js/jquery-1.10.2.min.js"></script>
         <script src="../../js/bootstrap-3.0.3.min.js"></script>
-        <script src="../../js/highlight.pack.js"></script> 
+        <script src="../../js/highlight.pack.js"></script>
     </head>
 
     <body>
@@ -53,11 +69,11 @@
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Array <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            
+
 <li >
     <a href="../../array/overview/">Overview</a>
 </li>
-                            
+
 <li >
     <a href="../../array/performance/">Performance</a>
 </li>
@@ -66,39 +82,39 @@
                     <li class="dropdown active">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">DataFrame <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            
+
 <li >
     <a href="../construction/">Construction</a>
 </li>
-                            
+
 <li >
     <a href="../access/">Accessing</a>
 </li>
-                            
+
 <li >
     <a href="../reshaping/">Reshaping</a>
 </li>
-                            
+
 <li >
     <a href="../filtering/">Filtering</a>
 </li>
-                            
+
 <li >
     <a href="../sorting/">Sorting</a>
 </li>
-                            
+
 <li >
     <a href="../grouping/">Grouping</a>
 </li>
-                            
+
 <li >
     <a href="../finding/">Finding</a>
 </li>
-                            
+
 <li >
     <a href="../writing/">Writing</a>
 </li>
-                            
+
 <li class="active">
     <a href="./">Performance</a>
 </li>
@@ -107,45 +123,45 @@
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Analysis <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            
+
 <li >
     <a href="../../analysis/statistics/">Descriptive Statistics</a>
 </li>
-                            
+
   <li class="dropdown-submenu">
     <a href="#">Linear Regression</a>
     <ul class="dropdown-menu">
-            
+
 <li >
     <a href="../../regression/ols/">Ordinary Least Squares</a>
 </li>
-            
+
 <li >
     <a href="../../regression/wls/">Weighted Least Squares</a>
 </li>
-            
+
 <li >
     <a href="../../regression/gls/">Generalized Least Squares</a>
 </li>
     </ul>
   </li>
-                            
+
 <li >
     <a href="../../analysis/pca/">Principal Component Analysis</a>
 </li>
-                            
+
 <li >
     <a href="../../analysis/linearalgebra/">Linear Algebra</a>
 </li>
-                            
+
 <li >
     <a href="../../analysis/timeseries/">Time Series Analysis</a>
 </li>
-                            
+
   <li class="dropdown-submenu">
     <a href="#">Examples</a>
     <ul class="dropdown-menu">
-            
+
 <li >
     <a href="../../examples/mpt/">Modern Portfolio Theory</a>
 </li>
@@ -156,29 +172,29 @@
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Visualization <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            
+
   <li class="dropdown-submenu">
     <a href="#">Charts</a>
     <ul class="dropdown-menu">
-            
+
 <li >
     <a href="../../viz/charts/overview/">Overview</a>
 </li>
-            
+
 <li >
     <a href="../../viz/charts/embed/">Embedding (HTML)</a>
 </li>
-            
+
 <li >
     <a href="../../viz/charts/gallery1/">Gallery (Google)</a>
 </li>
-            
+
 <li >
     <a href="../../viz/charts/gallery2/">Gallery (JFree)</a>
 </li>
     </ul>
   </li>
-                            
+
 <li >
     <a href="../../viz/tables/overview/">Tables</a>
 </li>
@@ -187,23 +203,23 @@
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Data Sources <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            
+
 <li >
     <a href="../../providers/quandl/">Quandl</a>
 </li>
-                            
+
 <li >
     <a href="../../providers/fred/">Federal Reserve</a>
 </li>
-                            
+
 <li >
     <a href="../../providers/google/">Google Finance</a>
 </li>
-                            
+
 <li >
     <a href="../../providers/yahoo/">Yahoo Finance</a>
 </li>
-                            
+
 <li >
     <a href="../../providers/world-bank/">World Bank</a>
 </li>
@@ -251,27 +267,27 @@
                 <div class="col-md-9" role="main">
 
 <h3 id="introduction">Introduction</h3>
-<p>The following sections provide some micro-benchmark timing and memory statistics for various 
-styles of Morpheus <code>DataFrames</code>. These benchmarks where performed on a 2013 MacBook Pro with a 
-Core i7 2.6Ghz Quad-core CPU, and 16GB of memory. As with all benchmarks, these figures should 
-be taken with a pinch of salt as real-world performance could differ substantially for all sorts 
-of reasons. They are however a reasonable set of observations to compare the relative cost of 
-different operations, and also to get a sense of how the sequential versus parallel execution 
+<p>The following sections provide some micro-benchmark timing and memory statistics for various
+styles of Morpheus <code>DataFrames</code>. These benchmarks where performed on a 2013 MacBook Pro with a
+Core i7 2.6Ghz Quad-core CPU, and 16GB of memory. As with all benchmarks, these figures should
+be taken with a pinch of salt as real-world performance could differ substantially for all sorts
+of reasons. They are however a reasonable set of observations to compare the relative cost of
+different operations, and also to get a sense of how the sequential versus parallel execution
 of these operations compares.</p>
 <h3 id="dataframe">DataFrame</h3>
 <h4 id="initialization">Initialization</h4>
 <p>A <code>DataFrame</code> is a column store composed of Morpheus Arrays, so the performance statistics presented
-<a href="../arrays">here</a> should serve as a rough guide to extrapolate some crude expectations regarding 
+<a href="../arrays">here</a> should serve as a rough guide to extrapolate some crude expectations regarding
 <code>DataFrame</code> performance &amp; memory. Nevertheless, there are many idiosyncratic operations on a <code>DataFrame</code>
 for which the performance characteristics are worthwhile understanding, and this section attempts to
 cover some of this ground.</p>
 <p>The chart below presents the initialization times for <code>DataFrames</code> with 10 columns of double precision
-values and row counts increasing from 1 million to 5 million rows. The series on this chart represent 
-frames with differing types for the row axis, including <code>Integer</code>, <code>Date</code>, <code>Instant</code>, <code>LocalDateTime</code> 
-and <code>ZonedDateTime</code> types. If you have read the <a href="../arrays">section</a> on the comparative performance 
-of Morpheus Arrays for these types, it is not surprising to see that the frame with a <code>ZonedDateTime</code> 
+values and row counts increasing from 1 million to 5 million rows. The series on this chart represent
+frames with differing types for the row axis, including <code>Integer</code>, <code>Date</code>, <code>Instant</code>, <code>LocalDateTime</code>
+and <code>ZonedDateTime</code> types. If you have read the <a href="../arrays">section</a> on the comparative performance
+of Morpheus Arrays for these types, it is not surprising to see that the frame with a <code>ZonedDateTime</code>
 row axis is more expensive to create than one with an <code>Integer</code> axis. With that said, this chart
-provides a comforting picture with regard to the fairly linear scalability of performance as the 
+provides a comforting picture with regard to the fairly linear scalability of performance as the
 row count increases, and the absolute times involved are also re-assuring.</p>
 <p align="center">
     <img class="chart" src="../../images/frame/data-frame-init-times.png"/>
@@ -280,27 +296,27 @@ row count increases, and the absolute times involved are also re-assuring.</p>
 <p><strong>Figure 1. Large DataFrame construction times can be affected by the complexity of the largest axis.</strong></p>
 <h4 id="memory">Memory</h4>
 <p>When constructing <code>DataFrames</code> that are entirely composed of Morpheus arrays that are themselves
-internally represented as primitives, it is fairly easy to estimate how much memory the corresponding 
+internally represented as primitives, it is fairly easy to estimate how much memory the corresponding
 frame will consume. Consider the <code>DataFrame</code> example in the previous section, which included 10 columns
-of double precision values. For the case with 5 million rows, and therefore 50 million elements, one 
-can reason that it would require at least <code>(((64 / 8) * 50,000,000) / 1024^2) = 381MB</code> for just the 
-data alone. As it turns out, direct measurement of this frame using the Java <code>Instrumentation</code> API 
+of double precision values. For the case with 5 million rows, and therefore 50 million elements, one
+can reason that it would require at least <code>(((64 / 8) * 50,000,000) / 1024^2) = 381MB</code> for just the
+data alone. As it turns out, direct measurement of this frame using the Java <code>Instrumentation</code> API
 suggests the entire object requires more like 500MB of RAM. </p>
-<p>The additional 120MB in this case is likely to be almost entirely attributable to the row and column 
-axis of the frame, and obviously much more the former than the latter. The row and column axis is 
-each backed by a <a href="http://trove.starlight-systems.com/">Trove</a> map of an appropriate type which maintains 
-the index, as well as a Morpheus array that defines the order. A Trove <code>TIntIntHashMap</code> initialized with 
-a capacity of 5 million elements consumes 62MB according to Java Instrumentation, so together this 
-explains over 90% of the memory used by this frame. This implies very little object overhead by the 
-supporting classes that make up the <code>DataFrame</code>, and also suggests that garbage collection times 
+<p>The additional 120MB in this case is likely to be almost entirely attributable to the row and column
+axis of the frame, and obviously much more the former than the latter. The row and column axis is
+each backed by a <a href="http://trove.starlight-systems.com/">Trove</a> map of an appropriate type which maintains
+the index, as well as a Morpheus array that defines the order. A Trove <code>TIntIntHashMap</code> initialized with
+a capacity of 5 million elements consumes 62MB according to Java Instrumentation, so together this
+explains over 90% of the memory used by this frame. This implies very little object overhead by the
+supporting classes that make up the <code>DataFrame</code>, and also suggests that garbage collection times
 should be minimal, which we will discuss in a following section.</p>
 <p align="center">
     <img class="chart" src="../../images/frame/data-frame-memory.png"/>
 </p>
 
 <p><strong>Figure 2. Memory usage for a DataFrame with 50 million 64-bit double precision values and various row key types.</strong> </p>
-<p>As you would expect, a <code>DataFrame</code> is generally very friendly to the garbage collector, so even creating 
-a large frame will not result in excessively long GC times. The chart below illustrates the times to 
+<p>As you would expect, a <code>DataFrame</code> is generally very friendly to the garbage collector, so even creating
+a large frame will not result in excessively long GC times. The chart below illustrates the times to
 deallocate the DataFrame in this test, and both the magnitude and the small sampling noise in these
 results is comforting.</p>
 <p align="center">
@@ -309,9 +325,9 @@ results is comforting.</p>
 
 <p><strong>Figure 3. The GC times are small in magnitude and demonstrate low sampling noise in the results.</strong> </p>
 <h4 id="row-iteration">Row Iteration</h4>
-<p>Row iteration is generally very fast when using the <code>forEach()</code> function with a consumer to perform 
-some relevant analysis on each row. For example, consider a DataFrame with 50 million rows and 4 
-columns containing random double precision values. The chart below shows how performance compares 
+<p>Row iteration is generally very fast when using the <code>forEach()</code> function with a consumer to perform
+some relevant analysis on each row. For example, consider a DataFrame with 50 million rows and 4
+columns containing random double precision values. The chart below shows how performance compares
 between sequential and parallel execution for a routine that computes the arithmetic mean of each row. </p>
 <p align="center">
     <img class="chart" src="../../images/frame/data-frame-row-iteration.png"/>
@@ -353,12 +369,12 @@ Chart.create().withBarPlot(timing, false, chart -&gt; {
 </code></pre>
 
 <h4 id="updating-elements">Updating Elements</h4>
-<p>A common <code>DataFrame</code> operation is to apply a function to each element in order to update the value based on 
+<p>A common <code>DataFrame</code> operation is to apply a function to each element in order to update the value based on
 some condition. The example below illustrates a performance comparison of sequential versus parallel execution for
 such a scenario. In this example, the <code>DataFrame</code> contains 200 million random double precision values which are
 initialized with a random value between 0 and 1 using <code>Math.random()</code>. The test the times how long it takes
-to iterate over all these values, and capping values at 0.5 if they exceed that value.The results show a large 
-performance improvement through parallel execution, and one could expect even larger differences as the 
+to iterate over all these values, and capping values at 0.5 if they exceed that value.The results show a large
+performance improvement through parallel execution, and one could expect even larger differences as the
 complexity of the apply function increases.</p>
 <p align="center">
     <img class="chart" src="../../images/frame/data-frame-apply-doubles.png"/>

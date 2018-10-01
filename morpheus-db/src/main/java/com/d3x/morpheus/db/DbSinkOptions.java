@@ -33,11 +33,11 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import javax.sql.DataSource;
 
-import com.zavtech.morpheus.frame.DataFrameException;
-import com.zavtech.morpheus.frame.DataFrameValue;
-import com.zavtech.morpheus.util.Asserts;
-import com.zavtech.morpheus.util.functions.Function1;
-import com.zavtech.morpheus.util.sql.SQLPlatform;
+import com.d3x.morpheus.frame.DataFrameException;
+import com.d3x.morpheus.frame.DataFrameValue;
+import com.d3x.morpheus.util.Asserts;
+import com.d3x.morpheus.util.functions.Function1;
+import com.d3x.morpheus.util.sql.SQLPlatform;
 
 /**
  * A class that defines all the options that can be configured to write a DataFrame to a SQL data store.

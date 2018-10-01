@@ -1,12 +1,28 @@
+<!--
+  ~ Copyright (C) 2014-2018 D3X Systems - All Rights Reserved
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        
+
         <meta name="author" content="Xavier Witdouck">
-        
+
         <link rel="shortcut icon" href="../../img/favicon.ico">
         <title>Reshaping - Morpheus</title>
         <link href="../../css/bootstrap-custom.min.css" rel="stylesheet">
@@ -20,10 +36,10 @@
             <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
             <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
         <![endif]-->
-	
+
 	<script src="../../js/jquery-1.10.2.min.js"></script>
         <script src="../../js/bootstrap-3.0.3.min.js"></script>
-        <script src="../../js/highlight.pack.js"></script> 
+        <script src="../../js/highlight.pack.js"></script>
     </head>
 
     <body>
@@ -53,11 +69,11 @@
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Array <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            
+
 <li >
     <a href="../../array/overview/">Overview</a>
 </li>
-                            
+
 <li >
     <a href="../../array/performance/">Performance</a>
 </li>
@@ -66,39 +82,39 @@
                     <li class="dropdown active">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">DataFrame <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            
+
 <li >
     <a href="../construction/">Construction</a>
 </li>
-                            
+
 <li >
     <a href="../access/">Accessing</a>
 </li>
-                            
+
 <li class="active">
     <a href="./">Reshaping</a>
 </li>
-                            
+
 <li >
     <a href="../filtering/">Filtering</a>
 </li>
-                            
+
 <li >
     <a href="../sorting/">Sorting</a>
 </li>
-                            
+
 <li >
     <a href="../grouping/">Grouping</a>
 </li>
-                            
+
 <li >
     <a href="../finding/">Finding</a>
 </li>
-                            
+
 <li >
     <a href="../writing/">Writing</a>
 </li>
-                            
+
 <li >
     <a href="../performance/">Performance</a>
 </li>
@@ -107,45 +123,45 @@
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Analysis <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            
+
 <li >
     <a href="../../analysis/statistics/">Descriptive Statistics</a>
 </li>
-                            
+
   <li class="dropdown-submenu">
     <a href="#">Linear Regression</a>
     <ul class="dropdown-menu">
-            
+
 <li >
     <a href="../../regression/ols/">Ordinary Least Squares</a>
 </li>
-            
+
 <li >
     <a href="../../regression/wls/">Weighted Least Squares</a>
 </li>
-            
+
 <li >
     <a href="../../regression/gls/">Generalized Least Squares</a>
 </li>
     </ul>
   </li>
-                            
+
 <li >
     <a href="../../analysis/pca/">Principal Component Analysis</a>
 </li>
-                            
+
 <li >
     <a href="../../analysis/linearalgebra/">Linear Algebra</a>
 </li>
-                            
+
 <li >
     <a href="../../analysis/timeseries/">Time Series Analysis</a>
 </li>
-                            
+
   <li class="dropdown-submenu">
     <a href="#">Examples</a>
     <ul class="dropdown-menu">
-            
+
 <li >
     <a href="../../examples/mpt/">Modern Portfolio Theory</a>
 </li>
@@ -156,29 +172,29 @@
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Visualization <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            
+
   <li class="dropdown-submenu">
     <a href="#">Charts</a>
     <ul class="dropdown-menu">
-            
+
 <li >
     <a href="../../viz/charts/overview/">Overview</a>
 </li>
-            
+
 <li >
     <a href="../../viz/charts/embed/">Embedding (HTML)</a>
 </li>
-            
+
 <li >
     <a href="../../viz/charts/gallery1/">Gallery (Google)</a>
 </li>
-            
+
 <li >
     <a href="../../viz/charts/gallery2/">Gallery (JFree)</a>
 </li>
     </ul>
   </li>
-                            
+
 <li >
     <a href="../../viz/tables/overview/">Tables</a>
 </li>
@@ -187,23 +203,23 @@
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Data Sources <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            
+
 <li >
     <a href="../../providers/quandl/">Quandl</a>
 </li>
-                            
+
 <li >
     <a href="../../providers/fred/">Federal Reserve</a>
 </li>
-                            
+
 <li >
     <a href="../../providers/google/">Google Finance</a>
 </li>
-                            
+
 <li >
     <a href="../../providers/yahoo/">Yahoo Finance</a>
 </li>
-                            
+
 <li >
     <a href="../../providers/world-bank/">World Bank</a>
 </li>
@@ -253,15 +269,15 @@
 
 <h3 id="reshaping">Reshaping</h3>
 <p>It is often useful to be able to expand a <code>DataFrame</code> in either the row or column dimension, or both, in order to store
-calculated data or other state as part of some analysis. For example, a frame could be used to capture real-time in-memory 
-performance metrics or other high frequency observations for expanding window statistical analysis, requiring new rows to be 
-added as data is collected. The following sections provide some demonstrations of how to use the API to add rows &amp; columns, 
+calculated data or other state as part of some analysis. For example, a frame could be used to capture real-time in-memory
+performance metrics or other high frequency observations for expanding window statistical analysis, requiring new rows to be
+added as data is collected. The following sections provide some demonstrations of how to use the API to add rows &amp; columns,
 and discusses some of the caveats one needs to be aware of.</p>
 <h4 id="adding-rows">Adding Rows</h4>
 <h5 id="singular">Singular</h5>
-<p>The <code>DataFrameRows</code> interface provides a number of methods for <strong>efficiently</strong> adding rows to an existing frame in place 
-(that is, modifying the existing frame as opposed to creating an entirely new instance). This is very much analogous to the 
-way that Java collections like <code>List</code>, <code>Set</code> and <code>Map</code> can be expanded in place.  Consider as a starting point a 4x5 frame 
+<p>The <code>DataFrameRows</code> interface provides a number of methods for <strong>efficiently</strong> adding rows to an existing frame in place
+(that is, modifying the existing frame as opposed to creating an entirely new instance). This is very much analogous to the
+way that Java collections like <code>List</code>, <code>Set</code> and <code>Map</code> can be expanded in place.  Consider as a starting point a 4x5 frame
 of doubles initialized with random values as follows.</p>
 <?prettify?>
 
@@ -282,7 +298,7 @@ DataFrame&lt;LocalDate,String&gt; frame = DataFrame.ofDoubles(
  2014-01-04  |     9.619  |     7.539  |     7.204  |     5.950  |     0.532  |
 </pre></div>
 
-<p>Below we add a single row with a <code>LocalDate</code> key that does not exist in the row axis. If the key did already exist, the operation 
+<p>Below we add a single row with a <code>LocalDate</code> key that does not exist in the row axis. If the key did already exist, the operation
 would be a no-op, however this behaviour can be controlled via <code>DataFrameOptions</code> (see section below on duplicate handling). Since
 all the columns of this frame are of type <code>double</code>, and we have not provided any initial values for the row, they all initialize
 as <code>Double.NaN</code>.</p>
@@ -306,7 +322,7 @@ frame.out().print(formats -&gt; {
 </pre></div>
 
 <p>It is possible to initialize values for a newly added row by providing a lambda function that consumes a <code>DataFrameValue</code>
-as shown below. In this case, we add another row with values initialized to <code>2.0</code>. A more involved initialization function 
+as shown below. In this case, we add another row with values initialized to <code>2.0</code>. A more involved initialization function
 is easy to imagine of course.</p>
 <?prettify?>
 
@@ -329,10 +345,10 @@ frame.out().print(formats -&gt; {
 </pre></div>
 
 <h5 id="multiple">Multiple</h5>
-<p>Adding multiple rows is also supported via overloaded <code>addAll()</code> methods, which expects an <code>Iterable</code> of keys as an argument. 
-Once again, any duplicates will be ignored unless this behaviour is disabled via <code>DataFrameOptions</code> (see duplicate handling 
-below). Continuing with the frame from the previous section, the code below adds additional rows based on a <code>Range</code> of <code>LocalDate</code> 
-objects, which works becase <code>Range</code> implements <code>Iterable</code> (note that a range's start value is inclusive, and the end value is 
+<p>Adding multiple rows is also supported via overloaded <code>addAll()</code> methods, which expects an <code>Iterable</code> of keys as an argument.
+Once again, any duplicates will be ignored unless this behaviour is disabled via <code>DataFrameOptions</code> (see duplicate handling
+below). Continuing with the frame from the previous section, the code below adds additional rows based on a <code>Range</code> of <code>LocalDate</code>
+objects, which works becase <code>Range</code> implements <code>Iterable</code> (note that a range's start value is inclusive, and the end value is
 exclusive).</p>
 <?prettify?>
 
@@ -384,10 +400,10 @@ frame.out().print(formats -&gt; {
 </pre></div>
 
 <h5 id="frame">Frame</h5>
-<p>The scenarios discussed in the previous sections illustrate how rows can be added by specifying one or more keys, with an optional 
-function to set the initial values for the newly added rows. It is often convenient to be able to add all the rows from one frame 
-to another, in place (i.e. without creating a third frame). In these situations, data from the added frame is copied across based 
-on <strong>intersecting columns</strong> between the two frames. Consider the following example where we construct two frames that have both 
+<p>The scenarios discussed in the previous sections illustrate how rows can be added by specifying one or more keys, with an optional
+function to set the initial values for the newly added rows. It is often convenient to be able to add all the rows from one frame
+to another, in place (i.e. without creating a third frame). In these situations, data from the added frame is copied across based
+on <strong>intersecting columns</strong> between the two frames. Consider the following example where we construct two frames that have both
 intersecting row and column keys.</p>
 <?prettify?>
 
@@ -432,8 +448,8 @@ DataFrame&lt;Integer,String&gt; frame2 = DataFrame.ofDoubles(
 </pre></div>
 
 <p>These two frames have intersecting row keys, namely <code>3</code> and <code>4</code>, and intersecting column keys, namely <code>C</code>, <code>D</code> and <code>E</code>. We
-can add all rows from <code>frame2</code> to <code>frame1</code> as per the code below, and since by default duplicates are ignored, the rows <code>3</code> and 
-<code>4</code> from <code>frame2</code> will not be added. In addition, only data for intersecting columns will be copied resulting in a 10x5 frame as 
+can add all rows from <code>frame2</code> to <code>frame1</code> as per the code below, and since by default duplicates are ignored, the rows <code>3</code> and
+<code>4</code> from <code>frame2</code> will not be added. In addition, only data for intersecting columns will be copied resulting in a 10x5 frame as
 shown below.</p>
 <?prettify?>
 
@@ -460,9 +476,9 @@ frame1.out().print(formats -&gt; {
 </pre></div>
 
 <h5 id="concatenation">Concatenation</h5>
-<p>When adding rows from one <code>DataFrame</code> to another as presented in the previous section, the data types for the intersecting 
-columns must be compatible, otherwise a <code>DataFrameException</code> will be raised. In the prior example, both frames were made up 
-of double precision columns, so this was not an issue. If the second frame, for argument sake, consisted of columns of type 
+<p>When adding rows from one <code>DataFrame</code> to another as presented in the previous section, the data types for the intersecting
+columns must be compatible, otherwise a <code>DataFrameException</code> will be raised. In the prior example, both frames were made up
+of double precision columns, so this was not an issue. If the second frame, for argument sake, consisted of columns of type
 <code>String</code> the <code>addAll()</code> method would have failed when an attempt was made to copy the String data from the second frame to
 the first.</p>
 <p>There are situations when it is necessary to combine the rows of two frames that have <strong>incompatible</strong> data types, or when it is
@@ -492,8 +508,8 @@ DataFrame&lt;Integer,String&gt; frame2 = DataFrame.ofObjects(
      9  |  (6, 0)  |  (6, 1)  |  (6, 2)  |  (6, 3)  |  (6, 4)  |
 </pre></div>
 
-<p>To combine the rows of this frame with the first frame of doubles created earlier, we can create a third frame with column data types 
-that support the combined data across all the frames in question. This technique can be used to concatenate the rows of any number of 
+<p>To combine the rows of this frame with the first frame of doubles created earlier, we can create a third frame with column data types
+that support the combined data across all the frames in question. This technique can be used to concatenate the rows of any number of
 frames. The code below uses the <code>DataFrame.concatRows()</code> static method and prints the result to standard out.</p>
 <?prettify?>
 
@@ -553,10 +569,10 @@ DataFrame&lt;LocalDate,String&gt; frame = DataFrame.ofDoubles(
 
 <h5 id="singular_1">Singular</h5>
 <p>The <code>DataFrameColumns</code> interface exposes various <code>add()</code> and <code>addAll()</code> methods, but they differ slightly to those on <code>DataFrameRows</code>.
-Each column in a frame is associated with a specific data type, so when adding additional columns the type needs to be either explicitly 
-specified, or implicitly defined through the data structure being added. Column data will ultimately end up being represented as a 
+Each column in a frame is associated with a specific data type, so when adding additional columns the type needs to be either explicitly
+specified, or implicitly defined through the data structure being added. Column data will ultimately end up being represented as a
 Morpehus <code>Array</code> within the frame, but it is possible to pass data as an <code>Iterable</code> thereby supporting many input types.</p>
-<p>The code below demonstrates 5 distinct ways of adding columns to the 10x2 <code>DataFrame</code> illustrated above, using the various 
+<p>The code below demonstrates 5 distinct ways of adding columns to the 10x2 <code>DataFrame</code> illustrated above, using the various
 techniques that are supported for single column adds. In some cases we simply pass the desired data type for the column, while
 in other cases we pass an <code>Iterable</code> in the form of a <code>Range</code> or <code>Array</code> object. The final state of the frame is shown below.</p>
 <?prettify?>
@@ -593,8 +609,8 @@ frame.out().print(formats -&gt; {
 </pre></div>
 
 <h5 id="multiple_1">Multiple</h5>
-<p>Adding multiple columns in one call is also supported as described in this section. The code below creates a similar 10x2 
-frame of random double precision values as a starting point, and then adds three columns labelled <code>A</code>, <code>B</code> and <code>C</code> of type 
+<p>Adding multiple columns in one call is also supported as described in this section. The code below creates a similar 10x2
+frame of random double precision values as a starting point, and then adds three columns labelled <code>A</code>, <code>B</code> and <code>C</code> of type
 <code>String</code>, and two additional columns presenting the column data directory via a <code>Range</code> and <code>Array</code> object. One thing to note
 about this example is that the data structures for <code>F</code> and <code>G</code> are shorter than the row count of the original frame, so
 they get extended as required with values initializing to the defaults for the type in question. If the data structures are
@@ -636,8 +652,8 @@ frame.out().print(formats -&gt; {
 </pre></div>
 
 <h5 id="frame_1">Frame</h5>
-<p>Similar to adding rows from one frame to another, it is also possible to add columns from one frame to another. Only columns 
-that are missing from the first frame are added by default, unless duplicate handling is changed via <code>DataFrameOptions</code>. In 
+<p>Similar to adding rows from one frame to another, it is also possible to add columns from one frame to another. Only columns
+that are missing from the first frame are added by default, unless duplicate handling is changed via <code>DataFrameOptions</code>. In
 addition, only data from intersecting rows will be copied. Consider a 9x2 frame initialized with random double precision values
 as follows:</p>
 <?prettify?>
@@ -664,7 +680,7 @@ DataFrame&lt;Integer,String&gt; frame1 = DataFrame.ofDoubles(
      8  |  0.633  |  0.476  |
 </pre></div>
 
-<p>A second 6x5 frame is initialized with intersecting rows for keys <code>0</code>, <code>2</code>, <code>4</code>, <code>6</code> and <code>8</code>, and one intersecting column, 
+<p>A second 6x5 frame is initialized with intersecting rows for keys <code>0</code>, <code>2</code>, <code>4</code>, <code>6</code> and <code>8</code>, and one intersecting column,
 namely for label <code>B</code>. The columns for this frame include various data types, namely of <code>Integer</code>. <code>Double</code>, <code>String</code> and
 <code>Boolean</code>, and all values are initialized by directly presenting a data structure representing the column values.</p>
 <?prettify?>
@@ -690,8 +706,8 @@ DataFrame&lt;Integer,String&gt; frame2 = DataFrame.of(Range.of(0, 12, 2), String
     10  |  60  |  11.000  |  6  |  (5,3)  |  false  |
 </pre></div>
 
-<p>Using the <code>addAll()</code> method on the <code>DataFrameColumns</code> interface we can add columns from the second 6x5 frame to the original 
-9x2 frame. Since duplicates are ignored by default, we expect that column <code>B</code> from the first frame will be retained and not 
+<p>Using the <code>addAll()</code> method on the <code>DataFrameColumns</code> interface we can add columns from the second 6x5 frame to the original
+9x2 frame. Since duplicates are ignored by default, we expect that column <code>B</code> from the first frame will be retained and not
 get over written by the values from the second frame. In addition, only data for intersecting rows will get transferred. The
 code to combine these frames and the 9x6 result is shown below. </p>
 <?prettify?>
@@ -720,8 +736,8 @@ frame1.out().print(formats -&gt; {
 
 <h5 id="concatenation_1">Concatenation</h5>
 <p>The above examples demonstrate adding columns to an existing frame which mutates the frame in place. At times it is preferable
-however to create a new frame which combines the data of two or more input frames. To do this, a static <code>concatColumns()</code> method 
-on the <code>DataFrame</code> interface exists which cam combine any number of frames. Again, duplicate columns across the input frames are 
+however to create a new frame which combines the data of two or more input frames. To do this, a static <code>concatColumns()</code> method
+on the <code>DataFrame</code> interface exists which cam combine any number of frames. Again, duplicate columns across the input frames are
 ignored with the first frame being the winner, and only data from intersecting rows to the first frame are captured.</p>
 <p>Consider 3 frames initialized as follows:</p>
 <?prettify?>
@@ -820,9 +836,9 @@ frame4.out().print(formats -&gt; {
 </pre></div>
 
 <h4 id="dataframe-union">DataFrame Union</h4>
-<p>Row and column concatenation only copies data based on columns and rows respectively that intersect with the entries in the 
-first frame. At times a full union of N frames is desirable, also taking into account the fact that the combined columns may 
-not share the same data type. In order to support this, a static method called <code>union()</code> on the <code>DataFrame</code> interface is 
+<p>Row and column concatenation only copies data based on columns and rows respectively that intersect with the entries in the
+first frame. At times a full union of N frames is desirable, also taking into account the fact that the combined columns may
+not share the same data type. In order to support this, a static method called <code>union()</code> on the <code>DataFrame</code> interface is
 provided for this purpose.</p>
 <p>Consider a 5x2, 6x5 and 6x4 frame with intersecting rows and columns initialized as follows. </p>
 <?prettify?>
@@ -919,14 +935,14 @@ frame4.out().print(formats -&gt; {
 </pre></div>
 
 <h4 id="duplicate-handling">Duplicate Handling</h4>
-<p>By design, a <code>DataFrame</code> row and column axis does not support duplicate keys. When expanding a frame, an attempt 
-to add row or column keys which are already present in the respective axis results in a no-op. In addition, 
-functions to concatenate or create a union of two or more frames operate on a combine first basis. While this 
-may suffice for most use cases, there are scenarios where you would not expect duplicates to exist across frames, 
-and would rather such an event raise an exception as opposed to operating on the combine first approach. This 
-behaviour, among others, can be achieved via the <code>DataFrameOptions</code> class which provides various methods to change 
+<p>By design, a <code>DataFrame</code> row and column axis does not support duplicate keys. When expanding a frame, an attempt
+to add row or column keys which are already present in the respective axis results in a no-op. In addition,
+functions to concatenate or create a union of two or more frames operate on a combine first basis. While this
+may suffice for most use cases, there are scenarios where you would not expect duplicates to exist across frames,
+and would rather such an event raise an exception as opposed to operating on the combine first approach. This
+behaviour, among others, can be achieved via the <code>DataFrameOptions</code> class which provides various methods to change
 the behaviour of the currently executing thread via the use of internal <code>ThreadLocal</code> variables.</p>
-<p>If we consider the union example from the previous section, we can cause it to fail (because there are duplicates 
+<p>If we consider the union example from the previous section, we can cause it to fail (because there are duplicates
 keys across the input frames) by wrapping the code in a <code>Callable</code> to <code>whileNotIgnoringDuplicates()</code> as follows.</p>
 <?prettify?>
 
@@ -937,16 +953,16 @@ keys across the input frames) by wrapping the code in a <code>Callable</code> to
 
 <p>Running this code results in an exception as follows:</p>
 <pre>
-    Caused by: com.zavtech.morpheus.frame.DataFrameException: A column for key already exists in this frame: B
-        at com.zavtech.morpheus.reference.XDataFrameColumns.lambda$addAll$121(XDataFrameColumns.java:139)
-        at com.zavtech.morpheus.reference.XDataFrameAxisBase.forEach(XDataFrameAxisBase.java:281)
-        at com.zavtech.morpheus.reference.XDataFrameColumns.addAll(XDataFrameColumns.java:135)
-        at com.zavtech.morpheus.reference.XDataFrameFactory.lambda$union$8(XDataFrameFactory.java:161)
+    Caused by: com.d3x.morpheus.frame.DataFrameException: A column for key already exists in this frame: B
+        at com.d3x.morpheus.reference.XDataFrameColumns.lambda$addAll$121(XDataFrameColumns.java:139)
+        at com.d3x.morpheus.reference.XDataFrameAxisBase.forEach(XDataFrameAxisBase.java:281)
+        at com.d3x.morpheus.reference.XDataFrameColumns.addAll(XDataFrameColumns.java:135)
+        at com.d3x.morpheus.reference.XDataFrameFactory.lambda$union$8(XDataFrameFactory.java:161)
         at java.util.Arrays$ArrayList.forEach(Arrays.java:3880)
-        at com.zavtech.morpheus.reference.XDataFrameFactory.union(XDataFrameFactory.java:159)
-        at com.zavtech.morpheus.frame.DataFrame.union(DataFrame.java:407)
-        at com.zavtech.morpheus.examples.ReshapingDocs.lambda$union$49(ReshapingDocs.java:304)
-        at com.zavtech.morpheus.frame.DataFrameOptions.whileNotIgnoringDuplicates(DataFrameOptions.java:219)
+        at com.d3x.morpheus.reference.XDataFrameFactory.union(XDataFrameFactory.java:159)
+        at com.d3x.morpheus.frame.DataFrame.union(DataFrame.java:407)
+        at com.d3x.morpheus.examples.ReshapingDocs.lambda$union$49(ReshapingDocs.java:304)
+        at com.d3x.morpheus.frame.DataFrameOptions.whileNotIgnoringDuplicates(DataFrameOptions.java:219)
 </pre>
 
 <h4 id="re-labelling">Re-Labelling</h4>
@@ -975,9 +991,9 @@ DataFrame&lt;Integer,String&gt; frame = DataFrame.ofDoubles(
      4  |  0.248  |  6.475  |  2.560  |  8.391  |  5.810  |
 </pre></div>
 
-<p>The <code>DataFraneAxis</code> interface exposes a <code>replaceKey()</code> method that can be used to change any number of keys in place. 
+<p>The <code>DataFraneAxis</code> interface exposes a <code>replaceKey()</code> method that can be used to change any number of keys in place.
 The only two caveats are that the replacement key must not already exist in the axis, as duplicates are not supported,
-and the replacment key must be of the same data type. If the replacement key does already exist, expect a <code>DataFrameException</code> 
+and the replacment key must be of the same data type. If the replacement key does already exist, expect a <code>DataFrameException</code>
 to be raised. The code below demonstrates how to replace a single key in both the row oe column axis, and prints the result. </p>
 <?prettify?>
 
@@ -998,8 +1014,8 @@ frame.out().print(formats -&gt; {
     40  |  0.248  |  6.475  |  2.560  |  8.391  |  5.810  |
 </pre></div>
 
-<p>While the above technique is useful to replace specific keys, it is often necessary to replace an axis entirely, and 
-possibly with a different key type. Consider the 10x5 frame of random double precision values below which is keyed by 
+<p>While the above technique is useful to replace specific keys, it is often necessary to replace an axis entirely, and
+possibly with a different key type. Consider the 10x5 frame of random double precision values below which is keyed by
 <code>LocalDate</code> on the row axis, and <code>String</code> on the column axis.</p>
 <?prettify?>
 
@@ -1027,8 +1043,8 @@ DataFrame&lt;LocalDate,String&gt; frame = DataFrame.ofDoubles(
 </pre></div>
 
 <p>Let us assume that the data for this hypothetical experient needs to be date shifted forward by 5 calendar days,
-and the row axis <code>LocalDate</code> objects need to be converted to <code>LocalDateTime</code> objects with a time set to 13:30. One 
-way to achieve this would be to create an entirely new frame, and copy the data across, although this would not be 
+and the row axis <code>LocalDate</code> objects need to be converted to <code>LocalDateTime</code> objects with a time set to 13:30. One
+way to achieve this would be to create an entirely new frame, and copy the data across, although this would not be
 particularly efficient, especially if the frame was extremely large. A better way is to use the <code>mapKeys()</code> method
 on <code>DataFeameAxis</code> and provide a mapping function that does the conversion as shown below.</p>
 <?prettify?>
@@ -1055,8 +1071,8 @@ on <code>DataFeameAxis</code> and provide a mapping function that does the conve
 </pre></div>
 
 <p>Unlike the <code>replaceKey()</code> method, <code>mapKeys()</code> takes a lambda function to generate an entirely new axis, and returns
-a new <code>DataFrame</code> initialized with the replacement axis. The data in the shifted frame is referentially the same as the 
-original frame, so the cost of this operation is limited to the cost of creating the new axis. We can confirm this by 
+a new <code>DataFrame</code> initialized with the replacement axis. The data in the shifted frame is referentially the same as the
+original frame, so the cost of this operation is limited to the cost of creating the new axis. We can confirm this by
 setting all the values in the shifted frame to zero, and then confirming the original frame has also been zero'd out.</p>
 <?prettify?>
 
@@ -1084,8 +1100,8 @@ frame.out().print(formats -&gt; {
 
 <h4 id="transpose">Transpose</h4>
 <p>When a <code>DataFrame</code> is transposed, it changes from being a column store data structure to row store, making the tranpose
-operation itself, even for very large frames, very cheap. One drawback of this design choice however is that a transposed 
-frame cannot be reshaped by adding rows and/or columns.  Attempting to re-shape a transposed <code>DataFrame</code> will result in a 
+operation itself, even for very large frames, very cheap. One drawback of this design choice however is that a transposed
+frame cannot be reshaped by adding rows and/or columns.  Attempting to re-shape a transposed <code>DataFrame</code> will result in a
 <code>DataFrameException</code> as the following example demonstrates.</p>
 <?prettify?>
 
@@ -1101,14 +1117,14 @@ frame.transpose().rows().add(&quot;F&quot;);
 </code></pre>
 
 <pre>
-com.zavtech.morpheus.frame.DataFrameException: Cannot add rows to a transposed DataFrame, call transpose() and then add columns
-    at com.zavtech.morpheus.reference.XDataFrameContent.addRow(XDataFrameContent.java:280)
-    at com.zavtech.morpheus.reference.XDataFrameRows.add(XDataFrameRows.java:77)
-    at com.zavtech.morpheus.reference.XDataFrameRows.add(XDataFrameRows.java:64)
-    at com.zavtech.morpheus.examples.ReshapingDocs.transpose(ReshapingDocs.java:403)
+com.d3x.morpheus.frame.DataFrameException: Cannot add rows to a transposed DataFrame, call transpose() and then add columns
+    at com.d3x.morpheus.reference.XDataFrameContent.addRow(XDataFrameContent.java:280)
+    at com.d3x.morpheus.reference.XDataFrameRows.add(XDataFrameRows.java:77)
+    at com.d3x.morpheus.reference.XDataFrameRows.add(XDataFrameRows.java:64)
+    at com.d3x.morpheus.examples.ReshapingDocs.transpose(ReshapingDocs.java:403)
 </pre>
 
-<p>The workaround to this limitation is to call <code>transpose()</code> on the row major version of the frame, which yields the un-tranposed 
+<p>The workaround to this limitation is to call <code>transpose()</code> on the row major version of the frame, which yields the un-tranposed
 original that can be re-shaped by adding rows and/or columns. Consider the same 5x5 frame created above, which we transpose,
 and then add a new column to the transposed frame by calling <code>addRow()</code> as shown below.</p>
 <?prettify?>
