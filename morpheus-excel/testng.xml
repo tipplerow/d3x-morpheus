@@ -4,7 +4,7 @@
 
     <test name="Excel Tests">
         <packages>
-            <package name="com.com.d3x.morpheus.source.*"/>
+            <package name="com.com.d3x.morpheus.excel.*"/>
         </packages>
     </test>
 

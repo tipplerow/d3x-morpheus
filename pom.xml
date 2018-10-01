@@ -175,6 +175,9 @@
 
 
     <build>
+
+        <directory>${user.home}/builds/${project.name}</directory>
+
         <pluginManagement>
             <plugins>
 
