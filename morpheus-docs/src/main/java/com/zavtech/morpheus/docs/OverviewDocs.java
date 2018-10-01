@@ -27,6 +27,7 @@ import java.time.Year;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
+import com.zavtech.morpheus.util.IO;
 import org.testng.annotations.Test;
 
 import com.zavtech.morpheus.array.Array;
@@ -77,17 +78,17 @@ public class OverviewDocs {
     public void regression() throws Exception {
 
         //Load the data
-        DataFrame<Integer,String> data = DataFrame.read().csv(options -> {
+        var data = DataFrame.read().csv(options -> {
             options.setResource("http://zavtech.com/data/samples/cars93.csv");
             options.setExcludeColumnIndexes(0);
         });
 
         //Run OLS regression and plot
-        String regressand = "Horsepower";
-        String regressor = "EngineSize";
+        var regressand = "Horsepower";
+        var regressor = "EngineSize";
         data.regress().ols(regressand, regressor, true, model -> {
-            System.out.println(model);
-            DataFrame<Integer,String> xy = data.cols().select(regressand, regressor);
+            IO.println(model);
+            var xy = data.cols().select(regressand, regressor);
             Chart.create().withScatterPlot(xy, false, regressor, chart -> {
                 chart.title().withText(regressand + " regressed on " + regressor);
                 chart.subtitle().withText("Single Variable Linear Regression");
@@ -139,7 +140,7 @@ public class OverviewDocs {
     public void housePriceTrend() throws Exception {
 
         //Create a data frame to capture the median prices of Apartments in the UK'a largest cities
-        DataFrame<Year,String> results = DataFrame.ofDoubles(
+        var results = DataFrame.ofDoubles(
             Range.of(1995, 2015).map(Year::of),
             Array.of("LONDON", "BIRMINGHAM", "SHEFFIELD", "LEEDS", "LIVERPOOL", "MANCHESTER")
         );
@@ -147,7 +148,7 @@ public class OverviewDocs {
         //Process yearly data in parallel to leverage all CPU cores
         results.rows().keys().parallel().forEach(year -> {
             System.out.printf("Loading UK house prices for %s...\n", year);
-            DataFrame<Integer,String> prices = loadHousePrices(year);
+            var prices = loadHousePrices(year);
             prices.rows().select(row -> {
                 //Filter rows to include only apartments in the relevant cities
                 final String propType = row.getValue("PropertyType");
@@ -164,11 +165,11 @@ public class OverviewDocs {
 
         //Map row keys to LocalDates, and map values to be percentage changes from start date
         final DataFrame<LocalDate,String> plotFrame = results.mapToDoubles(v -> {
-            final double firstValue = v.col().getDoubleAt(0);
-            final double currentValue = v.getDouble();
+            var firstValue = v.col().getDoubleAt(0);
+            var currentValue = v.getDouble();
             return (currentValue / firstValue - 1d) * 100d;
         }).rows().mapKeys(row -> {
-            final Year year = row.key();
+            var year = row.key();
             return LocalDate.of(year.getValue(), 12, 31);
         });
 

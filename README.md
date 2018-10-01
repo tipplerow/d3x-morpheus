@@ -1,14 +1,17 @@
-<p align="center">
-    <img src="http://www.zavtech.com/morpheus/images/morpheus-logo.png"/>
-</p>
+<div class="row">
+    <div class="col-md-6">
+        <img src="https://www.d3xsystems.com/images/common/morpheus-logo.svg" style="max-height:30px;"/>
+    </div>
+    <div class="col-md-6">
+        <img src="https://www.d3xsystems.com/images/common/d3x.svg" style="max-height:30px;"/>
+    </div>
+</div>
 
 ### Introduction
 
 The Morpheus library is designed to facilitate the development of high performance analytical software involving large datasets for 
 both offline and real-time analysis on the [Java Virtual Machine](https://en.wikipedia.org/wiki/Java_virtual_machine) (JVM). The 
 library is written in Java 8 with extensive use of lambdas, but is accessible to all JVM languages.
-
-**For detailed documentation with examples, see [here](http://www.zavtech.com/morpheus/docs/)**
 
 #### Motivation
 
@@ -108,17 +111,17 @@ and then creates a scatter chart with the regression line clearly displayed.
 <?prettify?>
 ```java
 //Load the data
-DataFrame<Integer,String> data = DataFrame.read().csv(options -> {
+var data = DataFrame.read().csv(options -> {
     options.setResource("http://zavtech.com/data/samples/cars93.csv");
     options.setExcludeColumnIndexes(0);
 });
 
-//Run OLS regression and plot 
-String regressand = "Horsepower";
-String regressor = "EngineSize";
+//Run OLS regression and plot
+var regressand = "Horsepower";
+var regressor = "EngineSize";
 data.regress().ols(regressand, regressor, true, model -> {
-    System.out.println(model);
-    DataFrame<Integer,String> xy = data.cols().select(regressand, regressor);
+    IO.println(model);
+    var xy = data.cols().select(regressand, regressor);
     Chart.create().withScatterPlot(xy, false, regressor, chart -> {
         chart.title().withText(regressand + " regressed on " + regressor);
         chart.subtitle().withText("Single Variable Linear Regression");
@@ -128,6 +131,7 @@ data.regress().ols(regressand, regressor, true, model -> {
         chart.plot().axes().domain().format().withPattern("0.00;-0.00");
         chart.plot().axes().range(0).label().withText(regressand);
         chart.plot().axes().range(0).format().withPattern("0;-0");
+        chart.writerPng(new File("./docs/images/ols/data-frame-ols.png"), 845, 450, true);
         chart.show();
     });
     return Optional.empty();
@@ -153,7 +157,7 @@ Durbin-Watson:                        1.9591
 </pre>
 
 <p align="center">
-    <img class="chart" src="http://www.zavtech.com/morpheus/docs/images/ols/data-frame-ols.png"/>
+    <img class="chart" src="./images/ols/data-frame-ols.png"/>
 </p>
 
 #### UK House Price Trends
@@ -206,7 +210,7 @@ parallel processing to load and process the data by calling `results.rows().keys
 <?prettify?>
 ```java
 //Create a data frame to capture the median prices of Apartments in the UK'a largest cities
-DataFrame<Year,String> results = DataFrame.ofDoubles(
+var results = DataFrame.ofDoubles(
     Range.of(1995, 2015).map(Year::of),
     Array.of("LONDON", "BIRMINGHAM", "SHEFFIELD", "LEEDS", "LIVERPOOL", "MANCHESTER")
 );
@@ -214,7 +218,7 @@ DataFrame<Year,String> results = DataFrame.ofDoubles(
 //Process yearly data in parallel to leverage all CPU cores
 results.rows().keys().parallel().forEach(year -> {
     System.out.printf("Loading UK house prices for %s...\n", year);
-    DataFrame<Integer,String> prices = loadHousePrices(year);
+    var prices = loadHousePrices(year);
     prices.rows().select(row -> {
         //Filter rows to include only apartments in the relevant cities
         final String propType = row.getValue("PropertyType");
@@ -224,18 +228,18 @@ results.rows().keys().parallel().forEach(year -> {
     }).rows().groupBy("City").forEach(0, (groupKey, group) -> {
         //Group row filtered frame so we can compute median prices in selected cities
         final String city = groupKey.item(0);
-        final double priceStat = group.colAt("PricePaid").stats().median();
-        results.data().setDouble(year, city, priceStat);
+        final double priceStat = group.col("PricePaid").stats().median();
+        results.setDouble(year, city, priceStat);
     });
 });
 
 //Map row keys to LocalDates, and map values to be percentage changes from start date
 final DataFrame<LocalDate,String> plotFrame = results.mapToDoubles(v -> {
-    final double firstValue = v.col().getDouble(0);
-    final double currentValue = v.getDouble();
+    var firstValue = v.col().getDoubleAt(0);
+    var currentValue = v.getDouble();
     return (currentValue / firstValue - 1d) * 100d;
 }).rows().mapKeys(row -> {
-    final Year year = row.key();
+    var year = row.key();
     return LocalDate.of(year.getValue(), 12, 31);
 });
 
@@ -249,6 +253,7 @@ Chart.create().withLinePlot(plotFrame, chart -> {
     chart.plot().axes().range(0).format().withPattern("0.##'%';-0.##'%'");
     chart.plot().style("LONDON").withColor(Color.BLACK);
     chart.legend().on().bottom();
+    chart.writerPng(new File("./docs/images/uk-house-prices.png"), 845, 480, true);
     chart.show();
 });
 ```
@@ -261,7 +266,7 @@ any nominal price reduction, there was certainly a fairly severe correction in t
 depreciated heavily against these currencies during the GFC.
 
 <p align="center">
-    <img class="chart" src="http://www.zavtech.com/morpheus/docs/images/uk-house-prices.png"/>
+    <img class="chart" src="./images/uk-house-prices.png"/>
 </p>
 
 ### Visualization
@@ -272,58 +277,78 @@ to follow by popular demand). This design makes it possible to generate interact
 charts as well as HTML5 browser based charts via the same programmatic interface. For more details on how to use this API, 
 see the section on visualization [here](./viz/charts/overview/), and the code [here](https://github.com/zavtech/morpheus-viz).
 
-<table width="100%" border="0">
-    <tr style="background-color:white;">
-        <td style="background-color:white;"><img class="smallChart" src="http://www.zavtech.com/morpheus/docs/images/gallery/chart-1.png"/></td>
-        <td style="background-color:white;"><img class="smallChart" src="http://www.zavtech.com/morpheus/docs/images/gallery/chart-2.png"/></td>
-    </tr>
-    <tr style="background-color:white;">
-        <td style="background-color:white;"><img class="smallChart" src="http://www.zavtech.com/morpheus/docs/images/gallery/chart-3.png"/></td>
-        <td style="background-color:white;"><img class="smallChart" src="http://www.zavtech.com/morpheus/docs/images/gallery/chart-4.png"/></td>
-    </tr>
-    <tr style="background-color:white;">
-        <td style="background-color:white;"><img class="smallChart" src="http://www.zavtech.com/morpheus/docs/images/gallery/chart-5.png"/></td>
-        <td style="background-color:white;"><img class="smallChart" src="http://www.zavtech.com/morpheus/docs/images/gallery/chart-6.png"/></td>
-    </tr>
-    <tr style="background-color:white;">
-        <td style="background-color:white;"><img class="smallChart" src="http://www.zavtech.com/morpheus/docs/images/gallery/chart-7.png"/></td>
-        <td style="background-color:white;"><img class="smallChart" src="http://www.zavtech.com/morpheus/docs/images/gallery/chart-8.png"/></td>
-    </tr>
-    <tr style="background-color:white;">
-        <td style="background-color:white;"><img class="smallChart" src="http://www.zavtech.com/morpheus/docs/images/gallery/chart-9.png"/></td>
-        <td style="background-color:white;"><img class="smallChart" src="http://www.zavtech.com/morpheus/docs/images/gallery/chart-10.png"/></td>
-    </tr>
-    <tr style="background-color:white;">
-        <td style="background-color:white;"><img class="smallChart" src="http://www.zavtech.com/morpheus/docs/images/gallery/chart-11.png"/></td>
-        <td style="background-color:white;"><img class="smallChart" src="http://www.zavtech.com/morpheus/docs/images/gallery/chart-12.png"/></td>
-    </tr>
-    <tr style="background-color:white;">
-        <td style="background-color:white;"><img class="smallChart" src="http://www.zavtech.com/morpheus/docs/images/gallery/chart-13.png"/></td>
-        <td style="background-color:white;"><img class="smallChart" src="http://www.zavtech.com/morpheus/docs/images/gallery/chart-14.png"/></td>
-    </tr>
-    <tr style="background-color:white;">
-        <td style="background-color:white;"><img class="smallChart" src="http://www.zavtech.com/morpheus/docs/images/gallery/chart-15.png"/></td>
-        <td style="background-color:white;"><img class="smallChart" src="http://www.zavtech.com/morpheus/docs/images/gallery/chart-16.png"/></td>
-    </tr>
-    <tr style="background-color:white;">
-        <td style="background-color:white;"><img class="smallChart" src="http://www.zavtech.com/morpheus/docs/images/gallery/chart-17.png"/></td>
-        <td style="background-color:white;"><img class="smallChart" src="http://www.zavtech.com/morpheus/docs/images/gallery/chart-18.png"/></td>
-    </tr>
-    <tr style="background-color:white;">
-        <td style="background-color:white;"><img class="smallChart" src="http://www.zavtech.com/morpheus/docs/images/gallery/chart-19.png"/></td>
-        <td style="background-color:white;"><img class="smallChart" src="http://www.zavtech.com/morpheus/docs/images/gallery/chart-20.png"/></td>
-    </tr>
-    <tr style="background-color:white;">
-        <td style="background-color:white;"><img class="smallChart" src="http://www.zavtech.com/morpheus/docs/images/gallery/chart-21.png"/></td>
-        <td style="background-color:white;"><img class="smallChart" src="http://www.zavtech.com/morpheus/docs/images/gallery/chart-22.png"/></td>
-    </tr>
-</table>
+<div class="smallChart">
+    <img class="smallChart" src="./images/gallery/chart-1.png"/>
+</div>
+<div class="smallChart">
+    <img class="smallChart" src="./images/gallery/chart-2.png"/>
+</div>
+<div class="smallChart">
+    <img class="smallChart" src="./images/gallery/chart-3.png"/>
+</div>
+<div class="smallChart">
+    <img class="smallChart" src="./images/gallery/chart-4.png"/>
+</div>
+<div class="smallChart">
+    <img class="smallChart" src="./images/gallery/chart-5.png"/>
+</div>
+<div class="smallChart">
+    <img class="smallChart" src="./images/gallery/chart-6.png"/>
+</div>
+<div class="smallChart">
+    <img class="smallChart" src="./images/gallery/chart-7.png"/>
+</div>
+<div class="smallChart">
+    <img class="smallChart" src="./images/gallery/chart-8.png"/>
+</div>
+<div class="smallChart">
+    <img class="smallChart" src="./images/gallery/chart-9.png"/>
+</div>
+<div class="smallChart">
+    <img class="smallChart" src="./images/gallery/chart-10.png"/>
+</div>
+<div class="smallChart">
+    <img class="smallChart" src="./images/gallery/chart-11.png"/>
+</div>
+<div class="smallChart">
+    <img class="smallChart" src="./images/gallery/chart-12.png"/>
+</div>
+<div class="smallChart">
+    <img class="smallChart" src="./images/gallery/chart-13.png"/>
+</div>
+<div class="smallChart">
+    <img class="smallChart" src="./images/gallery/chart-14.png"/>
+</div>
+<div class="smallChart">
+    <img class="smallChart" src="./images/gallery/chart-15.png"/>
+</div>
+<div class="smallChart">
+    <img class="smallChart" src="./images/gallery/chart-16.png"/>
+</div>
+<div class="smallChart">
+    <img class="smallChart" src="./images/gallery/chart-17.png"/>
+</div>
+<div class="smallChart">
+    <img class="smallChart" src="./images/gallery/chart-18.png"/>
+</div>
+<div class="smallChart">
+    <img class="smallChart" src="./images/gallery/chart-19.png"/>
+</div>
+<div class="smallChart">
+    <img class="smallChart" src="./images/gallery/chart-20.png"/>
+</div>
+<div class="smallChart">
+    <img class="smallChart" src="./images/gallery/chart-21.png"/>
+</div>
+<div class="smallChart">
+    <img class="smallChart" src="./images/gallery/chart-22.png"/>
+</div>
 
 ### Maven Artifacts
 
-Morpheus is published to Maven Central so it can be easily added as a dependency in your build tool of choice. The codebase is currently
-divided into 5 repositories to allow each module to be evolved independently. The core module, which is aptly named [morpheus-core](https://github.com/zavtech/morpheus-core),
-is the foundational library on which all other modules depend. The various Maven artifacts are as follows: 
+Morpheus is published to Maven Central so it can be easily added as a dependency in your build tool of choice. 
+The codebase is currently divided into 5 modules to allow each module to be evolved independently. The various
+ Maven artifacts are as follows: 
 
 **Morpheus Core**
 
@@ -331,7 +356,7 @@ The [foundational](https://github.com/zavtech/morpheus-core) library that contai
 
 ```xml
 <dependency>
-    <groupId>com.zavtech</groupId>
+    <groupId>com.d3xsystems</groupId>
     <artifactId>morpheus-core</artifactId>
     <version>${VERSION}</version>
 </dependency>
@@ -343,7 +368,7 @@ The [visualization](https://github.com/zavtech/morpheus-viz) components to displ
 
 ```xml
 <dependency>
-    <groupId>com.zavtech</groupId>
+    <groupId>com.d3xsystems</groupId>
     <artifactId>morpheus-viz</artifactId>
     <version>${VERSION}</version>
 </dependency>
@@ -355,7 +380,7 @@ The [adapter](https://github.com/zavtech/morpheus-quandl) to load data from [Qua
 
 ```xml
 <dependency>
-    <groupId>com.zavtech</groupId>
+    <groupId>com.d3xsystems</groupId>
     <artifactId>morpheus-quandl</artifactId>
     <version>${VERSION}</version>
 </dependency>
@@ -367,7 +392,7 @@ The [adapter](https://github.com/zavtech/morpheus-google) to load data from [Goo
 
 ```xml
 <dependency>
-    <groupId>com.zavtech</groupId>
+    <groupId>com.d3xsystems</groupId>
     <artifactId>morpheus-google</artifactId>
     <version>${VERSION}</version>
 </dependency>
@@ -379,7 +404,7 @@ The [adapter](https://github.com/zavtech/morpheus-yahoo) to load data from [Yaho
 
 ```xml
 <dependency>
-    <groupId>com.zavtech</groupId>
+    <groupId>com.d3xsystems</groupId>
     <artifactId>morpheus-yahoo</artifactId>
     <version>${VERSION}</version>
 </dependency>
@@ -400,3 +425,7 @@ A Continuous Integration build server can be accessed [here](http://zavnas.com/j
 ### License
 
 Morpheus is released under the [Apache Software Foundation License Version 2](https://www.apache.org/licenses/LICENSE-2.0).
+
+<p align="center">
+    <img style="background: none; border: none;" src="images/morpheus-logo1.png"/>
+</p>
