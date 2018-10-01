@@ -34,11 +34,11 @@ public abstract class DataFrameFactory {
     private static Throwable throwable;
     private static DataFrameFactory instance;
 
-    /**
+    /*
      * Static initializer
      */
     static {
-        final String defaultClassName = "com.zavtech.morpheus.reference.XDataFrameFactory";
+        final String defaultClassName = "com.d3x.morpheus.reference.XDataFrameFactory";
         try {
             final String className = System.getProperty("dataFrameFactory", defaultClassName);
             final Class factoryClass = Class.forName(className);
