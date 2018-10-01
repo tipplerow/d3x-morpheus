@@ -1,7 +1,4 @@
 <div>
-    <p align="right">
-        <img src="https://www.d3xsystems.com/images/common/d3x.svg" height="40px" align="right"/>
-    </p>
     <p align="left">
         <img src="https://www.d3xsystems.com/images/common/morpheus-logo.svg" height="50px" align="left"/>
     </p>
