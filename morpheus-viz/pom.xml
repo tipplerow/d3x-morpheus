@@ -23,7 +23,7 @@
     <parent>
         <groupId>com.d3xsystems</groupId>
         <artifactId>morpheus</artifactId>
-        <version>0.9.23</version>
+        <version>1.0.1</version>
     </parent>
 
     <name>morpheus-viz</name>
