@@ -1,5 +1,9 @@
-<img src="https://www.d3xsystems.com/images/common/morpheus-logo.svg" height="50px" align="left"/>
-<hr>
+<p align="center">
+    <img src="https://www.d3xsystems.com/images/common/d3x.svg" height="40px"/>
+</p>
+<p align="center">
+    <img src="https://www.d3xsystems.com/images/common/morpheus-logo.svg" height="50px" align="left"/>
+</p>
 
 ### Introduction
 
@@ -401,5 +405,5 @@ A Continuous Integration build server can be accessed [here](http://zavnas.com/j
 Morpheus is released under the [Apache Software Foundation License Version 2](https://www.apache.org/licenses/LICENSE-2.0).
 
 <p align="center">
-    <img src="https://www.d3xsystems.com/images/common/d3x.svg" height="100px" align="right"/>
+    <img src="https://www.d3xsystems.com/images/common/d3x.svg" height="100px"/>
 </p>
