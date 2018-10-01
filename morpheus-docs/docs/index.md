@@ -102,17 +102,17 @@ and then creates a scatter chart with the regression line clearly displayed.
 <?prettify?>
 ```java
 //Load the data
-DataFrame<Integer,String> data = DataFrame.read().csv(options -> {
+var data = DataFrame.read().csv(options -> {
     options.setResource("http://zavtech.com/data/samples/cars93.csv");
     options.setExcludeColumnIndexes(0);
 });
 
-//Run OLS regression and plot 
-String regressand = "Horsepower";
-String regressor = "EngineSize";
+//Run OLS regression and plot
+var regressand = "Horsepower";
+var regressor = "EngineSize";
 data.regress().ols(regressand, regressor, true, model -> {
-    System.out.println(model);
-    DataFrame<Integer,String> xy = data.cols().select(regressand, regressor);
+    IO.println(model);
+    var xy = data.cols().select(regressand, regressor);
     Chart.create().withScatterPlot(xy, false, regressor, chart -> {
         chart.title().withText(regressand + " regressed on " + regressor);
         chart.subtitle().withText("Single Variable Linear Regression");
@@ -122,6 +122,7 @@ data.regress().ols(regressand, regressor, true, model -> {
         chart.plot().axes().domain().format().withPattern("0.00;-0.00");
         chart.plot().axes().range(0).label().withText(regressand);
         chart.plot().axes().range(0).format().withPattern("0;-0");
+        chart.writerPng(new File("./docs/images/ols/data-frame-ols.png"), 845, 450, true);
         chart.show();
     });
     return Optional.empty();
@@ -200,7 +201,7 @@ parallel processing to load and process the data by calling `results.rows().keys
 <?prettify?>
 ```java
 //Create a data frame to capture the median prices of Apartments in the UK'a largest cities
-DataFrame<Year,String> results = DataFrame.ofDoubles(
+var results = DataFrame.ofDoubles(
     Range.of(1995, 2015).map(Year::of),
     Array.of("LONDON", "BIRMINGHAM", "SHEFFIELD", "LEEDS", "LIVERPOOL", "MANCHESTER")
 );
@@ -208,7 +209,7 @@ DataFrame<Year,String> results = DataFrame.ofDoubles(
 //Process yearly data in parallel to leverage all CPU cores
 results.rows().keys().parallel().forEach(year -> {
     System.out.printf("Loading UK house prices for %s...\n", year);
-    DataFrame<Integer,String> prices = loadHousePrices(year);
+    var prices = loadHousePrices(year);
     prices.rows().select(row -> {
         //Filter rows to include only apartments in the relevant cities
         final String propType = row.getValue("PropertyType");
@@ -218,18 +219,18 @@ results.rows().keys().parallel().forEach(year -> {
     }).rows().groupBy("City").forEach(0, (groupKey, group) -> {
         //Group row filtered frame so we can compute median prices in selected cities
         final String city = groupKey.item(0);
-        final double priceStat = group.colAt("PricePaid").stats().median();
-        results.data().setDouble(year, city, priceStat);
+        final double priceStat = group.col("PricePaid").stats().median();
+        results.setDouble(year, city, priceStat);
     });
 });
 
 //Map row keys to LocalDates, and map values to be percentage changes from start date
 final DataFrame<LocalDate,String> plotFrame = results.mapToDoubles(v -> {
-    final double firstValue = v.col().getDouble(0);
-    final double currentValue = v.getDouble();
+    var firstValue = v.col().getDoubleAt(0);
+    var currentValue = v.getDouble();
     return (currentValue / firstValue - 1d) * 100d;
 }).rows().mapKeys(row -> {
-    final Year year = row.key();
+    var year = row.key();
     return LocalDate.of(year.getValue(), 12, 31);
 });
 
@@ -243,6 +244,7 @@ Chart.create().withLinePlot(plotFrame, chart -> {
     chart.plot().axes().range(0).format().withPattern("0.##'%';-0.##'%'");
     chart.plot().style("LONDON").withColor(Color.BLACK);
     chart.legend().on().bottom();
+    chart.writerPng(new File("./docs/images/uk-house-prices.png"), 845, 480, true);
     chart.show();
 });
 ```
@@ -335,9 +337,9 @@ see the section on visualization [here](./viz/charts/overview/), and the code [h
 
 ### Maven Artifacts
 
-Morpheus is published to Maven Central so it can be easily added as a dependency in your build tool of choice. The codebase is currently
-divided into 5 repositories to allow each module to be evolved independently. The core module, which is aptly named [morpheus-core](https://github.com/zavtech/morpheus-core),
-is the foundational library on which all other modules depend. The various Maven artifacts are as follows: 
+Morpheus is published to Maven Central so it can be easily added as a dependency in your build tool of choice. 
+The codebase is currently divided into 5 modules to allow each module to be evolved independently. The various
+ Maven artifacts are as follows: 
 
 **Morpheus Core**
 
@@ -345,7 +347,7 @@ The [foundational](https://github.com/zavtech/morpheus-core) library that contai
 
 ```xml
 <dependency>
-    <groupId>com.zavtech</groupId>
+    <groupId>com.d3xsystems</groupId>
     <artifactId>morpheus-core</artifactId>
     <version>${VERSION}</version>
 </dependency>
@@ -357,7 +359,7 @@ The [visualization](https://github.com/zavtech/morpheus-viz) components to displ
 
 ```xml
 <dependency>
-    <groupId>com.zavtech</groupId>
+    <groupId>com.d3xsystems</groupId>
     <artifactId>morpheus-viz</artifactId>
     <version>${VERSION}</version>
 </dependency>
@@ -369,7 +371,7 @@ The [adapter](https://github.com/zavtech/morpheus-quandl) to load data from [Qua
 
 ```xml
 <dependency>
-    <groupId>com.zavtech</groupId>
+    <groupId>com.d3xsystems</groupId>
     <artifactId>morpheus-quandl</artifactId>
     <version>${VERSION}</version>
 </dependency>
@@ -381,7 +383,7 @@ The [adapter](https://github.com/zavtech/morpheus-google) to load data from [Goo
 
 ```xml
 <dependency>
-    <groupId>com.zavtech</groupId>
+    <groupId>com.d3xsystems</groupId>
     <artifactId>morpheus-google</artifactId>
     <version>${VERSION}</version>
 </dependency>
@@ -393,7 +395,7 @@ The [adapter](https://github.com/zavtech/morpheus-yahoo) to load data from [Yaho
 
 ```xml
 <dependency>
-    <groupId>com.zavtech</groupId>
+    <groupId>com.d3xsystems</groupId>
     <artifactId>morpheus-yahoo</artifactId>
     <version>${VERSION}</version>
 </dependency>
