@@ -19,7 +19,7 @@
 
   <test name="Quandl Basic Tests">
     <packages>
-      <package name="com.d3x.morpheus.quandl.*"/>
+      <package name="com.com.d3x.morpheus.quandl.*"/>
     </packages>
   </test>
 

@@ -23,8 +23,6 @@ import com.zavtech.morpheus.frame.DataFrameSink;
 import com.zavtech.morpheus.frame.DataFrameWrite;
 import com.zavtech.morpheus.sink.CsvSink;
 import com.zavtech.morpheus.sink.CsvSinkOptions;
-import com.zavtech.morpheus.sink.DbSink;
-import com.zavtech.morpheus.sink.DbSinkOptions;
 
 /**
  * The reference implementation of the DataFrameWrite interface to enable DataFrames to be written out to a storage device.
@@ -43,11 +41,6 @@ class XDataFrameWrite<R,C> implements DataFrameWrite<R,C> {
      */
     XDataFrameWrite(DataFrame<R,C> frame) {
         this.frame = frame;
-    }
-
-    @Override
-    public final void db(Consumer<DbSinkOptions<R,C>> configurator) {
-        this.to(new DbSink<>(), configurator);
     }
 
     @Override

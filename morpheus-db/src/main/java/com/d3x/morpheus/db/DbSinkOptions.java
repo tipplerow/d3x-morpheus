@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2014-2017 Xavier Witdouck
+/*
+ * Copyright (C) 2014-2018 D3X Systems - All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.zavtech.morpheus.sink;
+package com.d3x.morpheus.db;
 
 import java.sql.Connection;
 import java.sql.Date;

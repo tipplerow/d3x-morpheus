@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2014-2017 Xavier Witdouck
+/*
+ * Copyright (C) 2014-2018 D3X Systems - All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.zavtech.morpheus.io;
+package com.d3x.morpheus.db;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -53,6 +53,8 @@ public class DbTests {
 
     private enum DbType { H2, HSQL, SQLITE }
 
+    private DbSink dbSink = new DbSink();
+    private DbSource dbSource = new DbSource();
     private Map<String,DataSource> dataSourceMap = new LinkedHashMap<>();
 
 
@@ -166,7 +168,7 @@ public class DbTests {
 
     @Test(dataProvider="readDatabases")
     public void testRead1(String dbName) {
-        final DataFrame<Integer,String> frame = DataFrame.read().db(options -> {
+        final DataFrame<Integer,String> frame = dbSource.read(options -> {
             options.withConnection(dataSourceMap.get(dbName));
             options.withSql("select * from \"ProcessLog\"");
         });
@@ -183,7 +185,7 @@ public class DbTests {
 
     @Test(dataProvider="readDatabases")
     public void testRead2(String dbName) {
-        final DataFrame<String,String> frame = DataFrame.read().db(options -> {
+        final DataFrame<String,String> frame = dbSource.read(options -> {
             options.withConnection(dataSourceMap.get(dbName));
             options.withSql("select \"Ticker\", \"Fund Name\", \"Issuer\", \"AUM\", \"P/E\" from \"ETF\"");
         });
@@ -200,7 +202,7 @@ public class DbTests {
 
     @Test(dataProvider="readDatabases")
     public void testRead3(String dbName) {
-        final DataFrame<Integer,String> frame = DataFrame.read().db(options -> {
+        final DataFrame<Integer,String> frame = dbSource.read(options -> {
             options.withConnection(dataSourceMap.get(dbName));
             options.withSql("select * from \"TestTable\"");
         });
@@ -237,7 +239,7 @@ public class DbTests {
         });
 
         frame.rows().select(row -> row.key().equalsIgnoreCase("TDV")).out().print();
-        frame.write().db(options -> {
+        dbSink.write(frame, options -> {
             options.setConnection(source);
             options.setTableName("ETF");
             options.setRowKeyMapping("Ticker", String.class, Function1.toValue(v -> v));
@@ -263,7 +265,7 @@ public class DbTests {
             options.setColumnType("KernelModeTime", Long.class);
         });
 
-        frame.write().db(options -> {
+        dbSink.write(frame, options -> {
             options.setBatchSize(1000);
             options.setAutoIncrementColumnName("RecordId");
             options.setTableName("ProcessLog");
@@ -277,7 +279,8 @@ public class DbTests {
 
         final DataFrame<Integer,String> frame1 = createRandomFrame(10);
 
-        frame1.write().db(options -> {
+        DbSink sink = new DbSink();
+        sink.write(frame1, options -> {
             options.setBatchSize(1000);
             options.setTableName("RandomTable");
             options.setConnection(dataSourceMap.get(dbName));
@@ -285,7 +288,7 @@ public class DbTests {
         });
 
         final AtomicInteger counter = new AtomicInteger();
-        final DataFrame<Integer,String> frame2 = DataFrame.read().db(options -> {
+        final DataFrame<Integer,String> frame2 = dbSource.read(options -> {
             options.withConnection(dataSourceMap.get(dbName));
             options.withSql("select * from \"RandomTable\"");
             options.withExcludeColumns("RecordId");

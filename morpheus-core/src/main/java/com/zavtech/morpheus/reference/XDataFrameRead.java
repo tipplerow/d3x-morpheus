@@ -39,7 +39,6 @@ class XDataFrameRead implements DataFrameRead {
      */
     static {
         DataFrameSource.register(new CsvSource<>());
-        DataFrameSource.register(new DbSource<>());
     }
 
     /**
@@ -73,11 +72,5 @@ class XDataFrameRead implements DataFrameRead {
     @SuppressWarnings("unchecked")
     public <R> DataFrame<R,String> csv(Consumer<CsvSourceOptions<R>> configurator) {
         return DataFrameSource.lookup(CsvSource.class).read(configurator);
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public <R> DataFrame<R, String> db(Consumer<DbSourceOptions<R>> configurator) {
-        return DataFrameSource.lookup(DbSource.class).read(configurator);
     }
 }

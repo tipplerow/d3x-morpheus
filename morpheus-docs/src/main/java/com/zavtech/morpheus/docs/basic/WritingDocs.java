@@ -31,6 +31,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.zip.GZIPOutputStream;
 
+import com.d3x.morpheus.db.DbSink;
 import org.testng.annotations.Test;
 
 import com.zavtech.morpheus.frame.DataFrame;
@@ -104,6 +105,7 @@ public class WritingDocs {
 
     @Test()
     public void writeJson() {
+        /*
         DataFrame<LocalDate,String> frame = frame();
         frame.write().json(options -> {
             options.setFile("/Users/witdxav/morpheus/tests/DataFrame-1.json");
@@ -115,6 +117,7 @@ public class WritingDocs {
                 formats.setPrinter("Column-3", Printer.<Month>forObject(v -> v.name().toLowerCase()));
             });
         });
+        */
     }
 
 
@@ -122,7 +125,8 @@ public class WritingDocs {
     public void writeDb() throws Exception {
         DataFrame<LocalDate,String> frame = frame();
         Class.forName("org.hsqldb.jdbcDriver");
-        frame.write().db(options -> {
+        DbSink dbSink = new DbSink();
+        dbSink.write(frame, options -> {
             options.setBatchSize(1000);
             options.setTableName("TestTable");
             options.setConnection("jdbc:hsqldb:/Users/witdxav/morpheus/tests/DataFrame_3.db", "sa", null);
