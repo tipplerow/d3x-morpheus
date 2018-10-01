@@ -5,10 +5,9 @@
     <div>
         <img src="https://www.d3xsystems.com/images/common/d3x.svg" height="40px" align="right"/>
     </div>
-    <div>
-        <hr>
-    </div>
 <div>
+
+<hr>
 
 ### Introduction
 
