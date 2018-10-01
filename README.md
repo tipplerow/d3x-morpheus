@@ -1,13 +1,11 @@
-<table border="0">
-    <tr>
-        <td>
-            <img src="https://www.d3xsystems.com/images/common/morpheus-logo.svg" height="50px"/>
-        </td>
-        <td>
-            <img src="https://www.d3xsystems.com/images/common/d3x.svg" height="40px"/>
-        </td>
-    <tr>
-</table>
+<div style="width:100%">
+    <div style="width:50%; float:left">
+        <img src="https://www.d3xsystems.com/images/common/morpheus-logo.svg" height="50px"/>
+    </div>
+    <div style="width:50%; float:left">
+        <img src="https://www.d3xsystems.com/images/common/d3x.svg" height="40px"/>
+    </div>
+</div>
 
 ### Introduction
 
@@ -236,7 +234,7 @@ results.rows().keys().parallel().forEach(year -> {
 });
 
 //Map row keys to LocalDates, and map values to be percentage changes from start date
-final DataFrame<LocalDate,String> plotFrame = results.mapToDoubles(v -> {
+var plotFrame = results.mapToDoubles(v -> {
     var firstValue = v.col().getDoubleAt(0);
     var currentValue = v.getDouble();
     return (currentValue / firstValue - 1d) * 100d;
@@ -279,72 +277,52 @@ to follow by popular demand). This design makes it possible to generate interact
 charts as well as HTML5 browser based charts via the same programmatic interface. For more details on how to use this API, 
 see the section on visualization [here](./viz/charts/overview/), and the code [here](https://github.com/zavtech/morpheus-viz).
 
-<div class="smallChart">
-    <img class="smallChart" src="./morpheus-docs/docs/images/gallery/chart-1.png"/>
-</div>
-<div class="smallChart">
-    <img class="smallChart" src="./morpheus-docs/docs/images/gallery/chart-2.png"/>
-</div>
-<div class="smallChart">
-    <img class="smallChart" src="./morpheus-docs/docs/images/gallery/chart-3.png"/>
-</div>
-<div class="smallChart">
-    <img class="smallChart" src="./morpheus-docs/docs/images/gallery/chart-4.png"/>
-</div>
-<div class="smallChart">
-    <img class="smallChart" src="./morpheus-docs/docs/images/gallery/chart-5.png"/>
-</div>
-<div class="smallChart">
-    <img class="smallChart" src="./morpheus-docs/docs/images/gallery/chart-6.png"/>
-</div>
-<div class="smallChart">
-    <img class="smallChart" src="./morpheus-docs/docs/images/gallery/chart-7.png"/>
-</div>
-<div class="smallChart">
-    <img class="smallChart" src="./morpheus-docs/docs/images/gallery/chart-8.png"/>
-</div>
-<div class="smallChart">
-    <img class="smallChart" src="./morpheus-docs/docs/images/gallery/chart-9.png"/>
-</div>
-<div class="smallChart">
-    <img class="smallChart" src="./morpheus-docs/docs/images/gallery/chart-10.png"/>
-</div>
-<div class="smallChart">
-    <img class="smallChart" src="./morpheus-docs/docs/images/gallery/chart-11.png"/>
-</div>
-<div class="smallChart">
-    <img class="smallChart" src="./morpheus-docs/docs/images/gallery/chart-12.png"/>
-</div>
-<div class="smallChart">
-    <img class="smallChart" src="./morpheus-docs/docs/images/gallery/chart-13.png"/>
-</div>
-<div class="smallChart">
-    <img class="smallChart" src="./morpheus-docs/docs/images/gallery/chart-14.png"/>
-</div>
-<div class="smallChart">
-    <img class="smallChart" src="./morpheus-docs/docs/images/gallery/chart-15.png"/>
-</div>
-<div class="smallChart">
-    <img class="smallChart" src="./morpheus-docs/docs/images/gallery/chart-16.png"/>
-</div>
-<div class="smallChart">
-    <img class="smallChart" src="./morpheus-docs/docs/images/gallery/chart-17.png"/>
-</div>
-<div class="smallChart">
-    <img class="smallChart" src="./morpheus-docs/docs/images/gallery/chart-18.png"/>
-</div>
-<div class="smallChart">
-    <img class="smallChart" src="./morpheus-docs/docs/images/gallery/chart-19.png"/>
-</div>
-<div class="smallChart">
-    <img class="smallChart" src="./morpheus-docs/docs/images/gallery/chart-20.png"/>
-</div>
-<div class="smallChart">
-    <img class="smallChart" src="./morpheus-docs/docs/images/gallery/chart-21.png"/>
-</div>
-<div class="smallChart">
-    <img class="smallChart" src="./morpheus-docs/docs/images/gallery/chart-22.png"/>
-</div>
+<table width="100%" border="0">
+    <tr style="background-color:white;">
+        <td style="background-color:white;"><img class="smallChart" src="./morpheus-docs/docs/images/gallery/chart-1.png"/></td>
+        <td style="background-color:white;"><img class="smallChart" src="./morpheus-docs/docs/images/gallery/chart-2.png"/></td>
+    </tr>
+    <tr style="background-color:white;">
+        <td style="background-color:white;"><img class="smallChart" src="./morpheus-docs/docs/images/gallery/chart-3.png"/></td>
+        <td style="background-color:white;"><img class="smallChart" src="./morpheus-docs/docs/images/gallery/chart-4.png"/></td>
+    </tr>
+    <tr style="background-color:white;">
+        <td style="background-color:white;"><img class="smallChart" src="./morpheus-docs/docs/images/gallery/chart-5.png"/></td>
+        <td style="background-color:white;"><img class="smallChart" src="./morpheus-docs/docs/images/gallery/chart-6.png"/></td>
+    </tr>
+    <tr style="background-color:white;">
+        <td style="background-color:white;"><img class="smallChart" src="./morpheus-docs/docs/images/gallery/chart-7.png"/></td>
+        <td style="background-color:white;"><img class="smallChart" src="./morpheus-docs/docs/images/gallery/chart-8.png"/></td>
+    </tr>
+    <tr style="background-color:white;">
+        <td style="background-color:white;"><img class="smallChart" src="./morpheus-docs/docs/images/gallery/chart-9.png"/></td>
+        <td style="background-color:white;"><img class="smallChart" src="./morpheus-docs/docs/images/gallery/chart-10.png"/></td>
+    </tr>
+    <tr style="background-color:white;">
+        <td style="background-color:white;"><img class="smallChart" src="./morpheus-docs/docs/images/gallery/chart-11.png"/></td>
+        <td style="background-color:white;"><img class="smallChart" src="./morpheus-docs/docs/images/gallery/chart-12.png"/></td>
+    </tr>
+    <tr style="background-color:white;">
+        <td style="background-color:white;"><img class="smallChart" src="./morpheus-docs/docs/images/gallery/chart-13.png"/></td>
+        <td style="background-color:white;"><img class="smallChart" src="./morpheus-docs/docs/images/gallery/chart-14.png"/></td>
+    </tr>
+    <tr style="background-color:white;">
+        <td style="background-color:white;"><img class="smallChart" src="./morpheus-docs/docs/images/gallery/chart-15.png"/></td>
+        <td style="background-color:white;"><img class="smallChart" src="./morpheus-docs/docs/images/gallery/chart-16.png"/></td>
+    </tr>
+    <tr style="background-color:white;">
+        <td style="background-color:white;"><img class="smallChart" src="./morpheus-docs/docs/images/gallery/chart-17.png"/></td>
+        <td style="background-color:white;"><img class="smallChart" src="./morpheus-docs/docs/images/gallery/chart-18.png"/></td>
+    </tr>
+    <tr style="background-color:white;">
+        <td style="background-color:white;"><img class="smallChart" src="./morpheus-docs/docs/images/gallery/chart-19.png"/></td>
+        <td style="background-color:white;"><img class="smallChart" src="./morpheus-docs/docs/images/gallery/chart-20.png"/></td>
+    </tr>
+    <tr style="background-color:white;">
+        <td style="background-color:white;"><img class="smallChart" src="./morpheus-docs/docs/images/gallery/chart-21.png"/></td>
+        <td style="background-color:white;"><img class="smallChart" src="./morpheus-docs/docs/images/gallery/chart-22.png"/></td>
+    </tr>
+</table>
 
 ### Maven Artifacts
 
