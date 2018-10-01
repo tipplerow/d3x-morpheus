@@ -1,6 +1,8 @@
-<div>
-    <img src="https://www.d3xsystems.com/images/common/morpheus-logo.svg" height="50px" align="left"/>
-    <img src="https://www.d3xsystems.com/images/common/d3x.svg" height="40px" align="right"/>
+<div class="row">
+    <div class="col-md-12">
+        <img src="https://www.d3xsystems.com/images/common/morpheus-logo.svg" height="50px" align="left"/>
+        <img src="https://www.d3xsystems.com/images/common/d3x.svg" height="40px" align="right"/>
+    </div>
 </div>
 
 ### Introduction
