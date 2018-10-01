@@ -1,11 +1,15 @@
 <div>
     <p align="right">
-        <img src="https://www.d3xsystems.com/images/common/d3x.svg" height="40px"/>
+        <a href="https://www.d3xsystems.com/morpheus">
+            <img src="https://www.d3xsystems.com/images/common/d3x.svg" height="40px"/>
+        </a>
     </p>
 </div>
 <div>
     <p align="left">
-        <img src="https://www.d3xsystems.com/images/common/morpheus-logo.svg" height="50px"/>
+        <a href="https://www.d3xsystems.com">
+            <img src="https://www.d3xsystems.com/images/common/morpheus-logo.svg" height="50px"/>
+        </a>
     </p>
 </div>
 
