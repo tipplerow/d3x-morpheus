@@ -40,13 +40,13 @@
         <dependency>
             <groupId>com.d3xsystems</groupId>
             <artifactId>d3x-core-http-client</artifactId>
-            <version>1.0.1</version>
+            <version>1.0.10</version>
         </dependency>
 
         <dependency>
             <groupId>com.d3xsystems</groupId>
             <artifactId>d3x-core-util</artifactId>
-            <version>1.0.1</version>
+            <version>1.0.10</version>
         </dependency>
 
     </dependencies>
