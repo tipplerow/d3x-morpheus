@@ -45,7 +45,7 @@ import java.util.zip.ZipFile;
 import com.d3x.core.http.client.HttpClient;
 import com.d3x.core.http.client.HttpHeader;
 import com.d3x.core.http.client.HttpResponse;
-import com.d3x.core.util.Json;
+import com.d3x.core.json.Json;
 import com.d3x.morpheus.frame.DataFrame;
 import com.d3x.morpheus.util.IO;
 import com.google.gson.Gson;

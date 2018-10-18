@@ -45,7 +45,7 @@
 
         <dependency>
             <groupId>com.d3xsystems</groupId>
-            <artifactId>d3x-core-util</artifactId>
+            <artifactId>d3x-core-json</artifactId>
             <version>1.0.10</version>
         </dependency>
 
