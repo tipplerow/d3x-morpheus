@@ -153,27 +153,27 @@ population \\(\beta\\), or otherwise stated \\( E[ \hat{\beta} ] = \beta \\). Th
 | Assumption 5 | The errors are uncorrelated between observations                                                                                                  |
 | Assumption 6 | The errors are normally distributed, and independent and identically distributed (iid)                                                            |
 
-#### ** Linear in Parameters **
+#### Linear in Parameters
 
 The first assumption regarding linearity suggests that the dependent variable is a linear function of the independent variables. This does not imply that there
 is a linear relationship between the independent and dependent variables, it only states the the model is linear in parameters. For example, a model of the form
 \\(y = \alpha + \beta x^2 \\) qualifies as being linear in parameters, while \\(y = \alpha + \beta^2 x \\) does not. If the functional form of a  model under
 investigation is not linear in parameters, it can often be transformed so as to render it linear.
 
-#### ** Linearly Independent **
+#### Linearly Independent
 
 The second assumption that there is no perfect [multicollinearity](https://en.wikipedia.org/wiki/Multicollinearity) between the regressors is important, as if
 it exists, the OLS estimator cannot be calculated. Another way of expressing this condition is that one of the independent variables cannot be a function of any 
 of the other independent variables, and therefore the design matrix X must be non-singular, and therefore have full rank.
 
-#### ** Strict exogeneity **
+#### Strict Exogeneity
  
 The third assumption above states that the disturbance term averages out to zero for any given instance of X, which implies that no observations of the independent 
 variables convey any information about the error. Mathematically this is stated as \\( E[ \epsilon | X ] = 0 \\). This assumption is violated if the independent
 variables are [stochastic](https://en.wikipedia.org/wiki/Stochastic_process) in nature, which can arise as a result of [measurement error](https://en.wikipedia.org/wiki/Errors-in-variables_models), or if there is 
 [endogeneity](https://en.wikipedia.org/wiki/Endogeneity_(econometrics)) in the model.
 
-#### ** Spherical Errors **
+#### Spherical Errors
 
 The fourth and fifth assumptions relate to the [covariance matrix](https://en.wikipedia.org/wiki/Covariance_matrix) of the error term, and specifically states 
 that \\(E[ \epsilon \epsilon^T | X] = \sigma^2 I \\). There are two key concepts embedded in this statement, the first is that the disturbance term has uniform 
@@ -223,10 +223,10 @@ library to generate a scatter plot of the data, with **EngineSize** on the x-axi
 
 <?prettify?>
 ```java
-final String y = "Horsepower";
-final String x = "EngineSize";
-final DataFrame<Integer,String> frame = loadCarDataset();
-final DataFrame<Integer,String> xy = frame.cols().select(y, x);
+var y = "Horsepower";
+var x = "EngineSize";
+var frame = loadCarDataset();
+var xy = frame.cols().select(y, x);
 Chart.create().withScatterPlot(xy, false, x, chart -> {
     chart.title().withText(y + " vs " + x);
     chart.plot().style(y).withColor(Color.RED);
@@ -240,7 +240,7 @@ Chart.create().withScatterPlot(xy, false, x, chart -> {
 ```
 
 <p align="center">
-    <img class="chart" src="../../images/ols/data-frame-ols1.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/ols/data-frame-ols1.png"/>
 </p>
 
 The scatter plot certainly appears to suggest that there is a positive relationship between **EngineSize** and **Horsepower**. In addition, it seems somewhat 
@@ -251,11 +251,11 @@ for inspection.
 
 <?prettify?>
 ```java
-DataFrame<Integer,String> frame = loadCarDataset();
-String regressand = "Horsepower";
-String regressor = "EngineSize";
+var frame = loadCarDataset();
+var regressand = "Horsepower";
+var regressor = "EngineSize";
 frame.regress().ols(regressand, regressor, true, model -> {
-    System.out.println(model);
+    IO.println(model);
     return Optional.empty();
 });
 ```
@@ -292,9 +292,9 @@ interface, and provides all the relevant hooks to access the model inputs and ou
 
 <?prettify?>
 ```java
-final String regressand = "Horsepower";
-final String regressor = "EngineSize";
-final DataFrame<Integer,String> frame = loadCarDataset();
+var regressand = "Horsepower";
+var regressor = "EngineSize";
+var frame = loadCarDataset();
 frame.regress().ols(regressand, regressor, true, model -> {
     assert (model.getRegressand().equals(regressand));
     assert (model.getRegressors().size() == 1);
@@ -315,7 +315,7 @@ frame.regress().ols(regressand, regressor, true, model -> {
     assertEquals(model.getInterceptValue(Field.P_VALUE), 0.00003107, 0.0000001);
     assertEquals(model.getInterceptValue(Field.CI_LOWER), 24.73604714, 0.0000001);
     assertEquals(model.getInterceptValue(Field.CI_UPPER), 65.70288719, 0.0000001);
-    System.out.println(model);
+    IO.println(model);
     return Optional.of(model);
 });
 ```
@@ -323,17 +323,17 @@ frame.regress().ols(regressand, regressor, true, model -> {
 Finally, the chart below adds the OLS trendline to the initial scatter plot to get a better sense of how the solution fits the data. 
 
 <p align="center">
-    <img class="chart" src="../../images/ols/data-frame-ols2.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/ols/data-frame-ols2.png"/>
 </p>
 
 The code to generate this chart is as follows:
 
 <?prettify?>
 ```java
-final String regressand = "Horsepower";
-final String regressor = "EngineSize";
-final DataFrame<Integer,String> frame = loadCarDataset();
-final DataFrame<Integer,String> xy = frame.cols().select(regressand, regressor);
+var regressand = "Horsepower";
+var regressor = "EngineSize";
+var frame = loadCarDataset();
+var xy = frame.cols().select(regressand, regressor);
 Chart.create().withScatterPlot(xy, false, regressor, chart -> {
     chart.title().withFont(new Font("Verdana", Font.BOLD, 16));
     chart.title().withText(regressand + " regressed on " + regressor);
@@ -370,12 +370,12 @@ from the population coefficients, while adding white noise scaled according to t
  * @return          the frame of XY values
  */
 DataFrame<Integer,String> sample(double alpha, double beta, double startX, double stepX, double sigma, int n) {
-    final Array<Double> xValues = Array.of(Double.class, n).applyDoubles(v -> startX + v.index() * stepX);
-    final Array<Double> yValues = Array.of(Double.class, n).applyDoubles(v -> {
-        final double yfit = alpha + beta * xValues.getDouble(v.index());
+    var xValues = Array.of(Double.class, n).applyDoubles(v -> startX + v.index() * stepX);
+    var yValues = Array.of(Double.class, n).applyDoubles(v -> {
+        var yfit = alpha + beta * xValues.getDouble(v.index());
         return new NormalDistribution(yfit, sigma).sample();
     });
-    final Array<Integer> rowKeys = Range.of(0, n).toArray();
+    var rowKeys = Range.of(0, n).toArray();
     return DataFrame.of(rowKeys, String.class, columns -> {
         columns.add("X", xValues);
         columns.add("Y", yValues);
@@ -388,16 +388,16 @@ of samples. The code below plots 4 random samples of this population process wit
 
 <?prettify?>
 ```java
-final double beta = 1.45d;
-final double alpha = 4.15d;
-final double sigma = 20d;
+var beta = 1.45d;
+var alpha = 4.15d;
+var sigma = 20d;
 Chart.show(2, IntStream.range(0, 4).mapToObj(i -> {
-    DataFrame<Integer,String> frame = sample(alpha, beta, 0, 1, sigma, 100);
-    String title = "Sample %s Dataset, Beta: %.2f Alpha: %.2f";
-    String subtitle = "Parameter estimates, Beta^: %.3f, Alpha^: %.3f";
-    DataFrameLeastSquares<Integer,String> ols = frame.regress().ols("Y", "X", true, Optional::of).get();
-    double betaHat = ols.getBetaValue("X", DataFrameLeastSquares.Field.PARAMETER);
-    double alphaHat = ols.getInterceptValue(DataFrameLeastSquares.Field.PARAMETER);
+    var frame = sample(alpha, beta, 0, 1, sigma, 100);
+    var title = "Sample %s Dataset, Beta: %.2f Alpha: %.2f";
+    var subtitle = "Parameter estimates, Beta^: %.3f, Alpha^: %.3f";
+    var ols = frame.regress().ols("Y", "X", true, Optional::of).get();
+    var betaHat = ols.getBetaValue("X", DataFrameLeastSquares.Field.PARAMETER);
+    var alphaHat = ols.getInterceptValue(DataFrameLeastSquares.Field.PARAMETER);
     return Chart.create().withScatterPlot(frame, false, "X", chart -> {
         chart.title().withText(String.format(title, i, beta, alpha));
         chart.title().withFont(new Font("Arial", Font.BOLD, 14));
@@ -408,17 +408,21 @@ Chart.show(2, IntStream.range(0, 4).mapToObj(i -> {
 }));
 ```
 
-<div style="float:left;width:50%;">
-    <img class="chart" src="../../images/ols/ols-sample-0.png"/>
+<div class="row">
+    <div class=col-md-6>
+        <img class="chart img-fluid" src="/images/morpheus/ols/ols-sample-0.png"/>
+    </div>
+    <div class=col-md-6>
+        <img class="chart img-fluid" src="/images/morpheus/ols/ols-sample-1.png"/>
+    </div>
 </div>
-<div style="float:left;width:50%;">
-    <img class="chart" src="../../images/ols/ols-sample-1.png"/>
-</div>
-<div style="float:left;width:50%;">
-    <img class="chart" src="../../images/ols/ols-sample-2.png"/>
-</div>
-<div style="float:left;width:50%;">
-    <img class="chart" src="../../images/ols/ols-sample-3.png"/>
+<div class="row">
+    <div class=col-md-6>
+        <img class="chart img-fluid" src="/images/morpheus/ols/ols-sample-2.png"/>
+    </div>
+    <div class=col-md-6>
+        <img class="chart img-fluid" src="/images/morpheus/ols/ols-sample-3.png"/>
+    </div>
 </div>
 
 Given this data generating function, we can produce many samples from a known population process and then proceed to run OLS regressions on 
@@ -428,21 +432,21 @@ followed by the resulting plots.
 
 <?prettify?>
 ```java
-final int n = 100;
-final double actAlpha = 4.15d;
-final double actBeta = 1.45d;
-final double sigma = 20d;
-final int regressionCount = 100000;
-final Range<Integer> rows = Range.of(0, regressionCount);
-final Array<String> columns = Array.of("Beta", "Alpha");
-final DataFrame<Integer,String> results = DataFrame.ofDoubles(rows, columns);
+var n = 100;
+var actAlpha = 4.15d;
+var actBeta = 1.45d;
+var sigma = 20d;
+var regressionCount = 100000;
+var rows = Range.of(0, regressionCount);
+var columns = Array.of("Beta", "Alpha");
+var results = DataFrame.ofDoubles(rows, columns);
 
 //Run 100K regressions in parallel
 results.rows().parallel().forEach(row -> {
-    final DataFrame<Integer,String> frame = sample(actAlpha, actBeta, 0, 1, sigma, n);
+    var frame = sample(actAlpha, actBeta, 0, 1, sigma, n);
     frame.regress().ols("Y", "X", true, model -> {
-        final double alpha = model.getInterceptValue(DataFrameLeastSquares.Field.PARAMETER);
-        final double beta = model.getBetaValue("X", DataFrameLeastSquares.Field.PARAMETER);
+        var alpha = model.getInterceptValue(DataFrameLeastSquares.Field.PARAMETER);
+        var beta = model.getBetaValue("X", DataFrameLeastSquares.Field.PARAMETER);
         row.setDouble("Alpha", alpha);
         row.setDouble("Beta", beta);
         return Optional.empty();
@@ -451,11 +455,11 @@ results.rows().parallel().forEach(row -> {
 
 Array.of("Beta", "Alpha").forEach(coefficient -> {
     Chart.create().withHistPlot(results, 250, coefficient, chart -> {
-        final double mean = results.colAt(coefficient).stats().mean();
-        final double stdDev = results.colAt(coefficient).stats().stdDev();
-        final double actual = coefficient.equals("Beta") ? actBeta : actAlpha;
-        final String title = "%s Histogram from %s Regressions (n=%s)";
-        final String subtitle = "Actual: %.4f, Mean: %.4f, StdDev: %.4f";
+        var mean = results.colAt(coefficient).stats().mean();
+        var stdDev = results.colAt(coefficient).stats().stdDev();
+        var actual = coefficient.equals("Beta") ? actBeta : actAlpha;
+        var title = "%s Histogram from %s Regressions (n=%s)";
+        var subtitle = "Actual: %.4f, Mean: %.4f, StdDev: %.4f";
         chart.title().withText(String.format(title, coefficient, regressionCount, n));
         chart.subtitle().withText(String.format(subtitle, actual, mean, stdDev));
         chart.show(700, 400);
@@ -464,8 +468,8 @@ Array.of("Beta", "Alpha").forEach(coefficient -> {
 ```
 
 <p align="center">
-    <img class="chart" src="../../images/ols/ols-Alpha-unbiased.png"/>
-    <img class="chart" src="../../images/ols/ols-Beta-unbiased.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/ols/ols-Alpha-unbiased.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/ols/ols-Beta-unbiased.png"/>
 </p>
 
 The alpha and beta histogram plots above clearly show that the distribution of the 100000 estimates of each coefficient are centered on the 
@@ -483,13 +487,13 @@ narrowing variance as sample size increases.
 
 <?prettify?>
 ```java
-final double actAlpha = 4.15d;
-final double actBeta = 1.45d;
-final double sigma = 20d;
-final int regressionCount = 100000;
-final Range<Integer> sampleSizes = Range.of(100, 600, 100);
-final Range<Integer> rows = Range.of(0, regressionCount);
-final DataFrame<Integer,String> results = DataFrame.of(rows, String.class, columns -> {
+var actAlpha = 4.15d;
+var actBeta = 1.45d;
+var sigma = 20d;
+var regressionCount = 100000;
+var sampleSizes = Range.of(100, 600, 100);
+var rows = Range.of(0, regressionCount);
+var results = DataFrame.of(rows, String.class, columns -> {
     sampleSizes.forEach(n -> {
         columns.add(String.format("Beta(n=%s)", n), Double.class);
         columns.add(String.format("Alpha(n=%s)", n), Double.class);
@@ -497,14 +501,14 @@ final DataFrame<Integer,String> results = DataFrame.of(rows, String.class, colum
 });
 
 sampleSizes.forEach(n -> {
-    System.out.println("Running " + regressionCount + " regressions for n=" + n);
-    final String betaKey = String.format("Beta(n=%s)", n);
-    final String alphaKey = String.format("Alpha(n=%s)", n);
+    IO.println("Running " + regressionCount + " regressions for n=" + n);
+    var betaKey = String.format("Beta(n=%s)", n);
+    var alphaKey = String.format("Alpha(n=%s)", n);
     results.rows().parallel().forEach(row -> {
-        final DataFrame<Integer,String> frame = sample(actAlpha, actBeta, 0, 1, sigma, n);
+        var frame = sample(actAlpha, actBeta, 0, 1, sigma, n);
         frame.regress().ols("Y", "X", true, model -> {
-            final double alpha = model.getInterceptValue(DataFrameLeastSquares.Field.PARAMETER);
-            final double beta = model.getBetaValue("X", DataFrameLeastSquares.Field.PARAMETER);
+            var alpha = model.getInterceptValue(DataFrameLeastSquares.Field.PARAMETER);
+            var beta = model.getBetaValue("X", DataFrameLeastSquares.Field.PARAMETER);
             row.setDouble(alphaKey, alpha);
             row.setDouble(betaKey, beta);
             return Optional.empty();
@@ -513,7 +517,7 @@ sampleSizes.forEach(n -> {
 });
 
 Array.of("Beta", "Alpha").forEach(coeff -> {
-    final DataFrame<Integer,String> coeffResults = results.cols().select(col -> col.key().startsWith(coeff));
+    var coeffResults = results.cols().select(col -> col.key().startsWith(coeff));
     Chart.create().withHistPlot(coeffResults, 250, true, chart -> {
         chart.plot().axes().domain().label().withText("Coefficient Estimate");
         chart.title().withText(coeff + " Histograms of " + regressionCount + " Regressions");
@@ -525,31 +529,33 @@ Array.of("Beta", "Alpha").forEach(coeff -> {
 ```
 
 <p align="center">
-    <img class="chart" src="../../images/ols/ols-Beta-consistency.png"/>
-    <img class="chart" src="../../images/ols/ols-Alpha-consistency.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/ols/ols-Beta-consistency.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/ols/ols-Alpha-consistency.png"/>
 </p>
 
 It is clear from the above plots that as sample size increases, the variance in the estimates decreases, which is what we expect if the
 estimator is consistent. The bar charts below summarize the change in variance for each of the coefficients, and is follow by the code
 that generates these plots.
 
-<div style="float:left;width:50%;">
-    <img class="chart" src="../../images/ols/ols-beta-variance.png"/>
-</div>
-<div style="float:left;width:50%;">
-    <img class="chart" src="../../images/ols/ols-alpha-variance.png"/>
+<div class="row">
+    <div class="col-md-6">
+        <img class="chart img-fluid" src="/images/morpheus/ols/ols-beta-variance.png"/>
+    </div>
+    <div class="col-md-6">
+        <img class="chart img-fluid" src="/images/morpheus/ols/ols-alpha-variance.png"/>
+    </div>
 </div>
 
 <?prettify?>
 ```java
-Array<DataFrame<String,StatType>> variances = Array.of("Beta", "Alpha").map(value -> {
-    final String coefficient = value.getValue();
-    final Matcher matcher = Pattern.compile(coefficient + "\\(n=(\\d+)\\)").matcher("");
+var variances = Array.of("Beta", "Alpha").map(value -> {
+    var coefficient = value.getValue();
+    var matcher = Pattern.compile(coefficient + "\\(n=(\\d+)\\)").matcher("");
     return results.cols().select(column -> {
-        final String name = column.key();
+        var name = column.key();
         return matcher.reset(name).matches();
     }).cols().mapKeys(column -> {
-        final String name = column.key();
+        var name = column.key();
         if (matcher.reset(name).matches()) return matcher.group(1);
         throw new IllegalArgumentException("Unexpected column name: " + column.key());
     }).cols().stats().variance();

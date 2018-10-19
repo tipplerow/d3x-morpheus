@@ -38,7 +38,7 @@ public class PCADocs1 {
 
 
     private Set<String> tickers() throws Exception {
-        final List<String> lines = Files.readAllLines(Paths.get(getClass().getResource("/sp500-tickers.csv").toURI()));
+        var lines = Files.readAllLines(Paths.get(getClass().getResource("/sp500-tickers.csv").toURI()));
         return lines.stream().filter(l -> l.trim().length() > 0).sorted().collect(Collectors.toSet());
     }
 
@@ -66,9 +66,9 @@ public class PCADocs1 {
                 }
             });
             options.setRowPredicate(values -> {
-                final String symbol = values[0];
+                var symbol = values[0];
                 if (tickers.contains(symbol)) {
-                    final LocalDate date = LocalDate.parse(values[1]);
+                    var date = LocalDate.parse(values[1]);
                     return start.compareTo(date) <= 0 && end.compareTo(date) >= 0;
                 } else {
                     return false;

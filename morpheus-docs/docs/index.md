@@ -58,12 +58,12 @@ DataFrame.read().csv(options -> {
     options.setResource("http://zavtech.com/data/samples/cars93.csv");
     options.setExcludeColumnIndexes(0);
 }).rows().select(row -> {
-    double weightKG = row.getDouble("Weight") * 0.453592d;
-    double horsepower = row.getDouble("Horsepower");
+    var weightKG = row.getDouble("Weight") * 0.453592d;
+    var horsepower = row.getDouble("Horsepower");
     return horsepower / weightKG > 0.1d;
 }).cols().add("MPG(Highway/City)", Double.class, v -> {
-    double cityMpg = v.row().getDouble("MPG.city");
-    double highwayMpg = v.row().getDouble("MPG.highway");
+    var cityMpg = v.row().getDouble("MPG.city");
+    var highwayMpg = v.row().getDouble("MPG.highway");
     return highwayMpg / cityMpg;
 }).rows().sort(false, "MPG(Highway/City)").write().csv(options -> {
     options.setFile("/Users/witdxav/cars93m.csv");
@@ -122,7 +122,6 @@ data.regress().ols(regressand, regressor, true, model -> {
         chart.plot().axes().domain().format().withPattern("0.00;-0.00");
         chart.plot().axes().range(0).label().withText(regressand);
         chart.plot().axes().range(0).format().withPattern("0;-0");
-        chart.writerPng(new File("./docs/images/ols/data-frame-ols.png"), 845, 450, true);
         chart.show();
     });
     return Optional.empty();
@@ -148,7 +147,7 @@ Durbin-Watson:                        1.9591
 </pre>
 
 <p align="center">
-    <img class="chart" src="./images/ols/data-frame-ols.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/ols/data-frame-ols.png"/>
 </p>
 
 #### UK House Price Trends
@@ -172,7 +171,7 @@ re-name columns to something more meaningful to make subsequent access a little 
  * @return          the resulting DataFrame, with some columns renamed
  */
 private DataFrame<Integer,String> loadHousePrices(Year year) {
-    String resource = "http://prod.publicdata.landregistry.gov.uk.s3-website-eu-west-1.amazonaws.com/pp-%s.csv";
+    var resource = "http://prod.publicdata.landregistry.gov.uk.s3-website-eu-west-1.amazonaws.com/pp-%s.csv";
     return DataFrame.read().csv(options -> {
         options.setResource(String.format(resource, year.getValue()));
         options.setHeader(false);
@@ -212,20 +211,20 @@ results.rows().keys().parallel().forEach(year -> {
     var prices = loadHousePrices(year);
     prices.rows().select(row -> {
         //Filter rows to include only apartments in the relevant cities
-        final String propType = row.getValue("PropertyType");
-        final String city = row.getValue("City");
-        final String cityUpperCase = city != null ? city.toUpperCase() : null;
+        var propType = row.getValue("PropertyType");
+        var city = (String)row.getValue("City");
+        var cityUpperCase = city != null ? city.toUpperCase() : null;
         return propType != null && propType.equals("F") && results.cols().contains(cityUpperCase);
     }).rows().groupBy("City").forEach(0, (groupKey, group) -> {
         //Group row filtered frame so we can compute median prices in selected cities
-        final String city = groupKey.item(0);
-        final double priceStat = group.col("PricePaid").stats().median();
+        var city = (String)groupKey.item(0);
+        var priceStat = group.col("PricePaid").stats().median();
         results.setDouble(year, city, priceStat);
     });
 });
 
 //Map row keys to LocalDates, and map values to be percentage changes from start date
-final DataFrame<LocalDate,String> plotFrame = results.mapToDoubles(v -> {
+var plotFrame = results.mapToDoubles(v -> {
     var firstValue = v.col().getDoubleAt(0);
     var currentValue = v.getDouble();
     return (currentValue / firstValue - 1d) * 100d;
@@ -244,7 +243,6 @@ Chart.create().withLinePlot(plotFrame, chart -> {
     chart.plot().axes().range(0).format().withPattern("0.##'%';-0.##'%'");
     chart.plot().style("LONDON").withColor(Color.BLACK);
     chart.legend().on().bottom();
-    chart.writerPng(new File("./docs/images/uk-house-prices.png"), 845, 480, true);
     chart.show();
 });
 ```
@@ -257,7 +255,7 @@ any nominal price reduction, there was certainly a fairly severe correction in t
 depreciated heavily against these currencies during the GFC.
 
 <p align="center">
-    <img class="chart" src="./images/uk-house-prices.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/uk-house-prices.png"/>
 </p>
 
 ### Visualization
@@ -268,138 +266,144 @@ to follow by popular demand). This design makes it possible to generate interact
 charts as well as HTML5 browser based charts via the same programmatic interface. For more details on how to use this API, 
 see the section on visualization [here](./viz/charts/overview/), and the code [here](https://github.com/zavtech/morpheus-viz).
 
-<div class="smallChart">
-    <img class="smallChart" src="./images/gallery/chart-1.png"/>
-</div>
-<div class="smallChart">
-    <img class="smallChart" src="./images/gallery/chart-2.png"/>
-</div>
-<div class="smallChart">
-    <img class="smallChart" src="./images/gallery/chart-3.png"/>
-</div>
-<div class="smallChart">
-    <img class="smallChart" src="./images/gallery/chart-4.png"/>
-</div>
-<div class="smallChart">
-    <img class="smallChart" src="./images/gallery/chart-5.png"/>
-</div>
-<div class="smallChart">
-    <img class="smallChart" src="./images/gallery/chart-6.png"/>
-</div>
-<div class="smallChart">
-    <img class="smallChart" src="./images/gallery/chart-7.png"/>
-</div>
-<div class="smallChart">
-    <img class="smallChart" src="./images/gallery/chart-8.png"/>
-</div>
-<div class="smallChart">
-    <img class="smallChart" src="./images/gallery/chart-9.png"/>
-</div>
-<div class="smallChart">
-    <img class="smallChart" src="./images/gallery/chart-10.png"/>
-</div>
-<div class="smallChart">
-    <img class="smallChart" src="./images/gallery/chart-11.png"/>
-</div>
-<div class="smallChart">
-    <img class="smallChart" src="./images/gallery/chart-12.png"/>
-</div>
-<div class="smallChart">
-    <img class="smallChart" src="./images/gallery/chart-13.png"/>
-</div>
-<div class="smallChart">
-    <img class="smallChart" src="./images/gallery/chart-14.png"/>
-</div>
-<div class="smallChart">
-    <img class="smallChart" src="./images/gallery/chart-15.png"/>
-</div>
-<div class="smallChart">
-    <img class="smallChart" src="./images/gallery/chart-16.png"/>
-</div>
-<div class="smallChart">
-    <img class="smallChart" src="./images/gallery/chart-17.png"/>
-</div>
-<div class="smallChart">
-    <img class="smallChart" src="./images/gallery/chart-18.png"/>
-</div>
-<div class="smallChart">
-    <img class="smallChart" src="./images/gallery/chart-19.png"/>
-</div>
-<div class="smallChart">
-    <img class="smallChart" src="./images/gallery/chart-20.png"/>
-</div>
-<div class="smallChart">
-    <img class="smallChart" src="./images/gallery/chart-21.png"/>
-</div>
-<div class="smallChart">
-    <img class="smallChart" src="./images/gallery/chart-22.png"/>
-</div>
+<table width="100%" border="0">
+    <tr style="background-color:white;">
+        <td style="background-color:white;"><img class="smallChart" src="/images/morpheus/gallery/chart-1.png"/></td>
+        <td style="background-color:white;"><img class="smallChart" src="/images/morpheus/gallery/chart-2.png"/></td>
+    </tr>
+    <tr style="background-color:white;">
+        <td style="background-color:white;"><img class="smallChart" src="/images/morpheus/gallery/chart-3.png"/></td>
+        <td style="background-color:white;"><img class="smallChart" src="/images/morpheus/gallery/chart-4.png"/></td>
+    </tr>
+    <tr style="background-color:white;">
+        <td style="background-color:white;"><img class="smallChart" src="/images/morpheus/gallery/chart-5.png"/></td>
+        <td style="background-color:white;"><img class="smallChart" src="/images/morpheus/gallery/chart-6.png"/></td>
+    </tr>
+    <tr style="background-color:white;">
+        <td style="background-color:white;"><img class="smallChart" src="/images/morpheus/gallery/chart-7.png"/></td>
+        <td style="background-color:white;"><img class="smallChart" src="/images/morpheus/gallery/chart-8.png"/></td>
+    </tr>
+    <tr style="background-color:white;">
+        <td style="background-color:white;"><img class="smallChart" src="/images/morpheus/gallery/chart-9.png"/></td>
+        <td style="background-color:white;"><img class="smallChart" src="/images/morpheus/gallery/chart-10.png"/></td>
+    </tr>
+    <tr style="background-color:white;">
+        <td style="background-color:white;"><img class="smallChart" src="/images/morpheus/gallery/chart-11.png"/></td>
+        <td style="background-color:white;"><img class="smallChart" src="/images/morpheus/gallery/chart-12.png"/></td>
+    </tr>
+    <tr style="background-color:white;">
+        <td style="background-color:white;"><img class="smallChart" src="/images/morpheus/gallery/chart-13.png"/></td>
+        <td style="background-color:white;"><img class="smallChart" src="/images/morpheus/gallery/chart-14.png"/></td>
+    </tr>
+    <tr style="background-color:white;">
+        <td style="background-color:white;"><img class="smallChart" src="/images/morpheus/gallery/chart-15.png"/></td>
+        <td style="background-color:white;"><img class="smallChart" src="/images/morpheus/gallery/chart-16.png"/></td>
+    </tr>
+    <tr style="background-color:white;">
+        <td style="background-color:white;"><img class="smallChart" src="/images/morpheus/gallery/chart-17.png"/></td>
+        <td style="background-color:white;"><img class="smallChart" src="/images/morpheus/gallery/chart-18.png"/></td>
+    </tr>
+    <tr style="background-color:white;">
+        <td style="background-color:white;"><img class="smallChart" src="/images/morpheus/gallery/chart-19.png"/></td>
+        <td style="background-color:white;"><img class="smallChart" src="/images/morpheus/gallery/chart-20.png"/></td>
+    </tr>
+    <tr style="background-color:white;">
+        <td style="background-color:white;"><img class="smallChart" src="/images/morpheus/gallery/chart-21.png"/></td>
+        <td style="background-color:white;"><img class="smallChart" src="/images/morpheus/gallery/chart-22.png"/></td>
+    </tr>
+</table>
 
 ### Maven Artifacts
 
 Morpheus is published to Maven Central so it can be easily added as a dependency in your build tool of choice. 
-The codebase is currently divided into 5 modules to allow each module to be evolved independently. The various
- Maven artifacts are as follows: 
+The codebase is split into modules to better manage external dependencies. The core library currently has only three
+external dependencies, and this will be reduced to zero after further modularization. The various Maven artifacts 
+currently available are as follows: 
 
 **Morpheus Core**
 
-The [foundational](https://github.com/zavtech/morpheus-core) library that contains Morpheus Arrays, DataFrames and other key interfaces & implementations.
+The core library that contains Morpheus Arrays, DataFrames and other key interfaces & implementations.
 
 ```xml
 <dependency>
     <groupId>com.d3xsystems</groupId>
     <artifactId>morpheus-core</artifactId>
-    <version>${VERSION}</version>
+    <version>${morpheus-version}</version>
+</dependency>
+```
+
+**Morpheus Excel**
+
+An adapter to load Excel spreadsheets into a Morpheus DataFrame
+
+```xml
+<dependency>
+    <groupId>com.d3xsystems</groupId>
+    <artifactId>morpheus-excel</artifactId>
+    <version>${morpheus-version}</version>
+</dependency>
+```
+
+**Morpheus JSON**
+
+An adapter to read and write Morpheus DataFrames in an efficient JSON format leveraging the Google GSON library.
+
+```xml
+<dependency>
+    <groupId>com.d3xsystems</groupId>
+    <artifactId>morpheus-json</artifactId>
+    <version>${morpheus-version}</version>
+</dependency>
+```
+
+**Morpheus DB**
+
+An adapter to read and write Morpheus DataFrames against a SQL data store.
+
+```xml
+<dependency>
+    <groupId>com.d3xsystems</groupId>
+    <artifactId>morpheus-db</artifactId>
+    <version>${morpheus-version}</version>
 </dependency>
 ```
 
 **Morpheus Visualization**
 
-The [visualization](https://github.com/zavtech/morpheus-viz) components to display `DataFrames` in charts and tables.
+A library of components to display Morpheus `DataFrames` in charts and tables.
 
 ```xml
 <dependency>
     <groupId>com.d3xsystems</groupId>
     <artifactId>morpheus-viz</artifactId>
-    <version>${VERSION}</version>
+    <version>${morpheus-version}</version>
 </dependency>
 ```
 
 **Morpheus Quandl**
 
-The [adapter](https://github.com/zavtech/morpheus-quandl) to load data from [Quandl](http://www.quandl.com)
+An adapter to load data from [Quandl](http://www.quandl.com) into a Morpheus DataFrame
 
 ```xml
 <dependency>
     <groupId>com.d3xsystems</groupId>
     <artifactId>morpheus-quandl</artifactId>
-    <version>${VERSION}</version>
+    <version>${morpheus-version}</version>
 </dependency>
 ```
 
-**Morpheus Google**
+**Morpheus Worldbank**
 
-The [adapter](https://github.com/zavtech/morpheus-google) to load data from [Google Finance](http://finance.google.com)
+An adapter to load data from the [Worldbank](https://data.worldbank.org/) into a Morpheus DataFrame.
 
 ```xml
 <dependency>
     <groupId>com.d3xsystems</groupId>
-    <artifactId>morpheus-google</artifactId>
-    <version>${VERSION}</version>
+    <artifactId>morpheus-worldbank</artifactId>
+    <version>${morpheus-version}</version>
 </dependency>
 ```
 
-**Morpheus Yahoo**
-
-The [adapter](https://github.com/zavtech/morpheus-yahoo) to load data from [Yahoo Finance](http://finance.yahoo.com)
-
-```xml
-<dependency>
-    <groupId>com.d3xsystems</groupId>
-    <artifactId>morpheus-yahoo</artifactId>
-    <version>${VERSION}</version>
-</dependency>
-```
 
 ### Q&A Forum
 
@@ -411,12 +415,12 @@ Morpheus Javadocs can be accessed online [here](http://www.zavtech.com/morpheus/
 
 ### Build Status
 
-A Continuous Integration build server can be accessed [here](http://zavnas.com/jenkins/), which builds code after each merge.
+A Continuous Integration build server can be accessed [here](http://builds.d3xsystems.com), which builds code after each merge.
 
 ### License
 
 Morpheus is released under the [Apache Software Foundation License Version 2](https://www.apache.org/licenses/LICENSE-2.0).
 
 <p align="center">
-    <img style="background: none; border: none;" src="images/morpheus-logo1.png"/>
+    <img style="background: none; border: none;" src="/images/morpheus/morpheus-logo.svg" width="400"/>
 </p>

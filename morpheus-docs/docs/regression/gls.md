@@ -100,23 +100,23 @@ which is assumed to be \\(N(0,\sigma^2)\\). The code below defines a function th
  * @return          the frame of XY values with serially correlated residuals
  */
 DataFrame<Integer,String> sample(double alpha, double beta, double rho, double sigma, int n, boolean seed) {
-    final double startX = 1d;
-    final double stepX = 0.5d;
-    final RandomGenerator rand = seed ? new Well19937c(1234565) : new Well19937c();
-    final RealDistribution noise = new NormalDistribution(rand, 0, sigma);
-    final Array<Double> xValues = Array.of(Double.class, n).applyDoubles(v -> startX + v.index() * stepX);
-    final Array<Integer> rowKeys = Range.of(0, n).toArray();
+    var startX = 1d;
+    var stepX = 0.5d;
+    var rand = seed ? new Well19937c(1234565) : new Well19937c();
+    var noise = new NormalDistribution(rand, 0, sigma);
+    var xValues = Array.of(Double.class, n).applyDoubles(v -> startX + v.index() * stepX);
+    var rowKeys = Range.of(0, n).toArray();
     return DataFrame.of(rowKeys, String.class, columns -> {
         columns.add("X", xValues);
         columns.add("Y", Array.of(Double.class, n).applyDoubles(v -> {
-            final double xValue = xValues.getDouble(v.index());
-            final double yFitted = alpha + beta * xValue;
+            var xValue = xValues.getDouble(v.index());
+            var yFitted = alpha + beta * xValue;
             if (v.index() == 0) return yFitted + noise.sample();
             else {
-                final double priorX = xValues.getDouble(v.index()-1);
-                final double priorY = v.array().getDouble(v.index()-1);
-                final double priorError = priorY - (alpha + beta * priorX);
-                final double error = rho * priorError + noise.sample();
+                var priorX = xValues.getDouble(v.index()-1);
+                var priorY = v.array().getDouble(v.index()-1);
+                var priorError = priorY - (alpha + beta * priorX);
+                var error = rho * priorError + noise.sample();
                 return yFitted + error;
             }
         }));
@@ -128,35 +128,39 @@ To get a sense of what this data looks like, we can generate 4 random samples an
 to the data. The serial correlation in the residuals should be fairly obvious given that we can see a sequence of errors above the regression 
 line followed by a sequence below the line, which clearly is not typical of white noise.
 
-<div style="float:left;width:50%;">
-    <img class="chart" src="../../images/gls/gls-sample-0.png"/>
+<div class="row">
+    <div class="col-md-6">
+        <img class="chart img-fluid" src="/images/morpheus/gls/gls-sample-0.png"/>
+    </div>
+    <div class="col-md-6">
+        <img class="chart img-fluid" src="/images/morpheus/gls/gls-sample-1.png"/>
+    </div>
 </div>
-<div style="float:left;width:50%;">
-    <img class="chart" src="../../images/gls/gls-sample-1.png"/>
-</div>
-<div style="float:left;width:50%;">
-    <img class="chart" src="../../images/gls/gls-sample-2.png"/>
-</div>
-<div style="float:left;width:50%;">
-    <img class="chart" src="../../images/gls/gls-sample-3.png"/>
+<div class="row">
+    <div class="col-md-6">
+        <img class="chart img-fluid" src="/images/morpheus/gls/gls-sample-2.png"/>
+    </div>
+    <div class="col-md-6">
+        <img class="chart img-fluid" src="/images/morpheus/gls/gls-sample-3.png"/>
+    </div>
 </div>
 
 The code to generate these plots is as follows:
 
 <?prettify?>
 ```java
-final int n = 100;
-final double rho = 0.5d;
-final double beta = 4d;
-final double alpha = 20d;
-final double sigma = 10d;
+var n = 100;
+var rho = 0.5d;
+var beta = 4d;
+var alpha = 20d;
+var sigma = 10d;
 Chart.show(2, IntStream.range(0, 4).mapToObj(i -> {
-    DataFrame<Integer,String> frame = sample(alpha, beta, rho, sigma, n, false);
-    String title = "Sample %s Dataset, Beta: %.2f Alpha: %.2f";
-    String subtitle = "Parameter estimates, Beta^: %.3f, Alpha^: %.3f";
-    DataFrameLeastSquares<Integer,String> ols = frame.regress().ols("Y", "X", true, Optional::of).get();
-    double betaHat = ols.getBetaValue("X", DataFrameLeastSquares.Field.PARAMETER);
-    double alphaHat = ols.getInterceptValue(DataFrameLeastSquares.Field.PARAMETER);
+    var frame = sample(alpha, beta, rho, sigma, n, false);
+    var title = "Sample %s Dataset, Beta: %.2f Alpha: %.2f";
+    var subtitle = "Parameter estimates, Beta^: %.3f, Alpha^: %.3f";
+    var ols = frame.regress().ols("Y", "X", true, Optional::of).get();
+    var betaHat = ols.getBetaValue("X", DataFrameLeastSquares.Field.PARAMETER);
+    var alphaHat = ols.getInterceptValue(DataFrameLeastSquares.Field.PARAMETER);
     return Chart.create().withScatterPlot(frame, false, "X", chart -> {
         chart.title().withText(String.format(title, i, beta, alpha));
         chart.title().withFont(new Font("Arial", Font.BOLD, 14));
@@ -181,14 +185,14 @@ correlation in the residuals.
 
 <?prettify?>
 ```java
-int n = 100;
-double rho = 0.5d;
-double beta = 4d;
-double alpha = 20d;
-double sigma = 10d;
-DataFrame<Integer,String> frame = sample(alpha, beta, rho, sigma, n, true);
+var n = 100;
+var rho = 0.5d;
+var beta = 4d;
+var alpha = 20d;
+var sigma = 10d;
+var frame = sample(alpha, beta, rho, sigma, n, true);
 frame.regress().ols("Y", "X", true, model -> {
-    System.out.println(model);
+    IO.println(model);
     return Optional.empty();
 });
 ```
@@ -219,7 +223,7 @@ and is illustrated below for this example. The peak at lag 1 clearly breaches th
 line (the bar at lag 0 is by definition equal to 1).
 
 <p align="center">
-    <img class="chart" src="../../images/gls/gls-acf.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/gls/gls-acf.png"/>
 </p>
 
 The code to generate this plot is shown below, which effectively runs an OLS regression and then passes the resulting model object to the chart 
@@ -229,15 +233,15 @@ blue lines representing the 95% confidence intervals.
 
 <?prettify?>
 ```java
-final int n = 200;
-final double rho = 0.5d;
-final double beta = 4d;
-final double alpha = 20d;
-final double sigma = 10d;
-final DataFrame<Integer,String> frame = sample(alpha, beta, rho, sigma, n, true);
+var n = 200;
+var rho = 0.5d;
+var beta = 4d;
+var alpha = 20d;
+var sigma = 10d;
+var frame = sample(alpha, beta, rho, sigma, n, true);
 frame.regress().ols("Y", "X", true, model -> {
     Chart.create().withAcf(model, frame.rowCount()/2, 0.05d, chart -> {
-        final double rhoHat = model.getResiduals().colAt(0).stats().autocorr(1);
+        var rhoHat = model.getResiduals().colAt(0).stats().autocorr(1);
         chart.title().withText("Residual Autocorrelation Plot");
         chart.subtitle().withText(String.format("Autocorrelation Lag 1 = %.3f", rhoHat));
         chart.show(800, 300);
@@ -265,7 +269,7 @@ autocorrelation coefficient at lag 1 calculated from the residuals, and the samp
  * @return          the newly created correlation matrix
  */
 private DataFrame<Integer,Integer> createOmega(int size, double autocorr) {
-    final Range<Integer> keys = Range.of(0, size);
+    var keys = Range.of(0, size);
     return DataFrame.ofDoubles(keys, keys, v -> {
         return Math.pow(autocorr,  Math.abs(v.rowOrdinal() - v.colOrdinal()));
     });
@@ -279,17 +283,17 @@ which we pass to the `gls()` method on the `DataFrameRegression` interface.
 
 <?prettify?>
 ```java
-int n = 100;
-double rho = 0.5d;
-double beta = 4d;
-double alpha = 20d;
-double sigma = 10d;
-DataFrame<Integer,String> frame = sample(alpha, beta, rho, sigma, n, true);
+var n = 100;
+var rho = 0.5d;
+var beta = 4d;
+var alpha = 20d;
+var sigma = 10d;
+var frame = sample(alpha, beta, rho, sigma, n, true);
 frame.regress().ols("Y", "X", true, ols -> {
-    final double rhoHat = ols.getResiduals().colAt(0).stats().autocorr(1);
-    final DataFrame<Integer,Integer> omega = createOmega(n, rhoHat);
+    var rhoHat = ols.getResiduals().colAt(0).stats().autocorr(1);
+    var omega = createOmega(n, rhoHat);
     frame.regress().gls("Y", "X", omega, true, gls -> {
-        System.out.println(gls);
+        IO.println(gls);
         return Optional.empty();
     });
     return Optional.empty();
@@ -330,25 +334,25 @@ As expected, we get a bell shaped normal distribution centered on the known popu
 
 <?prettify?>
 ```java
-final int n = 100;
-final double rho = 0.5d;
-final double beta = 4d;
-final double alpha = 20d;
-final double sigma = 20d;
-final int regressionCount = 100000;
-Range<Integer> rows = Range.of(0, regressionCount);
-Array<String> columns = Array.of("Beta", "Alpha");
-DataFrame<Integer,String> results = DataFrame.ofDoubles(rows, columns);
+var n = 100;
+var rho = 0.5d;
+var beta = 4d;
+var alpha = 20d;
+var sigma = 20d;
+var regressionCount = 100000;
+var rows = Range.of(0, regressionCount);
+var columns = Array.of("Beta", "Alpha");
+var results = DataFrame.ofDoubles(rows, columns);
 
 //Run regressions in parallel to leverage all 4 cores...
 results.rows().parallel().forEach(row -> {
-    final DataFrame<Integer,String> frame = sample(alpha, beta, rho, sigma, n, false);
+    var frame = sample(alpha, beta, rho, sigma, n, false);
     frame.regress().ols("Y", "X", true, ols -> {
-        final double rhoHat = ols.getResiduals().colAt(0).stats().autocorr(1);
-        final DataFrame<Integer,Integer> omega = createOmega(frame.rowCount(), rhoHat);
+        var rhoHat = ols.getResiduals().colAt(0).stats().autocorr(1);
+        var omega = createOmega(frame.rowCount(), rhoHat);
         frame.regress().gls("Y", "X", omega, true, model -> {
-            final double alphaHat = model.getInterceptValue(Field.PARAMETER);
-            final double betaHat = model.getBetaValue("X", Field.PARAMETER);
+            var alphaHat = model.getInterceptValue(Field.PARAMETER);
+            var betaHat = model.getBetaValue("X", Field.PARAMETER);
             row.setDouble("Alpha", alphaHat);
             row.setDouble("Beta", betaHat);
             return Optional.empty();
@@ -358,14 +362,14 @@ results.rows().parallel().forEach(row -> {
 });
 
 Array.of("Beta", "Alpha").forEach(coeff -> {
-    final DataFrame<Integer,String> coeffResults = results.cols().select(col -> col.key().startsWith(coeff));
+    var coeffResults = results.cols().select(col -> col.key().startsWith(coeff));
     Chart.create().withHistPlot(coeffResults, 250, chart -> {
-        String title = "%s Histogram of %s GLS regressions, Rho = %.3f";
-        String subtitle = "%s estimate unbiasedness, Actual: %.2f, Mean: %.2f, Variance: %.2f";
-        double actual = coeff.equals("Beta") ? beta : alpha;
-        double estimate = coeffResults.colAt(coeff).stats().mean();
-        double variance = coeffResults.colAt(coeff).stats().variance();
-        Color color = coeff.equals("Beta") ? new Color(255, 100, 100) : new Color(102, 204, 255);
+        var title = "%s Histogram of %s GLS regressions, Rho = %.3f";
+        var subtitle = "%s estimate unbiasedness, Actual: %.2f, Mean: %.2f, Variance: %.2f";
+        var actual = coeff.equals("Beta") ? beta : alpha;
+        var estimate = coeffResults.colAt(coeff).stats().mean();
+        var variance = coeffResults.colAt(coeff).stats().variance();
+        var color = coeff.equals("Beta") ? new Color(255, 100, 100) : new Color(102, 204, 255);
         chart.plot().style(coeff).withColor(color);
         chart.plot().axes().domain().label().withText(coeff + " Estimate");
         chart.title().withText(String.format(title, coeff, regressionCount, rho));
@@ -376,8 +380,8 @@ Array.of("Beta", "Alpha").forEach(coeff -> {
 ```
 
 <p align="center">
-    <img class="chart" src="../../images/gls/gls-beta-unbiasedness.png"/>
-    <img class="chart" src="../../images/gls/gls-alpha-unbiasedness.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/gls/gls-beta-unbiasedness.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/gls/gls-alpha-unbiasedness.png"/>
 </p>
 
 
@@ -398,29 +402,29 @@ efficiency of GLS in this case is still apparent.
 
 <?prettify?>
 ```java
-final int n = 100;
-final double rho = 0.8d;
-final double beta = 4d;
-final double alpha = 20d;
-final double sigma = 20d;
-final int regressionCount = 100000;
-Range<Integer> rows = Range.of(0, regressionCount);
-Array<String> columns = Array.of("Beta(OLS)", "Alpha(OLS)", "Beta(GLS)", "Alpha(GLS)");
-DataFrame<Integer,String> results = DataFrame.ofDoubles(rows, columns);
+var n = 100;
+var rho = 0.8d;
+var beta = 4d;
+var alpha = 20d;
+var sigma = 20d;
+var regressionCount = 100000;
+var rows = Range.of(0, regressionCount);
+var columns = Array.of("Beta(OLS)", "Alpha(OLS)", "Beta(GLS)", "Alpha(GLS)");
+var results = DataFrame.ofDoubles(rows, columns);
 
 //Run regressions in parallel to leverage all 4 cores...
 results.rows().parallel().forEach(row -> {
-    DataFrame<Integer,String> data = sample(alpha, beta, rho, sigma, n, false);
+    var data = sample(alpha, beta, rho, sigma, n, false);
     data.regress().ols("Y", "X", true, ols -> {
-        final double alphaHatOls = ols.getInterceptValue(Field.PARAMETER);
-        final double betaHatOls = ols.getBetaValue("X", Field.PARAMETER);
+        var alphaHatOls = ols.getInterceptValue(Field.PARAMETER);
+        var betaHatOls = ols.getBetaValue("X", Field.PARAMETER);
         row.setDouble("Alpha(OLS)", alphaHatOls);
         row.setDouble("Beta(OLS)", betaHatOls);
-        final double rhoHat = ols.getResiduals().colAt(0).stats().autocorr(1);
-        final DataFrame<Integer,Integer> omega = createOmega(n, rhoHat);
+        var rhoHat = ols.getResiduals().colAt(0).stats().autocorr(1);
+        var omega = createOmega(n, rhoHat);
         data.regress().gls("Y", "X", omega, true, gls -> {
-            double alphaHat = gls.getInterceptValue(Field.PARAMETER);
-            double betaHat = gls.getBetaValue("X", Field.PARAMETER);
+            var alphaHat = gls.getInterceptValue(Field.PARAMETER);
+            var betaHat = gls.getBetaValue("X", Field.PARAMETER);
             row.setDouble("Alpha(GLS)", alphaHat);
             row.setDouble("Beta(GLS)", betaHat);
             return Optional.empty();
@@ -430,17 +434,17 @@ results.rows().parallel().forEach(row -> {
 });
 
 Array.of("Alpha", "Beta").forEach(coeff -> {
-    final String olsKey = coeff + "(OLS)";
-    final String glsKey = coeff + "(GLS)";
-    final DataFrame<Integer,String> data = results.cols().select(olsKey, glsKey);
+    var olsKey = coeff + "(OLS)";
+    var glsKey = coeff + "(GLS)";
+    var data = results.cols().select(olsKey, glsKey);
     Chart.create().withHistPlot(data, 350, chart -> {
-        double meanOls = results.colAt(olsKey).stats().mean();
-        double stdOls = results.colAt(olsKey).stats().stdDev();
-        double meanWls = results.colAt(glsKey).stats().mean();
-        double stdWls = results.colAt(glsKey).stats().stdDev();
-        double coeffAct = coeff.equals("Alpha") ? alpha : beta;
-        String title = "%s Histogram from %s OLS & GLS Regressions (n=%s)";
-        String subtitle = "Actual: %.4f, Mean(OLS): %.4f, Std(OLS): %.4f, Mean(GLS): %.4f, Std(GLS): %.4f";
+        var meanOls = results.colAt(olsKey).stats().mean();
+        var stdOls = results.colAt(olsKey).stats().stdDev();
+        var meanWls = results.colAt(glsKey).stats().mean();
+        var stdWls = results.colAt(glsKey).stats().stdDev();
+        var coeffAct = coeff.equals("Alpha") ? alpha : beta;
+        var title = "%s Histogram from %s OLS & GLS Regressions (n=%s)";
+        var subtitle = "Actual: %.4f, Mean(OLS): %.4f, Std(OLS): %.4f, Mean(GLS): %.4f, Std(GLS): %.4f";
         chart.title().withText(String.format(title, coeff, regressionCount, n));
         chart.title().withFont(new Font("Arial", Font.BOLD, 15));
         chart.subtitle().withText(String.format(subtitle, coeffAct, meanOls, stdOls, meanWls, stdWls));
@@ -452,8 +456,8 @@ Array.of("Alpha", "Beta").forEach(coeff -> {
 ```
 
 <p align="center">
-    <img class="chart" src="../../images/gls/gls-beta-efficiency.png"/>
-    <img class="chart" src="../../images/gls/gls-alpha-efficiency.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/gls/gls-beta-efficiency.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/gls/gls-alpha-efficiency.png"/>
 </p>
 
 ### Consistency
@@ -468,14 +472,14 @@ the estimator, at least empirically.
 
 <?prettify?>
 ```java
-final double beta = 4d;
-final double rho = 0.5d;
-final double alpha = 20d;
-final double sigma = 10d;
-final int regressionCount = 100000;
-final Range<Integer> sampleSizes = Range.of(20, 120, 20);
-final Range<Integer> rows = Range.of(0, regressionCount);
-final DataFrame<Integer,String> results = DataFrame.of(rows, String.class, columns -> {
+var beta = 4d;
+var rho = 0.5d;
+var alpha = 20d;
+var sigma = 10d;
+var regressionCount = 100000;
+var sampleSizes = Range.of(20, 120, 20);
+var rows = Range.of(0, regressionCount);
+var results = DataFrame.of(rows, String.class, columns -> {
     sampleSizes.forEach(n -> {
         columns.add(String.format("Beta(n=%s)", n), Double.class);
         columns.add(String.format("Alpha(n=%s)", n), Double.class);
@@ -483,15 +487,15 @@ final DataFrame<Integer,String> results = DataFrame.of(rows, String.class, colum
 });
 
 sampleSizes.forEach(n -> {
-    System.out.println("Running " + regressionCount + " regressions for n=" + n);
-    final String betaKey = String.format("Beta(n=%s)", n);
-    final String alphaKey = String.format("Alpha(n=%s)", n);
+    IO.println("Running " + regressionCount + " regressions for n=" + n);
+    var betaKey = String.format("Beta(n=%s)", n);
+    var alphaKey = String.format("Alpha(n=%s)", n);
     results.rows().parallel().forEach(row -> {
-        DataFrame<Integer,String> data = sample(alpha, beta, rho, sigma, n, false);
-        DataFrame<Integer,Integer> omega = createOmega(n, rho);
+        var data = sample(alpha, beta, rho, sigma, n, false);
+        var omega = createOmega(n, rho);
         data.regress().gls("Y", "X", omega, true, model -> {
-            final double alphaHat = model.getInterceptValue(Field.PARAMETER);
-            final double betaHat = model.getBetaValue("X", Field.PARAMETER);
+            var alphaHat = model.getInterceptValue(Field.PARAMETER);
+            var betaHat = model.getBetaValue("X", Field.PARAMETER);
             row.setDouble(alphaKey, alphaHat);
             row.setDouble(betaKey, betaHat);
             return Optional.empty();
@@ -500,7 +504,7 @@ sampleSizes.forEach(n -> {
 });
 
 Array.of("Beta", "Alpha").forEach(coeff -> {
-    final DataFrame<Integer,String> coeffResults = results.cols().select(col -> col.key().startsWith(coeff));
+    var coeffResults = results.cols().select(col -> col.key().startsWith(coeff));
     Chart.create().withHistPlot(coeffResults, 250, true, chart -> {
         chart.plot().axes().domain().label().withText("Coefficient Estimate");
         chart.title().withText(coeff + " Histograms of " + regressionCount + " Regressions");
@@ -512,31 +516,33 @@ Array.of("Beta", "Alpha").forEach(coeff -> {
 ```
 
 <p align="center">
-    <img class="chart" src="../../images/gls/gls-beta-consistency.png"/>
-    <img class="chart" src="../../images/gls/gls-alpha-consistency.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/gls/gls-beta-consistency.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/gls/gls-alpha-consistency.png"/>
 </p>
 
 The bar charts below illustrate the monotonically decreasing variance in both the \\(\beta\\) and \\(\alpha\\) coefficients.
 
-<div style="float:left;width:50%;">
-    <img class="chart" src="../../images/gls/gls-beta-variance.png"/>
-</div>
-<div style="float:left;width:50%;">
-    <img class="chart" src="../../images/gls/gls-alpha-variance.png"/>
+<div class="row">
+    <div class="col-md-6">
+        <img class="chart img-fluid" src="/images/morpheus/gls/gls-beta-variance.png"/>
+    </div>
+    <div class="col-md-6">
+        <img class="chart img-fluid" src="/images/morpheus/gls/gls-alpha-variance.png"/>
+    </div>
 </div>
 
 The code to generate this plot is as follows:
 
 <?prettify?>
 ```java
-Array<DataFrame<String,StatType>> variances = Array.of("Beta", "Alpha").map(value -> {
-    final String coefficient = value.getValue();
-    final Matcher matcher = Pattern.compile(coefficient + "\\(n=(\\d+)\\)").matcher("");
+var variances = Array.of("Beta", "Alpha").map(value -> {
+    var coefficient = value.getValue();
+    var matcher = Pattern.compile(coefficient + "\\(n=(\\d+)\\)").matcher("");
     return results.cols().select(column -> {
-        final String name = column.key();
+        var name = column.key();
         return matcher.reset(name).matches();
     }).cols().mapKeys(column -> {
-        final String name = column.key();
+        var name = column.key();
         if (matcher.reset(name).matches()) return matcher.group(1);
         throw new IllegalArgumentException("Unexpected column name: " + column.key());
     }).cols().stats().variance().transpose();

@@ -34,7 +34,7 @@ public class ReshapingDocs {
     @Test()
     public void addRows1() {
         //Create frame of Random doubles keyed by LocalDate and String
-        DataFrame<LocalDate,String> frame = DataFrame.ofDoubles(
+        var frame = DataFrame.ofDoubles(
             Range.ofLocalDates("2014-01-01", "2014-01-05"),
             Range.of(0, 5).map(i -> "Column-" + i),
             value -> Math.random() * 10d
@@ -73,7 +73,7 @@ public class ReshapingDocs {
     @Test()
     public void addRows2() {
         //Create a 5x5 DataFrame of doubles initialized with 1 for all values
-        DataFrame<Integer,String> frame1 = DataFrame.ofDoubles(
+        var frame1 = DataFrame.ofDoubles(
             Array.of(0, 1, 2, 3, 4),
             Array.of("A", "B", "C", "D", "E"),
             value -> 1d
@@ -82,7 +82,7 @@ public class ReshapingDocs {
         frame1.out().print();
 
         //Create a 7x5 DataFrame of doubles initialized with 2 for all values
-        DataFrame<Integer,String> frame2 = DataFrame.ofDoubles(
+        var frame2 = DataFrame.ofDoubles(
             Array.of(3, 4, 5, 6, 7, 8, 9),
             Array.of("C", "D", "E", "F", "G"),
             value -> 2d
@@ -100,7 +100,7 @@ public class ReshapingDocs {
     @Test()
     public void rowConcatenation() {
         //Create a 5x5 DataFrame of doubles initialized with 1 for all values
-        DataFrame<Integer,String> frame1 = DataFrame.ofDoubles(
+        var frame1 = DataFrame.ofDoubles(
             Array.of(0, 1, 2, 3, 4),
             Array.of("A", "B", "C", "D", "E"),
             value -> 1d
@@ -108,7 +108,7 @@ public class ReshapingDocs {
         frame1.out().print();
 
         //Create a 7x5 DataFrame of doubles initialized with 2 for all values
-        DataFrame<Integer,String> frame2 = DataFrame.ofObjects(
+        var frame2 = DataFrame.ofObjects(
             Array.of(3, 4, 5, 6, 7, 8, 9),
             Array.of("C", "D", "E", "F", "G"),
             value -> String.format("(%s, %s)", value.rowOrdinal(), value.colOrdinal())
@@ -116,7 +116,7 @@ public class ReshapingDocs {
         frame2.out().print();
 
         //Concatenate rows from frame1 and frame2
-        DataFrame<Integer,String> frame3 = DataFrame.concatRows(frame1, frame2);
+        var frame3 = DataFrame.concatRows(frame1, frame2);
         frame3.out().print(formats -> {
             formats.setDecimalFormat(Double.class, "0.0;-0.0", 1);
         });
@@ -125,10 +125,10 @@ public class ReshapingDocs {
 
     @Test()
     public void addRowsAndColumns() {
-        Array<String> columns1 = Array.of("A", "B", "C");
-        Array<String> columns2 = Array.of("D", "E", "F");
-        DataFrame<Integer,String> frame1 = DataFrame.ofDoubles(Range.of(0, 5), columns1, v -> 1d);
-        DataFrame<Integer,String> frame2 = DataFrame.ofDoubles(Range.of(5, 10), columns2, v -> 2d);
+        var columns1 = Array.of("A", "B", "C");
+        var columns2 = Array.of("D", "E", "F");
+        var frame1 = DataFrame.ofDoubles(Range.of(0, 5), columns1, v -> 1d);
+        var frame2 = DataFrame.ofDoubles(Range.of(5, 10), columns2, v -> 2d);
 
         frame1.out().print();
         frame2.out().print();
@@ -140,8 +140,8 @@ public class ReshapingDocs {
 
     @Test()
     public void addColumns1() {
-        LocalDate start = LocalDate.of(2014, 1, 1);
-        DataFrame<LocalDate,String> frame = DataFrame.ofDoubles(
+        var start = LocalDate.of(2014, 1, 1);
+        var frame = DataFrame.ofDoubles(
             Range.of(start, start.plusDays(10)),
             Array.of("A", "B"),
             value -> Math.random() * 10d
@@ -170,8 +170,8 @@ public class ReshapingDocs {
 
     @Test()
     public void addColumns2() {
-        LocalDate start = LocalDate.of(2014, 1, 1);
-        DataFrame<LocalDate,String> frame = DataFrame.ofDoubles(
+        var start = LocalDate.of(2014, 1, 1);
+        var frame = DataFrame.ofDoubles(
             Range.of(start, start.plusDays(10)),
             Array.of("A", "B"),
             value -> Math.random() * 10d
@@ -193,13 +193,13 @@ public class ReshapingDocs {
     @Test
     public void addColumns3() {
         //Create a 9x2 DataFrame of random double precision values
-        DataFrame<Integer,String> frame1 = DataFrame.ofDoubles(
+        var frame1 = DataFrame.ofDoubles(
             Range.of(0, 9, 1),
             Array.of("A", "B"),
             value -> Math.random()
         );
         //Create 6x5 frame with intersecting rows and columns to the first frame
-        DataFrame<Integer,String> frame2 = DataFrame.of(Range.of(0, 12, 2), String.class, columns -> {
+        var frame2 = DataFrame.of(Range.of(0, 12, 2), String.class, columns -> {
             columns.add("B", Array.of(10, 20, 30, 40, 50, 60));
             columns.add("C", Array.of(1d, 3d, 5d, 7d, 9d, 11d));
             columns.add("D", Range.of(1, 7));
@@ -226,13 +226,13 @@ public class ReshapingDocs {
     @Test
     public void addColumns4() {
         //Create a 9x2 DataFrame of random double precision values
-        DataFrame<Integer,String> frame1 = DataFrame.ofDoubles(
+        var frame1 = DataFrame.ofDoubles(
             Range.of(0, 9),
             Array.of("A", "B"),
             value -> Math.random()
         );
         //Create 6x5 frame with intersecting rows and columns to the first frame
-        DataFrame<Integer,String> frame2 = DataFrame.of(Range.of(0, 12, 2), String.class, columns -> {
+        var frame2 = DataFrame.of(Range.of(0, 12, 2), String.class, columns -> {
             columns.add("B", Array.of(10, 20, 30, 40, 50, 60));
             columns.add("C", Array.of(1d, 3d, 5d, 7d, 9d, 11d));
             columns.add("D", Range.of(1, 7));
@@ -240,7 +240,7 @@ public class ReshapingDocs {
             columns.add("F", Boolean.class, v -> Math.random() > 0.5d);
         });
         //Create a 9x2 DataFrame of random double precision values
-        DataFrame<Integer,String> frame3 = DataFrame.ofDoubles(
+        var frame3 = DataFrame.ofDoubles(
             Range.of(0, 5),
             Array.of("B", "F", "G", "H"),
             value -> Math.random()
@@ -257,7 +257,7 @@ public class ReshapingDocs {
         });
 
         //Concatenate columns from all 3 frames to create a new result
-        DataFrame<Integer,String> frame4 = DataFrame.concatColumns(frame1, frame2, frame3);
+        var frame4 = DataFrame.concatColumns(frame1, frame2, frame3);
         //Print frame to standard out with custom formatting
         frame4.out().print(formats -> {
             formats.setDecimalFormat(Double.class, "0.000;-0.000", 1);
@@ -267,13 +267,13 @@ public class ReshapingDocs {
     @Test()
     public void union() {
         //Create a 4x2 DataFrame of random double precision values
-        DataFrame<Integer,String> frame1 = DataFrame.ofDoubles(
+        var frame1 = DataFrame.ofDoubles(
             Range.of(0, 5),
             Array.of("A", "B"),
             value -> Math.random()
         );
         //Create 6x5 frame with intersecting rows and columns to the first frame
-        DataFrame<Integer,String> frame2 = DataFrame.of(Range.of(0, 12, 2), String.class, columns -> {
+        var frame2 = DataFrame.of(Range.of(0, 12, 2), String.class, columns -> {
             columns.add("B", Array.of(10, 20, 30, 40, 50, 60));
             columns.add("C", Array.of(1d, 3d, 5d, 7d, 9d, 11d));
             columns.add("D", Range.of(1, 7));
@@ -281,7 +281,7 @@ public class ReshapingDocs {
             columns.add("F", Boolean.class, v -> Math.random() > 0.5d);
         });
         //Create a 5x4 DataFrame of random double precision values
-        DataFrame<Integer,String> frame3 = DataFrame.ofDoubles(
+        var frame3 = DataFrame.ofDoubles(
             Range.of(0, 6),
             Array.of("B", "F", "G", "H"),
             value -> Math.random()
@@ -299,7 +299,7 @@ public class ReshapingDocs {
 
 
         //Create the union of all 3 frames which should yield an 9x8 frame
-        DataFrame<Integer,String> frame4 = DataFrameOptions.whileNotIgnoringDuplicates(() -> {
+        var frame4 = DataFrameOptions.whileNotIgnoringDuplicates(() -> {
             return DataFrame.combineFirst(frame1, frame2, frame3).rows().sort(true);
         });
         frame4.out().print(formats -> {
@@ -311,10 +311,10 @@ public class ReshapingDocs {
 
     @Test()
     public void mapRowKey() {
-        final Random random = new Random();
+        var random = new Random();
 
         //Create frame of ints keys by String x Integer keys
-        final DataFrame<String,Integer> frame = DataFrame.ofInts(
+        var frame = DataFrame.ofInts(
             Array.of("A", "B", "C", "D", "E"),
             Array.of(0, 1, 2, 3, 4),
             value -> random.nextInt(10)
@@ -329,10 +329,10 @@ public class ReshapingDocs {
         frame.out().print();
 
         //Map row keys to new data type (String -> Month)
-        DataFrame<Month,Integer> frame1 = frame.rows().mapKeys(row -> Month.of(row.ordinal()+1));
+        var frame1 = frame.rows().mapKeys(row -> Month.of(row.ordinal()+1));
 
         //Map column keys new data type (Integer -> String)
-        DataFrame<Month,String> frame2 = frame1.cols().mapKeys(col -> "C-" + col.ordinal());
+        var frame2 = frame1.cols().mapKeys(col -> "C-" + col.ordinal());
 
         //Print result to std out
         frame2.out().print();
@@ -341,7 +341,7 @@ public class ReshapingDocs {
     @Test
     public void replaceKey() {
         //Create a 5x5 DataFrame of random doubles
-        DataFrame<Integer,String> frame = DataFrame.ofDoubles(
+        var frame = DataFrame.ofDoubles(
             Array.of(0, 1, 2, 3, 4),
             Array.of("A", "B", "C", "D", "E"),
             value -> Math.random() * 10d
@@ -361,7 +361,7 @@ public class ReshapingDocs {
     @Test()
     public void dateShift() {
         //Create a 10x4 DataFrame of random doubles
-        DataFrame<LocalDate,String> frame = DataFrame.ofDoubles(
+        var frame = DataFrame.ofDoubles(
             Range.ofLocalDates("2014-01-01", "2014-01-11"),
             Array.of("A", "B", "C", "D"),
             value -> Math.random() * 10d
@@ -371,7 +371,7 @@ public class ReshapingDocs {
             formats.setDecimalFormat(Double.class, "0.000;-0.000", 1);
         });
 
-        DataFrame<LocalDateTime,String> shifted = frame.rows().mapKeys(row -> {
+        var shifted = frame.rows().mapKeys(row -> {
             final LocalDate rowKey = row.key().plusDays(5);
             return LocalDateTime.of(rowKey, LocalTime.of(13, 30));
         });
@@ -391,14 +391,14 @@ public class ReshapingDocs {
     public void transpose() {
 
         //Create a 5x5 DataFrame of random doubles
-        DataFrame<Integer,String> frame = DataFrame.ofDoubles(
+        var frame = DataFrame.ofDoubles(
             Array.of(0, 1, 2, 3, 4),
             Array.of("A", "B", "C", "D", "E"),
             value -> Math.random() * 10d
         );
 
         //Tranpose the transposed frame to get back to a colum store which can be re-shaped
-        DataFrame<String,Integer> transposed = frame.transpose();
+        var transposed = frame.transpose();
         transposed.transpose().rows().add(5);
         transposed.out().print(formats -> {
             formats.setDecimalFormat(Double.class, "0.00;-0.00", 1);

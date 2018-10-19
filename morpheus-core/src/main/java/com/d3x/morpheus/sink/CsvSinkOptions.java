@@ -145,7 +145,7 @@ public class CsvSinkOptions<R> {
      * Sets the formats to use for output to CSV
      * @param configure   the formats to apply
      */
-    public void setFormats(Consumer<Formats> configure) {
+    public void withFormats(Consumer<Formats> configure) {
         if (formats != null) {
             configure.accept(formats);
         } else {

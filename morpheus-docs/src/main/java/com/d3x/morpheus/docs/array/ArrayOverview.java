@@ -41,13 +41,13 @@ public class ArrayOverview {
     public void construction1() {
 
         //Create a dense array of double precision values with default value of NaN
-        Array<Double> denseArray = Array.of(Double.class, 1000, Double.NaN);
+        var denseArray = Array.of(Double.class, 1000, Double.NaN);
         //Create a sparse array which we expect to be only half populated, default value = 0
-        Array<Double> sparseArray = Array.of(Double.class, 1000, 0d, 0.5f);
+        var sparseArray = Array.of(Double.class, 1000, 0d, 0.5f);
         //Created a memory mapped array of double values using an anonymous file
-        Array<Double> mappedArray1 = Array.map(Double.class, 1000, Double.NaN);
+        var mappedArray1 = Array.map(Double.class, 1000, Double.NaN);
         //Created a memory mapped array of double values using a user specified file
-        Array<Double> mappedArray2 = Array.map(Double.class, 1000, Double.NaN, "test.dat");
+        var mappedArray2 = Array.map(Double.class, 1000, Double.NaN, "test.dat");
 
         //Assert that each array is of the type we expect
         Assert.assertTrue(denseArray.type() == Double.class);
@@ -99,7 +99,7 @@ public class ArrayOverview {
         //Read first element as primitive
         Assert.assertEquals(array.getDouble(0), 22d);
         //Read second element as generic boxed value
-        Assert.assertEquals(array.getValue(1), new Double(33d));
+        Assert.assertEquals(array.getValue(1), 33d);
     }
 
     @Test()

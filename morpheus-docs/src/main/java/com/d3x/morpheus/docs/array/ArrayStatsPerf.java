@@ -29,11 +29,11 @@ import com.d3x.morpheus.util.PerfStat;
 public class ArrayStatsPerf {
 
     public static void main(String[] args) {
-        final int count = 10;
-        final int size = 10000000;
-        final Array<Double> array = Array.of(Double.class, size).applyDoubles(v -> Math.random() * 100);
+        var count = 10;
+        var size = 10000000;
+        var array = Array.of(Double.class, size).applyDoubles(v -> Math.random() * 100);
 
-        final DataFrame<String,String> times = PerfStat.run(count, TimeUnit.MILLISECONDS, true, tasks -> {
+        var times = PerfStat.run(count, TimeUnit.MILLISECONDS, true, tasks -> {
             tasks.put("Min", () -> array.stats().min());
             tasks.put("Max", () -> array.stats().max());
             tasks.put("Mean", () -> array.stats().mean());

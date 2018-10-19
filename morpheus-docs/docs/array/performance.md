@@ -19,7 +19,7 @@ labels represent primitive array types while the capitalized `Boolean`, `Integer
 represent the boxed versions.
 
 <p align="center">
-    <img class="chart" src="../../images/native-array-create-times.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/native-array-create-times.png"/>
 </p>
 **Figure 1. Expect significant dispersion in initialization times for large non-primitive arrays**
 
@@ -31,7 +31,7 @@ collector only needs to keep track of one reference when performing its sweep. C
 a profound difference in performance.
 
 <p align="center">
-    <img class="chart" src="../../images/native-array-gc-times.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/native-array-gc-times.png"/>
 </p>
 **Figure 2. ZonedDateTime has a great API for time zone aware dates, but it comes at a price**
 
@@ -43,7 +43,7 @@ milliseconds. Also, it appears that the boxed versions of the `boolean`, `int`, 
 arrays use at least 3 times more memory.
 
 <p align="center">
-    <img class="chart" src="../../images/native-array-memory.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/native-array-memory.png"/>
 </p>
 **Figure 3. The boxed versions of the arrays appear to take more than 2-3 times the memory of their primitive counterparts**
 
@@ -89,7 +89,7 @@ performance is not unexpected, even for the cases where no unboxing is required,
 is necessary to set the value unlike the [] operator for native arrays. 
 
 <p align="center">
-    <img class="chart" src="../../images/native-vs-morpheus-init-times.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/native-vs-morpheus-init-times.png"/>
 </p>
 **Figure 4. Morpheus arrays are slightly slower to initialise, but not alarmingly so - there is payback for the effort**
 
@@ -101,7 +101,7 @@ massive reduction in the GC load easily offsets this. Considering the _magnitude
 array GC times, it feels like a good trade.
 
 <p align="center">
-    <img class="chart" src="../../images/native-vs-morpheus-gc-times.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/native-vs-morpheus-gc-times.png"/>
 </p>
 **Figure 5. Morpheus arrays which are based on primitives internally, are very friendly to the garbage collector**
 
@@ -111,7 +111,7 @@ array. Clearly it is not possible to improve on the allocated memory for primiti
 Morpheus arrays match their native counterparts.
 
 <p align="center">
-    <img class="chart" src="../../images/native-vs-morpheus-memory.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/native-vs-morpheus-memory.png"/>
 </p>
 **Figure 6. Morpheus arrays use significantly less memory than their object counterparts**
 
@@ -132,7 +132,7 @@ is trivial and a fluent extension of the API, and in this mode, it appears that 
 of native sequential execution on a Quad-Core machine. 
 
 <p align="center">
-    <img class="chart" src="../../images/native-vs-morpheus-array-sequential-vs-parallel1.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/native-vs-morpheus-array-sequential-vs-parallel1.png"/>
 </p>
 **Figure 7. Morpheus boxing & unboxing does come at a cost, but figure 8 shows the payoff**
 
@@ -144,7 +144,7 @@ the collector. So while the number of objects created in each test is roughly eq
 take far longer overall.
 
 <p align="center">
-    <img class="chart" src="../../images/native-vs-morpheus-array-sequential-vs-parallel2.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/native-vs-morpheus-array-sequential-vs-parallel2.png"/>
 </p>
 **Figure 8. Including GC times completely changes the picture, and Morpheus proves much faster overall**
 
@@ -152,21 +152,21 @@ The code to generate the plots in figure 7 and 8 is as follows:
 
 <?prettify?>
 ```java
-final int sample = 5;
-final boolean includeGC = false;
+var sample = 5;
+var includeGC = false;
 
-Range<Integer> arrayLengths = Range.of(1, 11).map(i -> i * 100000);
-Array<String> labels = Array.ofStrings("Native(Seq)", "Morpheus(Seq)", "Native(Par)", "Morpheus(Par)");
-DataFrame<String,String> results = DataFrame.ofDoubles(arrayLengths.map(String::valueOf), labels);
+var arrayLengths = Range.of(1, 11).map(i -> i * 100000);
+var labels = Array.ofStrings("Native(Seq)", "Morpheus(Seq)", "Native(Par)", "Morpheus(Par)");
+var results = DataFrame.ofDoubles(arrayLengths.map(String::valueOf), labels);
 
 arrayLengths.forEach(arrayLength -> {
 
-    DataFrame<String,String> timing = PerfStat.run(sample, TimeUnit.MILLISECONDS, includeGC, tasks -> {
+    var timing = PerfStat.run(sample, TimeUnit.MILLISECONDS, includeGC, tasks -> {
 
         tasks.put("Native(Seq)", () -> {
-            final AtomicInteger count = new AtomicInteger();
-            final LocalDateTime start = LocalDateTime.now().minusYears(5);
-            final LocalDateTime[] array = new LocalDateTime[arrayLength];
+            var count = new AtomicInteger();
+            var start = LocalDateTime.now().minusYears(5);
+            var array = new LocalDateTime[arrayLength];
             for (int i=0; i<array.length; ++i) {
                 array[i] = start.plusMinutes(i);
             }
@@ -179,9 +179,9 @@ arrayLengths.forEach(arrayLength -> {
         });
 
         tasks.put("Morpheus(Seq)", () -> {
-            final AtomicInteger count = new AtomicInteger();
-            final LocalDateTime start = LocalDateTime.now().minusYears(5);
-            final Array<LocalDateTime> array = Array.of(LocalDateTime.class, arrayLength);
+            var count = new AtomicInteger();
+            var start = LocalDateTime.now().minusYears(5);
+            var array = Array.of(LocalDateTime.class, arrayLength);
             array.applyValues(v -> start.plusMinutes(v.index()));
             array.forEach(value -> {
                 if (value.getDayOfWeek() == DayOfWeek.MONDAY) {
@@ -192,11 +192,11 @@ arrayLengths.forEach(arrayLength -> {
         });
 
         tasks.put("Native(Par)", () -> {
-            final AtomicInteger count = new AtomicInteger();
-            final LocalDateTime start = LocalDateTime.now().minusYears(5);
-            final IntStream indexes = IntStream.range(0, arrayLength).parallel();
-            final Stream<LocalDateTime> dates = indexes.mapToObj(start::plusMinutes);
-            final LocalDateTime[] array = dates.toArray(LocalDateTime[]::new);
+            var count = new AtomicInteger();
+            var start = LocalDateTime.now().minusYears(5);
+            var indexes = IntStream.range(0, arrayLength).parallel();
+            var dates = indexes.mapToObj(start::plusMinutes);
+            var array = dates.toArray(LocalDateTime[]::new);
             Stream.of(array).parallel().forEach(value -> {
                 if (value.getDayOfWeek() == DayOfWeek.MONDAY) {
                     count.incrementAndGet();
@@ -206,9 +206,9 @@ arrayLengths.forEach(arrayLength -> {
         });
 
         tasks.put("Morpheus(Par)", () -> {
-            final AtomicInteger count = new AtomicInteger();
-            final LocalDateTime start = LocalDateTime.now().minusYears(5);
-            final Array<LocalDateTime> array = Array.of(LocalDateTime.class, arrayLength);
+            var count = new AtomicInteger();
+            var start = LocalDateTime.now().minusYears(5);
+            var array = Array.of(LocalDateTime.class, arrayLength);
             array.parallel().applyValues(v -> start.plusMinutes(v.index()));
             array.parallel().forEach(value -> {
                 if (value.getDayOfWeek() == DayOfWeek.MONDAY) {
@@ -220,7 +220,7 @@ arrayLengths.forEach(arrayLength -> {
 
     });
 
-    String label = String.valueOf(arrayLength);
+    var label = String.valueOf(arrayLength);
     results.data().setDouble(label, "Native(Seq)", timing.data().getDouble("Mean", "Native(Seq)"));
     results.data().setDouble(label, "Morpheus(Seq)", timing.data().getDouble("Mean", "Morpheus(Seq)"));
     results.data().setDouble(label, "Native(Par)", timing.data().getDouble("Mean", "Native(Par)"));
@@ -229,12 +229,12 @@ arrayLengths.forEach(arrayLength -> {
 });
 
 //Create title from template
-final String prefix = "LocalDateTime Array Initialization + Traversal Times";
-final String title = prefix + (includeGC ? " (including-GC)" : " (excluding-GC)");
+var prefix = "LocalDateTime Array Initialization + Traversal Times";
+var title = prefix + (includeGC ? " (including-GC)" : " (excluding-GC)");
 
 //Record chart to file
-final String fileSuffix = includeGC ? "2.png" : "1.png";
-final String filePrefix = "./docs/images/native-vs-morpheus-array-sequential-vs-parallel";
+var fileSuffix = includeGC ? "2.png" : "1.png";
+var filePrefix = "./docs/images/native-vs-morpheus-array-sequential-vs-parallel";
 
 //Plot results as a bar chart
 Chart.create().withBarPlot(results, false, chart -> {
@@ -273,7 +273,7 @@ test, the tables are turned, and FastUtil vastly outperforms the native `Arrays`
 do not include any garbage collection costs incurred after the each test is completed.
 
 <p align="center">
-    <img class="chart" src="../../images/array-sort-native-vs-morpheus-1.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/array-sort-native-vs-morpheus-1.png"/>
 </p>
 **Figure 9. Sorting times for an array of 10 million random double precision values**
 
@@ -283,7 +283,7 @@ performance gap. While this is not an entirely fair comparison, it demonstrates 
 storing everything as primitives. 
 
 <p align="center">
-    <img class="chart" src="../../images/array-sort-native-vs-morpheus-2.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/array-sort-native-vs-morpheus-2.png"/>
 </p>
 **Figure 10. Same test as in figure 9, but using an array of randomly ordered LocalDateTimes**
 
@@ -291,17 +291,17 @@ The code to generate the results in figure 9 is as follows:
 
 <?prettify?>
 ```java
-Range<Integer> arrayLengths = Range.of(1, 11).map(i -> i * 100000);
-Array<String> labels = Array.ofStrings("Native(Seq)", "Morpheus(Seq)", "Native(Par)", "Morpheus(Par)");
-DataFrame<String,String> results = DataFrame.ofDoubles(arrayLengths.map(String::valueOf), labels);
+var arrayLengths = Range.of(1, 11).map(i -> i * 100000);
+var labels = Array.ofStrings("Native(Seq)", "Morpheus(Seq)", "Native(Par)", "Morpheus(Par)");
+var results = DataFrame.ofDoubles(arrayLengths.map(String::valueOf), labels);
 
 arrayLengths.forEach(length -> {
 
     System.out.println("Running sort test for array length " + length);
-    double[] array1 = new double[length];
-    Array<Double> array2 = Array.of(Double.class, length);
+    var array1 = new double[length];
+    var array2 = Array.of(Double.class, length);
 
-    DataFrame<String,String> timing = PerfStat.run(sample, TimeUnit.MILLISECONDS, false, tasks -> {
+    var timing = PerfStat.run(sample, TimeUnit.MILLISECONDS, false, tasks -> {
         tasks.put("Native(Seq)", () -> { Arrays.sort(array1); return array1; });
         tasks.put("Morpheus(Seq)", () -> array2.sort(true) );
         tasks.put("Native(Par)", () -> { Arrays.parallelSort(array1); return array1; });
@@ -312,11 +312,11 @@ arrayLengths.forEach(length -> {
         });
     });
 
-    String label = String.valueOf(length);
-    results.data().setDouble(label, "Native(Seq)", timing.data().getDouble("Mean", "Native(Seq)"));
-    results.data().setDouble(label, "Morpheus(Seq)", timing.data().getDouble("Mean", "Morpheus(Seq)"));
-    results.data().setDouble(label, "Native(Par)", timing.data().getDouble("Mean", "Native(Par)"));
-    results.data().setDouble(label, "Morpheus(Par)", timing.data().getDouble("Mean", "Morpheus(Par)"));
+    var label = String.valueOf(length);
+    results.setDouble(label, "Native(Seq)", timing.getDouble("Mean", "Native(Seq)"));
+    results.setDouble(label, "Morpheus(Seq)", timing.getDouble("Mean", "Morpheus(Seq)"));
+    results.setDouble(label, "Native(Par)", timing.getDouble("Mean", "Native(Par)"));
+    results.setDouble(label, "Morpheus(Par)", timing.getDouble("Mean", "Morpheus(Par)"));
 });
 
 Chart.create().withBarPlot(results, false, chart -> {
@@ -339,7 +339,7 @@ calculation times for these quantities on a Morpheus array of 10 million random 
 values. The code used to generate this plot is also included.
 
 <p align="center">
-    <img class="chart" src="../../images/morpheus-stat-times.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/morpheus-stat-times.png"/>
 </p>
 **Figure 11. Calculation times for various summary statistics on a Morpheus array with 10 million elements**
 
@@ -347,11 +347,11 @@ The code to generate these results is as follows:
 
 <?prettify?>
 ```java
-final int count = 10;
-final int size = 10000000;
-final Array<Double> array = Array.of(Double.class, size).applyDoubles(v -> Math.random() * 100);
+var count = 10;
+var size = 10000000;
+var array = Array.of(Double.class, size).applyDoubles(v -> Math.random() * 100);
 
-final DataFrame<String,String> times = PerfStat.run(count, TimeUnit.MILLISECONDS, true, tasks -> {
+var times = PerfStat.run(count, TimeUnit.MILLISECONDS, true, tasks -> {
     tasks.put("Min", () -> array.stats().min());
     tasks.put("Max", () -> array.stats().max());
     tasks.put("Mean", () -> array.stats().mean());

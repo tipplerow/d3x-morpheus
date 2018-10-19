@@ -52,12 +52,12 @@ public class OverviewDocs {
             options.setResource("http://zavtech.com/data/samples/cars93.csv");
             options.setExcludeColumnIndexes(0);
         }).rows().select(row -> {
-            double weightKG = row.getDouble("Weight") * 0.453592d;
-            double horsepower = row.getDouble("Horsepower");
+            var weightKG = row.getDouble("Weight") * 0.453592d;
+            var horsepower = row.getDouble("Horsepower");
             return horsepower / weightKG > 0.1d;
         }).cols().add("MPG(Highway/City)", Double.class, v -> {
-            double cityMpg = v.row().getDouble("MPG.city");
-            double highwayMpg = v.row().getDouble("MPG.highway");
+            var cityMpg = v.row().getDouble("MPG.city");
+            var highwayMpg = v.row().getDouble("MPG.highway");
             return highwayMpg / cityMpg;
         }).rows().sort(false, "MPG(Highway/City)").write().csv(options -> {
             options.setFile("/Users/witdxav/cars93m.csv");
@@ -151,14 +151,14 @@ public class OverviewDocs {
             var prices = loadHousePrices(year);
             prices.rows().select(row -> {
                 //Filter rows to include only apartments in the relevant cities
-                final String propType = row.getValue("PropertyType");
-                final String city = row.getValue("City");
-                final String cityUpperCase = city != null ? city.toUpperCase() : null;
+                var propType = row.getValue("PropertyType");
+                var city = (String)row.getValue("City");
+                var cityUpperCase = city != null ? city.toUpperCase() : null;
                 return propType != null && propType.equals("F") && results.cols().contains(cityUpperCase);
             }).rows().groupBy("City").forEach(0, (groupKey, group) -> {
                 //Group row filtered frame so we can compute median prices in selected cities
-                final String city = groupKey.item(0);
-                final double priceStat = group.col("PricePaid").stats().median();
+                var city = (String)groupKey.item(0);
+                var priceStat = group.col("PricePaid").stats().median();
                 results.setDouble(year, city, priceStat);
             });
         });
@@ -194,22 +194,22 @@ public class OverviewDocs {
 
     @Test()
     public void housePriceDownload() {
-        final String userHome = System.getProperty("user.home");
-        final String url = "http://prod.publicdata.landregistry.gov.uk.s3-website-eu-west-1.amazonaws.com/pp-%1$d.csv";
+        var userHome = System.getProperty("user.home");
+        var url = "http://prod.publicdata.landregistry.gov.uk.s3-website-eu-west-1.amazonaws.com/pp-%1$d.csv";
         IntStream.range(1995, 2017).forEach(year -> {
             BufferedInputStream bis = null;
             BufferedOutputStream bos = null;
             try {
-                final String urlString = String.format(url, year);
-                final String fileName = String.format("uk-house-prices-%1$d.csv", year);
-                final File file = new File(userHome, "uk-house-prices/" + fileName);
+                var urlString = String.format(url, year);
+                var fileName = String.format("uk-house-prices-%1$d.csv", year);
+                var file = new File(userHome, "uk-house-prices/" + fileName);
                 file.getParentFile().mkdirs();
                 bos = new BufferedOutputStream(new FileOutputStream(file));
                 bis = new BufferedInputStream(new URL(urlString).openStream());
                 System.out.println("Downloading house prices to " + file.getAbsolutePath());
-                final byte[] buffer = new byte[(int)Math.pow(1024, 2)];
+                var buffer = new byte[(int)Math.pow(1024, 2)];
                 while (true) {
-                    final int read = bis.read(buffer);
+                    var read = bis.read(buffer);
                     if (read < 0) break;
                     else {
                         bos.write(buffer, 0, read);

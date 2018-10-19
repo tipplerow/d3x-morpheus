@@ -27,11 +27,13 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.Month;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.zip.GZIPOutputStream;
 
 import com.d3x.morpheus.db.DbSink;
+import com.d3x.morpheus.json.JsonSink;
 import org.testng.annotations.Test;
 
 import com.d3x.morpheus.frame.DataFrame;
@@ -64,8 +66,8 @@ public class WritingDocs {
 
 
     private DataFrame<LocalDate,String> frame() {
-        final LocalDate start = LocalDate.of(2014, 1, 1);
-        final Range<LocalDate> rowKeys = Range.of(start, start.plusDays(10));
+        var start = LocalDate.of(2014, 1, 1);
+        var rowKeys = Range.of(start, start.plusDays(10));
         return DataFrame.of(rowKeys, String.class, columns -> {
             columns.add("Column-0", Boolean.class, v -> Math.random() > 0.5d);
             columns.add("Column-1", Double.class, v -> Math.random() * 10d);
@@ -74,57 +76,84 @@ public class WritingDocs {
             columns.add("Column-4", Integer.class, v -> (int)(Math.random() * 10));
             columns.add("Column-5", String.class, v -> String.format("(%s,%s)", v.rowOrdinal(), v.colOrdinal()));
             columns.add("Column-6", LocalDateTime.class, v -> LocalDateTime.now().plusMinutes(v.rowOrdinal()).minusYears(3).plusMonths(5));
-            //columns.add("Column-6", LocalDateTime.class, v -> LocalDateTime.now().plusMinutes(v.rowOrdinal()));
         });
     }
 
+
     @Test()
-    public void writeCsv() {
-        DataFrame<LocalDate,String> frame = frame();
-
-        frame.out().print();
-
+    public void writeCsv1() {
+        var frame = frame();
         frame.write().csv(options -> {
-            options.setFile("/Users/witdxav/morpheus/tests/DataFrame-1.csv");
+            options.setFile("/Users/witdxav/temp/test.csv");
             options.setSeparator(",");
             options.setIncludeRowHeader(true);
             options.setIncludeColumnHeader(true);
             options.setNullText("null");
             options.setTitle("Date");
             options.setRowKeyPrinter(Printer.ofLocalDate("yyyy-MM-dd"));
-            options.setFormats(formats -> {
-                formats.setTimeFormat("Column-2", "HH:mm");
-                formats.setDateTimeFormat("Column-6", "dd-MMM-yyyy HH:mm");
+            options.withFormats(formats -> {
+                var timeFormat = DateTimeFormatter.ofPattern("HH:mm");
+                var dateTimeFormat = DateTimeFormatter.ofPattern("dd-MMM-yyyy HH:mm");
                 formats.setDecimalFormat(Double.class, "0.00##;-0.00##", 1);
-                formats.setPrinter("Column-3", Printer.<Month>forObject(v -> v.name().toLowerCase()));
+                formats.setPrinter("Column-3", Printer.ofEnum());
+                formats.setPrinter("Column-2", Printer.ofLocalTime(timeFormat));
+                formats.setPrinter("Column-6", Printer.ofLocalDateTime(dateTimeFormat));
             });
         });
+    }
+
+
+    @Test()
+    public void writeCsv2() {
+        var frame = frame();
+        var bytes = new ByteArrayOutputStream(1024 * 100);
+        frame.write().csv(options -> {
+            options.setOutputStream(bytes);
+            options.setSeparator(",");
+            options.setIncludeRowHeader(true);
+            options.setIncludeColumnHeader(true);
+            options.setNullText("null");
+            options.setTitle("Date");
+            options.setRowKeyPrinter(Printer.ofLocalDate("yyyy-MM-dd"));
+            options.withFormats(formats -> {
+                var timeFormat = DateTimeFormatter.ofPattern("HH:mm");
+                var dateTimeFormat = DateTimeFormatter.ofPattern("dd-MMM-yyyy HH:mm");
+                formats.setDecimalFormat(Double.class, "0.00##;-0.00##", 1);
+                formats.setPrinter("Column-3", Printer.ofEnum());
+                formats.setPrinter("Column-2", Printer.ofLocalTime(timeFormat));
+                formats.setPrinter("Column-6", Printer.ofLocalDateTime(dateTimeFormat));
+            });
+        });
+
+        IO.println(new String(bytes.toByteArray()));
     }
 
 
     @Test()
     public void writeJson() {
-        /*
-        DataFrame<LocalDate,String> frame = frame();
-        frame.write().json(options -> {
-            options.setFile("/Users/witdxav/morpheus/tests/DataFrame-1.json");
+        var frame = frame();
+        var jsonSink = new JsonSink();
+        var bytes = new ByteArrayOutputStream(1024 * 100);
+        jsonSink.write(frame, options -> {
+            options.setOutputStream(bytes);
             options.setEncoding("UTF-8");
-            options.setFormats(formats -> {
+            options.withFormats(formats -> {
                 formats.setTimeFormat("Column-2", "HH:mm");
                 formats.setDateTimeFormat("Column-6", "dd-MMM-yyyy HH:mm");
                 formats.setDecimalFormat(Double.class, "0.00##;-0.00##", 1);
                 formats.setPrinter("Column-3", Printer.<Month>forObject(v -> v.name().toLowerCase()));
             });
         });
-        */
+
+        IO.println(new String(bytes.toByteArray()));
     }
 
 
     @Test()
     public void writeDb() throws Exception {
-        DataFrame<LocalDate,String> frame = frame();
         Class.forName("org.hsqldb.jdbcDriver");
-        DbSink dbSink = new DbSink();
+        var frame = frame();
+        var dbSink = new DbSink();
         dbSink.write(frame, options -> {
             options.setBatchSize(1000);
             options.setTableName("TestTable");
@@ -154,8 +183,8 @@ public class WritingDocs {
     @Test()
     public void postCsvToHttpEndPoint() throws IOException {
 
-        final LocalDate start = LocalDate.of(2014, 1, 1);
-        final Range<LocalDate> rowKeys = Range.of(start, start.plusDays(10));
+        var start = LocalDate.of(2014, 1, 1);
+        var rowKeys = Range.of(start, start.plusDays(10));
         DataFrame<LocalDate,String> frame = DataFrame.of(rowKeys, String.class, columns -> {
             columns.add("Column-0", Double.class, v -> Math.random());
             columns.add("Column-1", LocalTime.class, v -> LocalTime.now().plusMinutes(v.rowOrdinal()));
@@ -165,7 +194,7 @@ public class WritingDocs {
             columns.add("Column-5", LocalDateTime.class, v -> LocalDateTime.now().plusMinutes(v.rowOrdinal()));
         });
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        var baos = new ByteArrayOutputStream();
         frame.write().csv(options -> {
             try {
                 options.setOutputStream(new GZIPOutputStream(baos));
@@ -175,7 +204,7 @@ public class WritingDocs {
                 options.setNullText("null");
                 options.setTitle("Date");
                 options.setRowKeyPrinter(Printer.forObject(LocalDate::toString));
-                options.setFormats(formats -> {
+                options.withFormats(formats -> {
                     formats.setDecimalFormat(Double.class, "0.00##;-0.00##", 1);
                     formats.setTimeFormat("Column-1", "HH:mm");
                     formats.setDateTimeFormat("Column-5", "dd-MMM-yyyy HH:mm");
@@ -186,7 +215,7 @@ public class WritingDocs {
             }
         });
 
-        final byte[] bytes = baos.toByteArray();
+        var bytes = baos.toByteArray();
         HttpClient.getDefault().doPost(post -> {
             post.setRetryCount(5);
             post.setReadTimeout(5000);
@@ -208,60 +237,25 @@ public class WritingDocs {
 
     @Test()
     public void writeCustom() {
-        final DataFrame<LocalDate,String> frame = frame();
+        var frame = frame();
         frame.write().to(new CustomSink<>(), options -> {
-            options.setFile(new File("/Users/witdxav/test/DataFrame-1.gzip"));
-            options.setCompressed(true);
+            try {
+                options.setOutput(new FileOutputStream(new File("/Users/witdxav/test/DataFrame-1.gzip")));
+                options.setCompressed(true);
+            } catch (Exception ex) {
+                throw new RuntimeException(ex.getMessage(), ex);
+            }
         });
-
     }
 
 
 
-    public class CustomSinkOptions {
-
-        private OutputStream output;
-        private boolean compressed;
-
-        /**
-         * Returns the output stream to write to
-         * @return      the output stream to write to
-         */
-        public OutputStream getOutput() {
-            return output;
-        }
-
-        /**
-         * Returns true if compression is enabled
-         * @return  true if compression is enabled
-         */
-        public boolean isCompressed() {
-            return compressed;
-        }
-
-        /**
-         * Sets the output for these options
-         * @param output    the output stream to write to
-         */
-        public void setOutput(OutputStream output) {
-            this.output = output;
-        }
-
-        /**
-         * Sets the file output for these options
-         * @param file  the output file
-         */
-        public void setFile(File file) {
-            this.output = Try.call(() -> new BufferedOutputStream(new FileOutputStream(file)));
-        }
-
-        /**
-         * Sets whether the output should be wrapped in a GZIP stream
-         * @param compressed    true to wrap output in GZIP compression
-         */
-        public void setCompressed(boolean compressed) {
-            this.compressed = compressed;
-        }
+    @lombok.NoArgsConstructor()
+    @lombok.AllArgsConstructor()
+    @lombok.Builder(toBuilder = true)
+    public static class CustomSinkOptions {
+        @lombok.Getter @lombok.Setter private OutputStream output;
+        @lombok.Getter @lombok.Setter private boolean compressed;
     }
 
 
@@ -269,8 +263,8 @@ public class WritingDocs {
     public class CustomSink<R,C> implements DataFrameSink<R,C,CustomSinkOptions> {
         @Override
         public void write(DataFrame<R,C> frame, Consumer<CustomSinkOptions> configurator) {
-            final CustomSinkOptions options = Initialiser.apply(new CustomSinkOptions(), configurator);
             ObjectOutputStream os = null;
+            var options = Initialiser.apply(new CustomSinkOptions(), configurator);
             try {
                 if (options.isCompressed()) {
                     os = new ObjectOutputStream(new GZIPOutputStream(options.getOutput()));

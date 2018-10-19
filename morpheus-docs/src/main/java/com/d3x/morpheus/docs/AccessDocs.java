@@ -40,8 +40,8 @@ public class AccessDocs {
     @DataProvider(name="frame")
     public Object[][] getFrame() {
         //Create 5x5 frame with columns of different types.
-        final Range<Year> years = Range.of(2000 ,2005).map(Year::of);
-        final DataFrame<Year,String> frame = DataFrame.of(years, String.class, columns -> {
+        var years = Range.of(2000 ,2005).map(Year::of);
+        var frame = DataFrame.of(years, String.class, columns -> {
             columns.add("Column-0", Array.of(true, false, false, true, true));
             columns.add("Column-1", Array.of(1, 2, 3, 4, 5));
             columns.add("Column-2", Array.of(10L, 11L, 12L, 13L, 14L));
@@ -55,8 +55,8 @@ public class AccessDocs {
     @Test()
     public void testFrame() {
         //Create 5x5 frame with columns of different types.
-        final Range<Year> years = Range.of(2000 ,2005).map(Year::of);
-        final DataFrame<Year,String> frame = DataFrame.of(years, String.class, columns -> {
+        var years = Range.of(2000 ,2005).map(Year::of);
+        var frame = DataFrame.of(years, String.class, columns -> {
             columns.add("Column-0", Array.of(true, false, false, true, true));
             columns.add("Column-1", Array.of(1, 2, 3, 4, 5));
             columns.add("Column-2", Array.of(10L, 11L, 12L, 13L, 14L));
@@ -74,42 +74,42 @@ public class AccessDocs {
         frame.out().print();
 
         //Random access to primitive boolean values via ordinal or keys or any combination thereof
-        boolean b1 = frame.getBooleanAt(0, 0);
-        boolean b2 = frame.getBoolean(Year.of(2001), "Column-0");
-        boolean b3 = frame.rows().getBoolean(Year.of(2003), 0);
-        boolean b4 = frame.rows().getBooleanAt(0, "Column-0");
-        boolean b5 = frame.cols().getBoolean("Column-0", 0);
-        boolean b6 = frame.cols().getBooleanAt(0, Year.of(2003));
+        var b1 = frame.getBooleanAt(0, 0);
+        var b2 = frame.getBoolean(Year.of(2001), "Column-0");
+        var b3 = frame.rows().getBoolean(Year.of(2003), 0);
+        var b4 = frame.rows().getBooleanAt(0, "Column-0");
+        var b5 = frame.cols().getBoolean("Column-0", 0);
+        var b6 = frame.cols().getBooleanAt(0, Year.of(2003));
 
         //Random access to primitive int values via ordinal or keys or any combination thereof
-        int i1 = frame.getIntAt(4, 1);
-        int i2 = frame.getInt(Year.of(2001), "Column-1");
-        int i3 = frame.rows().getInt(Year.of(2003), 1);
-        int i4 = frame.rows().getIntAt(0, "Column-1");
-        int i5 = frame.cols().getInt("Column-0", 0);
-        int i6 = frame.cols().getIntAt(0, Year.of(2003));
+        var i1 = frame.getIntAt(4, 1);
+        var i2 = frame.getInt(Year.of(2001), "Column-1");
+        var i3 = frame.rows().getInt(Year.of(2003), 1);
+        var i4 = frame.rows().getIntAt(0, "Column-1");
+        var i5 = frame.cols().getInt("Column-0", 0);
+        var i6 = frame.cols().getIntAt(0, Year.of(2003));
 
         //Random access to primitive long values via ordinal or keys or any combination thereof
-        long l1 = frame.getLongAt(4, 2);
-        long l2 = frame.getLong(Year.of(2001), "Column-2");
-        long l3 = frame.rows().getLong(Year.of(2003), 2);
-        long l4 = frame.rows().getLongAt(0, "Column-2");
-        long l5 = frame.cols().getLong("Column-0", 0);
-        long l6 = frame.cols().getLongAt(0, Year.of(2003));
+        var l1 = frame.getLongAt(4, 2);
+        var l2 = frame.getLong(Year.of(2001), "Column-2");
+        var l3 = frame.rows().getLong(Year.of(2003), 2);
+        var l4 = frame.rows().getLongAt(0, "Column-2");
+        var l5 = frame.cols().getLong("Column-0", 0);
+        var l6 = frame.cols().getLongAt(0, Year.of(2003));
 
         //Random access to primitive double values via ordinal or keys or any combination thereof
-        double d1 = frame.getDoubleAt(4, 3);
-        double d2 = frame.getDouble(Year.of(2001), "Column-3");
-        double d3 = frame.rows().getDouble(Year.of(2003), 3);
-        double d4 = frame.rows().getDoubleAt(0, "Column-3");
-        double d5 = frame.cols().getDouble("Column-0", 0);
-        double d6 = frame.cols().getDoubleAt(0, Year.of(2003));
+        var d1 = frame.getDoubleAt(4, 3);
+        var d2 = frame.getDouble(Year.of(2001), "Column-3");
+        var d3 = frame.rows().getDouble(Year.of(2003), 3);
+        var d4 = frame.rows().getDoubleAt(0, "Column-3");
+        var d5 = frame.cols().getDouble("Column-0", 0);
+        var d6 = frame.cols().getDoubleAt(0, Year.of(2003));
 
         //Random access to any values via ordinal or keys or any combination thereof
-        String o1 = frame.getValueAt(0, 4);
-        Double o2 = frame.getValue(Year.of(2003), "Column-4");
-        LocalDate o3 = frame.rows().getValue(Year.of(2001), 4);
-        Month o4 = frame.rows().getValueAt(2, "Column-4");
+        var o1 = frame.<String>getValueAt(0, 4);
+        var o2 = frame.<Double>getValue(Year.of(2003), "Column-4");
+        var o3 = frame.rows().<LocalDate>getValue(Year.of(2001), 4);
+        var o4 = frame.rows().<Month>getValueAt(2, "Column-4");
     }
 
 
@@ -117,7 +117,7 @@ public class AccessDocs {
     public void testAllAccess() {
 
         //Create DataFrame of random doubles
-        DataFrame<Integer,String> frame = DataFrame.ofDoubles(
+        var frame = DataFrame.ofDoubles(
             Array.of(0, 1, 2, 3, 4, 5, 6, 7),
             Array.of("A", "B", "C", "D"),
             value -> Math.random()
@@ -132,7 +132,7 @@ public class AccessDocs {
 
     @Test()
     public void testPercentageConversion() {
-        final DataFrame<Tuple,String> frame = DemoData.loadPopulationDataset();
+        var frame = DemoData.loadPopulationDataset();
         //Sequential: Convert male & female population counts into weights
         frame.rows().parallel().forEach(row -> row.forEach(value -> {
             if (value.colKey().matches("M\\s+\\d+")) {
@@ -159,30 +159,31 @@ public class AccessDocs {
 
     @Test()
     public void testRandomAccess1() {
-        final DataFrame<Tuple,String> frame = DemoData.loadPopulationDataset();
+        //Load the ONS dataset
+        var frame = DemoData.loadPopulationDataset();
 
         //Random access to a row by ordinal or key
-        DataFrameRow<Tuple,String> row1 = frame.rowAt(4);
-        DataFrameRow<Tuple,String> row2 = frame.row(Tuple.of(2003, "City of London"));
+        var row1 = frame.rowAt(4);
+        var row2 = frame.row(Tuple.of(2003, "City of London"));
 
         //Random access to a column by ordinal or key
-        DataFrameColumn<Tuple,String> column1 = frame.colAt(2);
-        DataFrameColumn<Tuple,String> column2 = frame.col("All Persons");
+        var column1 = frame.colAt(2);
+        var column2 = frame.col("All Persons");
 
         //Access first and last rows
-        Optional<DataFrameRow<Tuple,String>> firstRow = frame.rows().first();
-        Optional<DataFrameRow<Tuple,String>> lastRow = frame.rows().last();
+        var firstRow = frame.rows().first();
+        var lastRow = frame.rows().last();
 
         //Access first and last columns
-        Optional<DataFrameColumn<Tuple,String>> firstColumn = frame.cols().first();
-        Optional<DataFrameColumn<Tuple,String>> lastColumn = frame.cols().last();
+        var firstColumn = frame.cols().first();
+        var lastColumn = frame.cols().last();
 
     }
 
 
     @Test()
     public void testRandomAccess2() {
-        final DataFrame<Tuple,String> frame = DemoData.loadPopulationDataset();
+        var frame = DemoData.loadPopulationDataset();
 
         // Find row with max value for All Persons column using column index
         frame.colAt(2).max().ifPresent(value -> {
@@ -197,11 +198,11 @@ public class AccessDocs {
 
 
         // Find row with max value for "All Persons: column using column key
-        final double expectedMax = frame.col("All Persons").stats().max();
+        var expectedMax = frame.col("All Persons").stats().max();
         frame.col("All Persons").max().ifPresent(value -> {
-            final DataFrameRow<Tuple,String> row = frame.row(value.rowKey());
-            final double actualMax = row.getDouble("All Persons");
-            Asserts.assertEquals(actualMax, expectedMax, "The max values match");
+            var row = frame.row(value.rowKey());
+            var actualMax = row.getDouble("All Persons");
+            Asserts.assertEquals(actualMax, expectedMax.doubleValue(), "The max values match");
         });
 
         //Access 5th row by row key, and find first value that matches a predicate
@@ -215,11 +216,11 @@ public class AccessDocs {
 
     @Test()
     public void testArrayAccess() {
-        final Array<Boolean> booleanArray = Array.of(true, false, true, false);
-        final Array<Integer> intArray = Array.of(1, 2, 3, 4, 5);
-        final Array<Long> longArray = Array.of(1L, 2L, 3L, 4L, 5L);
-        final Array<Double> doubleArray = Array.of(1d, 2d, 3d, 4d, 5d);
-        final Array<Object> objectArray = Array.of("Hello", LocalDate.of(1998, 1, 1), Month.JANUARY, 56.45d, true);
+        var booleanArray = Array.of(true, false, true, false);
+        var intArray = Array.of(1, 2, 3, 4, 5);
+        var longArray = Array.of(1L, 2L, 3L, 4L, 5L);
+        var doubleArray = Array.of(1d, 2d, 3d, 4d, 5d);
+        var objectArray = Array.of("Hello", LocalDate.of(1998, 1, 1), Month.JANUARY, 56.45d, true);
 
         System.out.println(booleanArray.getClass().getName());
         System.out.println(intArray.getClass().getName());
@@ -233,7 +234,7 @@ public class AccessDocs {
     public void demean() {
 
         //Load population dataset
-        final DataFrame<Tuple,String> onsFrame = DemoData.loadPopulationDataset();
+        var onsFrame = DemoData.loadPopulationDataset();
 
         //Iterate over male then female column set
         Array.of("M\\s+\\d++", "F\\s+\\d++").forEach(regex -> {
@@ -255,13 +256,13 @@ public class AccessDocs {
     @Test()
     public void weights() {
         //Load ONS population dataset
-        final DataFrame<Tuple,String> onsFrame = DemoData.loadPopulationDataset();
+        var onsFrame = DemoData.loadPopulationDataset();
 
         //Define function to compute population weight as a percentage of 2007 value per borough
-        final ToDoubleFunction<DataFrameValue<Tuple,String>> compute = value -> {
-            final String borough = value.rowKey().item(1);
-            final Tuple rowKey2014 = Tuple.of(2007, borough);
-            final double boroughCountIn2014 = onsFrame.getDouble(rowKey2014, "All Persons");
+        ToDoubleFunction<DataFrameValue<Tuple,String>> compute = value -> {
+            var borough = value.rowKey().item(1);
+            var rowKey2014 = Tuple.of(2007, borough);
+            var boroughCountIn2014 = onsFrame.getDouble(rowKey2014, "All Persons");
             return value.getDouble() / boroughCountIn2014;
         };
 

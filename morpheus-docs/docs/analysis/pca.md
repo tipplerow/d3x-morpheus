@@ -130,7 +130,7 @@ values representing its red, green, blue and alpha intensity.  Since each compon
 8-bit sequence, they have a range between 0 and 255 in base-10.
 
 <div style="text-align:center;">
-    <img src="../../images/pca/poppet.jpg" width="249" height="178"/>
+    <img class="img-fluid" src="/images/morpheus/pca/poppet.jpg"/>
 </div>
 
 We can load the target image into a Morpheus `DataFrame` of RGBA values using the code below. Here we initialize a frame of
@@ -142,11 +142,11 @@ import java.net.URL;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 
-URL url = getClass().getResource("/poppet.jpg");
-BufferedImage image = ImageIO.read(url);
-int rowCount = image.getHeight()
-int colCount = image.getWidth();
-DataFrame<Integer,Integer> rgbFrame = DataFrame.ofInts(rowCount, colCount, v -> {
+var url = getClass().getResource("/poppet.jpg");
+var image = ImageIO.read(url);
+var rowCount = image.getHeight()
+var colCount = image.getWidth();
+var rgbFrame = DataFrame.ofInts(rowCount, colCount, v -> {
     return image.getRGB(v.colOrdinal(), v.rowOrdinal());
 });
 ```
@@ -159,7 +159,7 @@ illustrated below, where the first 8 most significant bits represent the alpha c
 by green and then blue.
 
 <div style="text-align:center;">
-    <img src="../../images/pca/argb-channels.png"/>
+    <img class="img-fluid" src="/images/morpheus/pca/argb-channels.png"/>
 </div>
 
 To extract the 8-bit value representing the red intensity, we first need to shift our string of bits 16 places to the right so that 
@@ -172,9 +172,9 @@ operations just described.
 
 <?prettify?>
 ```java
-DataFrame<Integer,Integer> red = rgbFrame.mapToDoubles(v -> (v.getInt() >> 16) & 0xFF);
-DataFrame<Integer,Integer> green = rgbFrame.mapToDoubles(v -> (v.getInt() >> 8) & 0xFF);
-DataFrame<Integer,Integer> blue = rgbFrame.mapToDoubles(v -> v.getInt() & 0xFF);
+var red = rgbFrame.mapToDoubles(v -> (v.getInt() >> 16) & 0xFF);
+var green = rgbFrame.mapToDoubles(v -> (v.getInt() >> 8) & 0xFF);
+var blue = rgbFrame.mapToDoubles(v -> v.getInt() & 0xFF);
 ```
 
 ### Explained Variance
@@ -189,25 +189,25 @@ the `DataFrame` before calling the `pca()` method as the Morpheus library assume
 
 <?prettify?>
 ```java
-URL url = getClass().getResource("/poppet.jpg");
-DataFrame<Integer,Integer> rgbFrame = DataFrame.ofImage(url);
-Range<Integer> rowKeys = Range.of(0, rgbFrame.rowCount());
+var url = getClass().getResource("/poppet.jpg");
+var rgbFrame = DataFrame.ofImage(url);
+var rowKeys = Range.of(0, rgbFrame.rowCount());
 
-DataFrame<Integer,String> result = DataFrame.ofDoubles(rowKeys, Array.of("Red", "Green", "Blue"));
+var result = DataFrame.ofDoubles(rowKeys, Array.of("Red", "Green", "Blue"));
 Collect.<String,DataFrame<Integer,Integer>>asMap(mapping -> {
     mapping.put("Red", rgbFrame.mapToDoubles(v -> (v.getInt() >> 16) & 0xFF));
     mapping.put("Green", rgbFrame.mapToDoubles(v -> (v.getInt() >> 8) & 0xFF));
     mapping.put("Blue", rgbFrame.mapToDoubles(v -> v.getInt() & 0xFF));
 }).forEach((name, color) -> {
     color.transpose().pca().apply(true, model -> {
-        DataFrame<Integer,Field> eigenFrame = model.getEigenValues();
-        DataFrame<Integer,Field> varPercent = eigenFrame.cols().select(Field.VAR_PERCENT);
+        var eigenFrame = model.getEigenValues();
+        var varPercent = eigenFrame.cols().select(Field.VAR_PERCENT);
         result.update(varPercent.cols().mapKeys(k -> name), false, false);
         return Optional.empty();
     });
 });
 
-DataFrame<Integer,String> chartData = result.rows().select(c -> c.ordinal() < 10).copy();
+var chartData = result.rows().select(c -> c.ordinal() < 10).copy();
 Chart.create().withBarPlot(chartData.rows().mapKeys(r -> String.valueOf(r.ordinal())), false, chart -> {
     chart.plot().style("Red").withColor(Color.RED);
     chart.plot().style("Green").withColor(Color.GREEN);
@@ -226,7 +226,7 @@ off fairly monotonically, and by the time we get to the fifth component, only ab
 colors.
 
 <div style="text-align:center;">
-    <img class="chart" src="../../images/pca/poppet-explained-variance.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/pca/poppet-explained-variance.png"/>
 </div>
 
 ### Dimensional Reduction
@@ -245,11 +245,11 @@ of the image).
 
 <?prettify?>
 ```java
-URL url = getClass().getResource("/poppet.jpg");
-DataFrame<Integer,Integer> image = DataFrame.ofImage(url).transpose();
-DataFrame<Integer,Integer> red = image.mapToDoubles(v -> (v.getInt() >> 16) & 0xFF);
+var url = getClass().getResource("/poppet.jpg");
+var image = DataFrame.ofImage(url).transpose();
+var red = image.mapToDoubles(v -> (v.getInt() >> 16) & 0xFF);
 red.pca().apply(true, model -> {
-    DataFrame<Integer,Integer> scores = model.getScores();
+    var scores = model.getScores();
     Assert.assertEquals(scores.rowCount(), 504);
     Assert.assertEquals(scores.colCount(), 360);
     return Optional.empty();
@@ -276,11 +276,11 @@ than `nxp`, where `k` is the number of components to include (below we use `k=10
 
 <?prettify?>
 ```java
-URL url = getClass().getResource("/poppet.jpg");
-DataFrame<Integer,Integer> image = DataFrame.ofImage(url).transpose();
-DataFrame<Integer,Integer> red = image.mapToDoubles(v -> (v.getInt() >> 16) & 0xFF);
+var url = getClass().getResource("/poppet.jpg");
+var image = DataFrame.ofImage(url).transpose();
+var red = image.mapToDoubles(v -> (v.getInt() >> 16) & 0xFF);
 red.pca().apply(true, model -> {
-    DataFrame<Integer,Integer> scores = model.getScores(10);
+    var scores = model.getScores(10);
     Assert.assertEquals(scores.rowCount(), 504);
     Assert.assertEquals(scores.colCount(), 10);
     return Optional.empty();
@@ -300,11 +300,11 @@ of this data matches our original image, namely `504x360` (since we transpose th
 
 <?prettify?>
 ```java
-URL url = getClass().getResource("/poppet.jpg");
-DataFrame<Integer,Integer> image = DataFrame.ofImage(url).transpose();
-DataFrame<Integer,Integer> red = image.mapToDoubles(v -> (v.getInt() >> 16) & 0xFF);
+var url = getClass().getResource("/poppet.jpg");
+var image = DataFrame.ofImage(url).transpose();
+var red = image.mapToDoubles(v -> (v.getInt() >> 16) & 0xFF);
 red.pca().apply(true, model -> {
-    DataFrame<Integer,Integer> projection = model.getProjection(10);
+    var projection = model.getProjection(10);
     Assert.assertEquals(projection.rowCount(), 504);
     Assert.assertEquals(projection.colCount(), 360);
     return Optional.empty();
@@ -324,78 +324,76 @@ where we project the image using only 5 components all the way through to 70 com
 total number of components, namely 360 in this case, but it is clear that once we include up to 50 components, the transformed image 
 is almost indistinguishable from the original, at least to the human eye.
 
-<table>
-    <tr>
-        <td class="dog">
-            <img class="dog" src="../../images/pca/poppet-5.jpg"/><br>
-            <span>5 Principal Components</span>
-        </td>
-        <td class="dog">
-            <img class="dog" src="../../images/pca/poppet-10.jpg"/><br>
-            <span>10 Principal Components</span>
-        </td>
-        <td class="dog">
-            <img class="dog" src="../../images/pca/poppet-15.jpg"/><br>
-            <span>15 Principal Components</span>
-        </td>
-    </tr>
-    <tr>
-        <td class="dog">
-            <img class="dog" src="../../images/pca/poppet-20.jpg"/><br>
-            <span>20 Principal Components</span>
-        </td>
-        <td class="dog">
-            <img class="dog" src="../../images/pca/poppet-25.jpg"/><br>
-            <span>25 Principal Components</span>
-        </td>
-        <td class="dog">
-            <img class="dog" src="../../images/pca/poppet-30.jpg"/><br>
-            <span>30 Principal Components</span>
-        </td>
-    </tr>
-    <tr>
-        <td class="dog">
-            <img class="dog" src="../../images/pca/poppet-35.jpg"/><br>
-            <span>35 Principal Components</span>
-        </td>
-        <td class="dog">
-            <img class="dog" src="../../images/pca/poppet-40.jpg"/><br>
-            <span>40 Principal Components</span>
-        </td>
-        <td class="dog">
-            <img class="dog" src="../../images/pca/poppet-45.jpg"/><br>
-            <span>45 Principal Components</span>
-        </td>
-    </tr>
-    <tr>
-        <td class="dog">
-            <img class="dog" src="../../images/pca/poppet-50.jpg"/><br>
-            <span>50 Principal Components</span>
-        </td>
-        <td class="dog">
-            <img class="dog" src="../../images/pca/poppet-55.jpg"/><br>
-            <span>55 Principal Components</span>
-        </td>
-        <td class="dog">
-            <img class="dog" src="../../images/pca/poppet-60.jpg"/><br>
-            <span>60 Principal Components</span>
-        </td>
-    </tr>
-    <tr>
-        <td class="dog">
-            <img class="dog" src="../../images/pca/poppet-65.jpg"/><br>
-            <span>65 Principal Components</span>
-        </td>
-        <td class="dog">
-            <img class="dog" src="../../images/pca/poppet-70.jpg"/><br>
-            <span>70 Principal Components</span>
-        </td>
-        <td class="dog">
-            <img class="dog" src="../../images/pca/poppet-360.jpg"/><br>
-            <span>360 Principal Components</span>
-        </td>
-    </tr>
-</table>
+<div class="row">
+    <div class="col-md-4">
+        <img class="dog img-fluid" src="/images/morpheus/pca/poppet-5.jpg"/><br>
+        <span>5 Principal Components</span>
+    </div>
+    <div class="col-md-4">
+        <img class="dog img-fluid" src="/images/morpheus/pca/poppet-10.jpg"/><br>
+        <span>10 Principal Components</span>
+    </div>
+    <div class="col-md-4">
+        <img class="dog img-fluid" src="/images/morpheus/pca/poppet-15.jpg"/><br>
+        <span>15 Principal Components</span>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <img class="dog img-fluid" src="/images/morpheus/pca/poppet-20.jpg"/><br>
+        <span>20 Principal Components</span>
+    </div>
+    <div class="col-md-4">
+        <img class="dog img-fluid" src="/images/morpheus/pca/poppet-25.jpg"/><br>
+        <span>25 Principal Components</span>
+    </div>
+    <div class="col-md-4">
+        <img class="dog img-fluid" src="/images/morpheus/pca/poppet-30.jpg"/><br>
+        <span>30 Principal Components</span>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <img class="dog img-fluid" src="/images/morpheus/pca/poppet-35.jpg"/><br>
+        <span>35 Principal Components</span>
+    </div>
+    <div class="col-md-4">
+        <img class="dog img-fluid" src="/images/morpheus/pca/poppet-40.jpg"/><br>
+        <span>40 Principal Components</span>
+    </div>
+    <div class="col-md-4">
+        <img class="dog img-fluid" src="/images/morpheus/pca/poppet-45.jpg"/><br>
+        <span>45 Principal Components</span>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <img class="dog img-fluid" src="/images/morpheus/pca/poppet-50.jpg"/><br>
+        <span>50 Principal Components</span>
+    </div>
+    <div class="col-md-4">
+        <img class="dog img-fluid" src="/images/morpheus/pca/poppet-55.jpg"/><br>
+        <span>55 Principal Components</span>
+    </div>
+    <div class="col-md-4">
+        <img class="dog img-fluid" src="/images/morpheus/pca/poppet-60.jpg"/><br>
+        <span>60 Principal Components</span>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <img class="dog img-fluid" src="/images/morpheus/pca/poppet-65.jpg"/><br>
+        <span>65 Principal Components</span>
+    </div>
+    <div class="col-md-4">
+        <img class="dog img-fluid" src="/images/morpheus/pca/poppet-70.jpg"/><br>
+        <span>70 Principal Components</span>
+    </div>
+    <div class="col-md-4">
+        <img class="dog img-fluid" src="/images/morpheus/pca/poppet-360.jpg"/><br>
+        <span>360 Principal Components</span>
+    </div>
+</div>
 
 The final image in the table above is essentially the same as the original since we retain all components and so \\(V_i {V_i}^T = I \\)
 given that we know \\(V_i\\) is an orthogonal matrix by design. The code to generate this array of images is shown below. Here we load the 
@@ -406,23 +404,23 @@ projection back out as an image file.
 <?prettify?>
 ```java
 //Load image from classpath
-URL url = getClass().getResource("/poppet.jpg");
+var url = getClass().getResource("/poppet.jpg");
 
 //Re-create PCA reduced image while retaining different number of principal components
 Array.of(5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 360).forEach(nComp -> {
 
     //Initialize the **transpose** of image as we need nxp frame where n >= p
-    DataFrame<Integer,Integer> rgbFrame = DataFrame.ofImage(url).transpose();
+    var rgbFrame = DataFrame.ofImage(url).transpose();
 
     //Create 3 frames from RGB data, one for red, green and blue
-    DataFrame<Integer,Integer> red = rgbFrame.mapToDoubles(v -> (v.getInt() >> 16) & 0xFF);
-    DataFrame<Integer,Integer> green = rgbFrame.mapToDoubles(v -> (v.getInt() >> 8) & 0xFF);
-    DataFrame<Integer,Integer> blue = rgbFrame.mapToDoubles(v -> v.getInt() & 0xFF);
+    var red = rgbFrame.mapToDoubles(v -> (v.getInt() >> 16) & 0xFF);
+    var green = rgbFrame.mapToDoubles(v -> (v.getInt() >> 8) & 0xFF);
+    var blue = rgbFrame.mapToDoubles(v -> v.getInt() & 0xFF);
 
     //Perform PCA on each color frame, and project using only first N principal components
     Stream.of(red, green, blue).parallel().forEach(color -> {
         color.pca().apply(true, model -> {
-            DataFrame<Integer,Integer> projection = model.getProjection(nComp);
+            var projection = model.getProjection(nComp);
             projection.cap(true).doubles(0, 255);  //cap values between 0 and 255
             color.update(projection, false, false);
             return null;
@@ -431,27 +429,27 @@ Array.of(5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 360).forEach(nCo
 
     //Apply reduced RBG values onto the original frame so we don't need to allocate memory
     rgbFrame.applyInts(v -> {
-        int i = v.rowOrdinal();
-        int j = v.colOrdinal();
-        int r = (int)red.data().getDouble(i,j);
-        int g = (int)green.data().getDouble(i,j);
-        int b = (int)blue.data().getDouble(i,j);
+        var i = v.rowOrdinal();
+        var j = v.colOrdinal();
+        var r = (int)red.data().getDouble(i,j);
+        var g = (int)green.data().getDouble(i,j);
+        var b = (int)blue.data().getDouble(i,j);
         return ((0xFF) << 24) | ((r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF));
     });
 
     //Create reduced image from **transpose** of the DataFrame to get back original orientation
-    int width = rgbFrame.rowCount();
-    int height = rgbFrame.colCount();
-    BufferedImage transformed = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+    var width = rgbFrame.rowCount();
+    var height = rgbFrame.colCount();
+    var transformed = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
     rgbFrame.forEachValue(v -> {
-        int i = v.colOrdinal();
-        int j = v.rowOrdinal();
-        int rgb = v.getInt();
+        var i = v.colOrdinal();
+        var j = v.rowOrdinal();
+        var rgb = v.getInt();
         transformed.setRGB(j, i, rgb);
     });
 
     try {
-        File outputfile = new File("/Users/witdxav/temp/poppet-" + nComp + ".jpg");
+        var outputfile = new File("/Users/witdxav/temp/poppet-" + nComp + ".jpg");
         outputfile.getParentFile().mkdirs();
         ImageIO.write(transformed, "jpg", outputfile);
     } catch (Exception ex) {

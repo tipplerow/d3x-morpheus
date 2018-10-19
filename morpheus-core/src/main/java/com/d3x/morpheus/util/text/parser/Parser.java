@@ -83,7 +83,7 @@ public abstract class Parser<T> extends Function1<String,T> {
     }
 
     /**
-     * Returns the null checker for this parser
+     * Returns the null checker for this parser`
      * @return      the null checker
      */
     public final ToBooleanFunction<String> getNullChecker() {

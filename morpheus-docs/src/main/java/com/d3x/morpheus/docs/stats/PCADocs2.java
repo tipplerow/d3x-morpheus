@@ -41,7 +41,7 @@ public class PCADocs2 {
 
     @Test()
     public void test() {
-        DataFrame<Integer,Integer> frame = DataFrame.ofImage(getClass().getResource("/poppet.jpg"));
+        var frame = DataFrame.ofImage(getClass().getResource("/poppet.jpg"));
         Stream.of(DataFramePCA.Solver.EVD_COV, DataFramePCA.Solver.SVD).forEach(solver -> {
             frame.transpose().pca().apply(true, solver, model -> {
                 model.getEigenValues().out().print();
@@ -57,23 +57,23 @@ public class PCADocs2 {
     public void processImage() throws Exception {
 
         //Load image from classpath
-        URL url = getClass().getResource("/poppet.jpg");
+        var url = getClass().getResource("/poppet.jpg");
 
         //Re-create PCA reduced image while retaining different number of principal components
         Array.of(5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 360).forEach(nComp -> {
 
             //Initialize the **transpose** of image as we need nxp frame where n >= p
-            DataFrame<Integer,Integer> rgbFrame = DataFrame.ofImage(url).transpose();
+            var rgbFrame = DataFrame.ofImage(url).transpose();
 
             //Create 3 frames from RGB data, one for red, green and blue
-            DataFrame<Integer,Integer> red = rgbFrame.mapToDoubles(v -> (v.getInt() >> 16) & 0xFF);
-            DataFrame<Integer,Integer> green = rgbFrame.mapToDoubles(v -> (v.getInt() >> 8) & 0xFF);
-            DataFrame<Integer,Integer> blue = rgbFrame.mapToDoubles(v -> v.getInt() & 0xFF);
+            var red = rgbFrame.mapToDoubles(v -> (v.getInt() >> 16) & 0xFF);
+            var green = rgbFrame.mapToDoubles(v -> (v.getInt() >> 8) & 0xFF);
+            var blue = rgbFrame.mapToDoubles(v -> v.getInt() & 0xFF);
 
             //Perform PCA on each color frame, and project using only first N principal components
             Stream.of(red, green, blue).parallel().forEach(color -> {
                 color.pca().apply(true, model -> {
-                    DataFrame<Integer,Integer> projection = model.getProjection(nComp);
+                    var projection = model.getProjection(nComp);
                     projection.cap(true).doubles(0, 255);  //cap values between 0 and 255
                     color.update(projection, false, false);
                     return null;
@@ -82,27 +82,27 @@ public class PCADocs2 {
 
             //Apply reduced RBG values onto the original frame so we don't need to allocate memory
             rgbFrame.applyInts(v -> {
-                int i = v.rowOrdinal();
-                int j = v.colOrdinal();
-                int r = (int)red.getDouble(i,j);
-                int g = (int)green.getDouble(i,j);
-                int b = (int)blue.getDouble(i,j);
+                var i = v.rowOrdinal();
+                var j = v.colOrdinal();
+                var r = (int)red.getDouble(i,j);
+                var g = (int)green.getDouble(i,j);
+                var b = (int)blue.getDouble(i,j);
                 return ((0xFF) << 24) | ((r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF));
             });
 
             //Create reduced image from **transpose** of the DataFrame to get back original orientation
-            int width = rgbFrame.rowCount();
-            int height = rgbFrame.colCount();
-            BufferedImage transformed = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+            var width = rgbFrame.rowCount();
+            var height = rgbFrame.colCount();
+            var transformed = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
             rgbFrame.forEachValue(v -> {
-                int i = v.colOrdinal();
-                int j = v.rowOrdinal();
-                int rgb = v.getInt();
+                var i = v.colOrdinal();
+                var j = v.rowOrdinal();
+                var rgb = v.getInt();
                 transformed.setRGB(j, i, rgb);
             });
 
             try {
-                File outputfile = new File("/Users/witdxav/temp/poppet-" + nComp + ".jpg");
+                var outputfile = new File("/Users/witdxav/temp/poppet-" + nComp + ".jpg");
                 outputfile.getParentFile().mkdirs();
                 ImageIO.write(transformed, "jpg", outputfile);
             } catch (Exception ex) {
@@ -116,25 +116,25 @@ public class PCADocs2 {
     @Test()
     public void variancePlot() throws Exception {
 
-        URL url = getClass().getResource("/poppet.jpg");
-        DataFrame<Integer,Integer> rgbFrame = DataFrame.ofImage(url);
-        Range<Integer> rowKeys = Range.of(0, rgbFrame.rowCount());
+        var url = getClass().getResource("/poppet.jpg");
+        var rgbFrame = DataFrame.ofImage(url);
+        var rowKeys = Range.of(0, rgbFrame.rowCount());
 
-        DataFrame<Integer,String> result = DataFrame.ofDoubles(rowKeys, Array.of("Red", "Green", "Blue"));
+        var result = DataFrame.ofDoubles(rowKeys, Array.of("Red", "Green", "Blue"));
         Collect.<String,DataFrame<Integer,Integer>>asMap(mapping -> {
             mapping.put("Red", rgbFrame.mapToDoubles(v -> (v.getInt() >> 16) & 0xFF));
             mapping.put("Green", rgbFrame.mapToDoubles(v -> (v.getInt() >> 8) & 0xFF));
             mapping.put("Blue", rgbFrame.mapToDoubles(v -> v.getInt() & 0xFF));
         }).forEach((name, color) -> {
             color.transpose().pca().apply(true, model -> {
-                DataFrame<Integer,Field> eigenFrame = model.getEigenValues();
-                DataFrame<Integer,Field> varPercent = eigenFrame.cols().select(Field.VAR_PERCENT);
+                var eigenFrame = model.getEigenValues();
+                var varPercent = eigenFrame.cols().select(Field.VAR_PERCENT);
                 result.update(varPercent.cols().mapKeys(k -> name), false, false);
                 return Optional.empty();
             });
         });
 
-        DataFrame<Integer,String> chartData = result.rows().select(c -> c.ordinal() < 10).copy();
+        var chartData = result.rows().select(c -> c.ordinal() < 10).copy();
         Chart.create().withBarPlot(chartData.rows().mapKeys(r -> String.valueOf(r.ordinal())), false, chart -> {
             chart.plot().style("Red").withColor(Color.RED);
             chart.plot().style("Green").withColor(Color.GREEN);
@@ -153,7 +153,7 @@ public class PCADocs2 {
 
 
     Matrix toJama(DataFrame<?,?> frame) {
-        Matrix matrix = new Matrix(frame.rowCount(), frame.colCount());
+        var matrix = new Matrix(frame.rowCount(), frame.colCount());
         frame.forEachValue(v -> matrix.set(v.rowOrdinal(), v.colOrdinal(), v.getDouble()));
         return matrix;
     }
@@ -161,10 +161,10 @@ public class PCADocs2 {
 
     @Test()
     public void filesizes() throws Exception {
-        final File home = new File("/Users/witdxav");
-        final Range<Integer> rowKeys = Range.of(1, 61);
-        final DataFrame<Integer,String> frame = DataFrame.ofDoubles(rowKeys, Array.of("Size"), v -> {
-            final File file = new File(home, "cutedog-" + v.rowKey() + ".jpg");
+        var home = new File("/Users/witdxav");
+        var rowKeys = Range.of(1, 61);
+        var frame = DataFrame.ofDoubles(rowKeys, Array.of("Size"), v -> {
+            var file = new File(home, "cutedog-" + v.rowKey() + ".jpg");
             return (double)file.length();
         });
 
@@ -179,11 +179,11 @@ public class PCADocs2 {
 
     @Test()
     public void scores1() {
-        URL url = getClass().getResource("/poppet.jpg");
-        DataFrame<Integer,Integer> image = DataFrame.ofImage(url).transpose();
-        DataFrame<Integer,Integer> red = image.mapToDoubles(v -> (v.getInt() >> 16) & 0xFF);
+        var url = getClass().getResource("/poppet.jpg");
+        var image = DataFrame.ofImage(url).transpose();
+        var red = image.mapToDoubles(v -> (v.getInt() >> 16) & 0xFF);
         red.pca().apply(true, model -> {
-            DataFrame<Integer,Integer> scores = model.getScores();
+            var scores = model.getScores();
             Assert.assertEquals(scores.rowCount(), 504);
             Assert.assertEquals(scores.colCount(), 360);
             scores.out().print();
@@ -194,11 +194,11 @@ public class PCADocs2 {
 
     @Test()
     public void scores2() {
-        URL url = getClass().getResource("/poppet.jpg");
-        DataFrame<Integer,Integer> image = DataFrame.ofImage(url).transpose();
-        DataFrame<Integer,Integer> red = image.mapToDoubles(v -> (v.getInt() >> 16) & 0xFF);
+        var url = getClass().getResource("/poppet.jpg");
+        var image = DataFrame.ofImage(url).transpose();
+        var red = image.mapToDoubles(v -> (v.getInt() >> 16) & 0xFF);
         red.pca().apply(true, model -> {
-            DataFrame<Integer,Integer> scores = model.getScores(10);
+            var scores = model.getScores(10);
             Assert.assertEquals(scores.rowCount(), 504);
             Assert.assertEquals(scores.colCount(), 10);
             scores.out().print();
@@ -208,11 +208,11 @@ public class PCADocs2 {
 
     @Test()
     public void projection1() {
-        URL url = getClass().getResource("/poppet.jpg");
-        DataFrame<Integer,Integer> image = DataFrame.ofImage(url).transpose();
-        DataFrame<Integer,Integer> red = image.mapToDoubles(v -> (v.getInt() >> 16) & 0xFF);
+        var url = getClass().getResource("/poppet.jpg");
+        var image = DataFrame.ofImage(url).transpose();
+        var red = image.mapToDoubles(v -> (v.getInt() >> 16) & 0xFF);
         red.pca().apply(true, model -> {
-            DataFrame<Integer,Integer> projection = model.getProjection(10);
+            var projection = model.getProjection(10);
             Assert.assertEquals(projection.rowCount(), 504);
             Assert.assertEquals(projection.colCount(), 360);
             projection.out().print();
@@ -227,8 +227,8 @@ public class PCADocs2 {
      * @return          the DataFrame representation
      */
     DataFrame<Integer,Integer> toDataFrame(RealMatrix matrix) {
-        final Range<Integer> rowKeys = Range.of(0, matrix.getRowDimension());
-        final Range<Integer> colKeys = Range.of(0, matrix.getColumnDimension());
+        var rowKeys = Range.of(0, matrix.getRowDimension());
+        var colKeys = Range.of(0, matrix.getColumnDimension());
         return DataFrame.ofDoubles(rowKeys, colKeys, v -> matrix.getEntry(v.rowOrdinal(), v.colOrdinal()));
     }
 

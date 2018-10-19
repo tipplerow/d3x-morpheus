@@ -1,4 +1,4 @@
-### Reshaping
+### DataFrame Re-shaping
 
 It is often useful to be able to expand a `DataFrame` in either the row or column dimension, or both, in order to store
 calculated data or other state as part of some analysis. For example, a frame could be used to capture real-time in-memory 
@@ -18,7 +18,7 @@ of doubles initialized with random values as follows.
 <?prettify?>
 ```java
 //Create frame of Random doubles keyed by LocalDate and String
-DataFrame<LocalDate,String> frame = DataFrame.ofDoubles(
+var frame = DataFrame.ofDoubles(
     Range.ofLocalDates("2014-01-01", "2014-01-05"),
     Range.of(0, 5).map(i -> "Column-" + i),
     value -> Math.random() * 10d
@@ -92,7 +92,7 @@ exclusive).
 
 <?prettify?>
 ```java
-final Range<LocalDate> range1 = Range.ofLocalDates("2014-02-08", "2014-02-10");
+var range1 = Range.ofLocalDates("2014-02-08", "2014-02-10");
 frame.rows().addAll(range1);
 frame.out().print(formats -> {
     formats.withDecimalFormat(Double.class, "0.000;-0.000", 1);
@@ -118,7 +118,7 @@ we add rows based on another date `Range` and set initial values to 3.
 <?prettify?>
 ```java
 //Add multiple rows, with initial set to 3
-final Range<LocalDate> range2 = Range.ofLocalDates("2014-02-10", "2014-02-12");
+var range2 = Range.ofLocalDates("2014-02-10", "2014-02-12");
 frame.rows().addAll(range2, v -> 3d);
 frame.out().print(formats -> {
     formats.withDecimalFormat(Double.class, "0.000;-0.000", 1);
@@ -151,7 +151,7 @@ intersecting row and column keys.
 <?prettify?>
 ```java
 //Create a 5x5 DataFrame of doubles initialized with 1 for all values
-DataFrame<Integer,String> frame1 = DataFrame.ofDoubles(
+var frame1 = DataFrame.ofDoubles(
     Array.of(0, 1, 2, 3, 4),
     Array.of("A", "B", "C", "D", "E"),
     value -> 1d
@@ -171,7 +171,7 @@ DataFrame<Integer,String> frame1 = DataFrame.ofDoubles(
 <?prettify?>
 ```java
 //Create a 7x5 DataFrame of doubles initialized with 2 for all values
-DataFrame<Integer,String> frame2 = DataFrame.ofDoubles(
+var frame2 = DataFrame.ofDoubles(
     Array.of(3, 4, 5, 6, 7, 8, 9),
     Array.of("C", "D", "E", "F", "G"),
     value -> 2d
@@ -237,7 +237,7 @@ In this scenario we initialize the second frame with `String` values as follows:
 <?prettify?>
 ```java
 //Create a 7x5 DataFrame of doubles initialized with coordinate string of the form (i,j)
-DataFrame<Integer,String> frame2 = DataFrame.ofObjects(
+var frame2 = DataFrame.ofObjects(
     Array.of(3, 4, 5, 6, 7, 8, 9),
     Array.of("C", "D", "E", "F", "G"),
     value -> String.format("(%s, %s)", value.rowOrdinal(), value.colOrdinal())
@@ -263,7 +263,7 @@ frames. The code below uses the `DataFrame.concatRows()` static method and print
 <?prettify?>
 ```java
 //Concatenate rows from frame1 and frame2
-DataFrame<Integer,String> frame3 = DataFrame.concatRows(frame1, frame2);
+var frame3 = DataFrame.concatRows(frame1, frame2);
 frame3.out().print(formats -> {
     formats.withDecimalFormat(Double.class, "0.0;-0.0", 1);
 });
@@ -296,8 +296,8 @@ column axis by `String` values.
 
 <?prettify?>
 ```java
-LocalDate start = LocalDate.of(2014, 1, 1);
-DataFrame<LocalDate,String> frame = DataFrame.ofDoubles(
+var start = LocalDate.of(2014, 1, 1);
+var frame = DataFrame.ofDoubles(
     Range.of(start, start.plusDays(10)),
     Array.of("A", "B"),
     value -> Math.random() * 10d
@@ -373,8 +373,8 @@ longer than the row count, they are effectively truncated to fit the frame.
 
 <?prettify?>
 ```java
-LocalDate start = LocalDate.of(2014, 1, 1);
-DataFrame<LocalDate,String> frame = DataFrame.ofDoubles(
+var start = LocalDate.of(2014, 1, 1);
+var frame = DataFrame.ofDoubles(
     Range.of(start, start.plusDays(10)),
     Array.of("A", "B"),
     value -> Math.random() * 10d
@@ -416,7 +416,7 @@ as follows:
 <?prettify?>
 ```java
 //Create a 9x2 DataFrame of random double precision values
-DataFrame<Integer,String> frame1 = DataFrame.ofDoubles(
+var frame1 = DataFrame.ofDoubles(
     Range.of(0, 9, 1),
     Array.of("A", "B"),
     value -> Math.random()
@@ -444,7 +444,7 @@ namely for label `B`. The columns for this frame include various data types, nam
 <?prettify?>
 ```java
 //Create 6x5 frame with intersecting rows and columns to the first frame
-DataFrame<Integer,String> frame2 = DataFrame.of(Range.of(0, 12, 2), String.class, columns -> {
+var frame2 = DataFrame.of(Range.of(0, 12, 2), String.class, columns -> {
     columns.add("B", Array.of(10, 20, 30, 40, 50, 60));
     columns.add("C", Array.of(1d, 3d, 5d, 7d, 9d, 11d));
     columns.add("D", Range.of(1, 7));
@@ -504,7 +504,7 @@ Consider 3 frames initialized as follows:
 <?prettify?>
 ```java
 //Create a 9x2 DataFrame of random double precision values
-DataFrame<Integer,String> frame1 = DataFrame.ofDoubles(
+var frame1 = DataFrame.ofDoubles(
     Range.of(0, 9),
     Array.of("A", "B"),
     value -> Math.random()
@@ -528,7 +528,7 @@ DataFrame<Integer,String> frame1 = DataFrame.ofDoubles(
 <?prettify?>
 ```java
 //Create 6x5 frame with intersecting rows and columns to the first frame
-DataFrame<Integer,String> frame2 = DataFrame.of(Range.of(0, 12, 2), String.class, columns -> {
+var frame2 = DataFrame.of(Range.of(0, 12, 2), String.class, columns -> {
     columns.add("B", Array.of(10, 20, 30, 40, 50, 60));
     columns.add("C", Array.of(1d, 3d, 5d, 7d, 9d, 11d));
     columns.add("D", Range.of(1, 7));
@@ -551,7 +551,7 @@ DataFrame<Integer,String> frame2 = DataFrame.of(Range.of(0, 12, 2), String.class
 <?prettify?>
 ```java
 //Create a 9x4 DataFrame of random double precision values
-DataFrame<Integer,String> frame3 = DataFrame.ofDoubles(
+var frame3 = DataFrame.ofDoubles(
     Range.of(0, 5),
     Array.of("B", "F", "G", "H"),
     value -> Math.random()
@@ -576,7 +576,7 @@ in the combined frame.
 <?prettify?>
 ```java
 //Concatenate columns from all 3 frames to create a new result
-DataFrame<Integer,String> frame4 = DataFrame.concatColumns(frame1, frame2, frame3);
+var frame4 = DataFrame.concatColumns(frame1, frame2, frame3);
 //Print frame to standard out with custom formatting
 frame4.out().print(formats -> {
     formats.withDecimalFormat(Double.class, "0.000;-0.000", 1);
@@ -609,7 +609,7 @@ Consider a 5x2, 6x5 and 6x4 frame with intersecting rows and columns initialized
 <?prettify?>
 ```java
 //Create a 5x2 DataFrame of random double precision values
-DataFrame<Integer,String> frame1 = DataFrame.ofDoubles(
+var frame1 = DataFrame.ofDoubles(
     Range.of(0, 5),
     Array.of("A", "B"),
     value -> Math.random()
@@ -629,7 +629,7 @@ DataFrame<Integer,String> frame1 = DataFrame.ofDoubles(
 <?prettify?>
 ```java
 //Create 6x5 frame with intersecting rows and columns to the first frame
-DataFrame<Integer,String> frame2 = DataFrame.of(Range.of(0, 12, 2), String.class, columns -> {
+var frame2 = DataFrame.of(Range.of(0, 12, 2), String.class, columns -> {
     columns.add("B", Array.of(10, 20, 30, 40, 50, 60));
     columns.add("C", Array.of(1d, 3d, 5d, 7d, 9d, 11d));
     columns.add("D", Range.of(1, 7));
@@ -652,7 +652,7 @@ DataFrame<Integer,String> frame2 = DataFrame.of(Range.of(0, 12, 2), String.class
 <?prettify?>
 ```java
 //Create a 6x4 DataFrame of random double precision values
-DataFrame<Integer,String> frame3 = DataFrame.ofDoubles(
+var frame3 = DataFrame.ofDoubles(
     Range.of(0, 6),
     Array.of("B", "F", "G", "H"),
     value -> Math.random()
@@ -679,7 +679,7 @@ The code to create the union frame and the resulting structure are shown below:
 <?prettify?>
 ```java
 //Create the union of all 3 frames which should yield an 9x8 frame
-DataFrame<Integer,String> frame4 =  DataFrame.union(frame1, frame2, frame3);
+var frame4 =  DataFrame.union(frame1, frame2, frame3);
 //Print frame to standard out with custom formatting
 frame4.rows().sort(true);
 frame4.out().print(formats -> {
@@ -716,7 +716,7 @@ keys across the input frames) by wrapping the code in a `Callable` to `whileNotI
 
 <?prettify?>
 ```java
-DataFrame<Integer,String> frame4 = DataFrameOptions.whileNotIgnoringDuplicates(() -> {
+var frame4 = DataFrameOptions.whileNotIgnoringDuplicates(() -> {
     return DataFrame.union(frame1, frame2, frame3).rows().sort(true);
 });
 ```
@@ -749,7 +749,7 @@ Consider a 5x5 frame keyed by `Integer` rows and `String` columns initialized wi
 <?prettify?>
 ```java
 //Create a 5x5 DataFrame of random doubles
-DataFrame<Integer,String> frame = DataFrame.ofDoubles(
+var frame = DataFrame.ofDoubles(
     Array.of(0, 1, 2, 3, 4),
     Array.of("A", "B", "C", "D", "E"),
     value -> Math.random() * 10d
@@ -797,7 +797,7 @@ possibly with a different key type. Consider the 10x5 frame of random double pre
 <?prettify?>
 ```java
 //Create a 10x4 DataFrame of random doubles
-DataFrame<LocalDate,String> frame = DataFrame.ofDoubles(
+var frame = DataFrame.ofDoubles(
     Range.ofLocalDates("2014-01-01", "2014-01-11"),
     Array.of("A", "B", "C", "D"),
     value -> Math.random() * 10d
@@ -827,7 +827,7 @@ on `DataFeameAxis` and provide a mapping function that does the conversion as sh
 
 <?prettify?>
 ```java
-DataFrame<LocalDateTime,String> shifted = frame.rows().mapKeys(row -> {
+var shifted = frame.rows().mapKeys(row -> {
     final LocalDate rowKey = row.key().plusDays(5);
     return LocalDateTime.of(rowKey, LocalTime.of(13, 30));
 });
@@ -887,7 +887,7 @@ frame cannot be reshaped by adding rows and/or columns.  Attempting to re-shape 
 <?prettify?>
 ```java
 //Create a 5x5 DataFrame of random doubles
-DataFrame<Integer,String> frame = DataFrame.ofDoubles(
+var frame = DataFrame.ofDoubles(
     Array.of(0, 1, 2, 3, 4),
     Array.of("A", "B", "C", "D", "E"),
     value -> Math.random() * 10d
@@ -912,7 +912,7 @@ and then add a new column to the transposed frame by calling `addRow()` as shown
 <?prettify?>
 ```java
 //Tranpose the transposed frame to get back to a colum store which can be re-shaped
-DataFrame<String,Integer> transposed = frame.transpose();
+var transposed = frame.transpose();
 transposed.transpose().rows().add(5);
 transposed.out().print(formats -> {
     formats.withDecimalFormat(Double.class, "0.00;-0.00", 1);

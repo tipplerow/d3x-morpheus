@@ -39,7 +39,7 @@ public class SortingDocs {
      * @return          the ATP match results
      */
     static DataFrame<Integer,String> loadTennisMatchData(int year) {
-        final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd/MM/yy");
+        var dateFormat = DateTimeFormatter.ofPattern("dd/MM/yy");
         return DataFrame.read().csv(options -> {
             options.setHeader(true);
             options.setResource("http://www.zavtech.com/data/tennis/atp/atp-" + year + ".csv");
@@ -51,7 +51,7 @@ public class SortingDocs {
 
     @Test()
     public void sortRowAxis() {
-        DataFrame<Integer,String> frame = loadTennisMatchData(2013);
+        var frame = loadTennisMatchData(2013);
 
         frame.out().print();
 
@@ -64,7 +64,7 @@ public class SortingDocs {
 
     @Test()
     public void sortColAxis() {
-        DataFrame<Integer,String> frame = loadTennisMatchData(2013);
+        var frame = loadTennisMatchData(2013);
         //Sort columns by column keys in ascending order
         frame.cols().sort(true);
         //Print first ten rows
@@ -73,7 +73,7 @@ public class SortingDocs {
 
     @Test()
     public void sortRowsByData1() {
-        DataFrame<Integer,String> frame = loadTennisMatchData(2013);
+        var frame = loadTennisMatchData(2013);
         //Sort rows by the WRank (winner rank) column values
         frame.rows().sort(true, "WRank");
         //Print first ten rows
@@ -82,7 +82,7 @@ public class SortingDocs {
 
     @Test()
     public void sortColsByKeys() {
-        DataFrame<Integer,String> frame = loadTennisMatchData(2013);
+        var frame = loadTennisMatchData(2013);
         //Sort columns by column keys in ascending order
         frame.cols().sort(true);
         //Print first ten rows
@@ -92,7 +92,7 @@ public class SortingDocs {
     @Test()
     public void sortColsByData1() {
         //Create a 10x10 frame initialized with random doubles
-        DataFrame<String,String> frame = DataFrame.ofDoubles(
+        var frame = DataFrame.ofDoubles(
             Range.of(0, 10).map(i -> "R" + i),
             Range.of(0, 10).map(i -> "C" + i),
             value -> Math.random() * 100d
@@ -106,7 +106,7 @@ public class SortingDocs {
     @Test()
     public void sortRowsAndColsByData1() {
         //Create a 10x10 frame initialized with random doubles
-        DataFrame<String,String> frame = DataFrame.ofDoubles(
+        var frame = DataFrame.ofDoubles(
             Range.of(0, 10).map(i -> "R" + i),
             Range.of(0, 10).map(i -> "C" + i),
             value -> Math.random() * 100d
@@ -122,7 +122,7 @@ public class SortingDocs {
 
     @Test()
     public void sorRowsMultiDimensional() {
-        DataFrame<Integer,String> frame = loadTennisMatchData(2013);
+        var frame = loadTennisMatchData(2013);
         //Multidimensional row sort (ascending) first by Date, then WRank
         frame.rows().sort(true, Collect.asList("Date", "WRank"));
         //Print first ten rows
@@ -132,7 +132,7 @@ public class SortingDocs {
 
     @Test()
     public void sortRowsCustom() {
-        DataFrame<Integer,String> frame = loadTennisMatchData(2013);
+        var frame = loadTennisMatchData(2013);
         //Sort rows so that matches smallest difference in betting odds between winner and looser.
         frame.rows().sort((row1, row2) -> {
             double diff1 = Math.abs(row1.getDouble("AvgW") - row1.getDouble("AvgL"));
@@ -145,9 +145,9 @@ public class SortingDocs {
 
     @Test()
     public void sortOnFilter() {
-        DataFrame<Integer,String> frame = loadTennisMatchData(2013);
+        var frame = loadTennisMatchData(2013);
         //First filter frame to include only rows where Novak Djokovic was the victor
-        DataFrame<Integer,String> filter = frame.rows().select(row -> row.getValue("Winner").equals("Djokovic N."));
+        var filter = frame.rows().select(row -> row.getValue("Winner").equals("Djokovic N."));
         //Sort rows so that the highest rank players he beat come first
         filter.rows().sort(true, "LRank");
         //Print first ten rows
@@ -159,15 +159,15 @@ public class SortingDocs {
     public void performanceSequential() throws Exception {
 
         //Define range of row counts we want to test, from 1M to 5M inclusive
-        Range<Integer> rowCounts = Range.of(1, 6).map(i -> i * 1000000);
+        var rowCounts = Range.of(1, 6).map(i -> i * 1000000);
 
         //Time DataFrame sort operations on frame of random doubles with row counts ranging from 1M to 6M
-        DataFrame<String,String> results = DataFrame.combineFirst(rowCounts.map(rowCount -> {
-            Range<Integer> rowKeys = Range.of(0, rowCount.intValue());
-            Range<String> colKeys = Range.of(0, 5).map(i -> "C" + i);
+        var results = DataFrame.combineFirst(rowCounts.map(rowCount -> {
+            var rowKeys = Range.of(0, rowCount.intValue());
+            var colKeys = Range.of(0, 5).map(i -> "C" + i);
             //Create frame initialized with random double values
-            DataFrame<Integer,String> frame = DataFrame.ofDoubles(rowKeys, colKeys, v -> Math.random() * 100d);
-            String label = "Rows(" + (rowCount / 1000000) + "M)";
+            var frame = DataFrame.ofDoubles(rowKeys, colKeys, v -> Math.random() * 100d);
+            var label = "Rows(" + (rowCount / 1000000) + "M)";
             //Run each test 10 times, clear the sort before running the test with sort(null)
             return PerfStat.run(10, TimeUnit.MILLISECONDS, false, tasks -> {
                 tasks.beforeEach(() -> frame.rows().sort(null));
@@ -194,15 +194,15 @@ public class SortingDocs {
     public void performanceParallel() throws Exception {
 
         //Define range of row counts we want to test, from 1M to 5M inclusive
-        Range<Integer> rowCounts = Range.of(1, 6).map(i -> i * 1000000);
+        var rowCounts = Range.of(1, 6).map(i -> i * 1000000);
 
         //Time DataFrame sort operations on frame of random doubles with row counts ranging from 1M to 6M
-        DataFrame<String,String> results = DataFrame.combineFirst(rowCounts.map(rowCount -> {
-            Range<Integer> rowKeys = Range.of(0, rowCount.intValue());
-            Range<String> colKeys = Range.of(0, 5).map(i -> "C" + i);
+        var results = DataFrame.combineFirst(rowCounts.map(rowCount -> {
+            var rowKeys = Range.of(0, rowCount.intValue());
+            var colKeys = Range.of(0, 5).map(i -> "C" + i);
             //Create frame initialized with random double values
-            DataFrame<Integer,String> frame = DataFrame.ofDoubles(rowKeys, colKeys, v -> Math.random() * 100d);
-            String label = "Rows(" + (rowCount / 1000000) + "M)";
+            var frame = DataFrame.ofDoubles(rowKeys, colKeys, v -> Math.random() * 100d);
+            var label = "Rows(" + (rowCount / 1000000) + "M)";
             //Run each test 10 times, clear the sort before running the test with sort(null)
             return PerfStat.run(10, TimeUnit.MILLISECONDS, false, tasks -> {
                 tasks.beforeEach(() -> frame.rows().sort(null));
@@ -227,9 +227,9 @@ public class SortingDocs {
     public void performanceComparator() {
 
         //Create frame initialized with random double values
-        Range<Integer> rowKeys = Range.of(0, 1000000);
-        Range<String> colKeys = Range.of(0, 5).map(i -> "C" + i);
-        DataFrame<Integer,String> frame = DataFrame.ofDoubles(rowKeys, colKeys, v -> Math.random() * 100d);
+        var rowKeys = Range.of(0, 1000000);
+        var colKeys = Range.of(0, 5).map(i -> "C" + i);
+        var frame = DataFrame.ofDoubles(rowKeys, colKeys, v -> Math.random() * 100d);
         //Define comparator to sort rows by column C1, which is ordinal 1
         Comparator<DataFrameRow<Integer,String>> comparator = (row1, row2) -> {
             double v1 = row1.getDoubleAt(1);
@@ -238,7 +238,7 @@ public class SortingDocs {
         };
 
         //Time sorting in various modes (with & without comparator in both sequential & parallel mode)
-        DataFrame<String,String> results = PerfStat.run(10, TimeUnit.MILLISECONDS, false, tasks -> {
+        var results = PerfStat.run(10, TimeUnit.MILLISECONDS, false, tasks -> {
             tasks.beforeEach(() -> frame.rows().sort(null));
             tasks.put("W/O Comparator (seq)", () -> frame.rows().sort(true, "C1"));
             tasks.put("W/O Comparator (par)", () -> frame.rows().parallel().sort(true, "C1"));

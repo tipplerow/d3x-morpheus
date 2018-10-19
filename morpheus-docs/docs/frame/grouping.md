@@ -1,4 +1,4 @@
-### Grouping
+### DataFrame Grouping
 
 #### Introduction
 
@@ -41,16 +41,16 @@ row presented to it. The following code groups the frame by `Surface` and then b
 
 <?prettify?>
 ```java
-DataFrame<Integer,String> frame = loadTennisMatchData(2013);
-DataFrameGrouping.Rows<Integer,String> grouping = frame.rows().groupBy("Surface", "Round");
+var frame = loadTennisMatchData(2013);
+var grouping = frame.rows().groupBy("Surface", "Round");
 ```
 
 The same grouping can be achieved using the lambda `groupBy()` method, albeit more verbosely, as follows:
 
 <?prettify?>
 ```java
-DataFrame<Integer,String> frame = loadTennisMatchData(2013);
-DataFrameGrouping.Rows<Integer,String> grouping = frame.rows().groupBy(row -> {
+var frame = loadTennisMatchData(2013);
+var grouping = frame.rows().groupBy(row -> {
     String surface = row.getValue("Surface");
     String round = row.getValue("Round");
     return Tuple.of(surface, round);
@@ -65,10 +65,10 @@ tournament date as follows:
 
 <?prettify?>
 ```java
-DataFrame<Integer,String> frame = loadTennisMatchData(2013);
+var frame = loadTennisMatchData(2013);
 frame.rows().groupBy(row -> {
-    LocalDate date = row.getValue("Date");
-    Month month = date.getMonth();
+    var date = row.<LocalDate>getValue("Date");
+    var month = date.getMonth();
     return Tuple.of(month);
 }).forEach(0, (groupKey, group) -> {
     System.out.printf("There are %s rows for group %s\n", group.rowCount(), groupKey);
@@ -99,12 +99,12 @@ depths to be analyzed independently for maximum versatility. For example, consid
 
 <?prettify?>
 ```java
-DataFrame<Integer,String> frame = loadTennisMatchData(2013);
-DataFrameGrouping.Rows<Integer,String> grouping = frame.rows().groupBy("Court", "Surface", "Round");
+var frame = loadTennisMatchData(2013);
+var grouping = frame.rows().groupBy("Court", "Surface", "Round");
 for (int depth=0; depth<grouping.getDepth(); ++depth) {
     System.out.printf("Groups for depth %s...\n", depth);
     grouping.getGroupKeys(depth).sorted().forEach(groupKey -> {
-        DataFrame<Integer,String> group = grouping.getGroup(groupKey);
+        var group = grouping.getGroup(groupKey);
         System.out.printf("There are %s rows for group %s\n", group.rowCount(), groupKey);
     });
 }
@@ -164,8 +164,8 @@ the `mean()` on groups at different depths.
 
 <?prettify?>
 ```java
-DataFrame<Integer,String> frame = loadTennisMatchData(2013);
-DataFrameGrouping.Rows<Integer,String> grouping = frame.rows().groupBy("Court", "Surface", "Round");
+var frame = loadTennisMatchData(2013);
+var grouping = frame.rows().groupBy("Court", "Surface", "Round");
 //Computes means for top level groups
 grouping.stats(0).mean().rows().sort(true).out().print(formats -> {
     formats.withDecimalFormat(Double.class, "0.00;-0.00", 1);
@@ -258,12 +258,12 @@ and subsequently prints out the number of columns per group at level 0 and 1.
 
 <?prettify?>
 ```java
-DataFrame<String,Integer> frame = loadTennisMatchData(2013).transpose();
-DataFrameGrouping.Cols<String,Integer> grouping = frame.cols().groupBy("Court", "Surface");
+var frame = loadTennisMatchData(2013).transpose();
+var grouping = frame.cols().groupBy("Court", "Surface");
 for (int depth=0; depth<grouping.getDepth(); ++depth) {
     System.out.printf("Groups for depth %s...\n", depth);
     grouping.getGroupKeys(depth).sorted().forEach(groupKey -> {
-        DataFrame<String,Integer> group = grouping.getGroup(groupKey);
+        var group = grouping.getGroup(groupKey);
         System.out.printf("There are %s columns for group %s\n", group.colCount(), groupKey);
     });
 }
@@ -370,25 +370,25 @@ function increases, which is exactly what we see in the subsequent plot.
 * **Locality**: 16800 Groups
 
 <p align="center">
-    <img class="chart" src="../../images/frame/data-frame-group-by-0.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/frame/data-frame-group-by-0.png"/>
 </p>
 Running this same example with **parallel execution** yields a similar trend, but the absolute times are much smaller.
 
 <p align="center">
-    <img class="chart" src="../../images/frame/data-frame-group-by-1.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/frame/data-frame-group-by-1.png"/>
 </p>
 The following code is used to generate the above results, for the sequential execution.
 
 <?prettify?>
 ```java
 //Load UK house prices for 2006
-DataFrame<Integer,String> frame = loadHousePrices(2006);
+var frame = loadHousePrices(2006);
 
 //Run 10 iterations of sequential and parallel group by Town/City
-DataFrame<String,String> results = PerfStat.run(5, TimeUnit.MILLISECONDS, false, tasks -> {
+var results = PerfStat.run(5, TimeUnit.MILLISECONDS, false, tasks -> {
     tasks.put("PropertyType", () -> frame.rows().groupBy("PropertyType"));
     tasks.put("Month", () -> frame.rows().groupBy(row -> {
-        final LocalDateTime date = row.getValue("Date");
+        var date = row.<LocalDateTime>getValue("Date");
         return Tuple.of(date.getMonth());
     }));
     tasks.put("County", () -> frame.rows().groupBy("County"));
@@ -417,17 +417,17 @@ over twice as fast as the sequential algorithm. This result bodes well as this i
 and we would expect the parallel algorithm to perform even better as the grouping complexity increases.
 
 <p align="center">
-    <img class="chart" src="../../images/frame/data-frame-group-by-2.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/frame/data-frame-group-by-2.png"/>
 </p>
 The following code is used to generate the above results.
 
 <?prettify?>
 ```java
 //Load UK house prices for 2006
-DataFrame<Integer,String> frame = loadHousePrices(2006);
+var frame = loadHousePrices(2006);
 
 //Run 10 iterations of sequential and parallel group by County
-DataFrame<String,String> results = PerfStat.run(10, TimeUnit.MILLISECONDS, false, tasks -> {
+var results = PerfStat.run(10, TimeUnit.MILLISECONDS, false, tasks -> {
     tasks.put("Sequential", () -> frame.rows().sequential().groupBy("County"));
     tasks.put("Parallel", () -> frame.rows().parallel().groupBy("County"));
 });
@@ -456,17 +456,17 @@ The plot below indicates adding another dimension is significant, although using
 discount the additional cost, at least in this scenario.
 
 <p align="center">
-    <img class="chart" src="../../images/frame/data-frame-group-by-3.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/frame/data-frame-group-by-3.png"/>
 </p>
 The following code is used to generate the above results.
 
 <?prettify?>
 ```java
 //Load UK house prices for 2006
-DataFrame<Integer,String> frame = loadHousePrices(2006);
+var frame = loadHousePrices(2006);
 
 //Run 10 iterations of sequential and parallel group by County and Town/City
-DataFrame<String,String> results = PerfStat.run(10, TimeUnit.MILLISECONDS, false, tasks -> {
+var results = PerfStat.run(10, TimeUnit.MILLISECONDS, false, tasks -> {
     tasks.put("Sequential(1-D)", () -> frame.rows().sequential().groupBy("County"));
     tasks.put("Parallel(1-D)", () -> frame.rows().parallel().groupBy("County"));
     tasks.put("Sequential(2-D)", () -> frame.rows().sequential().groupBy("County", "County"));
@@ -499,17 +499,17 @@ The results in the subsequent plot suggests there is a very small performance co
 however it is fairly neglible in this case.
 
 <p align="center">
-    <img class="chart" src="../../images/frame/data-frame-group-by-4.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/frame/data-frame-group-by-4.png"/>
 </p>
 The following code is used to generate the above results.
 
 <?prettify?>
 ```java
 //Load UK house prices for 2006
-DataFrame<Integer,String> frame = loadHousePrices(2006);
+var frame = loadHousePrices(2006);
 
 //Run 10 iterations of sequential and parallel group by County and Town/City
-DataFrame<String,String> results = PerfStat.run(5, TimeUnit.MILLISECONDS, false, tasks -> {
+var results = PerfStat.run(5, TimeUnit.MILLISECONDS, false, tasks -> {
     tasks.put("Method-1", () -> frame.rows().groupBy("County", "Town/City"));
     tasks.put("Method-2", () -> frame.rows().groupBy(row -> Tuple.of(
         row.<String>getValue("County"),

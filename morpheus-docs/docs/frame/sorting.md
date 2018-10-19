@@ -1,4 +1,4 @@
-### Sorting
+### DataFrame Sorting
 
 #### Introduction
 
@@ -47,7 +47,7 @@ frame.
 
 <?prettify?>
 ```java
-DataFrame<Integer,String> frame = loadTennisMatchData(2013);
+var frame = loadTennisMatchData(2013);
 //Sort rows by row keys in descending order
 frame.rows().sort(false);
 //Print first ten rows
@@ -81,7 +81,7 @@ the expected names in the Winner column, namely Djokovic and Nadal.
 
 <?prettify?>
 ```java
-DataFrame<Integer,String> frame = loadTennisMatchData(2013);
+var frame = loadTennisMatchData(2013);
 //Sort rows by the WRank (winner rank) column values
 frame.rows().sort(true, "WRank");
 //Print first ten rows
@@ -112,9 +112,9 @@ does not follow a calendar year), followed by a WRank sort which is also ascendi
 
 <?prettify?>
 ```java
-DataFrame<Integer,String> frame = loadTennisMatchData(2013);
+var frame = loadTennisMatchData(2013);
 //Multidimensional row sort (ascending) first by Date, then WRank
-frame.rows().sort(true, Collect.asList("Date", "WRank"));
+frame.rows().sort(true, List.of("Date", "WRank"));
 //Print first ten rows
 frame.out().print(10);
 ```
@@ -151,7 +151,7 @@ This helps identity matches that as far as the bookmakers are concerned, are sim
 
 <?prettify?>
 ```java
-DataFrame<Integer,String> frame = loadTennisMatchData(2013);
+var frame = loadTennisMatchData(2013);
 //Sort rows so that matches smallest difference in betting odds between winner and looser.
 frame.rows().sort((row1, row2) -> {
     double diff1 = Math.abs(row1.getDouble("AvgW") - row1.getDouble("AvgL"));
@@ -187,7 +187,7 @@ from `DataFrame.cols()`.
 
 <?prettify?>
 ```java
-DataFrame<Integer,String> frame = loadTennisMatchData(2013);
+var frame = loadTennisMatchData(2013);
 //Sort columns by column keys in ascending order
 frame.cols().sort(true);
 //Print first ten rows
@@ -223,7 +223,7 @@ The column keys in the unsorted frame are `C0`, `C1`, `C2` to `C9`, and the new 
 <?prettify?>
 ```java
 //Create a 10x10 frame initialized with random doubles
-DataFrame<String,String> frame = DataFrame.ofDoubles(
+var frame = DataFrame.ofDoubles(
     Range.of(0, 10).map(i -> "R" + i),
     Range.of(0, 10).map(i -> "C" + i), 
     value -> Math.random() * 100d
@@ -253,7 +253,7 @@ We can of course sort by data in both the row and column dimension as follows:
 <?prettify?>
 ```java
 //Create a 10x10 frame initialized with random doubles
-DataFrame<String,String> frame = DataFrame.ofDoubles(
+var frame = DataFrame.ofDoubles(
     Range.of(0, 10).map(i -> "R" + i),
     Range.of(0, 10).map(i -> "C" + i),
     value -> Math.random() * 100d
@@ -293,9 +293,9 @@ rank players he beat appear first, so it is no surprise to see names like Nadal,
 
 <?prettify?>
 ```java
-DataFrame<Integer,String> frame = loadTennisMatchData(2013);
+var frame = loadTennisMatchData(2013);
 //First filter frame to include only rows where Novak Djokovic was the victor
-DataFrame<Integer,String> filter = frame.rows().select(row -> row.getValue("Winner").equals("Djokovic N."));
+var filter = frame.rows().select(row -> row.getValue("Winner").equals("Djokovic N."));
 //Sort rows so that the highest rank players he beat come first
 filter.rows().sort(true, "LRank");
 //Print first ten rows
@@ -354,15 +354,15 @@ see a very big difference between the *min* and *max* sort times if that was the
 <?prettify?>
 ```java
 //Define range of row counts we want to test, from 1M to 5M inclusive
-Range<Integer> rowCounts = Range.of(1, 6).map(i -> i * 1000000);
+var rowCounts = Range.of(1, 6).map(i -> i * 1000000);
 
 //Time DataFrame sort operations on frame of random doubles with row counts ranging from 1M to 6M
-DataFrame<String,String> results = DataFrame.combineFirst(rowCounts.map(rowCount -> {
-    Range<Integer> rowKeys = Range.of(0, rowCount.intValue());
-    Range<String> colKeys = Range.of(0, 5).map(i -> "C" + i);
+var results = DataFrame.combineFirst(rowCounts.map(rowCount -> {
+    var rowKeys = Range.of(0, rowCount.intValue());
+    var colKeys = Range.of(0, 5).map(i -> "C" + i);
     //Create frame initialized with random double values
-    DataFrame<Integer,String> frame = DataFrame.ofDoubles(rowKeys, colKeys, v -> Math.random() * 100d);
-    String label = "Rows(" + (rowCount / 1000000) + "M)";
+    var frame = DataFrame.ofDoubles(rowKeys, colKeys, v -> Math.random() * 100d);
+    var label = "Rows(" + (rowCount / 1000000) + "M)";
     //Run each test 10 times, clear the sort before running the test with sort(null)
     return PerfStat.run(10, TimeUnit.MILLISECONDS, false, tasks -> {
         tasks.beforeEach(() -> frame.rows().sort(null));
@@ -387,7 +387,7 @@ to 5 million rows. The dispersion in the 10 iterations as measured by the standa
 at least as a percentage of the time taken.
 
 <p align="center">
-    <img class="chart" src="../../images/frame/data-frame-row-sort-sequential.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/frame/data-frame-row-sort-sequential.png"/>
 </p>
 
 
@@ -399,15 +399,15 @@ sort by ensuring that we call `DataFrame.rows().parallel().sort()`. The modified
 <?prettify?>
 ```java
 //Define range of row counts we want to test, from 1M to 5M inclusive
-Range<Integer> rowCounts = Range.of(1, 6).map(i -> i * 1000000);
+var rowCounts = Range.of(1, 6).map(i -> i * 1000000);
 
 //Time DataFrame sort operations on frame of random doubles with row counts ranging from 1M to 6M
-DataFrame<String,String> results = DataFrame.combineFirst(rowCounts.map(rowCount -> {
-    Range<Integer> rowKeys = Range.of(0, rowCount.intValue());
-    Range<String> colKeys = Range.of(0, 5).map(i -> "C" + i);
+var results = DataFrame.combineFirst(rowCounts.map(rowCount -> {
+    var rowKeys = Range.of(0, rowCount.intValue());
+    var colKeys = Range.of(0, 5).map(i -> "C" + i);
     //Create frame initialized with random double values
-    DataFrame<Integer,String> frame = DataFrame.ofDoubles(rowKeys, colKeys, v -> Math.random() * 100d);
-    String label = "Rows(" + (rowCount / 1000000) + "M)";
+    var frame = DataFrame.ofDoubles(rowKeys, colKeys, v -> Math.random() * 100d);
+    var label = "Rows(" + (rowCount / 1000000) + "M)";
     //Run each test 10 times, clear the sort before running the test with sort(null)
     return PerfStat.run(10, TimeUnit.MILLISECONDS, false, tasks -> {
         tasks.beforeEach(() -> frame.rows().sort(null));
@@ -434,7 +434,7 @@ cache sizes increase and ever more cores become available, we can only expect th
 Law begins to plateau.
 
 <p align="center">
-    <img class="chart" src="../../images/frame/data-frame-row-sort-parallel.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/frame/data-frame-row-sort-parallel.png"/>
 </p>
 
 ##### Comparator Performance
@@ -451,9 +451,9 @@ follows:
 <?prettify?>
 ```java
 //Create frame initialized with random double values
-Range<Integer> rowKeys = Range.of(0, 1000000);
-Range<String> colKeys = Range.of(0, 5).map(i -> "C" + i);
-DataFrame<Integer,String> frame = DataFrame.ofDoubles(rowKeys, colKeys, v -> Math.random() * 100d);
+var rowKeys = Range.of(0, 1000000);
+var colKeys = Range.of(0, 5).map(i -> "C" + i);
+var frame = DataFrame.ofDoubles(rowKeys, colKeys, v -> Math.random() * 100d);
 //Define comparator to sort rows by column C1, which is ordinal 1
 Comparator<DataFrameRow<Integer,String>> comparator = (row1, row2) -> {
     double v1 = row1.getDouble(1);
@@ -462,7 +462,7 @@ Comparator<DataFrameRow<Integer,String>> comparator = (row1, row2) -> {
 };
 
 //Time sorting in various modes (with & without comparator in both sequential & parallel mode)
-DataFrame<String,String> results = PerfStat.run(10, TimeUnit.MILLISECONDS, false, tasks -> {
+var results = PerfStat.run(10, TimeUnit.MILLISECONDS, false, tasks -> {
     tasks.beforeEach(() -> frame.rows().sort(null));
     tasks.put("W/O Comparator (seq)", () -> frame.rows().sort(true, "C1"));
     tasks.put("W/O Comparator (par)", () -> frame.rows().parallel().sort(true, "C1"));
@@ -490,7 +490,7 @@ is that the parallel sort with the `Comparator` is still faster than the sequent
 the `Comparator`. 
 
 <p align="center">
-    <img class="chart" src="../../images/frame/data-frame-row-sort-comparator.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/frame/data-frame-row-sort-comparator.png"/>
 </p>
 
 These performance benchmarks are obviously very controlled test cases, and real world performance is likely

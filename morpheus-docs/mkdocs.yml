@@ -4,7 +4,7 @@ repo_url: https://github.com/zavtech/morpheus-core
 
 site_author: Xavier Witdouck
 
-copyright: Copyright (C) 2014-2017 Xavier Witdouck
+copyright: Copyright (C) 2014-2018 Xavier Witdouck
 
 extra_css:
   - ./css/morpheus.css
@@ -46,8 +46,8 @@ pages:
       - Charts:
         - Overview: viz/charts/overview.md
         - Embedding (HTML): viz/charts/embed.md
-        - Gallery (Google): viz/charts/gallery1.md
-        - Gallery (JFree): viz/charts/gallery2.md
+        - Gallery (Google): viz/charts/gallery-google.md
+        - Gallery (JFree): viz/charts/gallery-swing.md
       - Tables: viz/tables/overview.md
   - Data Sources:
     - Quandl: providers/quandl.md
