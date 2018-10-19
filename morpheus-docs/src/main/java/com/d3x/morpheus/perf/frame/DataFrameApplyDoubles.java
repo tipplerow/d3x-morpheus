@@ -34,19 +34,18 @@ public class DataFrameApplyDoubles {
     public static void main(String[] args) {
 
         //Sample size for timing statistics
-        int count = 10;
+        var count = 10;
 
         //Create frame with 50 million rows of Random doubles
-        Range<Integer> rowKeys = Range.of(0, 50000000);
-        Array<String> colKeys = Array.of("A", "B", "C", "D");
-        DataFrame<Integer,String> frame = DataFrame.ofDoubles(rowKeys, colKeys).applyDoubles(v -> Math.random());
+        var rowKeys = Range.of(0, 50000000);
+        var colKeys = Array.of("A", "B", "C", "D");
+        var frame = DataFrame.ofDoubles(rowKeys, colKeys).applyDoubles(v -> Math.random());
 
         //Time sequential and parallel capping of all elements in the DataFrame
-        ToDoubleFunction<DataFrameValue<Integer,String>> cap = (v) -> v.getDouble() > 0.5 ? 0.5 : v.getDouble();
-        DataFrame<String,String> timing = PerfStat.run(count, TimeUnit.MILLISECONDS, true, tasks -> {
+        var timing = PerfStat.run(count, TimeUnit.MILLISECONDS, true, tasks -> {
             tasks.beforeEach(() -> frame.applyDoubles(v -> Math.random()));
-            tasks.put("Sequential", () -> frame.sequential().applyDoubles(cap));
-            tasks.put("Parallel", () -> frame.parallel().applyDoubles(cap));
+            tasks.put("Sequential", () -> frame.sequential().applyDoubles(v -> v.getDouble() > 0.5 ? 0.5 : v.getDouble()));
+            tasks.put("Parallel", () -> frame.parallel().applyDoubles(v -> v.getDouble() > 0.5 ? 0.5 : v.getDouble()));
         });
 
         //Plot timing statistics as a bar chart

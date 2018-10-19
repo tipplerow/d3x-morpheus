@@ -46,13 +46,13 @@ the sparse array to be half populated by declaring a load factor of 0.5f.
 <?prettify?>
 ```java
 //Create a dense array of double precision values with default value of NaN
-Array<Double> denseArray = Array.of(Double.class, 1000, Double.NaN);
+var denseArray = Array.of(Double.class, 1000, Double.NaN);
 //Create a sparse array which we expect to be only half populated, default value = 0
-Array<Double> sparseArray = Array.of(Double.class, 1000, 0d, 0.5f);
+var sparseArray = Array.of(Double.class, 1000, 0d, 0.5f);
 //Created a memory mapped array of double values using an anonymous file
-Array<Double> mappedArray1 = Array.mmap(Double.class, 1000, Double.NaN);
+var mappedArray1 = Array.map(Double.class, 1000, Double.NaN);
 //Created a memory mapped array of double values using a user specified file
-Array<Double> mappedArray2 = Array.mmap(Double.class, 1000, Double.NaN, "test.dat");
+var mappedArray2 = Array.map(Double.class, 1000, Double.NaN, "test.dat");
 
 //Assert that each array is of the type we expect
 Assert.assertTrue(denseArray.type() == Double.class);
@@ -79,18 +79,18 @@ There are also convenient methods for creating a **dense** `Array` given the val
  
 <?prettify?>
 ```java
-Array<Boolean> booleans = Array.of(true, false, true, false, true, true);
-Array<Integer> integers = Array.of(0, 1, 2, 3, 4, 5);
-Array<Long> longs = Array.of(0L, 1L, 2L, 3L, 4L);
-Array<Double> doubles = Array.of(0d, 1d, 2d, 3d, 4d, 5d);
-Array<LocalDate> dates = Array.of(LocalDate.now(), LocalDate.now().plusDays(1));
+var booleans = Array.of(true, false, true, false, true, true);
+var integers = Array.of(0, 1, 2, 3, 4, 5);
+var longs = Array.of(0L, 1L, 2L, 3L, 4L);
+var doubles = Array.of(0d, 1d, 2d, 3d, 4d, 5d);
+var dates = Array.of(LocalDate.now(), LocalDate.now().plusDays(1));
 ```
 
 To create a half populated sparse `Array` where even indices are non-zero, one could do something as follows:
 
 <?prettify?>
 ```java
-Array<Double> sparseArray = Array.of(Double.class, 1000, 0d, 0.5f).applyDoubles(v -> {
+var sparseArray = Array.of(Double.class, 1000, 0d, 0.5f).applyDoubles(v -> {
     return v.index() % 2 == 0 ? Math.random() : 0d;
 });
 ```
@@ -106,15 +106,15 @@ via methods, not via a [] operator. There exist getter and setter methods for `b
 <?prettify?>
 ```java
 //Create a dense array of doubles
-Array<Double> array = Array.of(0d, 1d, 2d, 3d, 4d, 5d);
+var array = Array.of(0d, 1d, 2d, 3d, 4d, 5d);
 //Set first element using a primitive
 array.setDouble(0, 22d);
 //Set second element using a boxed value
 array.setValue(1, 33d);
 //Read first element as primitive
-Assert.assertEquals(array.getDouble(0), 22d);
+assertEquals(array.getDouble(0), 22d);
 //Read second element as generic boxed value
-Assert.assertEquals(array.getValue(1), new Double(33d));
+assertEquals(array.getValue(1), new Double(33d));
 ```
 
 ### Iteration
@@ -127,7 +127,7 @@ methods to allow fast iteration without any boxing cost. Consider the example be
 <?prettify?>
 ```java
 //Create dense array of 20K random doubles
-Array<Double> array = Array.of(Double.class, 20000, Double.NaN).applyDoubles(v -> Math.random());
+var array = Array.of(Double.class, 20000, Double.NaN).applyDoubles(v -> Math.random());
 //Iterate values by boxing doubles
 array.forEach(value -> Assert.assertTrue(value > 0d));
 //Iterate values and avoid boxing
@@ -195,7 +195,7 @@ to.
 <?prettify?>
 ```java
 //Create dense array of 1 million doubles
-Array<Double> array = Array.of(Double.class, 1000000, Double.NaN);
+var array = Array.of(Double.class, 1000000, Double.NaN);
 //Update with random values
 array.applyDoubles(v -> Math.random() * 100d);
 //Cap Values to be no larger than 50
@@ -227,15 +227,15 @@ mapping to various primitive types without any need for boxing.
 <?prettify?>
 ```java
 //Initial random generator
-Random random = new Random();
+var random = new Random();
 //Create Array of LocalDates with random offsets from today
-Array<LocalDate> dates = Array.of(LocalDate.class, 100, null).applyValues(v -> {
+var dates = Array.of(LocalDate.class, 100, null).applyValues(v -> {
     return LocalDate.now().minusDays(random.nextInt(1000));
 });
 //Map dates to date times with time set to 12:15
-Array<LocalDateTime> dateTimes = dates.map(v -> v.getValue().atTime(LocalTime.of(12, 15)));
+var dateTimes = dates.map(v -> v.getValue().atTime(LocalTime.of(12, 15)));
 //Map dates to day count offsets from today
-Array<Long> dayCounts = dates.mapToLongs(v -> ChronoUnit.DAYS.between(v.getValue(), LocalDate.now()));
+var dayCounts = dates.mapToLongs(v -> ChronoUnit.DAYS.between(v.getValue(), LocalDate.now()));
 //Check day counts resolve back to original dates
 dayCounts.forEachValue(v -> {
     long dayCount = v.getLong();
@@ -250,7 +250,7 @@ The mapping functions are also **parallel** aware.
 <?prettify?>
 ```java
 //Parallel map dates to day count offsets from today
-Array<Long> dayCounts = dates.parallel().mapToLongs(v -> {
+var dayCounts = dates.parallel().mapToLongs(v -> {
     LocalDate now = LocalDate.now();
     LocalDate value = v.getValue();
     return ChronoUnit.DAYS.between(value, now);
@@ -322,9 +322,9 @@ well as the value in a way that can avoid boxing.
 <?prettify?>
 ```java
 //Create random with seed
-Random random = new Random(3);
+var random = new Random(3);
 //Create dense array double precision values
-Array<Double> array = Array.of(Double.class, 1000, Double.NaN).applyDoubles(v -> random.nextDouble() * 55d);
+var array = Array.of(Double.class, 1000, Double.NaN).applyDoubles(v -> random.nextDouble() * 55d);
 
 //Find first value above 50
 Assert.assertTrue(array.first(v -> v.getDouble() > 50d).isPresent());
@@ -347,7 +347,7 @@ which can be done by calling one of the sort methods as shown below.
 <?prettify?>
 ```java
 //Sort the array for binary search
-Array<Double> sorted = array.sort(true);
+var sorted = array.sort(true);
 ```
 
 Knowing that the array is sorted, we can perform a binary search on a subset of the `Array` or the entire
@@ -378,7 +378,7 @@ IntStream.of(27, 45, 145, 378, 945).forEach(index -> {
     double value2 = sorted.getDouble(index+1);
     double mean = (value1 + value2) / 2d;
     //Find next value given a value that does not exist in the array
-    Optional<ArrayValue<Double>> nextValue = sorted.next(mean);
+    var nextValue = sorted.next(mean);
     Assert.assertTrue(nextValue.isPresent());
     nextValue.ifPresent(v -> {
         Assert.assertEquals(v.getDouble(), value2);
@@ -392,7 +392,7 @@ IntStream.of(27, 45, 145, 378, 945).forEach(index -> {
     double value2 = sorted.getDouble(index+1);
     double mean = (value1 + value2) / 2d;
     //Find prior value given a value that does not exist in the array
-    Optional<ArrayValue<Double>> priorValue = sorted.previous(mean);
+    var priorValue = sorted.previous(mean);
     Assert.assertTrue(priorValue.isPresent());
     priorValue.ifPresent(v -> {
         Assert.assertEquals(v.getDouble(), value1);
@@ -411,9 +411,9 @@ as follows:
 <?prettify?>
 ```java
 //Create random generator with seed
-Random random = new Random(22);
+var random = new Random(22);
 //Create dense array double precision values
-Array<Double> array = Array.of(Double.class, 1000, Double.NaN);
+var array = Array.of(Double.class, 1000, Double.NaN);
 //Initialise with random values
 array.applyDoubles(v -> {
     final double sign = random.nextDouble() > 0.5d ? 1d : -1d;
@@ -453,16 +453,16 @@ objects, they should be treated as ephemeral and only valid for the life of the 
 ```java
 //Sort by absolute ascending value
 array.sort(100, 200, (v1, v2) -> {
-    final double d1 = Math.abs(v1.getDouble());
-    final double d2 = Math.abs(v2.getDouble());
+    var d1 = Math.abs(v1.getDouble());
+    var d2 = Math.abs(v2.getDouble());
     return Double.compare(d1, d2);
 });
 
 //Check values in range are sorted as expected
 IntStream.range(101, 200).forEach(index -> {
-    double prior = Math.abs(array.getDouble(index-1));
-    double current = Math.abs(array.getDouble(index));
-    int compare = Double.compare(prior, current);
+    var prior = Math.abs(array.getDouble(index-1));
+    var current = Math.abs(array.getDouble(index));
+    var compare = Double.compare(prior, current);
     Assert.assertTrue(compare <= 0);
 });
 ```
@@ -474,8 +474,8 @@ improve performance.
 ```java
 //Parallel sort by absolute ascending value
 array.parallel().sort(100, 200, (v1, v2) -> {
-    final double d1 = Math.abs(v1.getDouble());
-    final double d2 = Math.abs(v2.getDouble());
+    var d1 = Math.abs(v1.getDouble());
+    var d2 = Math.abs(v2.getDouble());
     return Double.compare(d1, d2);
 });
 ```
@@ -490,16 +490,16 @@ of values, and the third creates a copy given specific indexes.
 <?prettify?>
 ```java
 //Create random generator with seed
-Random random = new Random(22);
+var random = new Random(22);
 //Create dense array double precision values
-Array<Double> array = Array.of(Double.class, 1000, Double.NaN).applyDoubles(v -> random.nextDouble());
+var array = Array.of(Double.class, 1000, Double.NaN).applyDoubles(v -> random.nextDouble());
 
 //Deep copy of entire Array
-Array<Double> copy1 = array.copy();
+var copy1 = array.copy();
 //Deep copy of subset of Array, start inclusive, end exclusive
-Array<Double> copy2 = array.copy(100, 200);
+var copy2 = array.copy(100, 200);
 //Deep copy of specific indexes
-Array<Double> copy3 = array.copy(new int[] {25, 304, 674, 485, 873});
+var copy3 = array.copy(new int[] {25, 304, 674, 485, 873});
 
 //Assert lengths as expected
 Assert.assertEquals(copy1.length(), array.length());
@@ -531,16 +531,16 @@ provides access to type specific streams as shown in the code examples below.
 <?prettify?>
 ```java
 //Create Array of various types
-Array<Integer> integers = Array.of(0, 1, 2, 3, 4, 5);
-Array<Long> longs = Array.of(0L, 1L, 2L, 3L, 4L);
-Array<Double> doubles = Array.of(0d, 1d, 2d, 3d, 4d, 5d);
-Array<LocalDate> dates = Array.of(LocalDate.now(), LocalDate.now().plusDays(1));
+var integers = Array.of(0, 1, 2, 3, 4, 5);
+var longs = Array.of(0L, 1L, 2L, 3L, 4L);
+var doubles = Array.of(0d, 1d, 2d, 3d, 4d, 5d);
+var dates = Array.of(LocalDate.now(), LocalDate.now().plusDays(1));
 
 //Create Java 8 streams of these Arrays
-IntStream intStream = integers.stream().ints();
-LongStream longStream = longs.stream().longs();
-DoubleStream doubleStream = doubles.stream().doubles();
-Stream<LocalDate> dateStream = dates.stream().values();
+var intStream = integers.stream().ints();
+var longStream = longs.stream().longs();
+var doubleStream = doubles.stream().doubles();
+var dateStream = dates.stream().values();
 ```
 
 ### Expanding
@@ -556,7 +556,7 @@ upon creation.
 <?prettify?>
 ```java
 //Create array of random doubles, with defauly value of -1
-Array<Double> array = Array.of(Double.class, 10, -1d).applyDoubles(v -> Math.random());
+var array = Array.of(Double.class, 10, -1d).applyDoubles(v -> Math.random());
 //Double the size of the array
 array.expand(20);
 //Confirm new length is as expected
@@ -576,11 +576,11 @@ precision random values, and creates a filter which only includes values > 5.
 <?prettify?>
 ```java
 //Create random generator with seed
-Random random = new Random(2);
+var random = new Random(2);
 //Create array of random doubles, with default value NaN
-Array<Double> array = Array.of(Double.class, 1000, Double.NaN).applyDoubles(v -> random.nextDouble() * 10d);
+var array = Array.of(Double.class, 1000, Double.NaN).applyDoubles(v -> random.nextDouble() * 10d);
 //Filter to include all values > 5
-Array<Double> filter = array.filter(v -> v.getDouble() > 5d);
+var filter = array.filter(v -> v.getDouble() > 5d);
 //Assert length as expected
 Assert.assertEquals(filter.length(), 486);
 //Assert all value are > 5
@@ -598,9 +598,9 @@ light-weight ready-only proxy.
 <?prettify?>
 ```java
 //Create array of random doubles, with default value NaN
-Array<Double> array = Array.of(Double.class, 1000, Double.NaN).applyDoubles(v -> Math.random());
+var array = Array.of(Double.class, 1000, Double.NaN).applyDoubles(v -> Math.random());
 //Create a light-weight read only wrapper
-Array<Double> readOnly = array.readOnly();
+var readOnly = array.readOnly();
 ```
 
 ### Filling
@@ -612,7 +612,7 @@ then proceed to fill indexes 10 through 20 with a fixed value.
 <?prettify?>
 ```java
 //Create array of random doubles, with default value NaN
-Array<Double> array = Array.of(Double.class, 1000, Double.NaN);
+var array = Array.of(Double.class, 1000, Double.NaN);
 //Fill indexes 10-20 (inclusive - exclusive) with value 25
 array.fill(25d, 10, 20);
 //Check results
@@ -632,15 +632,15 @@ limit. The code below illustrates and example of how to use these.
 <?prettify?>
 ```java
 //Create a random with seed
-Random random = new Random(10);
+var random = new Random(10);
 //Create Array of random LocalDates, all elements initially null
-Array<LocalDate> dates = Array.of(LocalDate.class, 1000);
+var dates = Array.of(LocalDate.class, 1000);
 //Populate with some random dates that will likely have duplicates
 dates.applyValues(v -> LocalDate.now().plusDays(random.nextInt(20)));
 //Generate distinct Array
-Array<LocalDate> distinct1 = dates.distinct();
+var distinct1 = dates.distinct();
 //Generate distinct limiting to first 5 matches
-Array<LocalDate> distinct2 = dates.distinct(5);
+var distinct2 = dates.distinct(5);
 //Check expected results
 Assert.assertEquals(distinct1.length(), 20);
 Assert.assertEquals(distinct2.length(), 5);
@@ -659,11 +659,11 @@ in an `ArrayException`.
 <?prettify?>
 ```java
 //Create a random with seed
-Random random = new Random(21);
+var random = new Random(21);
 //Create Array of random doubles, all elements initially null
-Array<Double> array = Array.of(Double.class, 1000).applyDoubles(v -> random.nextDouble() * 100);
+var array = Array.of(Double.class, 1000).applyDoubles(v -> random.nextDouble() * 100);
 //Compute upper and lower bounds in one pass
-Optional<Bounds<Double>> bounds = array.bounds();
+var bounds = array.bounds();
 //Confirm we have bounds
 Assert.assertTrue(bounds.isPresent());
 //Confirm expected results
@@ -688,15 +688,15 @@ so one can avoid this special null check case as shown by the example below.
 <?prettify?>
 ```java
 //Create a random with seed
-Random random = new Random(21);
+var random = new Random(21);
 //Create Array of random doubles, all elements initially null
-Array<Double> array = Array.of(Double.class, 1000).applyDoubles(v -> random.nextDouble() * 100);
+var array = Array.of(Double.class, 1000).applyDoubles(v -> random.nextDouble() * 100);
 //Set some values to NaN
 array.fill(Double.NaN, 10, 20);
 //Set some values to null, which is the same as NaN for double precision
 array.fill(null, 20, 30);
 //Filter out NaN values using is null
-Array<Double> filtered = array.filter(v -> !v.isNull());
+var filtered = array.filter(v -> !v.isNull());
 //Assert length
 Assert.assertEquals(filtered.length(), array.length() - 20);
 ```
@@ -711,7 +711,7 @@ example of how to use it unrelated to sorting is shown below.
 <?prettify?>
 ```java
 //Create Array of doubles
-Array<Double> array = Array.of(10d, 20d, 30d, 40d);
+var array = Array.of(10d, 20d, 30d, 40d);
 //Swap values
 array.swap(0, 3);
 //Assert values swapped

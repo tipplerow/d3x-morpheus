@@ -37,14 +37,14 @@ charts.
 ```java
 public static void main(String[] args) throws Exception {
     //Create some random data to plot
-    final DataFrame<Year,String> frame = randomData();
+    var frame = randomData();
     //Create the list of 4 charts, 2 JFree based, 2 Google based 
-    final List<Chart<?>> charts = createCharts(frame);
+    var charts = createCharts(frame);
     //Generate Javascript code which can be embedded in an HTML page
-    final String javascript = Chart.create().javascript(charts);
+    var javascript = Chart.create().javascript(charts);
 
     //Code generate some HTML, embed the Javascript and create appropriate divs
-    final HtmlCode htmlCode = new HtmlCode();
+    var htmlCode = new HtmlCode();
     htmlCode.newElement("html", html -> {
         html.newElement("head", head -> {
             head.newElement("script", script -> {
@@ -112,7 +112,7 @@ private static List<Chart<?>> createCharts(DataFrame<Year,String> frame) {
  * @return      the DataFrame with chart data
  */
 private static DataFrame<Year,String> randomData() {
-    final Array<Year> years = Range.of(2000, 2016).map(Year::of).toArray();
+    var years = Range.of(2000, 2016).map(Year::of).toArray();
     return DataFrame.of(years, String.class, columns -> {
         Stream.of("A", "B", "C", "D").forEach(label -> {
             columns.add(label, Array.randn(years.length()).cumSum());
@@ -489,17 +489,17 @@ public class ChartServlet extends javax.servlet.http.HttpServlet {
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException {
         try {
-            final String title = request.getParameter("title");
-            final Optional<String> widthParam = Optional.ofNullable(request.getParameter("width"));
-            final Optional<String> heightParam = Optional.ofNullable(request.getParameter("height"));
-            final Optional<String> transParam = Optional.ofNullable(request.getParameter("transparent"));
-            final DataFrame<Integer,String> frame = loadData();
+            var title = request.getParameter("title");
+            var widthParam = Optional.ofNullable(request.getParameter("width"));
+            var heightParam = Optional.ofNullable(request.getParameter("height"));
+            var transParam = Optional.ofNullable(request.getParameter("transparent"));
+            var frame = loadData();
             //Only the swing based charts support PNG generation
             Chart.create().asSwing().withLinePlot(frame, "DataDate", chart -> {
                 try {
-                    final int width = widthParam.map(Integer::parseInt).orElse(700);
-                    final int height = heightParam.map(Integer::parseInt).orElse(400);
-                    final boolean transparent = transParam.map(Boolean::parseBoolean).orElse(true);
+                    var width = widthParam.map(Integer::parseInt).orElse(700);
+                    var height = heightParam.map(Integer::parseInt).orElse(400);
+                    var transparent = transParam.map(Boolean::parseBoolean).orElse(true);
                     response.setContentType("image/png");
                     chart.title().withText(title);
                     chart.legend().on().bottom();
@@ -520,10 +520,10 @@ public class ChartServlet extends javax.servlet.http.HttpServlet {
      * @return      the DataFrame with chart data
      */
     private DataFrame<Integer,String> loadData() {
-        final int rowCount = 1000;
-        final LocalDate startDate = LocalDate.of(2013, 1, 1);
-        final Range<Integer> rowKeys = Range.of(0, rowCount);
-        final Range<LocalDate> dates = rowKeys.map(startDate::plusDays);
+        var rowCount = 1000;
+        var startDate = LocalDate.of(2013, 1, 1);
+        var rowKeys = Range.of(0, rowCount);
+        var dates = rowKeys.map(startDate::plusDays);
         return DataFrame.of(rowKeys, String.class, columns -> {
             columns.add("DataDate", dates);
             Stream.of("A", "B", "C", "D").forEach(label -> {

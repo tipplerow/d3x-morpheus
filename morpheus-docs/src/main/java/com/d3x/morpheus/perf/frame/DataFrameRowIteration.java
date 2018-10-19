@@ -31,15 +31,15 @@ public class DataFrameRowIteration {
     public static void main(String[] args) {
 
         //Sample size for timing statistics
-        int sample = 10;
+        var sample = 10;
 
         //Create frame with 50 million rows of Random doubles
-        Range<Integer> rowKeys = Range.of(0, 10000000);
-        Array<String> colKeys = Array.of("A", "B", "C", "D", "E", "F", "H");
-        DataFrame<Integer,String> frame = DataFrame.ofDoubles(rowKeys, colKeys).applyDoubles(v -> Math.random());
+        var rowKeys = Range.of(0, 10000000);
+        var colKeys = Array.of("A", "B", "C", "D", "E", "F", "H");
+        var frame = DataFrame.ofDoubles(rowKeys, colKeys).applyDoubles(v -> Math.random());
 
         //Time sequential and parallel computation of mean over all rows
-        DataFrame<String,String> timing = PerfStat.run(sample, TimeUnit.MILLISECONDS, false, tasks -> {
+        var timing = PerfStat.run(sample, TimeUnit.MILLISECONDS, false, tasks -> {
             tasks.put("Sequential", () -> {
                 frame.sequential().rows().forEach(row -> row.stats().mean());
                 return frame;

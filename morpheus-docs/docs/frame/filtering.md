@@ -1,4 +1,4 @@
-### Filtering
+### DataFrame Filtering
 
 #### Introduction
 
@@ -30,7 +30,7 @@ More information on the exact content of this file can be located [here](http://
  * @return          the ATP match results
  */
 static DataFrame<Integer,String> loadTennisMatchData(int year) {
-    final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd/MM/yy");
+    var dateFormat = DateTimeFormatter.ofPattern("dd/MM/yy");
     return DataFrame.read().csv(options -> {
         options.setHeader(true);
         options.setResource("http://www.zavtech.com/data/tennis/atp/atp-" + year + ".csv");
@@ -70,10 +70,10 @@ The code below shows a simple way of filtering the ATP match results to only inc
 
 <?prettify?>
 ```java
-DataFrame<Integer,String> frame = loadTennisMatchData(2013);
-DataFrame<Integer,String> filter = frame.rows().select(row -> {
-    final int wonSets = row.getInt("Wsets");
-    final int lostSets = row.getInt("Lsets");
+var frame = loadTennisMatchData(2013);
+var filter = frame.rows().select(row -> {
+    var wonSets = row.getInt("Wsets");
+    var lostSets = row.getInt("Lsets");
     return  wonSets + lostSets == 5;
 });
 ```
@@ -102,8 +102,8 @@ available on the eventual winner of the games in 2013.
 
 <?prettify?>
 ```java
-DataFrame<Integer,String> frame = loadTennisMatchData(2013);
-DataFrame<Integer,String> filter = frame.cols().select("B365W", "EXW", "LBW", "PSW" ,"SJW");
+var frame = loadTennisMatchData(2013);
+var filter = frame.cols().select("B365W", "EXW", "LBW", "PSW" ,"SJW");
 filter.out().print(10);
 ```
 <div class="frame"><pre class="frame">
@@ -136,20 +136,20 @@ this transformation.
 
 <?prettify?>
 ```java
-DataFrame<Integer,String> frame = loadTennisMatchData(2013);
+var frame = loadTennisMatchData(2013);
 
 //Array of the various bookmaker keys
-Array<String> bookies = Array.of("B365", "EX", "LB", "PS" ,"SJ");
+var bookies = Array.of("B365", "EX", "LB", "PS" ,"SJ");
 
 //Compute z-scores for winner & loser odds independently
 Stream.of("W", "L").forEach(x -> {
-    Array<String> colNames = bookies.mapValues(v -> v.getValue() + x);
+    var colNames = bookies.mapValues(v -> v.getValue() + x);
     frame.cols().select(colNames).rows().forEach(row -> {
-        double mean = row.stats().mean();
-        double stdDev = row.stats().stdDev();
+        var mean = row.stats().mean();
+        var stdDev = row.stats().stdDev();
         row.values().forEach(v -> {
-            double rawValue = v.getDouble();
-            double zScore = (rawValue - mean) / stdDev;
+            var rawValue = v.getDouble();
+            var zScore = (rawValue - mean) / stdDev;
             v.setDouble(zScore);
         });
     });
@@ -185,8 +185,8 @@ for brevity.
 <?prettify?>
 ```java
 //Select z-score odds on eventual winner across all bookmakers
-Set<String> colNames = Collect.asSet("B365W", "EXW", "LBW", "PSW" ,"SJW");
-DataFrame<Integer,String> finalWinnerOdds = frame.select(
+var colNames = Collect.asSet("B365W", "EXW", "LBW", "PSW" ,"SJW");
+var finalWinnerOdds = frame.select(
     row -> row.getValue("Round").equals("The Final"),
     col -> colNames.contains(col.key())
 );
@@ -224,16 +224,16 @@ variables, which for a beginner would likely be easier to follow:
 
 <?prettify?>
 ```java
-DataFrame<Integer,String> frame = loadTennisMatchData(2013);
+var frame = loadTennisMatchData(2013);
 //Select all 5 set matches, and the number of games won/lost in each set
-DataFrame<Integer,String> filter = frame.select(
+var filter = frame.select(
     row -> row.getDouble("Wsets") + row.getDouble("Lsets") == 5,
     col -> col.key().matches("(W|L)\\d+")
 );
 //Sum the rows which yields total games played per 5 set match
-DataFrame<Integer,StatType> gameCounts = filter.rows().stats().sum();
+var gameCounts = filter.rows().stats().sum();
 //The game count frame is Nx1, so compute summary stats on game counts
-DataFrame<StatType,StatType> gameStats = gameCounts.cols().describe(MIN, MAX, MEAN, STD_DEV);
+var gameStats = gameCounts.cols().describe(MIN, MAX, MEAN, STD_DEV);
 //Print results to std-out
 gameStats.out().print(formats -> {
     formats.withDecimalFormat(Double.class, "0.00;-0.00", 1);
@@ -252,7 +252,7 @@ analyzes.
 
 <?prettify?>
 ```java
-DataFrame<Integer,String> frame = loadTennisMatchData(2013);
+var frame = loadTennisMatchData(2013);
 frame.select(
     row -> row.getDouble("Wsets") + row.getDouble("Lsets") == 5,
     col -> col.key().matches("(W|L)\\d+")
@@ -393,7 +393,7 @@ as an upset because the favourite did not prevail. Concurrent iteration is also 
 
 <?prettify?>
 ```java
-DataFrame<Integer,String> frame = loadTennisMatchData(2013);
+var frame = loadTennisMatchData(2013);
 frame.rows().filter(row -> {
     String round = row.getValue("Round");
     double avgW = row.getDouble("AvgW");
@@ -438,9 +438,9 @@ the eventual winner of each match by the 5 different book makers.
 
 <?prettify?>
 ```java
-DataFrame<Integer,String> frame = loadTennisMatchData(2013);
+var frame = loadTennisMatchData(2013);
 frame.cols().filter("B365W", "EXW", "LBW", "PSW" ,"SJW").forEach(column -> {
-    Optional<Bounds<Double>> bounds = column.bounds();
+    var bounds = column.bounds();
     bounds.ifPresent(b -> {
         System.out.println(column.key() + " max odds=" + b.upper() + ", min odds=" + b.lower());
     });
@@ -476,14 +476,14 @@ that Novak won in each match.
 
 <?prettify?>
 ```java
-DataFrame<Integer,String> frame = loadTennisMatchData(2013);
+var frame = loadTennisMatchData(2013);
 //Select rows where Djokovic was the victor
-DataFrame<Integer,String> filter = frame.rows().select(row -> row.getValue("Winner").equals("Djokovic N."));
+var filter = frame.rows().select(row -> row.getValue("Winner").equals("Djokovic N."));
 //Add a column to the filter and seed with number of games won by Djokovic
-Array<String> colNames = Range.of(1, 6).map(i -> "W" + i).toArray();
+var colNames = Range.of(1, 6).map(i -> "W" + i).toArray();
 //Add new column to capture total number of games won by novak
 filter.cols().add("WonCount", Double.class, value -> {
-    final DataFrameRow<Integer,String> row = value.row(); //Access row associated with this value
+    var row = value.row(); //Access row associated with this value
     return colNames.mapToDoubles(v -> row.getDouble(v.getValue())).stats().sum().doubleValue();
 });
 
@@ -536,11 +536,11 @@ rows as follows:
 
 <?prettify?>
 ```java
-DataFrame<Integer,String> frame = loadTennisMatchData(2013);
+var frame = loadTennisMatchData(2013);
 //Select rows where Djokovic was the victor
-DataFrame<Integer,String> filter = frame.rows().select(row -> row.getValue("Winner").equals("Djokovic N."));
+var filter = frame.rows().select(row -> row.getValue("Winner").equals("Djokovic N."));
 //Define a range of 10 additional keys
-Range<Integer> rowKeys = Range.of(frame.rowCount(), frame.rowCount()+5);
+var rowKeys = Range.of(frame.rowCount(), frame.rowCount()+5);
 //Try add rows for new row keys
 filter.rows().addAll(rowKeys);
 ```
@@ -557,13 +557,13 @@ containing just the rows of the filter, so we can now add rows as usual.
 
 <?prettify?>
 ```java
-DataFrame<Integer,String> frame = loadTennisMatchData(2013);
+var frame = loadTennisMatchData(2013);
 //Select rows where Djokovic was the victor
-DataFrame<Integer,String> filter = frame.rows().select(row -> row.getValue("Winner").equals("Djokovic N."));
+var filter = frame.rows().select(row -> row.getValue("Winner").equals("Djokovic N."));
 //Create a deep copy of the filter frame
-DataFrame<Integer,String> copy = filter.copy();
+var copy = filter.copy();
 //Define a range of 5 additional keys
-Range<Integer> rowKeys = Range.of(frame.rowCount(), frame.rowCount()+5);
+var rowKeys = Range.of(frame.rowCount(), frame.rowCount()+5);
 //Add 5 new rows to the copy
 copy.rows().addAll(rowKeys);
 //Print last 10 rows
@@ -605,9 +605,9 @@ thereby introduce object header overhead as well as significantly higher garbage
 
 <?prettify?>
 ```java
-DataFrame<Integer,String> frame = loadTennisMatchData(2013);
+var frame = loadTennisMatchData(2013);
 //Transpose the original DataFrame
-DataFrame<String,Integer> transpose = frame.transpose();
+var transpose = frame.transpose();
 //Print 10x5 section of the frame
 transpose.left(5).out().print();
 //Attempt to add a column, which we know will fail

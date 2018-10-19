@@ -51,10 +51,10 @@ public class OLSDocs1 {
 
     @Test()
     public void scatterPlot() throws Exception {
-        DataFrame<Integer,String> frame = loadCarDataset();
-        final String y = "Horsepower";
-        final String x = "EngineSize";
-        DataFrame<Integer,String> xy = frame.cols().select(y, x);
+        var frame = loadCarDataset();
+        var y = "Horsepower";
+        var x = "EngineSize";
+        var xy = frame.cols().select(y, x);
         Chart.create().withScatterPlot(xy, false, x, chart -> {
             chart.title().withText(y + " vs " + x);
             chart.plot().style(y).withColor(Color.RED);
@@ -74,9 +74,9 @@ public class OLSDocs1 {
 
     @Test()
     public void ols2() throws Exception {
-        DataFrame<Integer,String> frame = loadCarDataset();
-        final String regressand = "Horsepower";
-        final String regressor = "EngineSize";
+        var frame = loadCarDataset();
+        var regressand = "Horsepower";
+        var regressor = "EngineSize";
         frame.regress().ols(regressand, regressor, true, model -> {
             assert (model.getRegressand().equals(regressand));
             assert (model.getRegressors().size() == 1);
@@ -106,10 +106,10 @@ public class OLSDocs1 {
 
     @Test()
     public void regressPlot() throws Exception {
-        DataFrame<Integer,String> frame = loadCarDataset();
-        final String regressand = "Horsepower";
-        final String regressor = "EngineSize";
-        DataFrame<Integer,String> xy = frame.cols().select(regressand, regressor);
+        var frame = loadCarDataset();
+        var regressand = "Horsepower";
+        var regressor = "EngineSize";
+        var xy = frame.cols().select(regressand, regressor);
         Chart.create().withScatterPlot(xy, false, regressor, chart -> {
             chart.title().withFont(new Font("Verdana", Font.BOLD, 16));
             chart.title().withText(regressand + " regressed on " + regressor);
@@ -131,9 +131,9 @@ public class OLSDocs1 {
 
     @Test()
     public void ols3() throws Exception {
-        DataFrame<Integer,String> frame = loadCarDataset();
-        final String regressand = "Horsepower";
-        final String regressor = "EngineSize";
+        var frame = loadCarDataset();
+        var regressand = "Horsepower";
+        var regressor = "EngineSize";
         frame.regress().ols(regressand, regressor, false, model -> {
             assert (model.getRegressand().equals(regressand));
             assert (model.getRegressors().size() == 1);

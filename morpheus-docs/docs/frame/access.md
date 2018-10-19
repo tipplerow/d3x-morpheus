@@ -71,24 +71,24 @@ so iterating over the frame in this way is unlikely to be as fast as the  `forEa
 
 <?prettify?>
 ```java
-//Load ONS dataset
-final DataFrame<Tuple,String> frame = loadPopulationDataset();
+//Load the ONS dataset
+var frame = DemoData.loadPopulationDataset();
 
 //Random access to a row by ordinal or key
-DataFrameRow<Tuple,String> row1 = frame.rowAt(4);
-DataFrameRow<Tuple,String> row2 = frame.rowAt(Tuple.of(2003, "City of London"));
+var row1 = frame.rowAt(4);
+var row2 = frame.row(Tuple.of(2003, "City of London"));
 
 //Random access to a column by ordinal or key
-DataFrameColumn<Tuple,String> column1 = frame.colAt(2);
-DataFrameColumn<Tuple,String> column2 = frame.colAt("All Persons");
+var column1 = frame.colAt(2);
+var column2 = frame.col("All Persons");
 
 //Access first and last rows
-Optional<DataFrameRow<Tuple,String>> firstRow = frame.rows().first();
-Optional<DataFrameRow<Tuple,String>> lastRow = frame.rows().last();
+var firstRow = frame.rows().first();
+var lastRow = frame.rows().last();
 
 //Access first and last columns
-Optional<DataFrameColumn<Tuple,String>> firstColumn = frame.cols().first();
-Optional<DataFrameColumn<Tuple,String>> lastColumn = frame.cols().last();
+var firstColumn = frame.cols().first();
+var lastColumn = frame.cols().last();
 ```
 
 The example below is slightly more elaborate where we access the "All Persons" column in the ONS `DataFrame` in order to 
@@ -99,11 +99,11 @@ a matching value - a nice unit test.
 <?prettify?>
 ```java
 // Find row with max value for "All Persons: column using column key
-final double expectedMax = frame.colAt("All Persons").stats().max();
-frame.colAt("All Persons").max().ifPresent(value -> {
-    final DataFrameRow<Tuple,String> row = frame.rowAt(value.rowKey());
-    final double actualMax = row.getDouble("All Persons");
-    Asserts.assertEquals(actualMax, expectedMax, "The max values match");
+var expectedMax = frame.col("All Persons").stats().max();
+frame.col("All Persons").max().ifPresent(value -> {
+    var row = frame.row(value.rowKey());
+    var actualMax = row.getDouble("All Persons");
+    Asserts.assertEquals(actualMax, expectedMax.doubleValue(), "The max values match");
 });
 ```
 
@@ -177,12 +177,12 @@ performance boost.
 //Parallel: Convert male & female population counts into weights
 frame.rows().parallel().forEach(row -> row.forEach(value -> {
     if (value.colKey().matches("M\\s+\\d+")) {
-        double totalMales = value.row().getDouble("All Males");
-        double count = value.getDouble();
+        var totalMales = value.row().getDouble("All Males");
+        var count = value.getDouble();
         value.setDouble(count / totalMales);
     } else if (value.colKey().matches("F\\s+\\d+")) {
-        double totalFemales = value.row().getDouble("All Females");
-        double count = value.getDouble();
+        var totalFemales = value.row().getDouble("All Females");
+        var count = value.getDouble();
         value.setDouble(count / totalFemales);
     }
 }));
@@ -207,8 +207,8 @@ import com.zavtech.morpheus.array.Array;
 import com.zavtech.morpheus.frame.DataFrame;
 
 //Create 5x5 frame with columns of different types.
-final Range<Year> years = Range.of(2000 ,2005).map(Year::of);
-final DataFrame<Year,String> frame = DataFrame.of(years, String.class, columns -> {
+var years = Range.of(2000 ,2005).map(Year::of);
+var frame = DataFrame.of(years, String.class, columns -> {
     columns.add("Column-0", Array.of(true, false, false, true, true));
     columns.add("Column-1", Array.of(1, 2, 3, 4, 5));
     columns.add("Column-2", Array.of(10L, 11L, 12L, 13L, 14L));
@@ -241,44 +241,42 @@ will be thrown.
 <?prettify?>
 ```java
 //Random access to primitive boolean values via ordinal or keys or any combination thereof
-boolean b1 = frame.ra().getBooleanAt(0, 0);                     //Access by ordinals
-boolean b2 = frame.ra().getBoolean(Year.of(2003), "Column-0");  //Access by keys
-boolean b3 = frame.rows().getBooleanAt(0, "Column-0");          //Access by row ordinal and column key
-boolean b4 = frame.rows().getBoolean(Year.of(2003), 0);         //Access by row key and column ordinal
-boolean b5 = frame.cols().getBoolean("Column-0", 0);            //Access by column key and row ordinal
-boolean b6 = frame.cols().getBooleanAt(0, Year.of(2003));       //Access by column ordinal and row key
+var b1 = frame.getBooleanAt(0, 0);
+var b2 = frame.getBoolean(Year.of(2001), "Column-0");
+var b3 = frame.rows().getBoolean(Year.of(2003), 0);
+var b4 = frame.rows().getBooleanAt(0, "Column-0");
+var b5 = frame.cols().getBoolean("Column-0", 0);
+var b6 = frame.cols().getBooleanAt(0, Year.of(2003));
 
 //Random access to primitive int values via ordinal or keys or any combination thereof
-int i1 = frame.ra().getIntAt(0, 1);                             //Access by ordinals
-int i2 = frame.ra().getInt(Year.of(2003), "Column-1");          //Access by keys
-int i3 = frame.rows().getIntAt(0, "Column-1");                  //Access by row ordinal and column key
-int i4 = frame.rows().getInt(Year.of(2003), 1);                 //Access by row key and column ordinal
-int i5 = frame.cols().getInt("Column-1", 0);                    //Access by column key and row ordinal
-int i6 = frame.cols().getIntAt(1, Year.of(2003));               //Access by column ordinal and row key
+var i1 = frame.getIntAt(4, 1);
+var i2 = frame.getInt(Year.of(2001), "Column-1");
+var i3 = frame.rows().getInt(Year.of(2003), 1);
+var i4 = frame.rows().getIntAt(0, "Column-1");
+var i5 = frame.cols().getInt("Column-0", 0);
+var i6 = frame.cols().getIntAt(0, Year.of(2003));
 
 //Random access to primitive long values via ordinal or keys or any combination thereof
-long l1 = frame.ra().getLongAt(0, 2);                           //Access by ordinals
-long l2 = frame.ra().getLong(Year.of(2003), "Column-2");        //Access by keys
-long l3 = frame.rows().getLongAt(0, "Column-2");                //Access by row ordinal and column key
-long l4 = frame.rows().getLong(Year.of(2003), 2);               //Access by row key and column ordinal
-long l5 = frame.cols().getLong("Column-2", 0);                  //Access by column key and row ordinal
-long l6 = frame.cols().getLongAt(2, Year.of(2003));             //Access by column ordinal and row key
+var l1 = frame.getLongAt(4, 2);
+var l2 = frame.getLong(Year.of(2001), "Column-2");
+var l3 = frame.rows().getLong(Year.of(2003), 2);
+var l4 = frame.rows().getLongAt(0, "Column-2");
+var l5 = frame.cols().getLong("Column-0", 0);
+var l6 = frame.cols().getLongAt(0, Year.of(2003));
 
 //Random access to primitive double values via ordinal or keys or any combination thereof
-double d1 = frame.ra().getDoubleAt(0, 3);                       //Access by ordinals
-double d2 = frame.ra().getDouble(Year.of(2003), "Column-3");    //Access by keys
-double d3 = frame.rows().getDoubleAt(0, "Column-3");            //Access by row ordinal and column key
-double d4 = frame.rows().getDouble(Year.of(2003), 3);           //Access by row key and column ordinal
-double d5 = frame.cols().getDouble("Column-3", 0);              //Access by column key and row ordinal
-double d6 = frame.cols().getDoubleAt(3, Year.of(2003));         //Access by column ordinal and row key
+var d1 = frame.getDoubleAt(4, 3);
+var d2 = frame.getDouble(Year.of(2001), "Column-3");
+var d3 = frame.rows().getDouble(Year.of(2003), 3);
+var d4 = frame.rows().getDoubleAt(0, "Column-3");
+var d5 = frame.cols().getDouble("Column-0", 0);
+var d6 = frame.cols().getDoubleAt(0, Year.of(2003));
 
 //Random access to any values via ordinal or keys or any combination thereof
-String o1 = frame.ra().getValueAt(0, 4);                        //Access by ordinals
-LocalDate o2 = frame.ra().getValue(Year.of(2001), "Column-4");  //Access by keys
-Month o3 = frame.rows().getValueAt(2, "Column-4");              //Access by row ordinal and column key
-Double o4 = frame.rows().getValue(Year.of(2003), 4);            //Access by row key and column ordinal
-Boolean o5 = frame.cols().getValue("Column-4", 4);              //Access by column key and row ordinal
-String o6 = frame.cols().getValueAt(4, Year.of(2000));          //Access by column ordinal and row key
+var o1 = frame.<String>getValueAt(0, 4);
+var o2 = frame.<Double>getValue(Year.of(2003), "Column-4");
+var o3 = frame.rows().<LocalDate>getValue(Year.of(2001), 4);
+var o4 = frame.rows().<Month>getValueAt(2, "Column-4");
 ```
 
 #### Iteration
@@ -292,15 +290,15 @@ values between 0 and 1, and then counts the number of values > 0.5, first sequen
 <?prettify?>
 ```java
 //Create DataFrame of random doubles
-DataFrame<Integer,String> frame = DataFrame.ofDoubles(
+var frame = DataFrame.ofDoubles(
     Array.of(0, 1, 2, 3, 4, 5, 6, 7),
     Array.of("A", "B", "C", "D"), 
     value -> Math.random()
 );
 
 //Count number of values > 0.5d first sequentially, then in parallel
-long count1 = frame.values().filter(v -> v.getDouble() > 0.5d).count();
-long count2 = frame.values().parallel().filter(v -> v.getDouble() > 0.5d).count();
+var count1 = frame.values().filter(v -> v.getDouble() > 0.5d).count();
+var count2 = frame.values().parallel().filter(v -> v.getDouble() > 0.5d).count();
 Assert.assertEquals(count1, count2);
 ```
 It should be noted that using the parallel API will not always speed up execution, and in some cases will 
@@ -324,30 +322,30 @@ respectively, as shown in the following examples:
 <?prettify?>
 ```java
 //Load the Wimbledon dataset
-DataFrame<Integer,String> frame = getWimbledonData(2013);
+var frame = getWimbledonData(2013);
 
 //Select the first row, and assert match date is 24-06-2013
 frame.rows().first().ifPresent(row -> {
-    LocalDate matchDate = row.getValue("Date");
+    var matchDate = row.<LocalDate>getValue("Date");
     assert(matchDate.equals(LocalDate.of(2013, 6, 24)));
 });
 
 //Select last row, and assert the winner is A Murray.
 frame.rows().last().ifPresent(row -> {
-    String winner = row.getValue("Winner");
+    var winner = row.getValue<String>("Winner");
     assert(winner.equals("Murray A."));
 });
 
 //Select first column, namely the date column, and find max date
 frame.cols().first().ifPresent(column -> {
-    Optional<LocalDate> matchDate = column.max();
-    LocalDate finalDate = LocalDate.of(2013, 7, 7);
+    var matchDate = column.<LocalDate>max();
+    var finalDate = LocalDate.of(2013, 7, 7);
     assert(matchDate.isPresent() && matchDate.get().equals(finalDate));
 });
 
 //Select last column and find the max AvgL betting odds
 frame.cols().last().ifPresent(column -> {
-    double matchDate = column.stats().max();
+    var matchDate = column.stats().max();
     assert(matchDate == 23.26d);
 });
 ```
@@ -363,7 +361,7 @@ male average from all male counts, and subtract the female average from all fema
 <?prettify?>
 ```java
 //Demean male and female population counts
-final DataFrame<Tuple,String> onsFrame = loadPopulationDataset();
+var onsFrame = loadPopulationDataset();
 
 //Iterate over male then female column set
 Array.of("M\\s+\\d++", "F\\s+\\d++").forEach(regex -> {
@@ -408,13 +406,13 @@ original frame, you ought to create a copy of the frame first using `DataFrame.c
 <?prettify?>
 ```java
 //Load ONS population dataset
-final DataFrame<Tuple,String> onsFrame = loadPopulationDataset();
+var onsFrame = loadPopulationDataset();
 
 //Define function to compute population weight as a percentage of 2007 value per borough
-final ToDoubleFunction<DataFrameValue<Tuple,String>> compute = value -> {
-    final String borough = value.rowKey().item(1);
-    final Tuple rowKey2014 = Tuple.of(2007, borough);
-    final double boroughCountIn2014 = onsFrame.data().getDouble(rowKey2014, "All Persons");
+ToDoubleFunction<DataFrameValue<Tuple,String>> compute = value -> {
+    var borough = value.rowKey().item(1);
+    var rowKey2014 = Tuple.of(2007, borough);
+    var boroughCountIn2014 = onsFrame.data().getDouble(rowKey2014, "All Persons");
     return value.getDouble() / boroughCountIn2014;
 };
 

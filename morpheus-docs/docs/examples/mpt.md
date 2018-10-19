@@ -1,15 +1,13 @@
-## Modern Portfolio Theory Primer
-
 ### Introduction
 
-In 1952, [Harry Markowitz](https://en.wikipedia.org/wiki/Harry_Markowitz) introduced [Modern Portfolio Theory](https://en.wikipedia.org/wiki/Modern_portfolio_theory)
-(MPT) in a seminal paper titled **Portfolio Selection**, which was published in the Journal of Finance. MPT provides a rigorous
-framework which quantifies the **risk** and **return** trade-off when constructing portfolios of risky assets. The theory formalizes
-the concept of **diversification** in mathematical terms, and suggests that rational investors seek to make investment decisions that
-**maximize portfolio return** for a defined level of **risk**.
+In 1952, [Harry Markowitz](https://en.wikipedia.org/wiki/Harry_Markowitz) published a seminal paper in the Journal of Finance 
+titled **Portfolio Selection**, where he first introduced [Modern Portfolio Theory](https://en.wikipedia.org/wiki/Modern_portfolio_theory) 
+(MPT). The theory introduced a rigorous framework that quantifies the **risk** and **return** trade-off when constructing 
+portfolios of risky assets, and formalized the concept of **diversification** in mathematical terms. It suggests that 
+rational investors seek to make investment decisions that **maximize portfolio return** for a defined level of **risk**.
 
 Given an investment universe of risky assets, MPT addresses the problem of **sizing the positions** of each asset in the portfolio
-so as to **maximize efficiency**. Moreover, the theory also introduces the concept of [systematic](https://en.wikipedia.org/wiki/Systematic_risk)
+so as to **maximize efficiency**. Moreover, it also introduces the concept of [systematic](https://en.wikipedia.org/wiki/Systematic_risk)
 versus [non-systematic](http://www.investopedia.com/terms/u/unsystematicrisk.asp) risk, the latter of which can be diversified away
 in a well proportioned portfolio. Systematic risk refers to general market wide risks such as interest rate risk, business recessions
 or wars, while non-systematic risk (also known as specific risk) relates to the **idiosyncratic risks** associated with an individual
@@ -19,9 +17,9 @@ Modern Portfolio Theory is still in widespread use today in professional investm
 foundational frameworks used to build efficient risk adjusted portfolios. Markowitz was awarded the **Nobel Memorial Prize in Economic
 Sciences** in 1990 for his work on MPT.
 
-In this article we will review some of the basic mathematics of **portfolio return** & **risk**, and then use the **Morpheus library**
-to demonstrate how to apply this knowledge to construct efficient investment portfolios. To help build intuition, we will begin
-with two asset portfolios before moving onto more real-world examples. In particular, we will consider a [Robo-Advisor](https://en.wikipedia.org/wiki/Robo-advisor)
+In this article we review some of the basic mathematics of **portfolio return** & **risk**, and then use the **Morpheus library**
+to demonstrate how to apply this knowledge to construct efficient investment portfolios. To help build intuition, we begin
+with two asset portfolios before moving onto more real-world examples. In particular, we consider a [Robo-Advisor](https://en.wikipedia.org/wiki/Robo-advisor)
 portfolio of 6 broad based [Exchange Traded Funds](https://en.wikipedia.org/wiki/Exchange-traded_fund), and compare this to a
 [Risk Parity](https://en.wikipedia.org/wiki/Risk_parity) construction as well as to a basic 60/40 Stock/Bond allocation.
 
@@ -185,19 +183,19 @@ of hindsight of course, you would have invested all your capital in Apple as it 
 however, the  performance of these stocks could very well be reversed, so we should probably spread our bets across the two.
 
 <p align="center">
-    <img class="chart" src="../../images/mpt/mpt_0.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/mpt/mpt_0.png"/>
 </p>
 
 The code to generate this plot is as follows:
 
 <?prettify?>
 ```java
-LocalDate end = LocalDate.now();
-LocalDate start = end.minusYears(1);
-Array<String> tickers = Array.of("AAPL", "AMZN");
+var end = LocalDate.now();
+var start = end.minusYears(1);
+var tickers = Array.of("AAPL", "AMZN");
 
-YahooFinance yahoo = new YahooFinance();
-DataFrame<LocalDate,String> cumReturns = yahoo.getCumReturns(start, end, tickers);
+var yahoo = new YahooFinance();
+var cumReturns = yahoo.getCumReturns(start, end, tickers);
 cumReturns.applyDoubles(v -> v.getDouble() * 100d);
 
 Chart.create().withLinePlot(cumReturns, chart -> {
@@ -232,13 +230,13 @@ tickers are used for the column keys.
  * @return          the frame of MxN random portfolios, 1 per row, labelled P0, P1 etc...
  */
 DataFrame<String,String> randomPortfolios(int count, Iterable<String> tickers) {
-    Range<String> rowKeys = Range.of(0, count).map(i -> "P" + i);
-    DataFrame<String,String> weights = DataFrame.ofDoubles(rowKeys, tickers);
+    var rowKeys = Range.of(0, count).map(i -> "P" + i);
+    var weights = DataFrame.ofDoubles(rowKeys, tickers);
     weights.applyDoubles(v -> Math.random());
     weights.rows().forEach(row -> {
-        final double sum = row.stats().sum();
+        var sum = row.stats().sum();
         row.applyDoubles(v -> {
-            double weight = v.getDouble();
+            var weight = v.getDouble();
             return weight / sum;
         });
     });
@@ -280,20 +278,20 @@ the resulting `DataFrame` should include a column containing the **Sharpe ratio*
  * @return              the DataFrame with risk, return and sharpe
  */
 DataFrame<String,String> calcRiskReturn(DataFrame<String,String> portfolios, LocalDate endDate, boolean sharpe) {
-    YahooFinance yahoo = new YahooFinance();
-    Array<String> tickers = portfolios.cols().keyArray();
-    Range<LocalDate> range = Range.of(endDate.minusYears(1), endDate);
-    DataFrame<LocalDate,String> dayReturns = yahoo.getDailyReturns(range, tickers);
-    DataFrame<LocalDate,String> cumReturns = yahoo.getCumReturns(range, tickers);
-    DataFrame<String,String> sigma = dayReturns.cols().stats().covariance().applyDoubles(x -> x.getDouble() * 252);
-    DataFrame<LocalDate,String> assetReturns = cumReturns.rows().last().map(DataFrameRow::toDataFrame).get();
-    DataFrame<String,String>  riskReturn = DataFrame.ofDoubles(portfolios.rows().keyArray(),
+    var yahoo = new YahooFinance();
+    var tickers = portfolios.cols().keyArray();
+    var range = Range.of(endDate.minusYears(1), endDate);
+    var dayReturns = yahoo.getDailyReturns(range, tickers);
+    var cumReturns = yahoo.getCumReturns(range, tickers);
+    var sigma = dayReturns.cols().stats().covariance().applyDoubles(x -> x.getDouble() * 252);
+    var assetReturns = cumReturns.rows().last().map(DataFrameRow::toDataFrame).get();
+    var riskReturn = DataFrame.ofDoubles(portfolios.rows().keyArray(),
         sharpe ? Array.of("Risk", "Return", "Sharpe") : Array.of("Risk", "Return")
     );
     portfolios.rows().forEach(row -> {
-        DataFrame<String,String> weights = row.toDataFrame();
-        double portReturn = weights.dot(assetReturns.transpose()).data().getDouble(0, 0);
-        double portVariance = weights.dot(sigma).dot(weights.transpose()).data().getDouble(0, 0);
+        var weights = row.toDataFrame();
+        var portReturn = weights.dot(assetReturns.transpose()).data().getDouble(0, 0);
+        var portVariance = weights.dot(sigma).dot(weights.transpose()).data().getDouble(0, 0);
         riskReturn.data().setDouble(row.key(), "Return", portReturn * 100d);
         riskReturn.data().setDouble(row.key(), "Risk", Math.sqrt(portVariance) * 100d);
         if (sharpe) {
@@ -312,16 +310,16 @@ can be plotted on a scatter chart with portfolio risk as the **domain axis** and
 The resulting plot for one simulation of 10,000 portfolios is shown below, and is followed by the code to generate it.
 
 <p align="center">
-    <img class="chart" src="../../images/mpt/mpt_1.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/mpt/mpt_1.png"/>
 </p>
 
 <?prettify?>
 ```java
-int count = 10000;
-LocalDate endDate = LocalDate.now();
-Array<String> tickers = Array.of("AAPL", "AMZN");
-DataFrame<String,String> portfolios = randomPortfolios(count, tickers);
-DataFrame<String,String> riskReturn = calcRiskReturn(portfolios, endDate, false);
+var count = 10000;
+var endDate = LocalDate.now();
+var tickers = Array.of("AAPL", "AMZN");
+var portfolios = randomPortfolios(count, tickers);
+var riskReturn = calcRiskReturn(portfolios, endDate, false);
 Chart.create().withScatterPlot(riskReturn, false, "Risk", chart -> {
     chart.title().withText("Risk / Return Profiles For AAPL+AMZN Portfolios");
     chart.subtitle().withText(count + " Portfolio Combinations Simulated");
@@ -375,7 +373,7 @@ below, followed by the code that generated it, is essentially an extension of th
 case we generate multiple 10,000 portfolio combinations with different asset constituents to see how they compare.
 
 <p align="center">
-    <img class="chart" src="../../images/mpt/mpt_2.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/mpt/mpt_2.png"/>
 </p>
 
 It is clear from the chart that the 5 two asset portfolios in this example have very different risk / return
@@ -388,24 +386,24 @@ portfolio combinations for which you need to accept a much **higher level of ris
 <?prettify?>
 ```java
 //Define portfolio count, investment horizon
-int count = 10000;
-LocalDate endDate = LocalDate.now();
+var count = 10000;
+var endDate = LocalDate.now();
 
-Array<DataFrame<String,String>> results = Array.of(
+var results = Array.of(
     Array.of("VTI", "BND"),
     Array.of("AAPL", "AMZN"),
     Array.of("GOOGL", "BND"),
     Array.of("ORCL", "KO"),
     Array.of("VWO", "VNQ")
 ).map(v -> {
-    Array<String> tickers = v.getValue();
-    DataFrame<String,String> portfolios = randomPortfolios(count, tickers);
-    DataFrame<String,String> riskReturn = calcRiskReturn(portfolios, endDate, false);
-    String label = String.format("%s+%s", tickers.getValue(0), tickers.getValue(1));
+    var tickers = v.getValue();
+    var portfolios = randomPortfolios(count, tickers);
+    var riskReturn = calcRiskReturn(portfolios, endDate, false);
+    var label = String.format("%s+%s", tickers.getValue(0), tickers.getValue(1));
     return riskReturn.cols().replaceKey("Return", label);
 });
 
-DataFrame<String,String> first = results.getValue(0);
+var first = results.getValue(0);
 Chart.create().<Integer,String>withScatterPlot(first, false, "Risk", chart -> {
     for (int i=1; i<results.length(); ++i) {
         chart.plot().<String>data().add(results.getValue(i), "Risk");
@@ -447,30 +445,30 @@ the assets are not perfectly correlated, return also suffers somewhat. Having sa
 the more diversified portfolios appear to provide a better risk / return trade off than the two asset portfolio.
 
 <p align="center">
-    <img class="chart" src="../../images/mpt/mpt_3.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/mpt/mpt_3.png"/>
 </p>
 
 The code to generate the above plot of 5 lots of 10,000 portfolios with various assets is as follows:
 
 <?prettify?>
 ```java
-int count = 10000;
-LocalDate endDate = LocalDate.of(2017, 9, 29);
-Array<DataFrame<String,String>> results = Array.of(
+var count = 10000;
+var endDate = LocalDate.of(2017, 9, 29);
+var results = Array.of(
     Array.of("VWO", "VNQ"),
     Array.of("VWO", "VNQ", "VEA"),
     Array.of("VWO", "VNQ", "VEA", "DBC"),
     Array.of("VWO", "VNQ", "VEA", "DBC", "VTI"),
     Array.of("VWO", "VNQ", "VEA", "DBC", "VTI", "BND")
 ).map(v -> {
-    Array<String> tickers = v.getValue();
-    DataFrame<String,String> portfolios = randomPortfolios(count, tickers);
-    DataFrame<String,String> riskReturn = calcRiskReturn(portfolios, endDate, false);
-    String label = String.format("%s Assets", tickers.length());
+    var tickers = v.getValue();
+    var portfolios = randomPortfolios(count, tickers);
+    var riskReturn = calcRiskReturn(portfolios, endDate, false);
+    var label = String.format("%s Assets", tickers.length());
     return riskReturn.cols().replaceKey("Return", label);
 });
 
-DataFrame<String,String> first = results.getValue(0);
+var first = results.getValue(0);
 Chart.create().<Integer,String>withScatterPlot(first, false, "Risk", chart -> {
     for (int i=1; i<results.length(); ++i) {
         chart.plot().<String>data().add(results.getValue(i), "Risk");
@@ -520,18 +518,18 @@ below illustrates 10,000 equity curves based on the **past 1 year returns**, sug
 2.5% all the way to 18.15%, which is pretty enormous.
 
 <p align="center">
-    <img class="chart" src="../../images/mpt/mpt_4.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/mpt/mpt_4.png"/>
 </p>
 
 The code to generate the above plot is as follows:
 
 <?prettify?>
 ```java
-int portfolioCount = 10000;
-Range<LocalDate> range = Range.of(LocalDate.now().minusYears(1), LocalDate.now());
-Array<String> tickers = Array.of("VTI", "BND", "VWO", "VTEB", "VIG", "XLE");
-DataFrame<Integer,String> portfolios = randomPortfolios(portfolioCount, tickers);
-DataFrame<LocalDate,String> performance = getEquityCurves(range, portfolios);
+var portfolioCount = 10000;
+var range = Range.of(LocalDate.now().minusYears(1), LocalDate.now());
+var tickers = Array.of("VTI", "BND", "VWO", "VTEB", "VIG", "XLE");
+var portfolios = randomPortfolios(portfolioCount, tickers);
+var performance = getEquityCurves(range, portfolios);
 Chart.create().withLinePlot(performance.applyDoubles(v -> v.getDouble() * 100d), chart -> {
     chart.title().withText(portfolioCount + " Equity Curves (Past 1 Year Returns)");
     chart.subtitle().withText("Robo-Advisor Universe: VTI, BND, VWO, VTEB, VIG, XLE");
@@ -556,15 +554,15 @@ and the `m` columns are labelled `P0`, `P1` through to `PM`.
  * @return              the cumulative returns for each portfolio, TxM, portfolios labelled P0, P1 etc...
  */
 DataFrame<LocalDate,String> getEquityCurves(Range<LocalDate> range, DataFrame<Integer,String> portfolios) {
-    final YahooFinance yahoo = new YahooFinance();
-    final Iterable<String> tickers = portfolios.cols().keyArray();
-    final DataFrame<LocalDate,String> cumReturns = yahoo.getCumReturns(range.start(), range.end(), tickers);
-    final Range<String> colKeys = Range.of(0, portfolios.rowCount()).map(i -> "P" + i);
+    var yahoo = new YahooFinance();
+    var tickers = portfolios.cols().keyArray();
+    var cumReturns = yahoo.getCumReturns(range.start(), range.end(), tickers);
+    var colKeys = Range.of(0, portfolios.rowCount()).map(i -> "P" + i);
     return DataFrame.ofDoubles(cumReturns.rows().keyArray(), colKeys, v -> {
-        double totalReturn = 0d;
+        var totalReturn = 0d;
         for (int i=0; i<portfolios.colCount(); ++i) {
-            final double weight = portfolios.data().getDouble(v.colOrdinal(), i);
-            final double assetReturn = cumReturns.data().getDouble(v.rowOrdinal(), i);
+            var weight = portfolios.data().getDouble(v.colOrdinal(), i);
+            var assetReturn = cumReturns.data().getDouble(v.rowOrdinal(), i);
             totalReturn += (weight * assetReturn);
         }
         return totalReturn;
@@ -581,13 +579,13 @@ that the portfolio returned `15.1%` for `6.71%` risk for the year up to 29-Sep-2
 
 <?prettify?>
 ```java
-LocalDate endDate = LocalDate.of(2017, 9, 29);
-Array<String> tickers = Array.of("VTI", "VEA", "VWO", "VTEB", "VIG", "XLE");
-DataFrame<String,String> portfolio = DataFrame.of(tickers, String.class, columns -> {
+var endDate = LocalDate.of(2017, 9, 29);
+var tickers = Array.of("VTI", "VEA", "VWO", "VTEB", "VIG", "XLE");
+var portfolio = DataFrame.of(tickers, String.class, columns -> {
     columns.add("Weights", Array.of(0.35d, 0.21d, 0.16d, 0.15d, 0.08d, 0.05d));
 });
 
-DataFrame<String,String> riskReturn = calcRiskReturn(portfolio.transpose(), endDate, false);
+var riskReturn = calcRiskReturn(portfolio.transpose(), endDate, false);
 IO.println(String.format("Portfolio Return: %s", riskReturn.data().getDouble(0, "Return")));
 IO.println(String.format("Portfolio Risk: %s", riskReturn.data().getDouble(0, "Risk")));
 ```
@@ -598,21 +596,21 @@ chart as shown below. The proposed portfolio, which is represented by the **red 
 and may also suggest that this particular Robo-Advisor's future expectations are not that different from the past year.
 
 <p align="center">
-    <img class="chart" src="../../images/mpt/mpt_5.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/mpt/mpt_5.png"/>
 </p>
 
 The code to generate this plot is as follows:
 
 <?prettify?>
 ```java
-int count = 100000;
-LocalDate endDate = LocalDate.of(2017, 9, 29);
-Array<String> tickers = Array.of("VTI", "VEA", "VWO", "VTEB", "VIG", "XLE");
-Array<Double> weights = Array.of(0.35d, 0.21d, 0.16d, 0.15d, 0.08d, 0.05d);
-DataFrame<String,String> portfolios = randomPortfolios(count, tickers);
+var count = 100000;
+var endDate = LocalDate.of(2017, 9, 29);
+var tickers = Array.of("VTI", "VEA", "VWO", "VTEB", "VIG", "XLE");
+var weights = Array.of(0.35d, 0.21d, 0.16d, 0.15d, 0.08d, 0.05d);
+var portfolios = randomPortfolios(count, tickers);
 portfolios.rowAt("P0").applyDoubles(v -> weights.getDouble(v.colOrdinal()));
-DataFrame<String,String> riskReturn = calcRiskReturn(portfolios, endDate, false);
-DataFrame<String,String> chosen = riskReturn.rows().select("P0").cols().replaceKey("Return", "Chosen");
+var riskReturn = calcRiskReturn(portfolios, endDate, false);
+var chosen = riskReturn.rows().select("P0").cols().replaceKey("Return", "Chosen");
 
 //Plot the results using a scatter plot
 Chart.create().withScatterPlot(riskReturn.cols().replaceKey("Return", "Random"), false, "Risk", chart -> {
@@ -660,27 +658,27 @@ in August. The risk, return and Sharpe ratios for these three portfolios is as f
 </pre></div>
 
 <p align="center">
-    <img class="chart" src="../../images/mpt/mpt_6.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/mpt/mpt_6.png"/>
 </p>
 
 The code to generate this plot is as follows, and leverages the `getEquityCurves()` function discussed earlier.
 
 <?prettify?>
 ```java
-int portfolioCount = 100000;
-LocalDate endDate = LocalDate.of(2017, 9, 29);
-Range<LocalDate> range = Range.of(endDate.minusYears(1), endDate);
-Array<String> tickers = Array.of("VTI", "VEA", "VWO", "VTEB", "VIG", "XLE");
-Array<Double> proposedWeights = Array.of(0.35d, 0.21d, 0.16d, 0.15d, 0.08d, 0.05d);
-DataFrame<String,String> portfolios = randomPortfolios(portfolioCount, tickers);
+var portfolioCount = 100000;
+var endDate = LocalDate.of(2017, 9, 29);
+var range = Range.of(endDate.minusYears(1), endDate);
+var tickers = Array.of("VTI", "VEA", "VWO", "VTEB", "VIG", "XLE");
+var proposedWeights = Array.of(0.35d, 0.21d, 0.16d, 0.15d, 0.08d, 0.05d);
+var portfolios = randomPortfolios(portfolioCount, tickers);
 portfolios.rowAt("P0").applyDoubles(v -> proposedWeights.getDouble(v.colOrdinal()));
-DataFrame<String,String> riskReturn = calcRiskReturn(portfolios, endDate, true).rows().sort(false, "Sharpe");
-DataFrame<String,String> candidates = portfolios.rows().select("P0",
+var riskReturn = calcRiskReturn(portfolios, endDate, true).rows().sort(false, "Sharpe");
+var candidates = portfolios.rows().select("P0",
     riskReturn.rows().first().get().key(),
     riskReturn.rows().last().get().key()
 );
 
-DataFrame<LocalDate,String> equityCurves = getEquityCurves(range, candidates).cols().mapKeys(col -> {
+var equityCurves = getEquityCurves(range, candidates).cols().mapKeys(col -> {
     switch (col.ordinal()) {
         case 0: return "Proposed";
         case 1: return "Best";
@@ -784,12 +782,12 @@ naive risk parity weights based on asset variances over some historical window. 
  * @return              the DataFrame of risk parity weights
  */
 public DataFrame<String,String> getRiskParityWeights(Iterable<String> tickers, Range<LocalDate> dateRange) {
-    YahooFinance yahoo = new YahooFinance();
-    DataFrame<LocalDate,String> returns = yahoo.getDailyReturns(dateRange, tickers);
-    Array<Double> variance = returns.cols().stats().variance().colAt(0).toArray();
-    Array<Double> volatility = variance.mapToDoubles(v -> Math.sqrt(252d * v.getDouble()));
-    double k = volatility.mapToDoubles(v -> 1d / v.getDouble()).stats().sum().doubleValue();
-    Array<Double> riskParityWeights = volatility.mapToDoubles(v -> 1d / (v.getDouble() * k));
+    var yahoo = new YahooFinance();
+    var returns = yahoo.getDailyReturns(dateRange, tickers);
+    var variance = returns.cols().stats().variance().colAt(0).toArray();
+    var volatility = variance.mapToDoubles(v -> Math.sqrt(252d * v.getDouble()));
+    var k = volatility.mapToDoubles(v -> 1d / v.getDouble()).stats().sum().doubleValue();
+    var riskParityWeights = volatility.mapToDoubles(v -> 1d / (v.getDouble() * k));
     return DataFrame.ofDoubles("RiskParity", tickers).applyDoubles(v -> {
         return riskParityWeights.getDouble(v.colOrdinal());
     });
@@ -806,22 +804,22 @@ illustrated in the prior section, which in code is as follows:
 
 <?prettify?>
 ```java
-YahooFinance yahoo = new YahooFinance();
-LocalDate endDate = LocalDate.of(2017, 11, 29);
-Range<LocalDate> dateRange = Range.of(endDate.minusYears(5), endDate);
-Array<String> tickers = Array.of("VTI", "VEA", "VWO", "VTEB", "VIG", "XLE");
-DataFrame<LocalDate,String> returns = yahoo.getDailyReturns(dateRange, tickers);
-Array<Double> variance = returns.cols().stats().variance().colAt(0).toArray();
-Array<Double> volatility = variance.mapToDoubles(v -> Math.sqrt(252d * v.getDouble()));
-double k = volatility.mapToDoubles(v -> 1d / v.getDouble()).stats().sum().doubleValue();
-Array<Double> riskParityWeights = volatility.mapToDoubles(v -> 1d / (v.getDouble() * k));
+var yahoo = new YahooFinance();
+var endDate = LocalDate.of(2017, 11, 29);
+var dateRange = Range.of(endDate.minusYears(5), endDate);
+var tickers = Array.of("VTI", "VEA", "VWO", "VTEB", "VIG", "XLE");
+var returns = yahoo.getDailyReturns(dateRange, tickers);
+var variance = returns.cols().stats().variance().colAt(0).toArray();
+var volatility = variance.mapToDoubles(v -> Math.sqrt(252d * v.getDouble()));
+var k = volatility.mapToDoubles(v -> 1d / v.getDouble()).stats().sum().doubleValue();
+var riskParityWeights = volatility.mapToDoubles(v -> 1d / (v.getDouble() * k));
 ```
 
 Next, consider a `DataFrame` of equal capital weights, equal risk weights and the Robo-Advisor proposed weights.
 
 <?prettify?>
 ```java
-DataFrame<String,String> portfolios = DataFrame.of(tickers, String.class, columns -> {
+var portfolios = DataFrame.of(tickers, String.class, columns -> {
     columns.add("Parity(Risk)", riskParityWeights);
     columns.add("Parity(Cap)", Range.of(0, 6).map(i -> 1d / 6d));
     columns.add("Robo(Proposed)", Array.of(0.35d, 0.21d, 0.16d, 0.15d, 0.08d, 0.05d));
@@ -842,17 +840,17 @@ the Robo-Advisor proposed portfolio, but significantly lower return. The **naive
 about half the risk of the other two candidates, but with lower return.
 
 <p align="center">
-    <img class="chart" src="../../images/mpt/parity_1.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/mpt/parity_1.png"/>
 </p>
 
 The code to generate this plot is as follows:
 
 <?prettify?>
 ```java
-DataFrame<String,String> randomPortfolios = randomPortfolios(100000, tickers);
-DataFrame<String,String> randomRiskReturn = calcRiskReturn(randomPortfolios, endDate, false);
-DataFrame<String,String> caseStudies = calcRiskReturn(portfolios.transpose(), endDate, false);
-Array<DataFrame<String,String>> frames = portfolios.cols().keyArray().map(v -> {
+var randomPortfolios = randomPortfolios(100000, tickers);
+var randomRiskReturn = calcRiskReturn(randomPortfolios, endDate, false);
+var caseStudies = calcRiskReturn(portfolios.transpose(), endDate, false);
+var frames = portfolios.cols().keyArray().map(v -> {
     return caseStudies.rows().select(v.getValue()).cols().replaceKey("Return", v.getValue());
 });
 
@@ -893,17 +891,17 @@ low volatility / low return assets, however one could use **leverage** to boost 
 the use of **leverage is dangerous**, and something that is best left to a professional investment manager.
 
 <p align="center">
-    <img class="chart" src="../../images/mpt/parity_2.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/mpt/parity_2.png"/>
 </p>
 
 The code to generate this plot is as follows:
 
 <?prettify?>
 ```java
-Range<LocalDate> endDates = Range.ofLocalDates("2008-12-31", "2018-12-31", Period.ofYears(1));
-DataFrame<String,String> combined = DataFrame.concatColumns(endDates.map(end -> {
-    LocalDate date = endDate.isAfter(end) ? end : endDate;
-    DataFrame<String,String> riskReturn = calcRiskReturn(portfolios.transpose(), date, true);
+var endDates = Range.ofLocalDates("2008-12-31", "2018-12-31", Period.ofYears(1));
+var combined = DataFrame.concatColumns(endDates.map(end -> {
+    var date = endDate.isAfter(end) ? end : endDate;
+    var riskReturn = calcRiskReturn(portfolios.transpose(), date, true);
     return riskReturn.cols().select("Sharpe").cols().replaceKey("Sharpe", String.valueOf(date.getYear()));
 }));
 
@@ -945,17 +943,21 @@ allocation.
 
 ------
 
-<div class="smallChart">
-    <img class="smallChart" src="../../images/mpt/mpt_7.png"/>
+<div class="row">
+    <div class="col-md-6">
+        <img class="chart img-fluid" src="/images/morpheus/mpt/mpt_7.png"/>
+    </div>
+    <div class="col-md-6">
+        <img class="chart img-fluid" src="/images/morpheus/mpt/mpt_8.png"/>
+    </div>
 </div>
-<div class="smallChart">
-    <img class="smallChart" src="../../images/mpt/mpt_8.png"/>
-</div>
-<div class="smallChart">
-    <img class="smallChart" src="../../images/mpt/mpt_9.png"/>
-</div>
-<div class="smallChart">
-    <img class="smallChart" src="../../images/mpt/mpt_10.png"/>
+<div class="row">
+    <div class="col-md-6">
+        <img class="chart img-fluid" src="/images/morpheus/mpt/mpt_9.png"/>
+    </div>
+    <div class="col-md-6">
+        <img class="chart img-fluid" src="/images/morpheus/mpt/mpt_10.png"/>
+    </div>
 </div>
 
 The chart in the lower left quadrant illustrates the equity curves of the 10,000 random portfolios, and demonstrates the wide
@@ -972,7 +974,7 @@ space** and **risk-adjusted space**. The table below documents the outcomes for 
  Worst  |   3.2051807  |   0.13636278  |  0.04254449  |
 </pre></div>
 
-#### KISS Principle
+#### Embracing Simplicity
 
 The **60/40 Stock-Bond allocation** portfolio appears to be a reasonable configuration, but how well does it compare to the
 proposed Robo-Advisor portfolio discussed [earlier](#robo-advisor)? The scatter chart below illustrates the risk / return
@@ -981,23 +983,23 @@ are not that dissimilar. Before jumping to any conclusions however, we should co
 perhaps less benign.
 
 <p align="center">
-    <img class="chart" src="../../images/mpt/mpt_11.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/mpt/mpt_11.png"/>
 </p>
 
 The code to generate the above plot is as follows.
 
 <?prettify?>
 ```java
-int count = 100000;
-LocalDate endDate = LocalDate.of(2017, 9, 29);
+var count = 100000;
+var endDate = LocalDate.of(2017, 9, 29);
 //Generate risk / return profile for Stock-Bond universe
-Array<String> tickers1 = Array.of("VTI", "BND");
-DataFrame<String,String> portfolios1 = randomPortfolios(count, tickers1);
-DataFrame<String,String> riskReturn1 = calcRiskReturn(portfolios1, endDate, false);
+var tickers1 = Array.of("VTI", "BND");
+var portfolios1 = randomPortfolios(count, tickers1);
+var riskReturn1 = calcRiskReturn(portfolios1, endDate, false);
 //Generate risk / return profile for Robo-Advisor universe
-Array<String> tickers2 = Array.of("VTI", "VEA", "VWO", "VTEB", "VIG", "XLE");
-DataFrame<String,String> portfolios2 = randomPortfolios(count, tickers2);
-DataFrame<String,String> riskReturn2 = calcRiskReturn(portfolios2, endDate, false);
+var tickers2 = Array.of("VTI", "VEA", "VWO", "VTEB", "VIG", "XLE");
+var portfolios2 = randomPortfolios(count, tickers2);
+var riskReturn2 = calcRiskReturn(portfolios2, endDate, false);
 //Plot the results using a scatter plot
 Chart.create().withScatterPlot(riskReturn2.cols().replaceKey("Return", "Robo"), false, "Risk", chart -> {
     chart.title().withText("Risk / Return Profiles: 60/40 Stock-Bond Versus Robo-Advisor");
@@ -1022,35 +1024,45 @@ these results in any material way.
 
 ----
 
-<div class="smallChart">
-    <img class="smallChart" src="../../images/mpt/mpt_kiss_2008.png"/>
+<div class="row">
+    <div class="col-md-6">
+        <img class="chart img-fluid" src="/images/morpheus/mpt/mpt_kiss_2008.png"/>
+    </div>
+    <div class="col-md-6">
+        <img class="chart img-fluid" src="/images/morpheus/mpt/mpt_kiss_2009.png"/>
+    </div>
 </div>
-<div class="smallChart">
-    <img class="smallChart" src="../../images/mpt/mpt_kiss_2009.png"/>
+<div class="row">
+    <div class="col-md-6">
+        <img class="chart img-fluid" src="/images/morpheus/mpt/mpt_kiss_2010.png"/>
+    </div>
+    <div class="col-md-6">
+        <img class="chart img-fluid" src="/images/morpheus/mpt/mpt_kiss_2011.png"/>
+    </div>
 </div>
-<div class="smallChart">
-    <img class="smallChart" src="../../images/mpt/mpt_kiss_2010.png"/>
+<div class="row">
+    <div class="col-md-6">
+        <img class="chart img-fluid" src="/images/morpheus/mpt/mpt_kiss_2012.png"/>
+    </div>
+    <div class="col-md-6">
+        <img class="chart img-fluid" src="/images/morpheus/mpt/mpt_kiss_2013.png"/>
+    </div>
 </div>
-<div class="smallChart">
-    <img class="smallChart" src="../../images/mpt/mpt_kiss_2011.png"/>
+<div class="row">
+    <div class="col-md-6">
+        <img class="chart img-fluid" src="/images/morpheus/mpt/mpt_kiss_2014.png"/>
+    </div>
+    <div class="col-md-6">
+        <img class="chart img-fluid" src="/images/morpheus/mpt/mpt_kiss_2015.png"/>
+    </div>
 </div>
-<div class="smallChart">
-    <img class="smallChart" src="../../images/mpt/mpt_kiss_2012.png"/>
-</div>
-<div class="smallChart">
-    <img class="smallChart" src="../../images/mpt/mpt_kiss_2013.png"/>
-</div>
-<div class="smallChart">
-    <img class="smallChart" src="../../images/mpt/mpt_kiss_2014.png"/>
-</div>
-<div class="smallChart">
-    <img class="smallChart" src="../../images/mpt/mpt_kiss_2015.png"/>
-</div>
-<div class="smallChart">
-    <img class="smallChart" src="../../images/mpt/mpt_kiss_2016.png"/>
-</div>
-<div class="smallChart">
-    <img class="smallChart" src="../../images/mpt/mpt_kiss_2017.png"/>
+<div class="row">
+    <div class="col-md-6">
+        <img class="chart img-fluid" src="/images/morpheus/mpt/mpt_kiss_2016.png"/>
+    </div>
+    <div class="col-md-6">
+        <img class="chart img-fluid" src="/images/morpheus/mpt/mpt_kiss_2017.png"/>
+    </div>
 </div>
 
 Note that the final plot labelled 2017 is a partial year and includes data to 12-Oct-2017.
@@ -1064,7 +1076,7 @@ over the long run. Some years will of course be better than others. To illustrat
 to see how it has performed over **multiple non-overlapping 1-year periods** starting in 2008. The chart below tells the story.
 
 <p align="center">
-    <img class="chart" src="../../images/mpt/mpt_12.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/mpt/mpt_12.png"/>
 </p>
 
 2008 was one of the **most brutal years** in recent financial history, where **systemic failure** was a genuine possibility at
@@ -1078,23 +1090,23 @@ The code to generate the above plot is as follows:
 <?prettify?>
 ```java
 //Define DataFrame of position weights per 60/40 Stock-Bond allocation
-Array<String> tickers = Array.of("VTI", "BND");
-DataFrame<String,String> portfolio = DataFrame.of(tickers, String.class, columns -> {
+var tickers = Array.of("VTI", "BND");
+var portfolio = DataFrame.of(tickers, String.class, columns -> {
     columns.add("Weights", Array.of(0.6d, 0.4d));
 });
 //Generate 1-year equity curves starting in 2008 for 60/40 allocation
-Range<LocalDate> dateRange = Range.of(LocalDate.of(2009, 1, 1), LocalDate.of(2018, 1, 1), Period.ofYears(1));
-Range<DataFrame<Integer,String>> frames = dateRange.map(date -> {
-    Range<LocalDate> range = Range.of(date.minusYears(1), date);
-    DataFrame<LocalDate,String> equityCurve = getEquityCurves(range, portfolio.transpose());
-    LocalDate start = equityCurve.rows().firstKey().get();
+var dateRange = Range.of(LocalDate.of(2009, 1, 1), LocalDate.of(2018, 1, 1), Period.ofYears(1));
+var frames = dateRange.map(date -> {
+    var range = Range.of(date.minusYears(1), date);
+    var equityCurve = getEquityCurves(range, portfolio.transpose());
+    var start = equityCurve.rows().firstKey().get();
     return equityCurve
         .rows().mapKeys(DataFrameRow::ordinal)
         .cols().mapKeys(col -> String.valueOf(start.getYear()))
         .applyDoubles(v -> v.getDouble() * 100d);
 });
 //Combine equity curves into single frame and add mean of each curve
-DataFrame<Integer,String> combined = DataFrame.concatColumns(frames).rows().select(r -> !r.hasNulls());
+var combined = DataFrame.concatColumns(frames).rows().select(r -> !r.hasNulls());
 //Add a column with the average of all equity curves
 combined.cols().add("Mean", Double.class, v -> v.row().stats().mean());
 //Plot the equity curves

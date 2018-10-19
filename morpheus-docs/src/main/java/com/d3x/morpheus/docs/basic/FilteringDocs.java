@@ -43,7 +43,7 @@ public class FilteringDocs {
      * @return          the ATP match results
      */
     static DataFrame<Integer,String> loadTennisMatchData(int year) {
-        final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd/MM/yy");
+        var dateFormat = DateTimeFormatter.ofPattern("dd/MM/yy");
         return DataFrame.read().csv(options -> {
             options.setHeader(true);
             options.setResource("http://www.zavtech.com/data/tennis/atp/atp-" + year + ".csv");
@@ -60,10 +60,10 @@ public class FilteringDocs {
 
     @Test()
     public void example1() {
-        DataFrame<Integer,String> frame = loadTennisMatchData(2013);
-        DataFrame<Integer,String> filter = frame.rows().select(row -> {
-            final int wonSets = row.getInt("Wsets");
-            final int lostSets = row.getInt("Lsets");
+        var frame = loadTennisMatchData(2013);
+        var filter = frame.rows().select(row -> {
+            var wonSets = row.getInt("Wsets");
+            var lostSets = row.getInt("Lsets");
             return  wonSets + lostSets == 5;
         });
         //Print first 10 rows
@@ -72,15 +72,15 @@ public class FilteringDocs {
 
     @Test()
     public void example2() {
-        DataFrame<Integer,String> frame = loadTennisMatchData(2013);
-        DataFrame<Integer,String> filter = frame.cols().select("B365W", "EXW", "LBW", "PSW" ,"SJW");
+        var frame = loadTennisMatchData(2013);
+        var filter = frame.cols().select("B365W", "EXW", "LBW", "PSW" ,"SJW");
         filter.out().print(10);
     }
 
 
     @Test()
     public void finalOdds() {
-        DataFrame<Integer,String> frame = loadTennisMatchData(2013);
+        var frame = loadTennisMatchData(2013);
         frame.rows().last().ifPresent(row -> {
             String winner = row.getValue("Winner");
             String loser = row.getValue("Loser");
@@ -93,10 +93,10 @@ public class FilteringDocs {
 
     @Test()
     public void filterRowsAndColumns() {
-        DataFrame<Integer,String> frame = loadTennisMatchData(2013);
+        var frame = loadTennisMatchData(2013);
 
         //Convert the betting odds to standardized z-scores
-        Array<String> bookies = Array.of("B365", "EX", "LB", "PS" ,"SJ");
+        var bookies = Array.of("B365", "EX", "LB", "PS" ,"SJ");
         Stream.of("W", "L").forEach(x -> {
             Array<String> colNames = bookies.map(v -> v.getValue() + x);
             frame.cols().select(colNames).rows().forEach(row -> {
@@ -115,8 +115,8 @@ public class FilteringDocs {
         });
 
         //Select z-score odds on eventual winner only across all bookmakers
-        Set<String> colNames = Collect.asSet("B365W", "EXW", "LBW", "PSW" ,"SJW");
-        DataFrame<Integer,String> winnerOdds = frame.select(
+        var colNames = Collect.asSet("B365W", "EXW", "LBW", "PSW" ,"SJW");
+        var winnerOdds = frame.select(
             row -> row.getValue("Round").equals("The Final"),
             col -> colNames.contains(col.key())
         );
@@ -131,7 +131,7 @@ public class FilteringDocs {
     @Test()
     public void head() {
         //Filter on the first 5 rows
-        DataFrame<Integer,String> frame = loadTennisMatchData(2013);
+        var frame = loadTennisMatchData(2013);
         frame.head(5).out().print(5);
     }
 
@@ -139,28 +139,28 @@ public class FilteringDocs {
     @Test()
     public void tail() {
         //Filter on the last 5 rows
-        DataFrame<Integer,String> frame = loadTennisMatchData(2013);
+        var frame = loadTennisMatchData(2013);
         frame.tail(5).out().print(5);
     }
 
     @Test()
     public void left() {
         //Filter on the first 5 columns
-        DataFrame<Integer,String> frame = loadTennisMatchData(2013);
+        var frame = loadTennisMatchData(2013);
         frame.left(5).out().print();
     }
 
     @Test()
     public void right() {
         //Filter on the last 14 columns
-        DataFrame<Integer,String> frame = loadTennisMatchData(2013);
+        var frame = loadTennisMatchData(2013);
         frame.right(14).out().print();
     }
 
     @Test()
     public void rightLeft() {
         //Filter on all betting ods, excluding max & averages
-        DataFrame<Integer,String> frame = loadTennisMatchData(2013);
+        var frame = loadTennisMatchData(2013);
         frame.right(14).left(10).out().print();
     }
 
@@ -169,7 +169,7 @@ public class FilteringDocs {
     public void firstRow() {
 
         //Load the Wimbledon dataset
-        DataFrame<Integer,String> frame = loadTennisMatchData(2013);
+        var frame = loadTennisMatchData(2013);
 
         //Select the first row, and assert match date is 24-06-2013
         frame.rows().first().ifPresent(row -> {
@@ -200,7 +200,7 @@ public class FilteringDocs {
 
     @Test()
     public void filterRows() {
-        DataFrame<Integer,String> frame = loadTennisMatchData(2013);
+        var frame = loadTennisMatchData(2013);
         frame.rows().filter(row -> {
             String round = row.getValue("Round");
             double avgW = row.getDouble("AvgW");
@@ -218,7 +218,7 @@ public class FilteringDocs {
 
     @Test()
     public void filterCols() {
-        DataFrame<Integer,String> frame = loadTennisMatchData(2013);
+        var frame = loadTennisMatchData(2013);
         frame.cols().filter("B365W", "EXW", "LBW", "PSW" ,"SJW").forEach(column -> {
             Optional<Bounds<Double>> bounds = column.bounds();
             bounds.ifPresent(b -> {
@@ -230,10 +230,10 @@ public class FilteringDocs {
 
     @Test()
     public void gameCountStats1() {
-        DataFrame<Integer,String> frame = loadTennisMatchData(2013);
+        var frame = loadTennisMatchData(2013);
 
         //Select all 5 set matches, and the number of games won/lost in each set
-        DataFrame<Integer,String> filter = frame.select(
+        var filter = frame.select(
             row -> row.getDouble("Wsets") + row.getDouble("Lsets") == 5,
             col -> col.key().matches("(W|L)\\d+")
         );
@@ -241,10 +241,10 @@ public class FilteringDocs {
         filter.out().print();
 
         //Sum the rows which yields total games played per 5 set match
-        DataFrame<Integer,StatType> gameCounts = filter.rows().stats().sum();
+        var gameCounts = filter.rows().stats().sum();
 
         //The game count frame is Nx1, so compute summary stats on game counts
-        DataFrame<StatType,StatType> gameStats = gameCounts.cols().describe(MIN, MAX, MEAN, STD_DEV);
+        var gameStats = gameCounts.cols().describe(MIN, MAX, MEAN, STD_DEV);
 
         //Print results to std-out
         gameStats.out().print(formats -> {
@@ -256,7 +256,7 @@ public class FilteringDocs {
 
     @Test()
     public void gameCountStats2() {
-        DataFrame<Integer,String> frame = loadTennisMatchData(2013);
+        var frame = loadTennisMatchData(2013);
         frame.select(
             row -> row.getDouble("Wsets") + row.getDouble("Lsets") == 5,
             col -> col.key().matches("(W|L)\\d+")
@@ -270,15 +270,15 @@ public class FilteringDocs {
 
     @Test()
     public void whenMutable() {
-        DataFrame<Integer,String> frame = loadTennisMatchData(2013);
+        var frame = loadTennisMatchData(2013);
 
         //Select rows where Djokovic was the victor
-        DataFrame<Integer,String> filter = frame.rows().select(row -> row.getValue("Winner").equals("Djokovic N."));
+        var filter = frame.rows().select(row -> row.getValue("Winner").equals("Djokovic N."));
 
         //Add a column to the filter and seed with number of games won by Djokovic
-        Array<String> colNames = Range.of(1, 6).map(i -> "W" + i).toArray();
+        var colNames = Range.of(1, 6).map(i -> "W" + i).toArray();
         filter.cols().add("WonCount", Double.class, value -> {
-            final DataFrameRow<Integer,String> row = value.row(); //Access row associated with this value
+            var row = value.row(); //Access row associated with this value
             return colNames.mapToDoubles(v -> row.getDouble(v.getValue())).stats().sum().doubleValue();
         });
 
@@ -291,11 +291,11 @@ public class FilteringDocs {
 
     @Test()
     public void whenImmutable1() {
-        DataFrame<Integer,String> frame = loadTennisMatchData(2013);
+        var frame = loadTennisMatchData(2013);
         //Select rows where Djokovic was the victor
-        DataFrame<Integer,String> filter = frame.rows().select(row -> row.getValue("Winner").equals("Djokovic N."));
+        var filter = frame.rows().select(row -> row.getValue("Winner").equals("Djokovic N."));
         //Define a range of 10 additional keys
-        Range<Integer> rowKeys = Range.of(frame.rowCount(), frame.rowCount()+5);
+        var rowKeys = Range.of(frame.rowCount(), frame.rowCount()+5);
         //Try add rows for new row keys
         filter.rows().addAll(rowKeys);
     }
@@ -303,13 +303,13 @@ public class FilteringDocs {
 
     @Test()
     public void whenImmutable2() {
-        DataFrame<Integer,String> frame = loadTennisMatchData(2013);
+        var frame = loadTennisMatchData(2013);
         //Select rows where Djokovic was the victor
-        DataFrame<Integer,String> filter = frame.rows().select(row -> row.getValue("Winner").equals("Djokovic N."));
+        var filter = frame.rows().select(row -> row.getValue("Winner").equals("Djokovic N."));
         //Define a range of 10 additional keys
-        Range<Integer> rowKeys = Range.of(frame.rowCount(), frame.rowCount()+5);
+        var rowKeys = Range.of(frame.rowCount(), frame.rowCount()+5);
         //Create a deep copy of the filter frame
-        DataFrame<Integer,String> copy = filter.copy();
+        var copy = filter.copy();
         //Add 5 new rows to the copy
         copy.rows().addAll(rowKeys);
         //Print last 10 rows
@@ -319,9 +319,9 @@ public class FilteringDocs {
 
     @Test()
     public void transpose1() {
-        DataFrame<Integer,String> frame = loadTennisMatchData(2013);
+        var frame = loadTennisMatchData(2013);
         //Transpose the original DataFrame
-        DataFrame<String,Integer> transpose = frame.transpose();
+        var transpose = frame.transpose();
         //Print 10x5 section of the frame
         transpose.left(5).out().print();
         //Attempt to add a column, which we know will fail

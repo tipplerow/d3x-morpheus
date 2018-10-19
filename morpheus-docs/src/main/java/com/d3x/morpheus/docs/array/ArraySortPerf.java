@@ -44,17 +44,17 @@ public class ArraySortPerf {
      */
     private static void testWithDoubles(int sample) {
 
-        Range<Integer> arrayLengths = Range.of(1, 11).map(i -> i * 100000);
-        Array<String> labels = Array.of("Native(Seq)", "Morpheus(Seq)", "Native(Par)", "Morpheus(Par)");
-        DataFrame<String,String> results = DataFrame.ofDoubles(arrayLengths.map(String::valueOf), labels);
+        var arrayLengths = Range.of(1, 11).map(i -> i * 100000);
+        var labels = Array.of("Native(Seq)", "Morpheus(Seq)", "Native(Par)", "Morpheus(Par)");
+        var results = DataFrame.ofDoubles(arrayLengths.map(String::valueOf), labels);
 
         arrayLengths.forEach(length -> {
 
             System.out.println("Running sort test for array length " + length);
-            double[] array1 = new double[length];
-            Array<Double> array2 = Array.of(Double.class, length);
+            var array1 = new double[length];
+            var array2 = Array.of(Double.class, length);
 
-            DataFrame<String,String> timing = PerfStat.run(sample, TimeUnit.MILLISECONDS, false, tasks -> {
+            var timing = PerfStat.run(sample, TimeUnit.MILLISECONDS, false, tasks -> {
                 tasks.put("Native(Seq)", () -> { Arrays.sort(array1); return array1; });
                 tasks.put("Morpheus(Seq)", () -> array2.sort(true) );
                 tasks.put("Native(Par)", () -> { Arrays.parallelSort(array1); return array1; });
@@ -65,7 +65,7 @@ public class ArraySortPerf {
                 });
             });
 
-            String label = String.valueOf(length);
+            var label = String.valueOf(length);
             results.setDouble(label, "Native(Seq)", timing.getDouble("Mean", "Native(Seq)"));
             results.setDouble(label, "Morpheus(Seq)", timing.getDouble("Mean", "Morpheus(Seq)"));
             results.setDouble(label, "Native(Par)", timing.getDouble("Mean", "Native(Par)"));
@@ -89,16 +89,16 @@ public class ArraySortPerf {
 
     private static void testWithLocalDatesTimes(int sample) {
 
-        Range<Integer> arrayLengths = Range.of(1, 11).map(i -> i * 100000);
-        Array<String> labels = Array.of("Native(Seq)", "Morpheus(Seq)", "Native(Par)", "Morpheus(Par)");
-        DataFrame<String,String> results = DataFrame.ofDoubles(arrayLengths.map(String::valueOf), labels);
+        var arrayLengths = Range.of(1, 11).map(i -> i * 100000);
+        var labels = Array.of("Native(Seq)", "Morpheus(Seq)", "Native(Par)", "Morpheus(Par)");
+        var results = DataFrame.ofDoubles(arrayLengths.map(String::valueOf), labels);
 
         arrayLengths.forEach(length -> {
 
             System.out.println("Running sort test for array length " + length);
-            final LocalDateTime start = LocalDateTime.now();
-            final LocalDateTime[] array1 = new LocalDateTime[length];
-            final Array<LocalDateTime> array2 = Range.of(0, length.intValue()).map(start::plusSeconds).toArray();
+            var start = LocalDateTime.now();
+            var array1 = new LocalDateTime[length];
+            var array2 = Range.of(0, length.intValue()).map(start::plusSeconds).toArray();
 
             DataFrame<String,String> timing = PerfStat.run(sample, TimeUnit.MILLISECONDS, false, tasks -> {
                 tasks.put("Native(Seq)", () -> { Arrays.sort(array1); return array1; });
@@ -111,7 +111,7 @@ public class ArraySortPerf {
                 });
             });
 
-            String label = String.valueOf(length);
+            var label = String.valueOf(length);
             results.setDouble(label, "Native(Seq)", timing.getDouble("Mean", "Native(Seq)"));
             results.setDouble(label, "Morpheus(Seq)", timing.getDouble("Mean", "Morpheus(Seq)"));
             results.setDouble(label, "Native(Par)", timing.getDouble("Mean", "Native(Par)"));

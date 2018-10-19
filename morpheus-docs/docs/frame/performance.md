@@ -27,7 +27,7 @@ provides a comforting picture with regard to the fairly linear scalability of pe
 row count increases, and the absolute times involved are also re-assuring.
 
 <p align="center">
-    <img class="chart" src="../../images/frame/data-frame-init-times.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/frame/data-frame-init-times.png"/>
 </p>
 **Figure 1. Large DataFrame construction times can be affected by the complexity of the largest axis.**
 
@@ -51,7 +51,7 @@ supporting classes that make up the `DataFrame`, and also suggests that garbage 
 should be minimal, which we will discuss in a following section.
 
 <p align="center">
-    <img class="chart" src="../../images/frame/data-frame-memory.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/frame/data-frame-memory.png"/>
 </p>
 **Figure 2. Memory usage for a DataFrame with 50 million 64-bit double precision values and various row key types.** 
 
@@ -61,7 +61,7 @@ deallocate the DataFrame in this test, and both the magnitude and the small samp
 results is comforting.
 
 <p align="center">
-    <img class="chart" src="../../images/frame/data-frame-gc-times.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/frame/data-frame-gc-times.png"/>
 </p>
 **Figure 3. The GC times are small in magnitude and demonstrate low sampling noise in the results.** 
 
@@ -73,7 +73,7 @@ columns containing random double precision values. The chart below shows how per
 between sequential and parallel execution for a routine that computes the arithmetic mean of each row. 
 
 <p align="center">
-    <img class="chart" src="../../images/frame/data-frame-row-iteration.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/frame/data-frame-row-iteration.png"/>
 </p>
 **Figure 4. The parallel version of the result shows up to 50 million rows processed per second.** 
 
@@ -82,15 +82,15 @@ The code to generate these results is as follows:
 <?prettify?>
 ```java
 //Sample size for timing statistics
-int sample = 10;
+var sample = 10;
 
 //Create frame with 50 million rows of Random doubles
-Range<Integer> rowKeys = Range.of(0, 10000000);
-Array<String> colKeys = Array.of("A", "B", "C", "D", "E", "F", "H");
-DataFrame<Integer,String> frame = DataFrame.ofDoubles(rowKeys, colKeys).applyDoubles(v -> Math.random());
+var rowKeys = Range.of(0, 10000000);
+var colKeys = Array.of("A", "B", "C", "D", "E", "F", "H");
+var frame = DataFrame.ofDoubles(rowKeys, colKeys).applyDoubles(v -> Math.random());
 
 //Time sequential and parallel computation of mean over all rows
-DataFrame<String,String> timing = PerfStat.run(sample, TimeUnit.MILLISECONDS, false, tasks -> {
+var timing = PerfStat.run(sample, TimeUnit.MILLISECONDS, false, tasks -> {
     tasks.put("Sequential", () -> {
         frame.sequential().rows().forEach(row -> row.stats().mean());
         return frame;
@@ -123,7 +123,7 @@ performance improvement through parallel execution, and one could expect even la
 complexity of the apply function increases.
 
 <p align="center">
-    <img class="chart" src="../../images/frame/data-frame-apply-doubles.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/frame/data-frame-apply-doubles.png"/>
 </p>
 **Figure 5. Inspecting 200 million DataFrame elements and capping values > 0.5 in a little over a second.** 
 
@@ -132,19 +132,18 @@ The code to generate these results is as follows:
 <?prettify?>
 ```java
 //Sample size for timing statistics
-int count = 10;
+var count = 10;
 
 //Create frame with 50 million rows of Random doubles
-Range<Integer> rowKeys = Range.of(0, 50000000);
-Array<String> colKeys = Array.of("A", "B", "C", "D");
-DataFrame<Integer,String> frame = DataFrame.ofDoubles(rowKeys, colKeys).applyDoubles(v -> Math.random());
+var rowKeys = Range.of(0, 50000000);
+var colKeys = Array.of("A", "B", "C", "D");
+var frame = DataFrame.ofDoubles(rowKeys, colKeys).applyDoubles(v -> Math.random());
 
 //Time sequential and parallel capping of all elements in the DataFrame
-ToDoubleFunction<DataFrameValue<Integer,String>> cap = (v) -> v.getDouble() > 0.5 ? 0.5 : v.getDouble();
-DataFrame<String,String> timing = PerfStat.run(count, TimeUnit.MILLISECONDS, true, tasks -> {
+var timing = PerfStat.run(count, TimeUnit.MILLISECONDS, true, tasks -> {
     tasks.beforeEach(() -> frame.applyDoubles(v -> Math.random()));
-    tasks.put("Sequential", () -> frame.sequential().applyDoubles(cap));
-    tasks.put("Parallel", () -> frame.parallel().applyDoubles(cap));
+    tasks.put("Sequential", () -> frame.sequential().applyDoubles(v -> v.getDouble() > 0.5 ? 0.5 : v.getDouble()));
+    tasks.put("Parallel", () -> frame.parallel().applyDoubles(v -> v.getDouble() > 0.5 ? 0.5 : v.getDouble()));
 });
 
 //Plot timing statistics as a bar chart

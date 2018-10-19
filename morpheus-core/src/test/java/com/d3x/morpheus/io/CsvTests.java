@@ -88,7 +88,7 @@ public class CsvTests {
         System.out.println("Writing to " + file.getAbsolutePath());
         frame.write().csv(options -> {
             options.setFile(file);
-            options.setFormats(formats -> {
+            options.withFormats(formats -> {
                 formats.setPrinter("LocalDateTimeColumn", Printer.ofLocalDateTime(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
                 formats.setPrinter("ZonedDateTimeColumn", Printer.ofZonedDateTime(DateTimeFormatter.ISO_ZONED_DATE_TIME));
             });

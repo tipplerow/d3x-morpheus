@@ -20,6 +20,7 @@ import java.io.File;
 import java.time.LocalDate;
 import java.util.concurrent.TimeUnit;
 
+import com.d3x.morpheus.util.IO;
 import org.testng.annotations.Test;
 
 import com.d3x.morpheus.array.Array;
@@ -53,7 +54,7 @@ public class StatsDocs {
      * @return          the newly created frame
      */
     static DataFrame<LocalDate,String> random(int rowCount, String... columns) {
-        final LocalDate start = LocalDate.now().minusDays(rowCount);
+        var start = LocalDate.now().minusDays(rowCount);
         return DataFrame.ofDoubles(
             Range.of(0, rowCount).map(start::plusDays),
             Array.of(columns),
@@ -66,41 +67,39 @@ public class StatsDocs {
     public void frameStats() {
 
         //Create 100x5 DataFrame of random doubles
-        DataFrame<LocalDate,String> frame = random(100, "A", "B", "C", "D", "E");
+        var frame = random(100, "A", "B", "C", "D", "E");
 
-        frame.out().print();
+        IO.println("\n");
+        IO.printf("Count = %.4f\n", frame.stats().count());
+        IO.printf("Minimum = %.4f\n", frame.stats().min());
+        IO.printf("Maximum = %.4f\n", frame.stats().max());
+        IO.printf("Mean = %.4f\n", frame.stats().mean());
+        IO.printf("Median = %.4f\n", frame.stats().median());
+        IO.printf("Variance = %.4f\n", frame.stats().variance());
+        IO.printf("StdDev = %.4f\n", frame.stats().stdDev());
+        IO.printf("Skew = %.4f\n", frame.stats().skew());
+        IO.printf("Kurtosis = %.4f\n", frame.stats().kurtosis());
+        IO.printf("Mean Abs Deviation = %.4f\n", frame.stats().mad());
+        IO.printf("Sum = %.4f\n", frame.stats().sum());
+        IO.printf("Sum of Squares = %.4f\n", frame.stats().sumSquares());
+        IO.printf("Std Error of Mean = %.4f\n", frame.stats().sem());
+        IO.printf("Geometric Mean = %.4f\n", frame.stats().geoMean());
+        IO.printf("Percentile(75th) = %.4f\n", frame.stats().percentile(0.75d));
+        IO.printf("Autocorrelation(2) = %.4f\n", frame.stats().autocorr(2));
 
-        System.out.println("\n");
-        System.out.printf("Count = %.4f\n", frame.stats().count());
-        System.out.printf("Minimum = %.4f\n", frame.stats().min());
-        System.out.printf("Maximum = %.4f\n", frame.stats().max());
-        System.out.printf("Mean = %.4f\n", frame.stats().mean());
-        System.out.printf("Median = %.4f\n", frame.stats().median());
-        System.out.printf("Variance = %.4f\n", frame.stats().variance());
-        System.out.printf("StdDev = %.4f\n", frame.stats().stdDev());
-        System.out.printf("Skew = %.4f\n", frame.stats().skew());
-        System.out.printf("Kurtosis = %.4f\n", frame.stats().kurtosis());
-        System.out.printf("Mean Abs Deviation = %.4f\n", frame.stats().mad());
-        System.out.printf("Sum = %.4f\n", frame.stats().sum());
-        System.out.printf("Sum of Squares = %.4f\n", frame.stats().sumSquares());
-        System.out.printf("Std Error of Mean = %.4f\n", frame.stats().sem());
-        System.out.printf("Geometric Mean = %.4f\n", frame.stats().geoMean());
-        System.out.printf("Percentile(75th) = %.4f\n", frame.stats().percentile(0.75d));
-        System.out.printf("Autocorrelation(2) = %.4f\n", frame.stats().autocorr(2));
-
-        DataFrame<String,StatType> count = frame.cols().stats().count();
-        DataFrame<String,StatType> min = frame.cols().stats().min();
-        DataFrame<String,StatType> max = frame.cols().stats().max();
-        DataFrame<String,StatType> mean = frame.cols().stats().mean();
-        DataFrame<String,StatType> median = frame.cols().stats().median();
-        DataFrame<String,StatType> variance = frame.cols().stats().variance();
-        DataFrame<String,StatType> stdDev = frame.cols().stats().stdDev();
-        DataFrame<String,StatType> kurtosis = frame.cols().stats().kurtosis();
-        DataFrame<String,StatType> mad = frame.cols().stats().mad();
-        DataFrame<String,StatType> sum = frame.cols().stats().sum();
-        DataFrame<String,StatType> sumSquares = frame.cols().stats().sumSquares();
-        DataFrame<String,StatType> sem = frame.cols().stats().sem();
-        DataFrame<String,StatType> geoMean = frame.cols().stats().geoMean();
+        var count = frame.cols().stats().count();
+        var min = frame.cols().stats().min();
+        var max = frame.cols().stats().max();
+        var mean = frame.cols().stats().mean();
+        var median = frame.cols().stats().median();
+        var variance = frame.cols().stats().variance();
+        var stdDev = frame.cols().stats().stdDev();
+        var kurtosis = frame.cols().stats().kurtosis();
+        var mad = frame.cols().stats().mad();
+        var sum = frame.cols().stats().sum();
+        var sumSquares = frame.cols().stats().sumSquares();
+        var sem = frame.cols().stats().sem();
+        var geoMean = frame.cols().stats().geoMean();
 
         frame.cols().describe(
             StatType.COUNT,
@@ -117,11 +116,10 @@ public class StatsDocs {
     public void rowStats1() {
 
         //Create 100x5 DataFrame of random doubles
-        DataFrame<LocalDate,String> frame = random(100, "A", "B", "C", "D", "E");
-        //Capture stats interface for two rows independently sourced by ordinal and key
-        LocalDate date = frame.rows().key(3);
-        Stats<Double> stats1 = frame.rowAt(3).stats();
-        Stats<Double> stats2 = frame.row(date).stats();
+        var frame = random(100, "A", "B", "C", "D", "E");
+        var date = frame.rows().key(3);
+        var stats1 = frame.rowAt(3).stats();
+        var stats2 = frame.row(date).stats();
 
         StatType.univariate().forEach(statType -> {
             switch (statType) {
@@ -148,28 +146,28 @@ public class StatsDocs {
     @Test()
     public void rowStats() {
 
-        DataFrame<LocalDate,String> frame = random(10, "A", "B", "C", "D", "E");
+        var frame = random(10, "A", "B", "C", "D", "E");
 
         frame.out().print();
 
-        DataFrame<LocalDate,StatType> count = frame.rows().stats().count();
-        DataFrame<LocalDate,StatType> min = frame.rows().stats().min();
-        DataFrame<LocalDate,StatType> max = frame.rows().stats().max();
-        DataFrame<LocalDate,StatType> mean = frame.rows().stats().mean();
-        DataFrame<LocalDate,StatType> median = frame.rows().stats().median();
-        DataFrame<LocalDate,StatType> variance = frame.rows().stats().variance();
-        DataFrame<LocalDate,StatType> stdDev = frame.rows().stats().stdDev();
-        DataFrame<LocalDate,StatType> kurtosis = frame.rows().stats().kurtosis();
-        DataFrame<LocalDate,StatType> mad = frame.rows().stats().mad();
-        DataFrame<LocalDate,StatType> sum = frame.rows().stats().sum();
-        DataFrame<LocalDate,StatType> sumLogs = frame.rows().stats().sumLogs();
-        DataFrame<LocalDate,StatType> sumSquares = frame.rows().stats().sumSquares();
-        DataFrame<LocalDate,StatType> sem = frame.rows().stats().sem();
-        DataFrame<LocalDate,StatType> geoMean = frame.rows().stats().geoMean();
-        DataFrame<LocalDate,StatType> autocorr = frame.rows().stats().autocorr(1);
-        DataFrame<LocalDate,StatType> percentile = frame.rows().stats().percentile(0.75d);
+        var count = frame.rows().stats().count();
+        var min = frame.rows().stats().min();
+        var max = frame.rows().stats().max();
+        var mean = frame.rows().stats().mean();
+        var median = frame.rows().stats().median();
+        var variance = frame.rows().stats().variance();
+        var stdDev = frame.rows().stats().stdDev();
+        var kurtosis = frame.rows().stats().kurtosis();
+        var mad = frame.rows().stats().mad();
+        var sum = frame.rows().stats().sum();
+        var sumLogs = frame.rows().stats().sumLogs();
+        var sumSquares = frame.rows().stats().sumSquares();
+        var sem = frame.rows().stats().sem();
+        var geoMean = frame.rows().stats().geoMean();
+        var autocorr = frame.rows().stats().autocorr(1);
+        var percentile = frame.rows().stats().percentile(0.75d);
 
-        DataFrame<LocalDate,StatType> rowStats = frame.rows().describe(
+        var rowStats = frame.rows().describe(
             StatType.COUNT, StatType.MEAN, StatType.VARIANCE, StatType.SKEWNESS, StatType.SUM
         );
         rowStats.out().print();
@@ -179,17 +177,17 @@ public class StatsDocs {
     public void rowDemean() throws Exception {
 
         //Create a 1,000,000x10 DataFrame of random double precision values
-        DataFrame<LocalDate,String> frame = random(1000000, "A", "B", "C", "D", "E", "F", "G", "H", "I", "J");
+        var frame = random(1000000, "A", "B", "C", "D", "E", "F", "G", "H", "I", "J");
 
         //Run 10 performance samples, randomizing the frame before each test
-        DataFrame<String,String> timing = PerfStat.run(10, TimeUnit.MILLISECONDS, false, tasks -> {
+        var timing = PerfStat.run(10, TimeUnit.MILLISECONDS, false, tasks -> {
 
             tasks.beforeEach(() -> frame.applyDoubles(v -> Math.random() * 100d));
 
             tasks.put("Bad", () -> {
                 for (int i=0; i<frame.rowCount(); ++i) {
-                    final DataFrameRow<LocalDate,String> row = frame.rowAt(i);
-                    final double mean = row.stats().mean();
+                    var row = frame.rowAt(i);
+                    var mean = row.stats().mean();
                     row.applyDoubles(v -> v.getDouble() - mean);
                 }
                 return frame;
@@ -197,7 +195,7 @@ public class StatsDocs {
 
             tasks.put("Good(sequential)", () -> {
                 frame.rows().forEach(row -> {
-                    final double mean = row.stats().mean();
+                    var mean = row.stats().mean();
                     row.applyDoubles(v -> v.getDouble() - mean);
                 });
                 return frame;
@@ -205,7 +203,7 @@ public class StatsDocs {
 
             tasks.put("Good(parallel)", () -> {
                 frame.rows().parallel().forEach(row -> {
-                    final double mean = row.stats().mean();
+                    var mean = row.stats().mean();
                     row.applyDoubles(v -> v.getDouble() - mean);
                 });
                 return frame;
@@ -230,30 +228,30 @@ public class StatsDocs {
 
     @Test()
     public void colStats() {
-        DataFrame<LocalDate,String> frame = random(100, "A", "B", "C", "D", "E");
+        var frame = random(100, "A", "B", "C", "D", "E");
 
         frame.out().print();
 
-        DataFrame<String,StatType> count = frame.cols().stats().count();
-        DataFrame<String,StatType> min = frame.cols().stats().min();
-        DataFrame<String,StatType> max = frame.cols().stats().max();
-        DataFrame<String,StatType> mean = frame.cols().stats().mean();
-        DataFrame<String,StatType> median = frame.cols().stats().median();
-        DataFrame<String,StatType> variance = frame.cols().stats().variance();
-        DataFrame<String,StatType> stdDev = frame.cols().stats().stdDev();
-        DataFrame<String,StatType> kurtosis = frame.cols().stats().kurtosis();
-        DataFrame<String,StatType> mad = frame.cols().stats().mad();
-        DataFrame<String,StatType> sum = frame.cols().stats().sum();
-        DataFrame<String,StatType> sumLogs = frame.cols().stats().sumLogs();
-        DataFrame<String,StatType> sumSquares = frame.cols().stats().sumSquares();
-        DataFrame<String,StatType> sem = frame.cols().stats().sem();
-        DataFrame<String,StatType> geoMean = frame.cols().stats().geoMean();
-        DataFrame<String,StatType> autocorr = frame.cols().stats().autocorr(1);
-        DataFrame<String,StatType> percentile = frame.cols().stats().percentile(0.75d);
+        var count = frame.cols().stats().count();
+        var min = frame.cols().stats().min();
+        var max = frame.cols().stats().max();
+        var mean = frame.cols().stats().mean();
+        var median = frame.cols().stats().median();
+        var variance = frame.cols().stats().variance();
+        var stdDev = frame.cols().stats().stdDev();
+        var kurtosis = frame.cols().stats().kurtosis();
+        var mad = frame.cols().stats().mad();
+        var sum = frame.cols().stats().sum();
+        var sumLogs = frame.cols().stats().sumLogs();
+        var sumSquares = frame.cols().stats().sumSquares();
+        var sem = frame.cols().stats().sem();
+        var geoMean = frame.cols().stats().geoMean();
+        var autocorr = frame.cols().stats().autocorr(1);
+        var percentile = frame.cols().stats().percentile(0.75d);
 
         percentile.out().print();
 
-        DataFrame<String,StatType> colStats = frame.cols().describe(
+        var colStats = frame.cols().describe(
             StatType.COUNT, StatType.MEAN, StatType.VARIANCE, StatType.SKEWNESS, StatType.SUM
         );
         colStats.out().print();
@@ -265,10 +263,9 @@ public class StatsDocs {
     public void colStats1() {
 
         //Create 100x5 DataFrame of random doubles
-        DataFrame<LocalDate,String> frame = random(100, "A", "B", "C", "D", "E");
-        //Capture stats interface for two columns independently sourced by ordinal and key
-        Stats<Double> stats1 = frame.colAt(3).stats();
-        Stats<Double> stats2 = frame.col("D").stats();
+        var frame = random(100, "A", "B", "C", "D", "E");
+        var stats1 = frame.colAt(3).stats();
+        var stats2 = frame.col("D").stats();
 
         StatType.univariate().forEach(statType -> {
             switch (statType) {
@@ -294,16 +291,16 @@ public class StatsDocs {
 
     @Test()
     public void expanding() {
-        DataFrame<LocalDate,String> frame = random(100, "A", "B", "C", "D", "E");
-        DataFrame<LocalDate,String> expandingMean = frame.cols().stats().expanding(5).mean();
+        var frame = random(100, "A", "B", "C", "D", "E");
+        var expandingMean = frame.cols().stats().expanding(5).mean();
         expandingMean.out().print(10);
     }
 
 
     @Test()
     public void rolling() {
-        DataFrame<LocalDate,String> frame = random(100, "A", "B", "C", "D", "E");
-        DataFrame<LocalDate,String> rollingMean = frame.cols().stats().rolling(5).mean();
+        var frame = random(100, "A", "B", "C", "D", "E");
+        var rollingMean = frame.cols().stats().rolling(5).mean();
         rollingMean.out().print(10);
 
     }
@@ -313,7 +310,7 @@ public class StatsDocs {
 
     @Test()
     public void testStats1() {
-        DataFrame<Integer,String> frame = loadCarDataset();
+        var frame = loadCarDataset();
         frame.out().print();
         frame.cols().describe(
             StatType.MEAN,
@@ -324,7 +321,7 @@ public class StatsDocs {
 
     @Test()
     public void testStats2() {
-        DataFrame<Integer,String> frame = loadCarDataset();
+        var frame = loadCarDataset();
         frame.out().print();
         frame.transpose().rows().describe(
             StatType.MEAN,
@@ -335,8 +332,8 @@ public class StatsDocs {
 
     @Test()
     public void testNonNumeric1() {
-        DataFrame<Integer,String> frame = loadCarDataset();
-        DataFrame<String,StatType> colStats = frame.cols().describe(
+        var frame = loadCarDataset();
+        var colStats = frame.cols().describe(
             StatType.COUNT, StatType.MEAN, StatType.VARIANCE, StatType.SKEWNESS, StatType.SUM
         );
 
@@ -347,18 +344,18 @@ public class StatsDocs {
 
     @Test()
     public void testCovariance1() {
-        DataFrame<Integer,String> frame = loadCarDataset();
-        double covar1 = frame.cols().stats().covariance("Price", "Horsepower");
-        double covar2 = frame.cols().stats().covariance("EngineSize", "MPG.city");
-        System.out.printf("\nCovariance between Price & Horsepower = %.2f", covar1);
-        System.out.printf("\nCovariance between EngineSize and MPG.city = %.2f", covar2);
+        var frame = loadCarDataset();
+        var covar1 = frame.cols().stats().covariance("Price", "Horsepower");
+        var covar2 = frame.cols().stats().covariance("EngineSize", "MPG.city");
+        IO.printf("\nCovariance between Price & Horsepower = %.2f", covar1);
+        IO.printf("\nCovariance between EngineSize and MPG.city = %.2f", covar2);
     }
 
     @Test()
     public void testCovariance2() {
-        DataFrame<Integer,String> frame = loadCarDataset();
-        DataFrame<String,String> covm = frame.cols().stats().covariance();
-        covm.out().print(100, formats -> {
+        var frame = loadCarDataset();
+        var covMatrix = frame.cols().stats().covariance();
+        covMatrix.out().print(100, formats -> {
             formats.setDecimalFormat("0.000;-0.000", 1);
         });
     }
@@ -366,18 +363,18 @@ public class StatsDocs {
 
     @Test()
     public void testCorrelation1() {
-        DataFrame<Integer,String> frame = loadCarDataset();
-        double correl1 = frame.cols().stats().correlation("Price", "Horsepower");
-        double correl2 = frame.cols().stats().correlation("EngineSize", "MPG.city");
-        System.out.printf("\nCorrelation between Price & Horsepower = %.2f", correl1);
-        System.out.printf("\nCorrelation between EngineSize and MPG.city = %.2f", correl2);
+        var frame = loadCarDataset();
+        var correl1 = frame.cols().stats().correlation("Price", "Horsepower");
+        var correl2 = frame.cols().stats().correlation("EngineSize", "MPG.city");
+        IO.printf("\nCorrelation between Price & Horsepower = %.2f", correl1);
+        IO.printf("\nCorrelation between EngineSize and MPG.city = %.2f", correl2);
     }
 
     @Test()
     public void testCorrelation2() {
-        DataFrame<Integer,String> frame = loadCarDataset();
-        DataFrame<String,String> correlm = frame.cols().stats().correlation();
-        correlm.out().print(100, formats -> {
+        var frame = loadCarDataset();
+        var correlMatrix = frame.cols().stats().correlation();
+        correlMatrix.out().print(100, formats -> {
             formats.setDecimalFormat("0.000;-0.000", 1);
         });
     }
@@ -387,10 +384,10 @@ public class StatsDocs {
     public void correlationPerformance() throws Exception {
 
         //Create a 1,000,000x10 DataFrame of random double precision values
-        DataFrame<LocalDate,String> frame = random(1000000, "A", "B", "C", "D", "E", "F", "G", "H", "I", "J");
+        var frame = random(1000000, "A", "B", "C", "D", "E", "F", "G", "H", "I", "J");
 
         //Run 10 performance samples, randomizing the frame before each test
-        DataFrame<String,String> timing = PerfStat.run(10, TimeUnit.MILLISECONDS, false, tasks -> {
+        var timing = PerfStat.run(10, TimeUnit.MILLISECONDS, false, tasks -> {
             tasks.beforeEach(() -> frame.applyDoubles(v -> Math.random() * 100d));
             tasks.put("Sequential", () -> frame.cols().stats().correlation());
             tasks.put("Parallel", () -> frame.cols().parallel().stats().correlation());

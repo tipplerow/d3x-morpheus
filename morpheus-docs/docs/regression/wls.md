@@ -70,7 +70,7 @@ this data as follows:
 
 <?prettify?>
 ```java
-DataFrame<Integer,String> frame = DataFrame.read().csv("/supervisor.csv");
+var frame = DataFrame.read().csv("/supervisor.csv");
 Chart.create().withScatterPlot(frame, false, "x", chart -> {
     chart.plot().style("y").withColor(Color.BLUE);
     chart.title().withText("Supervisors (y) vs Workers (x)");
@@ -83,7 +83,7 @@ Chart.create().withScatterPlot(frame, false, "x", chart -> {
 ```
 
 <p align="center">
-    <img class="chart" src="../../images/wls/wls-chatterjee1.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/wls/wls-chatterjee1.png"/>
 </p>
 
 If the increasing variance in the dependent variable is not obvious from the scatter plot, it can be useful to plot the residuals from an OLS
@@ -91,7 +91,7 @@ regression against the fitted values. The code below shows how to do this, and i
 
 <?prettify?>
 ```java
-DataFrame<Integer,String> frame = DataFrame.read().csv("/supervisor.csv");
+var frame = DataFrame.read().csv("/supervisor.csv");
 frame.regress().ols("y", "x", true, model -> {
     Chart.create().withResidualsVsFitted(model, chart -> {
         chart.title().withText("OLS Residuals vs Fitted Y Values");
@@ -105,7 +105,7 @@ frame.regress().ols("y", "x", true, model -> {
 ```
 
 <p align="center">
-    <img class="chart" src="../../images/wls/wls-chatterjee2.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/wls/wls-chatterjee2.png"/>
 </p>
 
 While it is pretty clear from the above plots that heteroscedasticity is present in the data, which is a violation of one of the
@@ -115,9 +115,9 @@ matrix required by the latter. The code below runs the OLS regression and the pr
 
 <?prettify?>
 ```java
-DataFrame<Integer,String> frame = DataFrame.read().csv("/supervisor.csv");
+var frame = DataFrame.read().csv("/supervisor.csv");
 frame.regress().ols("y", "x", model -> {
-    System.out.println(model);
+    IO.println(model);
     return Optional.empty();
 });
 ```
@@ -149,12 +149,12 @@ The code below generates a plot of the absolute value of the residuals against t
 
 <?prettify?>
 ```java
-DataFrame<Integer,String> frame = DataFrame.read().csv("/supervisor.csv");
+var frame = DataFrame.read().csv("/supervisor.csv");
 frame.regress().ols("y", "x", true, model -> {
-    final DataFrame<Integer,String> residuals = model.getResiduals();
-    final DataFrame<Integer,String> residualsAbs = residuals.mapToDoubles(v -> Math.abs(v.getDouble()));
-    final DataFrame<Integer,String> xValues = frame.cols().select("x");
-    final DataFrame<Integer,String> newData = DataFrame.concatColumns(residualsAbs, xValues);
+    var residuals = model.getResiduals();
+    var residualsAbs = residuals.mapToDoubles(v -> Math.abs(v.getDouble()));
+    var xValues = frame.cols().select("x");
+    var newData = DataFrame.concatColumns(residualsAbs, xValues);
     Chart.create().withScatterPlot(newData, false, "x", chart -> {
         chart.plot().style("Residuals").withPointsVisible(true).withColor(Color.BLUE).withPointShape(ChartShape.DIAMOND);
         chart.title().withText("ABS(Residuals) vs Predictor of Original Regression");
@@ -169,7 +169,7 @@ frame.regress().ols("y", "x", true, model -> {
 ```
 
 <p align="center">
-    <img class="chart" src="../../images/wls/wls-chatterjee4.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/wls/wls-chatterjee4.png"/>
 </p>
 
 We can now use the reciprocal of the fitted values of this regression as the elements of the diagonal weight matrix, W. The code
@@ -184,14 +184,14 @@ below generates this array of weights which can then be passed to the `DataFrame
  */
 private Array<Double> computeWeights(DataFrame<Integer,String> frame) {
     return frame.regress().ols("y", "x", model -> {
-        final DataFrame<Integer,String> residuals = model.getResiduals();
-        final DataFrame<Integer,String> residualsAbs = residuals.mapToDoubles(v -> Math.abs(v.getDouble()));
-        final DataFrame<Integer,String> xValues = frame.cols().select("x");
-        final DataFrame<Integer,String> newData = DataFrame.concatColumns(residualsAbs, xValues);
+        var residuals = model.getResiduals();
+        var residualsAbs = residuals.mapToDoubles(v -> Math.abs(v.getDouble()));
+        var xValues = frame.cols().select("x");
+        var newData = DataFrame.concatColumns(residualsAbs, xValues);
         return newData.cols().ols("Residuals", "x", ols -> {
             ols.withIntercept(false);
-            final DataFrame<Integer,String> yHat = ols.getFittedValues();
-            final double[] weights = yHat.colAt(0).toDoubleStream().map(v -> 1d / Math.pow(v, 2d)).toArray();
+            var yHat = ols.getFittedValues();
+            var weights = yHat.colAt(0).toDoubleStream().map(v -> 1d / Math.pow(v, 2d)).toArray();
             return Optional.of(Array.of(weights));
         });
     }).orElse(null);
@@ -204,10 +204,10 @@ results to standard out.
 
 <?prettify?>
 ```java
-DataFrame<Integer,String> frame = DataFrame.read().csv("/supervisor.csv");
-Array<Double> weights = computeWeights(frame);
+var frame = DataFrame.read().csv("/supervisor.csv");
+var weights = computeWeights(frame);
 frame.regress().wls("y", "x", weights, model -> {
-    System.out.println(model);
+    IO.println(model);
     return Optional.empty();
 });
 ```
@@ -247,19 +247,19 @@ of the independent variable compared to the OLS line, which equally weights all 
  */
 public void plotCompare() throws Exception {
 
-    DataFrame<Integer,String> frame = DataFrame.read().csv("/supervisor.csv");
-    double[] x = frame.colAt("x").toDoubleStream().toArray();
+    var frame = DataFrame.read().csv("/supervisor.csv");
+    var x = frame.colAt("x").toDoubleStream().toArray();
     
-    DataFrameLeastSquares<Integer,String> ols = frame.regress().ols("y", "x", true, Optional::of).orElse(null);
-    double olsAlpha = ols.getInterceptValue(DataFrameLeastSquares.Field.PARAMETER);
-    double olsBeta = ols.getBetaValue("x", DataFrameLeastSquares.Field.PARAMETER);
-    DataFrame<Integer,String> olsFit = createFitted(olsAlpha, olsBeta, x, "OLS");
+    var ols = frame.regress().ols("y", "x", true, Optional::of).get();
+    var olsAlpha = ols.getInterceptValue(DataFrameLeastSquares.Field.PARAMETER);
+    var olsBeta = ols.getBetaValue("x", DataFrameLeastSquares.Field.PARAMETER);
+    var olsFit = createFitted(olsAlpha, olsBeta, x, "OLS");
     
-    Array<Double> weights = computeWeights(frame);
-    DataFrameLeastSquares<Integer,String> wls = frame.regress().wls("y", "x", weights, true, Optional::of).orElse(null);
-    double wlsAlpha = wls.getInterceptValue(DataFrameLeastSquares.Field.PARAMETER);
-    double wlsBeta = wls.getBetaValue("x", DataFrameLeastSquares.Field.PARAMETER);
-    DataFrame<Integer,String> wlsFit = createFitted(wlsAlpha, wlsBeta, x, "WLS");
+    var weights = computeWeights(frame);
+    var wls = frame.regress().wls("y", "x", weights, true, Optional::of).get();
+    var wlsAlpha = wls.getInterceptValue(DataFrameLeastSquares.Field.PARAMETER);
+    var wlsBeta = wls.getBetaValue("x", DataFrameLeastSquares.Field.PARAMETER);
+    var wlsFit = createFitted(wlsAlpha, wlsBeta, x, "WLS");
     
     Chart.create().withScatterPlot(frame, false, "x", chart -> {
         chart.plot().style("y").withColor(Color.BLUE);
@@ -298,7 +298,7 @@ private DataFrame<Integer,String> createFitted(double alpha, double beta, double
 ```
 
 <p align="center">
-    <img class="chart" src="../../images/wls/wls-chatterjee3.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/wls/wls-chatterjee3.png"/>
 </p>
 
 ### Unbiasedness
@@ -314,8 +314,8 @@ which will yield a dataset with the desired characteristics (i.e. heteroscedasti
 <?prettify?>
 ```java
 /**
- * Returns a sample dataset based on a known population process using the linear coefficients provided
- * The sample dataset exhibits increasing variance proprtional to the independent variable.
+ * Returns a sample dataset based on a known population process using the regression coefficients provided
+ * The sample dataset exhibits increasing variance in the dependent variable as the independent variable increases.
  * @param alpha     the intercept term for population process
  * @param beta      the slope term for population process
  * @param startX    the start value for independent variable
@@ -323,14 +323,14 @@ which will yield a dataset with the desired characteristics (i.e. heteroscedasti
  * @return          the frame of XY values
  */
 private DataFrame<Integer,String> sample(double alpha, double beta, double startX, double stepX, int n) {
-    Array<Double> xValues = Array.of(Double.class, n).applyDoubles(v -> startX + v.index() * stepX);
-    Array<Double> yValues = Array.of(Double.class, n).applyDoubles(v -> {
-        final double xValue = xValues.getDouble(v.index());
-        final double yFitted = alpha + beta * xValue;
-        final double stdDev = xValue * 2d;
+    var xValues = Array.of(Double.class, n).applyDoubles(v -> startX + v.index() * stepX);
+    var yValues = Array.of(Double.class, n).applyDoubles(v -> {
+        var xValue = xValues.getDouble(v.index());
+        var yFitted = alpha + beta * xValue;
+        var stdDev = xValue * 1.1d;
         return new NormalDistribution(yFitted, stdDev).sample();
     });
-    Range<Integer> rowKeys = Range.of(0, n);
+    var rowKeys = Range.of(0, n);
     return DataFrame.of(rowKeys, String.class, columns -> {
         columns.add("X", xValues);
         columns.add("Y", yValues);
@@ -344,15 +344,15 @@ increasing for larger values of the independent variable.
 
 <?prettify?>
 ```java
-final double beta = 4d;
-final double alpha = 20d;
+var beta = 4d;
+var alpha = 20d;
 Chart.show(2, IntStream.range(0, 4).mapToObj(i -> {
-    DataFrame<Integer,String> frame = sample(alpha, beta, 1, 1, 100);
-    String title = "Sample %s Dataset, Beta: %.2f Alpha: %.2f";
-    String subtitle = "Parameter estimates, Beta^: %.3f, Alpha^: %.3f";
-    DataFrameLeastSquares<Integer,String> ols = frame.regress().ols("Y", "X", true, Optional::of).get();
-    double betaHat = ols.getBetaValue("X", DataFrameLeastSquares.Field.PARAMETER);
-    double alphaHat = ols.getInterceptValue(DataFrameLeastSquares.Field.PARAMETER);
+    var frame = sample(alpha, beta, 1, 1, 100);
+    var title = "Sample %s Dataset, Beta: %.2f Alpha: %.2f";
+    var subtitle = "Parameter estimates, Beta^: %.3f, Alpha^: %.3f";
+    var ols = frame.regress().ols("Y", "X", true, Optional::of).get();
+    var betaHat = ols.getBetaValue("X", DataFrameLeastSquares.Field.PARAMETER);
+    var alphaHat = ols.getInterceptValue(DataFrameLeastSquares.Field.PARAMETER);
     return Chart.create().withScatterPlot(frame, false, "X", chart -> {
         chart.title().withText(String.format(title, i, beta, alpha));
         chart.title().withFont(new Font("Arial", Font.BOLD, 14));
@@ -363,17 +363,21 @@ Chart.show(2, IntStream.range(0, 4).mapToObj(i -> {
 }));
 ```
 
-<div style="float:left;width:50%;">
-    <img class="chart" src="../../images/wls/wls-sample-0.png"/>
+<div class="row">
+    <div class="col-md-6">
+        <img class="chart img-fluid" src="/images/morpheus/wls/wls-sample-0.png"/>
+    </div>
+    <div class="col-md-6">
+        <img class="chart img-fluid" src="/images/morpheus/wls/wls-sample-1.png"/>
+    </div>
 </div>
-<div style="float:left;width:50%;">
-    <img class="chart" src="../../images/wls/wls-sample-1.png"/>
-</div>
-<div style="float:left;width:50%;">
-    <img class="chart" src="../../images/wls/wls-sample-2.png"/>
-</div>
-<div style="float:left;width:50%;">
-    <img class="chart" src="../../images/wls/wls-sample-3.png"/>
+<div class="row">
+    <div class="col-md-6">
+        <img class="chart img-fluid" src="/images/morpheus/wls/wls-sample-2.png"/>
+    </div>
+    <div class="col-md-6">
+        <img class="chart img-fluid" src="/images/morpheus/wls/wls-sample-3.png"/>
+    </div>
 </div>
 
 Now that we have a function that can generate data samples given some population parameters and with the appropriate variance characteristics,
@@ -383,20 +387,20 @@ plots a histogram of the results.
 
 <?prettify?>
 ```java
-int n = 100;
-double beta = 4d;
-double alpha = 20d;
-int regressionCount = 100000;
-Range<Integer> rows = Range.of(0, regressionCount);
-Array<String> columns = Array.of("Beta", "Alpha");
-DataFrame<Integer,String> results = DataFrame.ofDoubles(rows, columns);
+var n = 100;
+var beta = 4d;
+var alpha = 20d;
+var regressionCount = 100000;
+var rows = Range.of(0, regressionCount);
+var columns = Array.of("Beta", "Alpha");
+var results = DataFrame.ofDoubles(rows, columns);
 
 results.rows().parallel().forEach(row -> {
-    final DataFrame<Integer,String> frame = sample(alpha, beta, 1, 1, n);
-    final Array<Double> weights = computeWeights(frame);
+    var frame = sample(alpha, beta, 1, 1, n);
+    var weights = computeWeights(frame);
     frame.regress().wls("Y", "X", weights, true, model -> {
-        final double alphaHat = model.getInterceptValue(Field.PARAMETER);
-        final double betaHat = model.getBetaValue("X", Field.PARAMETER);
+        var alphaHat = model.getInterceptValue(Field.PARAMETER);
+        var betaHat = model.getBetaValue("X", Field.PARAMETER);
         row.setDouble("Alpha", alphaHat);
         row.setDouble("Beta", betaHat);
         return Optional.empty();
@@ -404,14 +408,14 @@ results.rows().parallel().forEach(row -> {
 });
 
 Array.of("Beta", "Alpha").forEach(coeff -> {
-    final DataFrame<Integer,String> coeffResults = results.cols().select(col -> col.key().startsWith(coeff));
+    var coeffResults = results.cols().select(col -> col.key().startsWith(coeff));
     Chart.create().withHistPlot(coeffResults, 250, chart -> {
-        String title = "%s Histogram of %s WLS regressions";
-        String subtitle = "%s estimate unbiasedness, Actual: %.2f, Mean: %.2f, Variance: %.2f";
-        double actual = coeff.equals("Beta") ? beta : alpha;
-        double estimate = coeffResults.colAt(coeff).stats().mean();
-        double variance = coeffResults.colAt(coeff).stats().variance();
-        Color color = coeff.equals("Beta") ? new Color(255, 100, 100) : new Color(102, 204, 255);
+        var title = "%s Histogram of %s WLS regressions";
+        var subtitle = "%s estimate unbiasedness, Actual: %.2f, Mean: %.2f, Variance: %.2f";
+        var actual = coeff.equals("Beta") ? beta : alpha;
+        var estimate = coeffResults.colAt(coeff).stats().mean();
+        var variance = coeffResults.colAt(coeff).stats().variance();
+        var color = coeff.equals("Beta") ? new Color(255, 100, 100) : new Color(102, 204, 255);
         chart.plot().style(coeff).withColor(color);
         chart.plot().axes().domain().label().withText(coeff + " Estimate");
         chart.title().withText(String.format(title, coeff, regressionCount));
@@ -427,8 +431,8 @@ results printed below, the **mean** slope and intercept coefficient was an exact
 decimal places.
 
 <p align="center">
-    <img class="chart" src="../../images/wls/wls-Beta-unbiasedness.png"/>
-    <img class="chart" src="../../images/wls/wls-Alpha-unbiasedness.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/wls/wls-Beta-unbiasedness.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/wls/wls-Alpha-unbiasedness.png"/>
 </p>
 
 
@@ -450,28 +454,28 @@ heteroscedasticity, just not BLUE. The following code executes these regressions
 
 <?prettify?>
 ```java
-final int n = 100;
-final double beta = 4d;
-final double alpha = 20d;
-final int regressionCount = 100000;
-Range<Integer> rows = Range.of(0, regressionCount);
-Array<String> columns = Array.of("Beta(OLS)", "Alpha(OLS)", "Beta(WLS)", "Alpha(WLS)");
-DataFrame<Integer,String> results = DataFrame.ofDoubles(rows, columns);
+var n = 100;
+var beta = 4d;
+var alpha = 20d;
+var regressionCount = 100000;
+var rows = Range.of(0, regressionCount);
+var columns = Array.of("Beta(OLS)", "Alpha(OLS)", "Beta(WLS)", "Alpha(WLS)");
+var results = DataFrame.ofDoubles(rows, columns);
 
 results.rows().parallel().forEach(row -> {
-    final DataFrame<Integer,String> frame = sample(alpha, beta, 1, 1, n);
+    var frame = sample(alpha, beta, 1, 1, n);
     frame.regress().ols("Y", "X", true, model -> {
-        double alphaHat = model.getInterceptValue(Field.PARAMETER);
-        double betaHat = model.getBetaValue("X", Field.PARAMETER);
+        var alphaHat = model.getInterceptValue(Field.PARAMETER);
+        var betaHat = model.getBetaValue("X", Field.PARAMETER);
         row.setDouble("Alpha(OLS)", alphaHat);
         row.setDouble("Beta(OLS)", betaHat);
         return Optional.empty();
     });
 
-    final Array<Double> weights = computeWeights(frame);
+    var weights = computeWeights(frame);
     frame.regress().wls("Y", "X", weights, true, model -> {
-        double alphaHat = model.getInterceptValue(Field.PARAMETER);
-        double betaHat = model.getBetaValue("X", Field.PARAMETER);
+        var alphaHat = model.getInterceptValue(Field.PARAMETER);
+        var betaHat = model.getBetaValue("X", Field.PARAMETER);
         row.setDouble("Alpha(WLS)", alphaHat);
         row.setDouble("Beta(WLS)", betaHat);
         return Optional.empty();
@@ -479,17 +483,17 @@ results.rows().parallel().forEach(row -> {
 });
 
 Array.of("Alpha", "Beta").forEach(coeff -> {
-    final String olsKey = coeff + "(OLS)";
-    final String wlsKey = coeff + "(WLS)";
-    final DataFrame<Integer,String> data = results.cols().select(olsKey, wlsKey);
+    var olsKey = coeff + "(OLS)";
+    var wlsKey = coeff + "(WLS)";
+    var data = results.cols().select(olsKey, wlsKey);
     Chart.create().withHistPlot(data, 200, true, chart -> {
-        double meanOls = results.colAt(olsKey).stats().mean();
-        double stdOls = results.colAt(olsKey).stats().stdDev();
-        double meanWls = results.colAt(wlsKey).stats().mean();
-        double stdWls = results.colAt(wlsKey).stats().stdDev();
-        double coeffAct = coeff.equals("Alpha") ? alpha : beta;
-        String title = "%s Histogram from %s OLS & WLS Regressions (n=%s)";
-        String subtitle = "Actual: %.4f, Mean(OLS): %.4f, Std(OLS): %.4f, Mean(WLS): %.4f, Std(WLS): %.4f";
+        var meanOls = results.colAt(olsKey).stats().mean();
+        var stdOls = results.colAt(olsKey).stats().stdDev();
+        var meanWls = results.colAt(wlsKey).stats().mean();
+        var stdWls = results.colAt(wlsKey).stats().stdDev();
+        var coeffAct = coeff.equals("Alpha") ? alpha : beta;
+        var title = "%s Histogram from %s OLS & WLS Regressions (n=%s)";
+        var subtitle = "Actual: %.4f, Mean(OLS): %.4f, Std(OLS): %.4f, Mean(WLS): %.4f, Std(WLS): %.4f";
         chart.title().withText(String.format(title, coeff, regressionCount, n));
         chart.title().withFont(new Font("Arial", Font.BOLD, 15));
         chart.subtitle().withText(String.format(subtitle, coeffAct, meanOls, stdOls, meanWls, stdWls));
@@ -506,8 +510,8 @@ coefficient. The efficiency of each model however is clearly different, and as e
 variance in both the intercept and slope estimates compared to OLS.
 
 <p align="center">
-    <img class="chart" src="../../images/wls/wls-Beta-efficiency.png"/>
-    <img class="chart" src="../../images/wls/wls-Alpha-efficiency.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/wls/wls-Beta-efficiency.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/wls/wls-Alpha-efficiency.png"/>
 </p>
 
 ### Consistency
@@ -524,12 +528,12 @@ in a `DataFrame`, which is then used to generate a histogram in order to be able
 
 <?prettify?>
 ```java
-final double beta = 4d;
-final double alpha = 20d;
-final int regressionCount = 100000;
-final Range<Integer> sampleSizes = Range.of(100, 600, 100);
-final Range<Integer> rows = Range.of(0, regressionCount);
-final DataFrame<Integer,String> results = DataFrame.of(rows, String.class, columns -> {
+var beta = 4d;
+var alpha = 20d;
+var regressionCount = 100000;
+var sampleSizes = Range.of(100, 600, 100);
+var rows = Range.of(0, regressionCount);
+var results = DataFrame.of(rows, String.class, columns -> {
     sampleSizes.forEach(n -> {
         columns.add(String.format("Beta(n=%s)", n), Double.class);
         columns.add(String.format("Alpha(n=%s)", n), Double.class);
@@ -537,15 +541,15 @@ final DataFrame<Integer,String> results = DataFrame.of(rows, String.class, colum
 });
 
 sampleSizes.forEach(n -> {
-    System.out.println("Running " + regressionCount + " regressions for n=" + n);
-    final String betaKey = String.format("Beta(n=%s)", n);
-    final String alphaKey = String.format("Alpha(n=%s)", n);
+    IO.println("Running " + regressionCount + " regressions for n=" + n);
+    var betaKey = String.format("Beta(n=%s)", n);
+    var alphaKey = String.format("Alpha(n=%s)", n);
     results.rows().parallel().forEach(row -> {
-        final DataFrame<Integer,String> frame = sample(alpha, beta, 1, 1, n);
-        final Array<Double> weights = computeWeights(frame);
+        var frame = sample(alpha, beta, 1, 1, n);
+        var weights = computeWeights(frame);
         frame.regress().wls("Y", "X", weights, true, model -> {
-            final double alphaHat = model.getInterceptValue(Field.PARAMETER);
-            final double betaHat = model.getBetaValue("X", Field.PARAMETER);
+            var alphaHat = model.getInterceptValue(Field.PARAMETER);
+            var betaHat = model.getBetaValue("X", Field.PARAMETER);
             row.setDouble(alphaKey, alphaHat);
             row.setDouble(betaKey, betaHat);
             return Optional.empty();
@@ -554,7 +558,7 @@ sampleSizes.forEach(n -> {
 });
 
 Array.of("Beta", "Alpha").forEach(coeff -> {
-    final DataFrame<Integer,String> coeffResults = results.cols().select(col -> col.key().startsWith(coeff));
+    var coeffResults = results.cols().select(col -> col.key().startsWith(coeff));
     Chart.create().withHistPlot(coeffResults, 250, true, chart -> {
         chart.plot().axes().domain().label().withText("Coefficient Estimate");
         chart.title().withText(coeff + " Histograms of " + regressionCount + " Regressions");
@@ -569,33 +573,35 @@ The plots below demonstrate a clear pattern of decreasing variance in the slope 
 regard to the intercept estimate, the evidence is less obvious, and the chart suggests only a maringal reduction in variance.
 
 <p align="center">
-    <img class="chart" src="../../images/wls/wls-Beta-consistency.png"/>
-    <img class="chart" src="../../images/wls/wls-Alpha-consistency.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/wls/wls-Beta-consistency.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/wls/wls-Alpha-consistency.png"/>
 </p>
 
 To get a better sense of the trend in estimation variance as sample size increases, we can compute the variance for all estimates
 in a given run, and generate a bar plot of the results. The visualization below suggests the variance in the intercept is decreasing,
 just not as aggressively as the slope coefficient in this case.
 
-<div style="float:left;width:50%;">
-    <img class="chart" src="../../images/wls/wls-beta-variance.png"/>
-</div>
-<div style="float:left;width:50%;">
-    <img class="chart" src="../../images/wls/wls-alpha-variance.png"/>
+<div class="row">
+    <div class="col-md-6">
+        <img class="chart img-fluid" src="/images/morpheus/wls/wls-beta-variance.png"/>
+    </div>
+    <div class="col-md-6">
+        <img class="chart img-fluid" src="/images/morpheus/wls/wls-alpha-variance.png"/>
+    </div>
 </div>
 
 The code to generate this plot is as follows:
 
 <?prettify?>
 ```java
-Array<DataFrame<String,StatType>> variances = Array.of("Beta", "Alpha").map(value -> {
-    final String coefficient = value.getValue();
-    final Matcher matcher = Pattern.compile(coefficient + "\\(n=(\\d+)\\)").matcher("");
+var variances = Array.of("Beta", "Alpha").map(value -> {
+    var coefficient = value.getValue();
+    var matcher = Pattern.compile(coefficient + "\\(n=(\\d+)\\)").matcher("");
     return results.cols().select(column -> {
-        final String name = column.key();
+        var name = column.key();
         return matcher.reset(name).matches();
     }).cols().mapKeys(column -> {
-        final String name = column.key();
+        var name = column.key();
         if (matcher.reset(name).matches()) return matcher.group(1);
         throw new IllegalArgumentException("Unexpected column name: " + column.key());
     }).cols().stats().variance().transpose();

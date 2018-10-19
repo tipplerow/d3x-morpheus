@@ -41,7 +41,7 @@ public class GroupingDocs {
      * @return          the ATP match results
      */
     static DataFrame<Integer,String> loadTennisMatchData(int year) {
-        final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd/MM/yy");
+        var dateFormat = DateTimeFormatter.ofPattern("dd/MM/yy");
         return DataFrame.read().csv(options -> {
             options.setHeader(true);
             options.setResource("http://www.zavtech.com/data/tennis/atp/atp-" + year + ".csv");
@@ -89,14 +89,14 @@ public class GroupingDocs {
 
     @Test()
     public void groupRowsExample1() {
-        DataFrame<Integer,String> frame = loadTennisMatchData(2013);
+        var frame = loadTennisMatchData(2013);
         frame.out().print();
 
-        DataFrameGrouping.Rows<Integer,String> grouping = frame.rows().groupBy("Surface", "Round");
+        var grouping = frame.rows().groupBy("Surface", "Round");
         for (int depth=0; depth<grouping.getDepth(); ++depth) {
             System.out.printf("Groups for depth %s...\n", depth);
             grouping.getGroupKeys(depth).sorted().forEach(groupKey -> {
-                DataFrame<Integer,String> group = grouping.getGroup(groupKey);
+                var group = grouping.getGroup(groupKey);
                 System.out.printf("There are %s rows for group %s\n", group.rowCount(), groupKey);
             });
         }
@@ -105,8 +105,8 @@ public class GroupingDocs {
 
     @Test()
     public void groupRowsExample2() {
-        DataFrame<Integer,String> frame = loadTennisMatchData(2013);
-        DataFrameGrouping.Rows<Integer,String> grouping = frame.rows().groupBy(row -> {
+        var frame = loadTennisMatchData(2013);
+        var grouping = frame.rows().groupBy(row -> {
             String surface = row.getValue("Surface");
             String round = row.getValue("Round");
             return Tuple.of(surface, round);
@@ -114,7 +114,7 @@ public class GroupingDocs {
         for (int depth=0; depth<grouping.getDepth(); ++depth) {
             System.out.printf("Groups for depth %s...\n", depth);
             grouping.getGroupKeys(depth).sorted().forEach(groupKey -> {
-                DataFrame<Integer,String> group = grouping.getGroup(groupKey);
+                var group = grouping.getGroup(groupKey);
                 System.out.printf("There are %s rows for group %s\n", group.rowCount(), groupKey);
             });
         }
@@ -122,10 +122,10 @@ public class GroupingDocs {
 
     @Test()
     public void groupRowsExample3() {
-        DataFrame<Integer,String> frame = loadTennisMatchData(2013);
+        var frame = loadTennisMatchData(2013);
         frame.rows().groupBy(row -> {
-            LocalDate date = row.getValue("Date");
-            Month month = date.getMonth();
+            var date = row.<LocalDate>getValue("Date");
+            var month = date.getMonth();
             return Tuple.of(month);
         }).forEach(0, (groupKey, group) -> {
             System.out.printf("There are %s rows for group %s\n", group.rowCount(), groupKey);
@@ -134,12 +134,12 @@ public class GroupingDocs {
 
     @Test()
     public void groupRowExample4() {
-        DataFrame<Integer,String> frame = loadTennisMatchData(2013);
-        DataFrameGrouping.Rows<Integer,String> grouping = frame.rows().groupBy("Court", "Surface", "Round");
+        var frame = loadTennisMatchData(2013);
+        var grouping = frame.rows().groupBy("Court", "Surface", "Round");
         for (int depth=0; depth<grouping.getDepth(); ++depth) {
             System.out.printf("Groups for depth %s...\n", depth);
             grouping.getGroupKeys(depth).sorted().forEach(groupKey -> {
-                DataFrame<Integer,String> group = grouping.getGroup(groupKey);
+                var group = grouping.getGroup(groupKey);
                 System.out.printf("There are %s rows for group %s\n", group.rowCount(), groupKey);
             });
         }
@@ -147,8 +147,8 @@ public class GroupingDocs {
 
     @Test()
     public void groupRowExample5() {
-        DataFrame<Integer,String> frame = loadTennisMatchData(2013);
-        DataFrameGrouping.Rows<Integer,String> grouping = frame.rows().groupBy("Court", "Surface", "Round");
+        var frame = loadTennisMatchData(2013);
+        var grouping = frame.rows().groupBy("Court", "Surface", "Round");
         grouping.stats(0).mean().rows().sort(true).out().print(formats -> {
             formats.setDecimalFormat(Double.class, "0.00;-0.00", 1);
         });
@@ -164,13 +164,13 @@ public class GroupingDocs {
 
     @Test()
     public void groupColsExample1() {
-        DataFrame<String,Integer> frame = loadTennisMatchData(2013).transpose();
+        var frame = loadTennisMatchData(2013).transpose();
+        var grouping = frame.cols().groupBy("Court", "Surface");
         frame.left(20).out().print(10);
-        DataFrameGrouping.Cols<String,Integer> grouping = frame.cols().groupBy("Court", "Surface");
         for (int depth=0; depth<grouping.getDepth(); ++depth) {
             System.out.printf("Groups for depth %s...\n", depth);
             grouping.getGroupKeys(depth).sorted().forEach(groupKey -> {
-                DataFrame<String,Integer> group = grouping.getGroup(groupKey);
+                var group = grouping.getGroup(groupKey);
                 System.out.printf("There are %s columns for group %s\n", group.colCount(), groupKey);
             });
         }
@@ -181,15 +181,15 @@ public class GroupingDocs {
     public void groupLargeSequential() throws Exception {
 
         //Load UK house prices for 2006
-        DataFrame<Integer,String> frame = loadHousePrices(2006);
+        var frame = loadHousePrices(2006);
 
         frame.out().print();
 
         //Run 10 iterations of sequential and parallel group by Town/City
-        DataFrame<String,String> results = PerfStat.run(5, TimeUnit.MILLISECONDS, false, tasks -> {
+        var results = PerfStat.run(5, TimeUnit.MILLISECONDS, false, tasks -> {
             tasks.put("PropertyType", () -> frame.rows().groupBy("PropertyType"));
             tasks.put("Month", () -> frame.rows().groupBy(row -> {
-                final LocalDateTime date = row.getValue("Date");
+                var date = row.<LocalDateTime>getValue("Date");
                 return Tuple.of(date.getMonth());
             }));
             tasks.put("County", () -> frame.rows().groupBy("County"));
@@ -218,7 +218,7 @@ public class GroupingDocs {
     public void groupLargeParallel() throws Exception {
 
         //Load UK house prices for 2006
-        DataFrame<Integer,String> frame = loadHousePrices(2006);
+        var frame = loadHousePrices(2006);
 
         frame.out().print();
 
@@ -226,7 +226,7 @@ public class GroupingDocs {
         DataFrame<String,String> results = PerfStat.run(5, TimeUnit.MILLISECONDS, false, tasks -> {
             tasks.put("PropertyType", () -> frame.rows().groupBy("PropertyType"));
             tasks.put("Month", () -> frame.rows().parallel().groupBy(row -> {
-                final LocalDateTime date = row.getValue("Date");
+                var date = row.<LocalDateTime>getValue("Date");
                 return Tuple.of(date.getMonth());
             }));
             tasks.put("County", () -> frame.rows().parallel().groupBy("County"));
@@ -256,10 +256,10 @@ public class GroupingDocs {
     public void groupLarge1() throws Exception {
 
         //Load UK house prices for 2006
-        DataFrame<Integer,String> frame = loadHousePrices(2006);
+        var frame = loadHousePrices(2006);
 
         //Run 10 iterations of sequential and parallel group by Town/City
-        DataFrame<String,String> results = PerfStat.run(5, TimeUnit.MILLISECONDS, false, tasks -> {
+        var results = PerfStat.run(5, TimeUnit.MILLISECONDS, false, tasks -> {
             tasks.put("Sequential", () -> frame.rows().sequential().groupBy("County"));
             tasks.put("Parallel", () -> frame.rows().parallel().groupBy("County"));
         });
@@ -284,10 +284,10 @@ public class GroupingDocs {
     public void groupLarge2() throws Exception {
 
         //Load UK house prices for 2006
-        DataFrame<Integer,String> frame = loadHousePrices(2006);
+        var frame = loadHousePrices(2006);
 
         //Run 10 iterations of sequential and parallel group by County and Town/City
-        DataFrame<String,String> results = PerfStat.run(5, TimeUnit.MILLISECONDS, false, tasks -> {
+        var results = PerfStat.run(5, TimeUnit.MILLISECONDS, false, tasks -> {
             tasks.put("Sequential(1-D)", () -> frame.rows().sequential().groupBy("County"));
             tasks.put("Parallel(1-D)", () -> frame.rows().parallel().groupBy("County"));
             tasks.put("Sequential(2-D)", () -> frame.rows().sequential().groupBy("County", "County"));
@@ -314,10 +314,10 @@ public class GroupingDocs {
     public void groupLarge3() throws Exception {
 
         //Load UK house prices for 2006
-        DataFrame<Integer,String> frame = loadHousePrices(2006);
+        var frame = loadHousePrices(2006);
 
         //Run 10 iterations of sequential and parallel group by County and Town/City
-        DataFrame<String,String> results = PerfStat.run(5, TimeUnit.MILLISECONDS, false, tasks -> {
+        var results = PerfStat.run(5, TimeUnit.MILLISECONDS, false, tasks -> {
             tasks.put("Method-1", () -> frame.rows().groupBy("County", "Town/City"));
             tasks.put("Method-2", () -> frame.rows().groupBy(row -> Tuple.of(
                 row.<String>getValue("County"),

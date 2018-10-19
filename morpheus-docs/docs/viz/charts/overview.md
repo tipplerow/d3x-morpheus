@@ -38,7 +38,7 @@ Chart.create().asHtml().withLinePlot(frame, chart -> {
 ```
 
 The following sections demonstrate how to use the Morpheus charting API, and provide various examples of what kind of 
-charts are supported. The illustrations below are PNG files generated using the JFreeChart adapter, however a [gallery](./gallery1) 
+charts are supported. The illustrations below are PNG files generated using the JFreeChart adapter, however a [gallery](/morpheus/charts/swing) 
 of the same plots generated via the **Google adapter** show just how similar the plots from the two implementations are. 
 While most of the functionality exposed by the Morpheus Charting API are supported by both adapters, there are some gaps 
 in the Google adapter which are documented below.
@@ -57,9 +57,9 @@ import com.zavtech.morpheus.array.Array;
 import com.zavtech.morpheus.frame.DataFrame;
 
 int rowCount = 1000;
-LocalDate startDate = LocalDate.of(2013, 1, 1);
-Range<LocalDate> dates = Range.of(0, rowCount).map(startDate::plusDays);
-DataFrame<LocalDate,String> frame = DataFrame.of(dates, String.class, columns -> {
+var startDate = LocalDate.of(2013, 1, 1);
+var dates = Range.of(0, rowCount).map(startDate::plusDays);
+var frame = DataFrame.of(dates, String.class, columns -> {
     columns.add("A", Array.randn(rowCount).cumSum());
 });
 ```
@@ -91,7 +91,7 @@ Chart.create().withLinePlot(frame, chart -> {
 ```
 
 <p align="center">
-    <img class="chart" src="../../../images/charts/chart-basic-1.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/charts/chart-basic-1.png"/>
 </p>
 
 ### Multiple Series
@@ -103,11 +103,11 @@ the domain axis to the `withLines()` method. In the example below, we create a s
 
 <?prettify?>
 ```java
-int rowCount = 1000;
-LocalDate startDate = LocalDate.of(2013, 1, 1);
-Range<Integer> rowKeys = Range.of(0, rowCount);
-Range<LocalDate> dates = rowKeys.map(startDate::plusDays);
-DataFrame<Integer,String> frame = DataFrame.of(rowKeys, String.class, columns -> {
+var rowCount = 1000;
+var startDate = LocalDate.of(2013, 1, 1);
+var rowKeys = Range.of(0, rowCount);
+var dates = rowKeys.map(startDate::plusDays);
+var frame = DataFrame.of(rowKeys, String.class, columns -> {
     columns.add("DataDate", dates);
     Stream.of("A", "B", "C", "D").forEach(label -> {
         columns.add(label, Array.randn(rowCount).cumSum());
@@ -140,7 +140,7 @@ Chart.create().withLinePlot(frame, "DataDate", chart -> {
 });
 ```
 <p align="center">
-    <img class="chart" src="../../../images/charts/chart-basic-2.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/charts/chart-basic-2.png"/>
 </p>
 
 ### Series Specific Style
@@ -152,11 +152,11 @@ in **black**, and using a **thicker** point size to make it distinguishable from
 
 <?prettify?>
 ```java
-int rowCount = 1000;
-LocalDate startDate = LocalDate.of(2013, 1, 1);
-Range<Integer> rowKeys = Range.of(0, rowCount);
-Range<LocalDate> dates = rowKeys.map(startDate::plusDays);
-DataFrame<Integer,String> frame = DataFrame.of(rowKeys, String.class, columns -> {
+var rowCount = 1000;
+var startDate = LocalDate.of(2013, 1, 1);
+var rowKeys = Range.of(0, rowCount);
+var dates = rowKeys.map(startDate::plusDays);
+var frame = DataFrame.of(rowKeys, String.class, columns -> {
     columns.add("DataDate", dates);
     Stream.of("A", "B", "C", "D").forEach(label -> {
         columns.add(label, Array.randn(rowCount).cumSum());
@@ -195,7 +195,7 @@ Chart.create().withLinePlot(frame, "DataDate", chart -> {
 });
 ```
 <p align="center">
-    <img class="chart" src="../../../images/charts/chart-basic-3.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/charts/chart-basic-3.png"/>
 </p>
 
 ### Multiple Axis
@@ -213,9 +213,9 @@ this would rapidly become hard to read.
 
 <?prettify?>
 ```java
-int rowCount = 1000;
-Range<Integer> rowKeys = Range.of(0, rowCount);
-DataFrame<Integer,String> frame = DataFrame.of(rowKeys, String.class, columns -> {
+var rowCount = 1000;
+var rowKeys = Range.of(0, rowCount);
+var frame = DataFrame.of(rowKeys, String.class, columns -> {
     Stream.of("A", "B").forEach(c -> columns.add(c, Array.randn(rowCount).cumSum()));
     Stream.of("C", "D").forEach(c -> {
         columns.add(c, Array.randn(rowCount).mapToDoubles(v -> v.getDouble() * 100).cumSum());
@@ -236,7 +236,7 @@ Chart.create().withLinePlot(frame.cols().select("A", "B"), chart -> {
 ```
 
 <p align="center">
-    <img class="chart" src="../../../images/charts/chart-basic-4.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/charts/chart-basic-4.png"/>
 </p>
 
 ### Multiple Renderers
@@ -253,9 +253,9 @@ the third frame is rendered with **dashed lines** and no shapes at the datum poi
 
 <?prettify?>
 ```java
-int rowCount = 20;
-Range<Integer> rowKeys = Range.of(0, rowCount);
-DataFrame<Integer,String> frame = DataFrame.of(rowKeys, String.class, columns -> {
+var rowCount = 20;
+var rowKeys = Range.of(0, rowCount);
+var frame = DataFrame.of(rowKeys, String.class, columns -> {
     Stream.of("A", "B", "C", "D", "E", "F").forEach(label -> {
         columns.add(label, Array.randn(rowCount).cumSum());
     });
@@ -277,7 +277,7 @@ Chart.create().withLinePlot(frame.cols().select("A", "B"), chart -> {
 ```
 
 <p align="center">
-    <img class="chart" src="../../../images/charts/chart-basic-5.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/charts/chart-basic-5.png"/>
 </p>
 
 ## Simple Bar Charts
@@ -292,8 +292,8 @@ Generating bar charts based on **continuous** data is also possible and is demon
 
 <?prettify?>
 ```java
-Range<Year> years = Range.of(2000, 2006).map(Year::of);
-DataFrame<Year,String> data = DataFrame.of(years, String.class, columns -> {
+var years = Range.of(2000, 2006).map(Year::of);
+var data = DataFrame.of(years, String.class, columns -> {
     Stream.of("A", "B", "C", "D").forEach(label -> {
         columns.add(label, Array.of(Double.class, 6).applyDoubles(v -> Math.random()).cumSum());
     });
@@ -310,7 +310,7 @@ Chart.create().withBarPlot(data, false, chart -> {
 ```
 
 <p align="center">
-    <img class="chart" src="../../../images/charts/chart-bars-1.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/charts/chart-bars-1.png"/>
 </p>
 
 Switching to a horizontal orientation can be done by simply calling the `orient().horizontal()` method as shown below.
@@ -329,7 +329,7 @@ Chart.create().withBarPlot(data, false, chart -> {
 ```
 
 <p align="center">
-    <img class="chart" src="../../../images/charts/chart-bars-2.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/charts/chart-bars-2.png"/>
 </p>
 
 ### Continuous Domain Axis
@@ -347,10 +347,10 @@ values, and the first 10 rows of this frame are shown below.
 
 <?prettify?>
 ```java
-int rowCount = 20;
-LocalDateTime start = LocalDateTime.of(2014, 1, 1, 8, 30);
-Range<LocalDateTime> rowKeys = Range.of(0, rowCount).map(i -> start.plusMinutes(i * 10));
-DataFrame<LocalDateTime,String> frame = DataFrame.of(rowKeys, String.class, columns -> {
+var rowCount = 20;
+var start = LocalDateTime.of(2014, 1, 1, 8, 30);
+var rowKeys = Range.of(0, rowCount).map(i -> start.plusMinutes(i * 10));
+var frame = DataFrame.of(rowKeys, String.class, columns -> {
     columns.add("A", Array.of(Double.class, rowCount).applyDoubles(v -> Math.random()).cumSum());
 });
 ```
@@ -388,7 +388,7 @@ Chart.create().withBarPlot(frame, false, chart -> {
 ```
 
 <p align="center">
-    <img class="chart" src="../../../images/charts/chart-bars-3.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/charts/chart-bars-3.png"/>
 </p>
 
 Thankfully this can be achieved very easily through the API, namely via two methods on the `ChartModel` interface
@@ -412,7 +412,7 @@ Chart.create().withBarPlot(frame, false, chart -> {
 ```
 
 <p align="center">
-    <img class="chart" src="../../../images/charts/chart-bars-4.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/charts/chart-bars-4.png"/>
 </p>
 
 The flexibility of the `withLowerDomainInterval()` and `withUpperDomainInterval()` methods means lambdas with any
@@ -430,8 +430,8 @@ with 10 rows and 5 columns of randomly initialized values which can be generated
 
 <?prettify?>
 ```java
-Range<Year> years = Range.of(2000, 2010).map(Year::of);
-DataFrame<Year,String> frame = DataFrame.of(years, String.class, columns -> {
+var years = Range.of(2000, 2010).map(Year::of);
+var frame = DataFrame.of(years, String.class, columns -> {
     Stream.of("A", "B", "C", "D", "E", "F", "G").forEach(label -> {
         columns.add(label, Array.randn(10).applyDoubles(v -> Math.abs(v.getDouble())).cumSum());
     });
@@ -467,7 +467,7 @@ Chart.create().withBarPlot(frame, true, chart -> {
 });
 ```
 <p align="center">
-    <img class="chart" src="../../../images/charts/chart-stacked-bars-1.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/charts/chart-stacked-bars-1.png"/>
 </p>
 
 Switching to a horizontal orientation can be done by simply calling the `orient().horizontal()` method as shown below.
@@ -486,7 +486,7 @@ Chart.create().withBarPlot(frame, true, chart -> {
 ```
 
 <p align="center">
-    <img class="chart" src="../../../images/charts/chart-stacked-bars-2.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/charts/chart-stacked-bars-2.png"/>
 </p>
 
 ### Continuous Domain Axis
@@ -499,10 +499,10 @@ and then proceed to make the bars 10 minutes wide by injecting a **lower** domai
 
 <?prettify?>
 ```java
-int rowCount = 40;
-LocalDateTime start = LocalDateTime.of(2014, 1, 1, 8, 30);
-Range<LocalDateTime> rowKeys = Range.of(0, rowCount).map(i -> start.plusMinutes(i * 10));
-DataFrame<LocalDateTime,String> frame = DataFrame.of(rowKeys, String.class, columns -> {
+var rowCount = 40;
+var start = LocalDateTime.of(2014, 1, 1, 8, 30);
+var rowKeys = Range.of(0, rowCount).map(i -> start.plusMinutes(i * 10));
+var frame = DataFrame.of(rowKeys, String.class, columns -> {
     Stream.of("A", "B", "C", "D", "E", "F").forEach(label -> {
         columns.add(label, Array.randn(40, 1, 5).cumSum());
     });
@@ -520,7 +520,7 @@ Chart.create().withBarPlot(frame, true, chart -> {
 ```
 
 <p align="center">
-    <img class="chart" src="../../../images/charts/chart-stacked-bars-3.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/charts/chart-stacked-bars-3.png"/>
 </p>
 
 **Compatibility Note**: The Google Chart adapter **does not** support lower / upper domain interval functions as the underlying library
@@ -541,8 +541,8 @@ the plot below.
 
 <?prettify?>
 ```java
-int recordCount = 1000000;
-DataFrame<Integer,String> frame = DataFrame.of(Range.of(0, recordCount), String.class, columns -> {
+var recordCount = 1000000;
+var frame = DataFrame.of(Range.of(0, recordCount), String.class, columns -> {
     columns.add("A", Array.randn(recordCount));
 });
 
@@ -554,7 +554,7 @@ Chart.create().withHistPlot(frame, 50, chart -> {
 ```
 
 <p align="center">
-    <img class="chart" src="../../../images/charts/chart-hist-1.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/charts/chart-hist-1.png"/>
 </p>
 
 ### Multiple Distributions
@@ -567,8 +567,8 @@ function as before, and in this example we generate 100 bins per series to yield
 
 <?prettify?>
 ```java
-int recordCount = 1000000;
-DataFrame<Integer,String> frame = DataFrame.of(Range.of(0, recordCount), String.class, columns -> {
+var recordCount = 1000000;
+var frame = DataFrame.of(Range.of(0, recordCount), String.class, columns -> {
     columns.add("A", Array.randn(recordCount, 0d, 1d));
     columns.add("B", Array.randn(recordCount, 0d, 0.8d));
     columns.add("C", Array.randn(recordCount, 0d, 0.6d));
@@ -584,13 +584,13 @@ Chart.create().withHistPlot(frame, 100, chart -> {
 ```
 
 <p align="center">
-    <img class="chart" src="../../../images/charts/chart-hist-2.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/charts/chart-hist-2.png"/>
 </p>
 
 ### Fitted Distribution
 
 <p align="center">
-    <img class="chart" src="../../../images/charts/chart-hist-3.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/charts/chart-hist-3.png"/>
 </p>
 
 ## Scatter Charts
@@ -612,12 +612,12 @@ and the number of data points to generate. The table below illustrates the basic
  * @return          the frame of XY values
  */
 private DataFrame<Integer,String> sample(double alpha, double beta, double sigma, double stepSize, int n) {
-    final Array<Double> xValues = Array.of(Double.class, n).applyDoubles(v -> 0d + v.index() * stepSize);
-    final Array<Double> yValues = Array.of(Double.class, n).applyDoubles(v -> {
-        final double yfit = alpha + beta * xValues.getDouble(v.index());
+    var xValues = Array.of(Double.class, n).applyDoubles(v -> 0d + v.index() * stepSize);
+    var yValues = Array.of(Double.class, n).applyDoubles(v -> {
+        var yfit = alpha + beta * xValues.getDouble(v.index());
         return new NormalDistribution(yfit, sigma).sample();
     });
-    final Array<Integer> rowKeys = Range.of(0, n).toArray();
+    var rowKeys = Range.of(0, n).toArray();
     return DataFrame.of(rowKeys, String.class, columns -> {
         columns.add("X", xValues);
         columns.add("Y", yValues);
@@ -649,7 +649,7 @@ via the `withScatterPlot()` method using the column labelled `X` for the domain 
 
 <?prettify?>
 ```java
-DataFrame<Integer,String> frame = scatter(4d, 0.5d, 20d, 0.5, 1000);
+var frame = scatter(4d, 0.5d, 20d, 0.5, 1000);
 
 Chart.create().withScatterPlot(frame, false, "X", chart -> {
     chart.plot().axes().domain().label().withText("X-Value");
@@ -661,7 +661,7 @@ Chart.create().withScatterPlot(frame, false, "X", chart -> {
 ```
 
 <p align="center">
-    <img class="chart" src="../../../images/charts/chart-scatter-1.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/charts/chart-scatter-1.png"/>
 </p>
 
 ## Multiple Series
@@ -675,7 +675,7 @@ immaterial in this case.
 
 <?prettify?>
 ```java
-DataFrame<Integer,String> frame = DataFrame.concatColumns(
+var frame = DataFrame.concatColumns(
     scatter(4d, 1d, 80d, 0.5, 500).cols().replaceKey("Y", "A"),
     scatter(4d, 6d, 100d, 0.5, 500).cols().replaceKey("Y", "B"),
     scatter(4d, 12d, 180d, 0.5, 500).cols().replaceKey("Y", "C")
@@ -695,7 +695,7 @@ Chart.create().withScatterPlot(frame, false, "X", chart -> {
 ```
 
 <p align="center">
-    <img class="chart" src="../../../images/charts/chart-scatter-2.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/charts/chart-scatter-2.png"/>
 </p>
 
 ## Multiple Frames
@@ -712,12 +712,12 @@ to also render it with dots as follows.
 
 <?prettify?>
 ```java
-DataFrame<Integer,String> frame1 = DataFrame.concatColumns(
+var frame1 = DataFrame.concatColumns(
     sample(4d, 1d, 80d, 0.5, 500).cols().replaceKey("Y", "A"),
     sample(4d, 3d, 100d, 0.5, 500).cols().replaceKey("Y", "B")
 );
 
-DataFrame<Integer,String> frame2 = DataFrame.concatColumns(
+var frame2 = DataFrame.concatColumns(
     sample(4d, 7d, 80d, 0.55, 600).cols().replaceKey("Y", "C"),
     sample(4d, -10d, 100d, 0.55, 600).cols().replaceKey("Y", "D")
 );
@@ -735,7 +735,7 @@ Chart.create().withScatterPlot(frame1, false, "X", chart -> {
 ```
 
 <p align="center">
-    <img class="chart" src="../../../images/charts/chart-scatter-3.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/charts/chart-scatter-3.png"/>
 </p>
 
 ## Regression Charts
@@ -753,7 +753,7 @@ below with the standard style applied to the regression line.
 
 <?prettify?>
 ```java
-DataFrame<Integer,String> frame = scatter(4d, 1d, 80d, 0.5d, 1000);
+var frame = scatter(4d, 1d, 80d, 0.5d, 1000);
 Chart.create().withScatterPlot(frame, false, "X", chart -> {
     chart.plot().axes().domain().label().withText("X-Value");
     chart.plot().axes().range(0).label().withText("Y-Value");
@@ -765,7 +765,7 @@ Chart.create().withScatterPlot(frame, false, "X", chart -> {
 ```
 
 <p align="center">
-    <img class="chart" src="../../../images/charts/chart-regress-1.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/charts/chart-regress-1.png"/>
 </p>
 
 ### Multiple Frames
@@ -778,12 +778,12 @@ fitted line.
 
 <?prettify?>
 ```java
-DataFrame<Integer,String> frame1 = DataFrame.concatColumns(
+var frame1 = DataFrame.concatColumns(
     scatter(4d, 1d, 80d, 0.5, 500).cols().replaceKey("Y", "A"),
     scatter(4d, 4d, 100d, 0.5, 500).cols().replaceKey("Y", "B")
 );
 
-DataFrame<Integer,String> frame2 = DataFrame.concatColumns(
+var frame2 = DataFrame.concatColumns(
     scatter(4d, -3d, 80d, 0.55, 600).cols().replaceKey("Y", "C"),
     scatter(4d, -10d, 100d, 0.45, 600).cols().replaceKey("Y", "D")
 );
@@ -804,7 +804,7 @@ Chart.create().withScatterPlot(frame1, false, "X", chart -> {
 ```
 
 <p align="center">
-    <img class="chart" src="../../../images/charts/chart-regress-2.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/charts/chart-regress-2.png"/>
 </p>
 
 ## Area Charts
@@ -816,9 +816,9 @@ examples below show a stacked and non-stacked area chart for the identical datas
 
 <?prettify?>
 ```java
-int rowCount = 100;
-Range<Integer> rowKeys = Range.of(0, rowCount);
-DataFrame<Integer,String> frame = DataFrame.of(rowKeys, String.class, columns -> {
+var rowCount = 100;
+var rowKeys = Range.of(0, rowCount);
+var frame = DataFrame.of(rowKeys, String.class, columns -> {
     Stream.of("A", "B", "C", "D", "E").forEach(label -> {
         columns.add(label, Array.randn(rowCount, 10d, 100d).cumSum());
     });
@@ -835,7 +835,7 @@ Chart.create().withAreaPlot(frame, true, chart -> {
 ```
 
 <p align="center">
-    <img class="chart" src="../../../images/charts/chart-area-1.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/charts/chart-area-1.png"/>
 </p>
 
 The following code plots the identical dataset but with overlapping areas rather than stacked (which is simply achieved by
@@ -844,9 +844,9 @@ former being of a larger scale given the aggregate nature of that visualization.
 
 <?prettify?>
 ```java
-int rowCount = 100;
-Range<Integer> rowKeys = Range.of(0, rowCount);
-DataFrame<Integer,String> frame = DataFrame.of(rowKeys, String.class, columns -> {
+var rowCount = 100;
+var rowKeys = Range.of(0, rowCount);
+var frame = DataFrame.of(rowKeys, String.class, columns -> {
     Stream.of("A", "B", "C", "D", "E").forEach(label -> {
         columns.add(label, Array.randn(rowCount, 10d, 100d).cumSum());
     });
@@ -864,7 +864,7 @@ Chart.create().withAreaPlot(frame, false, chart -> {
 ```
 
 <p align="center">
-    <img class="chart" src="../../../images/charts/chart-area-2.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/charts/chart-area-2.png"/>
 </p>
 
 
@@ -881,7 +881,7 @@ countries which we have defined as the row keys in terms of their 3-character IS
 
 <?prettify?>
 ```java
-DataFrame<String,String> frame = DataFrame.ofDoubles(
+var frame = DataFrame.ofDoubles(
     Array.of("AUS", "GBR", "USA", "DEU", "ITA", "ESP", "ZAF"),
     Array.of("Random"),
     value -> Math.random() * 10d
@@ -918,7 +918,7 @@ Chart.create().withPiePlot(frame, false, chart -> {
 ```
 
 <p align="center">
-    <img class="chart" src="../../../images/charts/chart-pie-1.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/charts/chart-pie-1.png"/>
 </p>
 
 ### Donut Pie Plot
@@ -940,7 +940,7 @@ Chart.create().withPiePlot(frame, false, "Random", chart -> {
 ```
 
 <p align="center">
-    <img class="chart" src="../../../images/charts/chart-pie-2.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/charts/chart-pie-2.png"/>
 </p>
 
 ### 3D Pie Plot
@@ -959,7 +959,7 @@ Chart.create().withPiePlot(frame, true, chart -> {
 ```
 
 <p align="center">
-    <img class="chart" src="../../../images/charts/chart-pie-3.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/charts/chart-pie-3.png"/>
 </p>
 
 ### Exploded Section
@@ -982,11 +982,5 @@ Chart.create().withPiePlot(frame, false, chart -> {
 ```
 
 <p align="center">
-    <img class="chart" src="../../../images/charts/chart-pie-4.png"/>
-</p>
-
-----
-
-<p align="center">
-    <img style="background: none; border: none;" src="../../../images/morpheus-logo1.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/charts/chart-pie-4.png"/>
 </p>

@@ -1,3 +1,5 @@
+### DataFrame Construction
+
 ### Introduction
 
 A `DataFrame` is a column storage optimized structure where each column is configured to hold a specific data type,
@@ -72,8 +74,8 @@ In addition, the column values in this example are initialized with random value
 <?prettify?>
 ```java
 //Create a frame with 5 columns each optimized for a different data type and randomly initialized values
-Random rand = new java.util.Random();
-DataFrame<Year,Month> randomFrame = DataFrame.of(years, Month.class, columns -> {
+var rand = new java.util.Random();
+var randomFrame = DataFrame.of(years, Month.class, columns -> {
     columns.add(Month.JANUARY, Boolean.class).applyBooleans(v -> rand.nextBoolean()); 
     columns.add(Month.MARCH, Integer.class).applyInts(v -> rand.nextInt());       
     columns.add(Month.JUNE, Long.class).applyLongs(v -> rand.nextLong());           
@@ -89,7 +91,7 @@ be specified.
 <?prettify?>
 ```java
 //Create an empty frame with initial capacity, then add rows and columns
-DataFrame<Year,Month> frame = DataFrame.empty(Year.class, Month.class);
+var frame = DataFrame.empty(Year.class, Month.class);
 frame.rows().add(Year.of(1975));
 frame.rows().add(Year.of(1980));
 frame.rows().addAll(Range.of(1995, 2014).map(Year::of));
@@ -111,13 +113,11 @@ examples.
 <?prettify?>
 ```java
 //Parse file or classpath resource, with first row as header
-DataFrame<Integer,String> frame1 = DataFrame.readCsv("/temp/data.csv");
-
+var frame1 = DataFrame.readCsv("/temp/data.csv");
 //Parse URL, with first row as header
-DataFrame<Integer,String> frame2 = DataFrame.readCsv("http://www.domain.com/data?file.csv");
-
+var frame2 = DataFrame.readCsv("http://www.domain.com/data?file.csv");
 //Parse file, with first row as header, and row keys parsed as LocalDates from the first column, index=0
-DataFrame<LocalDate,String> frame3 = DataFrame.readCsv(options -> {
+var frame3 = DataFrame.readCsv(options -> {
     options.withResource("/temp/data.csv");
     options.withRowKeyParser(LocalDate.class, row -> LocalDate.parse(row[0]));
 });
@@ -160,9 +160,9 @@ all resolve to `double` type.
 
 <?prettify?>
 ```java
-DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-String url = "http://chart.finance.yahoo.com/table.csv?s=SPY&a=0&b=1&c=2013&d=5&e=6&f=2014&g=d&ignore=.csv";
-DataFrame<LocalDate,String> frame = DataFrame.readCsv(options -> {
+var dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+var url = "http://chart.finance.yahoo.com/table.csv?s=SPY&a=0&b=1&c=2013&d=5&e=6&f=2014&g=d&ignore=.csv";
+var frame = DataFrame.readCsv(options -> {
     options.withResource(url);
     options.withRowKeyParser(LocalDate.class, values -> LocalDate.parse(values[0], dateFormat));
     options.withParser("Volume", v -> v == null ? 0L : Long.parseLong(v));
@@ -197,7 +197,7 @@ difference does suggest that parallel loading can make a material improvement on
 is pretty standard issue these days.
 
 <p align="center">
-    <img class="chart" src="../../images/morpheus-parse-csv-times.png"/>
+    <img class="chart img-fluid" src="/images/morpheus/morpheus-parse-csv-times.png"/>
 </p>
 
 The code to produce this plot is as follows:
@@ -207,11 +207,11 @@ The code to produce this plot is as follows:
 import com.zavtech.morpheus.frame.DataFrame;
 import com.zavtech.morpheus.viz.chart.Chart;
 
-final String path = "/Users/witdxav/Dropbox/data/fxcm/AUDUSD/2012/AUDUSD-2012.csv";
-final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy.MM.dd");
-final DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("HH:mm");
+var path = "/Users/witdxav/Dropbox/data/fxcm/AUDUSD/2012/AUDUSD-2012.csv";
+var dateFormat = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+var timeFormat = DateTimeFormatter.ofPattern("HH:mm");
 
-DataFrame<String,String> timingStats = PerfStat.run(5, TimeUnit.MILLISECONDS, false, tasks -> {
+var timingStats = PerfStat.run(5, TimeUnit.MILLISECONDS, false, tasks -> {
 
     tasks.put("Sequential", () -> DataFrame.read().<LocalDateTime>csv(options -> {
         options.setHeader(false);
@@ -219,8 +219,8 @@ DataFrame<String,String> timingStats = PerfStat.run(5, TimeUnit.MILLISECONDS, fa
         options.setResource(path);
         options.setExcludeColumnIndexes(1);
         options.setRowKeyParser(LocalDateTime.class, row -> {
-            final LocalDate date = LocalDate.parse(row[0], dateFormat);
-            final LocalTime time = LocalTime.parse(row[1], timeFormat);
+            var date = LocalDate.parse(row[0], dateFormat);
+            var time = LocalTime.parse(row[1], timeFormat);
             return LocalDateTime.of(date, time);
         });
     }));
@@ -231,8 +231,8 @@ DataFrame<String,String> timingStats = PerfStat.run(5, TimeUnit.MILLISECONDS, fa
         options.setResource(path);
         options.setExcludeColumnIndexes(1);
         options.setRowKeyParser(LocalDateTime.class, row -> {
-            final LocalDate date = LocalDate.parse(row[0], dateFormat);
-            final LocalTime time = LocalTime.parse(row[1], timeFormat);
+            var date = LocalDate.parse(row[0], dateFormat);
+            var time = LocalTime.parse(row[1], timeFormat);
             return LocalDateTime.of(date, time);
         });
     }));
@@ -260,10 +260,10 @@ rows that fall on a **Monday**.
 
 <?prettify?>
 ```java
-DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-Set<String> columnSet = Collect.asSet("Open", "Close", "Adj Close");
-String url = "http://chart.finance.yahoo.com/table.csv?s=SPY&a=0&b=1&c=2013&d=5&e=6&f=2014&g=d&ignore=.csv";
-DataFrame<LocalDate,String> frame = DataFrame.readCsv(options -> {
+var dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+var columnSet = Collect.asSet("Open", "Close", "Adj Close");
+var url = "http://chart.finance.yahoo.com/table.csv?s=SPY&a=0&b=1&c=2013&d=5&e=6&f=2014&g=d&ignore=.csv";
+var frame = DataFrame.readCsv(options -> {
     options.withResource(url);
     options.withColNamePredicate(columnSet::contains);
     options.withRowKeyParser(LocalDate.class, values -> LocalDate.parse(values[0], dateFormat));
@@ -347,15 +347,15 @@ data as required. The following code demonstrates some basic examples:
 <?prettify?>
 ```java
 //Parse a file, or classpath resource from Morpheus JSON format
-DataFrame<LocalDate,String> frame = DataFrame.readJson("/temp/data.json");
+var frame = DataFrame.readJson("/temp/data.json");
 ```
 To select a subset of rows and columns, apply predicates to the request as below.
 
 <?prettify?>
 ```java
 //Parse a file, or classpath resource from Morpheus JSON format, selecting only a subset of rows & columns
-final Set<String> columns = Stream.of("Date", "PostCode", "Street", "County").collect(Collectors.toSet());
-DataFrame<LocalDate,String> frame = DataFrame.readJson(options -> {
+var columns = Stream.of("Date", "PostCode", "Street", "County").collect(Collectors.toSet());
+var frame = DataFrame.readJson(options -> {
     options.withResource("/temp/data.json");
     options.withCharset(StandardCharsets.UTF_16);
     options.withRowPredicate(rowKey -> rowKey.getDayOfWeek() == DayOfWeek.MONDAY);
@@ -383,7 +383,7 @@ import com.zavtech.morpheus.frame.DataFrame;
 Class.forName("org.h2.Driver");
 
 //Create a frame from a select statement
-DataFrame<Integer,String> frame = DataFrame.readDb(options -> {
+var frame = DataFrame.readDb(options -> {
     options.withConnection("jdbc:h2://databases/testDb", "sa", null);
     options.withSql("select * from Customer where city = 'London'");
 });
@@ -402,7 +402,7 @@ import com.zavtech.morpheus.frame.DataFrame;
 
 // Join products and inventory to see what we have where
 javax.sql.DataSource dataSource = getDataSource();
-DataFrame<Tuple,String> frame = DataFrame.readDb(options -> {
+var frame = DataFrame.readDb(options -> {
     options.withConnection(dataSource);
     options.withSql("select * from Product t1 inner join Inventory t2 on t1.productId = t2.productId");
     options.withExcludeColumns("productId", "warehouseId");  //not need as part of the key
@@ -435,8 +435,8 @@ import com.zavtech.morpheus.frame.DataFrame;
 import com.zavtech.morpheus.util.sql.SQLExtractor;
 
 //Convert the user's time zone into a ZoneId 
-javax.sql.DataSource dataSource = getDataSource();
-DataFrame<Integer,String> frame = DataFrame.readDb(options -> {
+var dataSource = getDataSource();
+var frame = DataFrame.readDb(options -> {
     options.withConnection(dataSource);
     options.withSql("select * from Customer where city = ? and dob > ?");
     options.withParameters("London", LocalDate.of(1970, 1, 1));
