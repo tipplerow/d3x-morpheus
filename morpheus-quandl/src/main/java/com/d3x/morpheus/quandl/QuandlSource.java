@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -31,6 +32,7 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.Temporal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -42,19 +44,25 @@ import java.util.function.Consumer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import com.d3x.core.http.client.HttpClient;
-import com.d3x.core.http.client.HttpHeader;
-import com.d3x.core.http.client.HttpResponse;
-import com.d3x.core.json.Json;
 import com.d3x.morpheus.frame.DataFrame;
 import com.d3x.morpheus.util.IO;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
+import com.google.gson.JsonParseException;
 import com.google.gson.stream.JsonReader;
 import com.univocity.parsers.common.ParsingContext;
 import com.univocity.parsers.common.processor.RowProcessor;
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
+import org.apache.http.Header;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 
 import static com.d3x.morpheus.quandl.QuandlField.END_DATE;
 import static com.d3x.morpheus.quandl.QuandlField.LAST_REFRESH_TIME;
@@ -79,6 +87,8 @@ public class QuandlSource {
     @lombok.Getter @lombok.Setter private String apiKey;
     /** The Quandl server base url */
     @lombok.Getter @lombok.Setter private String baseUrl;
+    /** The http client to interact with Quandl */
+    private CloseableHttpClient httpClient;
 
 
     /**
@@ -99,13 +109,14 @@ public class QuandlSource {
         Objects.requireNonNull(apiKey, "The Quandl apiKey cannot be null");
         this.baseUrl = baseUrl;
         this.apiKey = apiKey;
+        this.httpClient = HttpClientBuilder.create().build();
         this.gson = new GsonBuilder()
             .registerTypeAdapter(QuandlDatasetInfo.class, new QuandlDatasetInfo.Deserializer())
             .registerTypeAdapter(QuandlDatabaseInfo.class, new QuandlDatabaseInfo.Deserializer())
-            .registerTypeAdapter(LocalTime.class, new Json.LocalTimeDeserializer(DateTimeFormatter.ISO_LOCAL_TIME))
-            .registerTypeAdapter(LocalDate.class, new Json.LocalDateDeserializer(DateTimeFormatter.ISO_LOCAL_DATE))
-            .registerTypeAdapter(LocalDateTime.class, new Json.LocalDateTimeDeserializer(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
-            .registerTypeAdapter(ZonedDateTime.class, new Json.ZonedDateTimeDeserializer(DateTimeFormatter.ISO_ZONED_DATE_TIME))
+            .registerTypeAdapter(LocalTime.class, new TemporalDeserializer(DateTimeFormatter.ISO_LOCAL_TIME))
+            .registerTypeAdapter(LocalDate.class, new TemporalDeserializer(DateTimeFormatter.ISO_LOCAL_DATE))
+            .registerTypeAdapter(LocalDateTime.class, new TemporalDeserializer(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
+            .registerTypeAdapter(ZonedDateTime.class, new TemporalDeserializer(DateTimeFormatter.ISO_ZONED_DATE_TIME))
             .create();
     }
 
@@ -204,49 +215,41 @@ public class QuandlSource {
      * @return              the frame with dataset meta-data
      */
     public DataFrame<Integer,QuandlField> search(String expression) {
+        JsonReader reader = null;
+        CloseableHttpResponse response = null;
         try {
             final String search = URLEncoder.encode(expression, "UTF-8");
             final URL url = createUrl("/api/v3/datasets.json", "query=" + search + "&per_page=2000");
             final DataFrame<Integer,QuandlField> frame = QuandlDatasetInfo.frame(2000);
-            return HttpClient.getDefault().doGet(url, request -> {
-                request.setRetryCount(3);
-                request.setConnectTimeout(4000);
-                request.setReadTimeout(30000);
-                request.setResponseHandler(response -> {
-                    JsonReader reader = null;
-                    try {
-                        reader = new JsonReader(new BufferedReader(new InputStreamReader(response.getStream())));
-                        reader.beginObject();
-                        reader.nextName();
-                        reader.beginArray();
-                        while (reader.hasNext()) {
-                            final QuandlDatasetInfo info = gson.fromJson(reader, QuandlDatasetInfo.class);
-                            final int rowIndex = frame.rowCount();
-                            if (frame.rows().add(info.getId())) {
-                                frame.rows().setValueAt(rowIndex, QuandlField.DATABASE_CODE, info.getDatabaseCode());
-                                frame.rows().setValueAt(rowIndex, QuandlField.DATASET_CODE, info.getDatasetCode());
-                                frame.rows().setValueAt(rowIndex, QuandlField.NAME, info.getName());
-                                frame.rows().setValueAt(rowIndex, QuandlField.DESCRIPTION, info.getDescription());
-                                frame.rows().setValueAt(rowIndex, QuandlField.LAST_REFRESH_TIME, info.getRefreshedAt());
-                                frame.rows().setValueAt(rowIndex, QuandlField.START_DATE, info.getOldestAvailableDate());
-                                frame.rows().setValueAt(rowIndex, QuandlField.END_DATE, info.getNewestAvailableDate());
-                                frame.rows().setValueAt(rowIndex, QuandlField.COLUMN_NAMES, info.getColumnNames());
-                                frame.rows().setValueAt(rowIndex, QuandlField.FREQUENCY, info.getFrequency());
-                                frame.rows().setValueAt(rowIndex, QuandlField.DATASET_TYPE, info.getType());
-                                frame.rows().setValueAt(rowIndex, QuandlField.PREMIUM, info.isPremium());
-                                frame.rows().setValueAt(rowIndex, QuandlField.DATABASE_ID, info.getDatabaseId());
-                            }
-                        }
-                        return frame;
-                    } catch (Exception ex) {
-                        throw new QuandlException("Failed to load dataset meta-data for " + url, ex);
-                    } finally {
-                        IO.close(reader);
-                    }
-                });
-            });
+            response = doGet(url.toString(), null);
+            reader = new JsonReader(new BufferedReader(new InputStreamReader(response.getEntity().getContent())));
+            reader.beginObject();
+            reader.nextName();
+            reader.beginArray();
+            while (reader.hasNext()) {
+                final QuandlDatasetInfo info = gson.fromJson(reader, QuandlDatasetInfo.class);
+                final int rowIndex = frame.rowCount();
+                if (frame.rows().add(info.getId())) {
+                    frame.rows().setValueAt(rowIndex, QuandlField.DATABASE_CODE, info.getDatabaseCode());
+                    frame.rows().setValueAt(rowIndex, QuandlField.DATASET_CODE, info.getDatasetCode());
+                    frame.rows().setValueAt(rowIndex, QuandlField.NAME, info.getName());
+                    frame.rows().setValueAt(rowIndex, QuandlField.DESCRIPTION, info.getDescription());
+                    frame.rows().setValueAt(rowIndex, QuandlField.LAST_REFRESH_TIME, info.getRefreshedAt());
+                    frame.rows().setValueAt(rowIndex, QuandlField.START_DATE, info.getOldestAvailableDate());
+                    frame.rows().setValueAt(rowIndex, QuandlField.END_DATE, info.getNewestAvailableDate());
+                    frame.rows().setValueAt(rowIndex, QuandlField.COLUMN_NAMES, info.getColumnNames());
+                    frame.rows().setValueAt(rowIndex, QuandlField.FREQUENCY, info.getFrequency());
+                    frame.rows().setValueAt(rowIndex, QuandlField.DATASET_TYPE, info.getType());
+                    frame.rows().setValueAt(rowIndex, QuandlField.PREMIUM, info.isPremium());
+                    frame.rows().setValueAt(rowIndex, QuandlField.DATABASE_ID, info.getDatabaseId());
+                }
+            }
+            return frame;
         } catch (Exception ex) {
             throw new QuandlException("Failed to execute search request for " + expression, ex);
+        } finally {
+            IO.close(reader);
+            IO.close(response);
         }
     }
 
@@ -258,28 +261,20 @@ public class QuandlSource {
      * @return          the database meta-data definition
      */
     public QuandlDatabaseInfo getMetaData(String database) throws QuandlException {
+        JsonReader reader = null;
+        CloseableHttpResponse response = null;
         try {
             final URL url = createUrl("/api/v3/databases/" + database + ".json");
-            return HttpClient.getDefault().doGet(url, request -> {
-                request.setRetryCount(3);
-                request.setConnectTimeout(4000);
-                request.setReadTimeout(10000);
-                request.setResponseHandler(response -> {
-                    JsonReader reader = null;
-                    try {
-                        reader = new JsonReader(new BufferedReader(new InputStreamReader(response.getStream())));
-                        reader.beginObject();
-                        reader.nextName();
-                        return gson.fromJson(reader, QuandlDatabaseInfo.class);
-                    } catch (Exception ex) {
-                        throw new QuandlException("Failed to load dataset meta-data for " + url, ex);
-                    } finally {
-                        IO.close(reader);
-                    }
-                });
-            });
+            response = doGet(url.toString(), null);
+            reader = new JsonReader(new BufferedReader(new InputStreamReader(response.getEntity().getContent())));
+            reader.beginObject();
+            reader.nextName();
+            return gson.fromJson(reader, QuandlDatabaseInfo.class);
         } catch (Exception ex) {
             throw new QuandlException("Failed to load database meta-data for " + database, ex);
+        } finally {
+            IO.close(reader);
+            IO.close(response);
         }
     }
 
@@ -291,28 +286,20 @@ public class QuandlSource {
      * @return          the dataset meta-data definition
      */
     public QuandlDatasetInfo getMetaData(String database, String dataset) throws QuandlException {
+        JsonReader reader = null;
+        CloseableHttpResponse response = null;
         try {
             final URL url = createUrl("/api/v3/datasets/" + database + "/" + dataset + "/metadata.json");
-            return HttpClient.getDefault().doGet(url, request -> {
-                request.setRetryCount(3);
-                request.setConnectTimeout(4000);
-                request.setReadTimeout(10000);
-                request.setResponseHandler(response -> {
-                    JsonReader reader = null;
-                    try {
-                        reader = new JsonReader(new BufferedReader(new InputStreamReader(response.getStream())));
-                        reader.beginObject();
-                        reader.nextName();
-                        return gson.fromJson(reader, QuandlDatasetInfo.class);
-                    } catch (Exception ex) {
-                        throw new QuandlException("Failed to load dataset meta-data for " + url, ex);
-                    } finally {
-                        IO.close(reader);
-                    }
-                });
-            });
+            response = doGet(url.toString(), null);
+            reader = new JsonReader(new BufferedReader(new InputStreamReader(response.getEntity().getContent())));
+            reader.beginObject();
+            reader.nextName();
+            return gson.fromJson(reader, QuandlDatasetInfo.class);
         } catch (Exception ex) {
             throw new QuandlException("Failed to load dataset meta-data for " + database + "/" + dataset, ex);
+        } finally {
+            IO.close(reader);
+            IO.close(response);
         }
     }
 
@@ -351,6 +338,7 @@ public class QuandlSource {
      * @return          the resulting DataFrame
      */
     public DataFrame<Integer,String> getDataTable(Consumer<DataTableOptions> consumer) {
+        CloseableHttpResponse response = null;
         final DataTableOptions options = initOptions(DataTableOptions.class, consumer);
         try {
             final String database = options.getDatabase();
@@ -358,21 +346,24 @@ public class QuandlSource {
             final String queryString = options.toQueryString();
             final String urlPath = "/api/v3/datatables/" + database + "/" + dataset + ".csv";
             final URL url = createUrl(urlPath, queryString);
-            final HttpResponse response = doGet(url);
-            final DataFrame<Integer,String> frame = DataFrame.read().csv(response.getStream());
-            HttpHeader cursorId = response.getHeader("Cursor_ID").orNull();
+            response = doGet(url.toString(), null);
+            final DataFrame<Integer,String> frame = DataFrame.read().csv(response.getEntity().getContent());
+            Header cursorId = response.getFirstHeader("Cursor_ID");
             while (cursorId != null) {
                 final String nextQuery = queryString + "&qopts.cursor_id=" + cursorId.getValue();
                 final URL nextUrl = createUrl(urlPath, nextQuery);
-                final HttpResponse nextResponse = doGet(nextUrl);
-                final DataFrame<Integer,String> nextPage = DataFrame.read().csv(nextResponse.getStream());
+                IO.close(response);
+                response = doGet(nextUrl.toString(), null);
+                final DataFrame<Integer,String> nextPage = DataFrame.read().csv(response.getEntity().getContent());
                 final DataFrame<Integer,String> nextFrame = nextPage.rows().mapKeys(row -> frame.rowCount() + row.ordinal());
-                cursorId = nextResponse.getHeader("Cursor_ID").orNull();
+                cursorId = response.getFirstHeader("Cursor_ID");
                 frame.rows().addAll(nextFrame);
             }
             return frame;
         } catch (Exception ex) {
             throw new QuandlException("Failed to load data-table from Quandl for: " + options, ex);
+        } finally {
+            IO.close(response);
         }
     }
 
@@ -396,20 +387,6 @@ public class QuandlSource {
         } catch (Exception ex) {
             throw new QuandlException("Failed to initialize quandl query options for type: " + type, ex);
         }
-    }
-
-
-    /**
-     * Performs an HTTP GET request with the URL specified
-     * @param url   the url to call
-     * @return      the http response
-     */
-    private HttpResponse doGet(URL url) {
-        IO.println("Calling: " + url);
-        return HttpClient.getDefault().doGet(url, request -> {
-            request.setRetryCount(3);
-            request.setResponseHandler(response -> response);
-        });
     }
 
 
@@ -462,6 +439,32 @@ public class QuandlSource {
         settings.setReadInputOnSeparateThread(true);
         return new CsvParser(settings);
     }
+
+
+    /**
+     * Performs an HTTP GET and returns the Apache response object
+     * @param url       the request url
+     * @param handler   the handler to configure GET request
+     * @return          the Apache response
+     */
+    public CloseableHttpResponse doGet(String url, Consumer<HttpGet> handler) {
+        try {
+            HttpGet request = new HttpGet(url);
+            if (handler != null) handler.accept(request);
+            CloseableHttpResponse response = httpClient.execute(request);
+            int statusCode = response.getStatusLine().getStatusCode();
+            if (statusCode != 200) {
+                throw new QuandlException("Quandl response code of " + statusCode + " to " + url);
+            } else {
+                return response;
+            }
+        } catch (QuandlException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            throw new QuandlException("Failed to execute HTTP GET for " + url, ex);
+        }
+    }
+
 
 
     /**
@@ -637,6 +640,31 @@ public class QuandlSource {
                 return query.toString();
             } catch (Exception ex) {
                 throw new QuandlException("Failed to generate query URL string from options: " + this, ex);
+            }
+        }
+    }
+
+
+
+    @lombok.AllArgsConstructor()
+    private static class TemporalDeserializer<T extends Temporal> implements JsonDeserializer<T> {
+        @lombok.NonNull()
+        private DateTimeFormatter formatter;
+        @Override
+        @SuppressWarnings("unchecked")
+        public T deserialize(JsonElement json, Type type, JsonDeserializationContext context) throws JsonParseException {
+            if (json == null || json.equals(JsonNull.INSTANCE)) {
+                return null;
+            } else if (type.equals(LocalTime.class)) {
+                return (T)LocalTime.parse(json.getAsString(), formatter);
+            } else if (type.equals(LocalDate.class)) {
+                return (T)LocalDate.parse(json.getAsString(), formatter);
+            } else if (type.equals(LocalDateTime.class)) {
+                return (T)LocalDateTime.parse(json.getAsString(), formatter);
+            } else if (type.equals(ZonedDateTime.class)) {
+                return (T)ZonedDateTime.parse(json.getAsString(), formatter);
+            } else {
+                throw new IllegalArgumentException("Unsupported temporal type: " + type);
             }
         }
     }
