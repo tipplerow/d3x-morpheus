@@ -3,11 +3,11 @@
 #### Introduction
 
 A `DataFrame` represents tablular data framed by a row and column axis that define a coordindate space by which entries 
-can be read or written. As previously discussed in the section on [access](./access), it is possible to read/write data items 
-either by keys, ordinals or a combination of the two. Finding data in a `DataFrame` often means identifying the row and or 
-column coordinates associated with the data being searched. The Morpheus API provides a versatile set of functions to locate 
-data in various ways, often providing both sequential and parallel search algorithms. This section provides some useful 
-examples of how to use these APIs.
+can be read or written. As previously discussed in the section on [access](https://www.d3xsystems.com/morpheus/frame/access), 
+it is possible to read/write data items either by keys, ordinals or a combination of the two. Finding data in a `DataFrame` 
+often means identifying the row and or column coordinates associated with the data being searched. The Morpheus API provides 
+a versatile set of functions to locate data in various ways, often providing both sequential and parallel search algorithms. 
+This section provides some useful examples of how to use these APIs.
 
 #### Example Data
 

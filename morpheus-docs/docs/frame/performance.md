@@ -12,19 +12,19 @@ of these operations compares.
 #### Initialization
 
 A `DataFrame` is a column store composed of Morpheus Arrays, so the performance statistics presented
-[here](./arrays) should serve as a rough guide to extrapolate some crude expectations regarding 
-`DataFrame` performance & memory. Nevertheless, there are many idiosyncratic operations on a `DataFrame`
-for which the performance characteristics are worthwhile understanding, and this section attempts to
-cover some of this ground.
+[here](https://www.d3xsystems.com/morpheus/array-perf) should serve as a rough guide to extrapolate some 
+crude expectations regarding `DataFrame` performance & memory. Nevertheless, there are many idiosyncratic 
+operations on a `DataFrame` for which the performance characteristics are worthwhile understanding, and 
+this section attempts to cover some of this ground.
 
 The chart below presents the initialization times for `DataFrames` with 10 columns of double precision
 values and row counts increasing from 1 million to 5 million rows. The series on this chart represent 
 frames with differing types for the row axis, including `Integer`, `Date`, `Instant`, `LocalDateTime` 
-and `ZonedDateTime` types. If you have read the [section](./arrays) on the comparative performance 
-of Morpheus Arrays for these types, it is not surprising to see that the frame with a `ZonedDateTime` 
-row axis is more expensive to create than one with an `Integer` axis. With that said, this chart
-provides a comforting picture with regard to the fairly linear scalability of performance as the 
-row count increases, and the absolute times involved are also re-assuring.
+and `ZonedDateTime` types. If you have read the [section](https://www.d3xsystems.com/morpheus/array-perf) 
+on the comparative performance of Morpheus Arrays for these types, it is not surprising to see that the 
+frame with a `ZonedDateTime` row axis is more expensive to create than one with an `Integer` axis. With 
+that said, this chart provides a comforting picture with regard to the fairly linear scalability of 
+performance as the row count increases, and the absolute times involved are also re-assuring.
 
 <p align="center">
     <img class="chart img-fluid" src="/images/morpheus/frame/data-frame-init-times.png"/>

@@ -2,39 +2,46 @@
 
 ### Introduction
 
-One of the [Gauss Markov](ols/#gauss-markov-assumptions) assumptions that has to be met in order for [OLS](ols/) to be the Best, 
-Linear, Unbiased Estimator (BLUE) is that of **spherical errors**. More specifically, the assumption states that the error or disturbance 
-term in the model must exhibit uniform variance (i.e. [homoscedasticity](https://en.wikipedia.org/wiki/Homoscedasticity)), and also that 
+One of the [Gauss Markov](https://www.d3xsystems.com/morpheus/ols/#gauss-markov-assumptions) assumptions that has to be 
+met in order for [OLS](https://www.d3xsystems.com/morpheus/ols) to be the Best, Linear, Unbiased Estimator (BLUE) is 
+that of **spherical errors**. More specifically, the assumption states that the error or disturbance term in the model 
+must exhibit uniform variance (i.e. [homoscedasticity](https://en.wikipedia.org/wiki/Homoscedasticity)), and also that 
 there is no [autocorrelation](https://en.wikipedia.org/wiki/Autocorrelation) between errors.
 
 In the real world, this assumption will not always hold, and errors may exhibit [heteroscedasticity](https://en.wikipedia.org/wiki/Heteroscedasticity) 
-or autocorrelation or both. When the errors in a regression show no serial correlation but are heteroscedastic, then a [Weighted Least Squares](wls/) 
-(WLS) model should be used, whereas if correlation is present a [Generalized Least Squares](https://en.wikipedia.org/wiki/Generalized_least_squares) (GLS)
-model is appropriate. WLS is in fact a special case of GLS where the the lack of autocorrelation implies that the off diagonal terms of the 
-[covariance matrix](https://en.wikipedia.org/wiki/Covariance_matrix) of the errors are zero, thus simplifying the analysis.
+or autocorrelation or both. When the errors in a regression show no serial correlation but are heteroscedastic, then 
+a [Weighted Least Squares](https://www.d3xsystems.com/morpheus/wls) (WLS) model should be used, whereas if correlation 
+is present a [Generalized Least Squares](https://en.wikipedia.org/wiki/Generalized_least_squares) (GLS) model is 
+appropriate. WLS is in fact a special case of GLS where the the lack of autocorrelation implies that the off diagonal 
+terms of the [covariance matrix](https://en.wikipedia.org/wiki/Covariance_matrix) of the errors are zero, thus 
+simplifying the analysis.
 
-The following section covers some of the theory behind GLS, provides an example of how to apply it with the Morpheus API, and then goes
-onto demonstrate empirically the [unbiased](https://en.wikipedia.org/wiki/Bias_of_an_estimator), [consistent](https://en.wikipedia.org/wiki/Consistent_estimator) 
-and [efficient](https://en.wikipedia.org/wiki/Efficient_estimator) nature of the estimator.
+The following section covers some of the theory behind GLS, provides an example of how to apply it with the Morpheus API, 
+and then goesonto demonstrate empirically the [unbiased](https://en.wikipedia.org/wiki/Bias_of_an_estimator), 
+[consistent](https://en.wikipedia.org/wiki/Consistent_estimator) and [efficient](https://en.wikipedia.org/wiki/Efficient_estimator) 
+nature of the estimator.
 
 ### Theory
 
-A Generalized Least Squares model is based on the usual linear equation, however we now assume that the error term has a variance structure 
-that is described by a covariance matrix \\(\Omega\\), which differs from the OLS model which assumes white noise in the form of \\(\sigma^2 I\\).
+A Generalized Least Squares model is based on the usual linear equation, however we now assume that the error term has 
+a variance structure that is described by a covariance matrix \\(\Omega\\), which differs from the OLS model which assumes
+ white noise in the form of \\(\sigma^2 I\\).
 
 $$ Y = X \beta + \epsilon \ \ \ \ where \ E[\epsilon]=0 \ \ \ \ Var(\epsilon) = \sigma^2 \Omega  $$ 
 
-Given that the presence of serial correlation and possibly heteroscedasticity is a violation of one of the [Gauss Markov](ols/#gauss-markov-assumptions)
-assumptions, OLS is no longer BLUE. To address this, we follow the same strategy as in [Weighted Least Squares](wls/#theory), where we consider the 
-existence of an unknown matrix P that when applied to both sides of the model equation, transforms it in such a way that the transformed system 
-exhibits **spherical errors**. If such a matrix P exists, we can apply OLS to the trasnsformed system given that it satisfies the Gauss Markov 
-assumptions. Consider the transformed system below:
+Given that the presence of serial correlation and possibly heteroscedasticity is a violation of one of the 
+[Gauss Markov](https://www.d3xsystems.com/morpheus/ols/#gauss-markov-assumptions)assumptions, OLS is no longer BLUE. To 
+address this, we follow the same strategy as in [Weighted Least Squares](https://www.d3xsystems.com/morpheus/wls/#theory), 
+where we consider the existence of an unknown matrix P that when applied to both sides of the model equation, transforms 
+it in such a way that the transformed system exhibits **spherical errors**. If such a matrix P exists, we can apply OLS 
+to the transformed system given that it satisfies the Gauss Markov assumptions. Consider the transformed system below:
 
 $$ P Y = P X \beta + P \epsilon \ \ \ \ where \ E[P\epsilon]=0 \ \ \ \ Var(P\epsilon) = \sigma^2 I $$
 
-The next step is to solve for P in terms of something we can observe or estimate. As it turns out, it is possible to solve for P in terms of \\(\Omega\\) 
-which itself can be estimated from the sample data of whatever problem happens to be under investigation.  Based on an assumption that P is a symmetric 
-matrix and therefore \\(P^T = P\\), we can express \\(P\\) in terms of \\(\Omega\\) as follows:
+The next step is to solve for P in terms of something we can observe or estimate. As it turns out, it is possible to solve 
+for P in terms of \\(\Omega\\) which itself can be estimated from the sample data of whatever problem happens to be under 
+investigation.  Based on an assumption that P is a symmetric matrix and therefore \\(P^T = P\\), we can express \\(P\\) in 
+terms of \\(\Omega\\) as follows:
 
 $$ \begin{align}
 Var(P \epsilon) & = \sigma^2 I \\\\
@@ -46,9 +53,9 @@ P \Omega P^ T & = I \\\\
 P & = \Omega^{-\frac{1}{2}}
 \end{align} $$
 
-This analysis suggests that the transform matrix P is in fact equal to \\(\Omega^{-\frac{1}{2}}\\), and when applied to our original model,
-should yield a new model with spherical errors against which we can apply a standard OLS estimator. Let us re-write the transformed model 
-in terms of Z, B and E as follows:
+This analysis suggests that the transform matrix P is in fact equal to \\(\Omega^{-\frac{1}{2}}\\), and when applied to 
+our original model, should yield a new model with spherical errors against which we can apply a standard OLS estimator. 
+Let us re-write the transformed model in terms of Z, B and E as follows:
 
 $$ Z = B \beta + E \ \ \ \  where \ Z = P Y, \ \ B = PX, \ \ and \\ E = P \epsilon $$
  
@@ -64,28 +71,30 @@ Substituting \\(\Omega\\) for P:
 
 $$ \hat{\beta}_{gls} = (X^T \Omega^{-1} X)^{-1} X^T \Omega^{-1} Y $$
 
-Given the \\(\hat{\beta}_{gls}\\) expression above, it is clear that some estimate of \\(\Omega\\) is required. Note that the absolute scale
-of \\(\Omega\\) is not required to be known up front since the scale comes from \\(\sigma^2\\) in the expression \\(Var(\epsilon)=\sigma^2\Omega\\).
-If the errors are uncorrelated but exhibit non-uniform variance, \\(\Omega\\) is a diagonal matrix such that all off diagonal terms are zero, and
-the problem becomes WLS. If the errors are correlated, which is often the case in time series data, the off diagonal terms will be non-zero.
+Given the \\(\hat{\beta}_{gls}\\) expression above, it is clear that some estimate of \\(\Omega\\) is required. Note 
+that the absolute scaleof \\(\Omega\\) is not required to be known up front since the scale comes from \\(\sigma^2\\) 
+in the expression \\(Var(\epsilon)=\sigma^2\Omega\\).If the errors are uncorrelated but exhibit non-uniform variance, 
+\\(\Omega\\) is a diagonal matrix such that all off diagonal terms are zero, and the problem becomes WLS. If the errors 
+are correlated, which is often the case in time series data, the off diagonal terms will be non-zero.
 
 ### Example
 
-To demonstrate a GLS regression using the Morpheus API, we will define a data generating function which we can use to create a sample dataset
-with the appropriate characteristics (i.e. serially correlated errors in a linear regression). For convenience, we will limit the dataset
-to two dimensions so that the results are easy to visualize. Furthermore, to make our life easier in the context of this example, we will 
-enforce a correlation structure in the error term, namely that of a [autoregressive](https://en.wikipedia.org/wiki/Autoregressive_model)
-process of order 1, or AR(1) for short. Knowing this upfront makes the estimation of \\(\Omega\\) easy. Let us define our data generating
-process as follows:
+To demonstrate a GLS regression using the Morpheus API, we will define a data generating function which we can use to 
+create a sample dataset with the appropriate characteristics (i.e. serially correlated errors in a linear regression). 
+For convenience, we will limit the dataset to two dimensions so that the results are easy to visualize. Furthermore, to 
+make our life easier in the context of this example, we will enforce a correlation structure in the error term, namely 
+that of a [autoregressive](https://en.wikipedia.org/wiki/Autoregressive_model) process of order 1, or AR(1) for short. 
+Knowing this upfront makes the estimation of \\(\Omega\\) easy. Let us define our data generating process as follows:
 
 $$ y_{t} = \alpha + \beta x_{t} + u_{t} $$
 
 $$ u_{t} = \rho u_{t-1} + \epsilon_{t} $$
 
-Here we impose a structure on the error term of the form dictated by the second equation, which suggests that an error at time \\(t\\) is equal 
-to the prior error multiplied by some correlation coefficient \\(\rho\\) where \\(|\rho|<1\\) plus white noise in the form of \\(\epsilon\\) 
-which is assumed to be \\(N(0,\sigma^2)\\). The code below defines a function that is parameterized as per the above equations, and returns a 
-`DataFrame` with two columns containing the X and Y values output by this model.
+Here we impose a structure on the error term of the form dictated by the second equation, which suggests that an error 
+at time \\(t\\) is equal to the prior error multiplied by some correlation coefficient \\(\rho\\) where \\(|\rho|<1\\) 
+plus white noise in the form of \\(\epsilon\\) which is assumed to be \\(N(0,\sigma^2)\\). The code below defines a 
+function that is parameterized as per the above equations, and returns a `DataFrame` with two columns containing the X 
+and Y values output by this model.
 
 <?prettify?>
 ```java
@@ -124,9 +133,10 @@ DataFrame<Integer,String> sample(double alpha, double beta, double rho, double s
 }
 ```
 
-To get a sense of what this data looks like, we can generate 4 random samples and plot them as below, while fitting an OLS regression model 
-to the data. The serial correlation in the residuals should be fairly obvious given that we can see a sequence of errors above the regression 
-line followed by a sequence below the line, which clearly is not typical of white noise.
+To get a sense of what this data looks like, we can generate 4 random samples and plot them as below, while fitting an 
+OLS regression model to the data. The serial correlation in the residuals should be fairly obvious given that we can 
+see a sequence of errors above the regression line followed by a sequence below the line, which clearly is not typical 
+of white noise.
 
 <div class="row">
     <div class="col-md-6">
@@ -171,17 +181,18 @@ Chart.show(2, IntStream.range(0, 4).mapToObj(i -> {
 }));
 ```
 
-In the real world we would obviously not know if there was serial correlation in the residuals, and if there was, what type of model might
-be appropriate for modeling it. Other than looking at a scatter plot, there are various ways of checking for the presence of serial correlation.
-One commonly used technique is to compute the [Durbin Watson](https://en.wikipedia.org/wiki/Durbin%E2%80%93Watson_statistic) test statistic, 
-which by default is included in the model output generated by the Morpheus library, and is defined as:
+In the real world we would obviously not know if there was serial correlation in the residuals, and if there was, what 
+type of model might be appropriate for modeling it. Other than looking at a scatter plot, there are various ways of 
+checking for the presence of serial correlation. One commonly used technique is to compute the 
+[Durbin Watson](https://en.wikipedia.org/wiki/Durbin%E2%80%93Watson_statistic) test statistic, which by default is 
+included in the model output generated by the Morpheus library, and is defined as:
 
 $$ d = \frac{\sum_{t=2}^T (u_{t} - u_{t-1}^2)}{\sum_{t=1}^T u_{t}^2} $$
 
-The value of this statistic lies between 0 and 4, and if it is substantially less than 2, there is evidence for positive serial correlation. 
-For more details on this statistic, consult the above link. The code below runs an OLS regression given a sample of our data and prints the 
-model results to standard out. The Durbin Watson statistic comes out to be **1.0603** which is highly suggestive that there is positive serial 
-correlation in the residuals.
+The value of this statistic lies between 0 and 4, and if it is substantially less than 2, there is evidence for 
+positive serial correlation. For more details on this statistic, consult the above link. The code below runs an OLS 
+regression given a sample of our data and prints the model results to standard out. The Durbin Watson statistic comes 
+out to be **1.0603** which is highly suggestive that there is positive serial correlation in the residuals.
 
 <?prettify?>
 ```java
@@ -215,21 +226,24 @@ Durbin-Watson:                        1.0603
 =============================================================================================
 </pre>
 
-Once we have established a belief that the residuals are serially correlated, and therefore OLS is no longer BLUE, we then need to understand 
-the nature of the serial correlation. In this example we know the structure comes from an AR(1) process, but in reality some analysis of the residuals 
-will be required in order to come up with a reasonable model, and hence some estimation of the covariance matrix \\(\Omega\\). A common first task would 
-be to plot the autocorrelation function of the residuals, which is a visualization usually referred to as a [correlogram](https://en.wikipedia.org/wiki/Correlogram),
-and is illustrated below for this example. The peak at lag 1 clearly breaches the upper bound of the 95% confidence interval represented by the dashed blue 
-line (the bar at lag 0 is by definition equal to 1).
+Once we have established a belief that the residuals are serially correlated, and therefore OLS is no longer BLUE, 
+we then need to understand the nature of the serial correlation. In this example we know the structure comes from an 
+AR(1) process, but in reality some analysis of the residuals will be required in order to come up with a reasonable 
+model, and hence some estimation of the covariance matrix \\(\Omega\\). A common first task would be to plot the 
+autocorrelation function of the residuals, which is a visualization usually referred to as a 
+[correlogram](https://en.wikipedia.org/wiki/Correlogram),and is illustrated below for this example. The peak at lag 
+1 clearly breaches the upper bound of the 95% confidence interval represented by the dashed blue line (the bar at 
+lag 0 is by definition equal to 1).
 
 <p align="center">
     <img class="chart img-fluid" src="/images/morpheus/gls/gls-acf.png"/>
 </p>
 
-The code to generate this plot is shown below, which effectively runs an OLS regression and then passes the resulting model object to the chart 
-`acf()` function, which is an abbreviation for Autocorrelation Function. In addition, the third argument to the `acf()` method is the significance 
-level to use in order to generate the confidence intervals for the ACF. In this case, we chose a 5% level of significance, resulting in the dashed 
-blue lines representing the 95% confidence intervals.
+The code to generate this plot is shown below, which effectively runs an OLS regression and then passes the resulting 
+model object to the chart `acf()` function, which is an abbreviation for Autocorrelation Function. In addition, the 
+third argument to the `acf()` method is the significance level to use in order to generate the confidence intervals 
+for the ACF. In this case, we chose a 5% level of significance, resulting in the dashed blue lines representing the 95% 
+confidence intervals.
 
 <?prettify?>
 ```java
@@ -250,15 +264,17 @@ frame.regress().ols("Y", "X", true, model -> {
 });
 ```
 
-We have now established that there is serial correlation in the residuals based on the Durbin Watson test statistic, and we can reasonably
-assume that an AR(1) process is an appropriate model for the residuals based on our observations in the ACF plot. Given this information
-we now have to estimate \\(\Omega\\) which is the covariance matrix of the residuals across all lags in the sample. As it turns out,
-an AR(1) process has a well defined correlation structure which is described in more detail [here](https://onlinecourses.science.psu.edu/stat510/node/60), 
-and suggests that the correlation between two observations k periods apart is equal to \\(\rho^k\\). 
+We have now established that there is serial correlation in the residuals based on the Durbin Watson test statistic, 
+and we can reasonably assume that an AR(1) process is an appropriate model for the residuals based on our observations 
+in the ACF plot. Given this information we now have to estimate \\(\Omega\\) which is the covariance matrix of the 
+residuals across all lags in the sample. As it turns out, an AR(1) process has a well defined correlation structure 
+which is described in more detail [here](https://onlinecourses.science.psu.edu/stat510/node/60), and suggests that 
+the correlation between two observations k periods apart is equal to \\(\rho^k\\). 
 
-The elements of the \\(\Omega\\) matrix can therefore be easily computed since the entry in the \\(i^{th}\\) row and \\(j^{th}\\) column will 
-simply be \\(\rho^{|i-j|}\\). The code below returns a `DataFrame` to represent \\(\Omega\\) given the value of \\(\rho\\), which should be the 
-autocorrelation coefficient at lag 1 calculated from the residuals, and the sample size of the data since \\(\Omega\\) has `nxn` dimensions.
+The elements of the \\(\Omega\\) matrix can therefore be easily computed since the entry in the \\(i^{th}\\) row and 
+\\(j^{th}\\) column will simply be \\(\rho^{|i-j|}\\). The code below returns a `DataFrame` to represent \\(\Omega\\) 
+given the value of \\(\rho\\), which should be the autocorrelation coefficient at lag 1 calculated from the residuals, 
+and the sample size of the data since \\(\Omega\\) has `nxn` dimensions.
 
 <?prettify?>
 ```java
@@ -276,10 +292,11 @@ private DataFrame<Integer,Integer> createOmega(int size, double autocorr) {
 }
 ```
 
-Now that we have an estimate for \\(\Omega\\) we can run a GLS regression which is illustrated by the code and results below. While we specify
-our value of \\(\rho\\) upfront in order to generate our data sample, we first run an OLS regression so that we can calculate an estimate
-of \\(\hat{\rho}\\) based on the autocorrelation coefficient of the residuals with lag 1. This \\(\hat{\rho}\\) estimate is then used to construct \\(\Omega\\)
-which we pass to the `gls()` method on the `DataFrameRegression` interface.
+Now that we have an estimate for \\(\Omega\\) we can run a GLS regression which is illustrated by the code and results 
+below. While we specify our value of \\(\rho\\) upfront in order to generate our data sample, we first run an OLS 
+regression so that we can calculate an estimate of \\(\hat{\rho}\\) based on the autocorrelation coefficient of the 
+residuals with lag 1. This \\(\hat{\rho}\\) estimate is then used to construct \\(\Omega\\) which we pass to the `gls()` 
+method on the `DataFrameRegression` interface.
 
 <?prettify?>
 ```java
@@ -318,19 +335,22 @@ Durbin-Watson:                        1.8814
 =============================================================================================
 </pre>
 
-The coefficient estimates from the GLS regression are very close to that produced by the OLS model, however the standard errors are higher for
-GLS, and the 95% confidence intervals substantially wider. One of the known problems of OLS in the presence of serially correlated errors is
-that it yields downwardly biased estimates of the standard errors, and therefore statistical inference from these is unreliable. In this
-particular problem, the OLS parameter confidence interval includes the known population values, but the magnitude of the noise that drives
-the residuals is relatively small, so this will not always be the case.
+The coefficient estimates from the GLS regression are very close to that produced by the OLS model, however the standard 
+errors are higher for GLS, and the 95% confidence intervals substantially wider. One of the known problems of OLS in the 
+presence of serially correlated errors is that it yields downwardly biased estimates of the standard errors, and therefore 
+statistical inference from these is unreliable. In this particular problem, the OLS parameter confidence interval includes 
+the known population values, but the magnitude of the noise that drives the residuals is relatively small, so this will 
+not always be the case.
 
 ### Unbiasedness
 
-As per the [OLS](ols/#unbiasedness) and [WLS](wls/#unbiasedness) examples, here we attempt to demonstrate empirically the unbiased nature of 
-the GLS estimator. We have already introduced our data generating process earlier (see `sample()` function above), which can be used to manufacture 
-many data samples on which we can fit a GLS model, while collecting all the parameter estimates for each run. The code below generates 100,000
-samples of data with \\(n=100\\), runs a GLS regression on each, and then plots the frequency distribution of the slope and intercept estimates. 
-As expected, we get a bell shaped normal distribution centered on the known population values for both the slope and intercept parameters.
+As per the [OLS](https://www.d3xsystems.com/morpheus/ols/#unbiasedness) and [WLS](https://www.d3xsystems.com/morpheus/wls/#unbiasedness) 
+examples, here we attempt to demonstrate empirically the unbiased nature of the GLS estimator. We have already introduced 
+our data generating process earlier (see `sample()` function above), which can be used to manufacture many data samples 
+on which we can fit a GLS model, while collecting all the parameter estimates for each run. The code below generates 
+100,000 samples of data with \\(n=100\\), runs a GLS regression on each, and then plots the frequency distribution of 
+the slope and intercept estimates. As expected, we get a bell shaped normal distribution centered on the known population 
+values for both the slope and intercept parameters.
 
 <?prettify?>
 ```java
@@ -387,18 +407,19 @@ Array.of("Beta", "Alpha").forEach(coeff -> {
 
 ### Efficiency
 
-A more efficient estimator implies one with lower [sampling error](https://en.wikipedia.org/wiki/Sampling_error) in the parameter estimates 
-than other less efficient estimators. In the case of the [WLS](wls/#efficiency) example, the relative efficiency versus OLS in the presence 
-of [heteroscedastic](https://en.wikipedia.org/wiki/Heteroscedasticity) errors was fairly stark. As it turns out, for the GLS data generating 
-process introduced earlier (see `sample()` function above), the comparative efficiency with OLS is only marginally better. In this example, 
-I have therefore increased the value of \\(\sigma\\) to 20 and the value of \\(\rho\\) to 0.8 in order to get a noticeable difference in the 
+A more efficient estimator implies one with lower [sampling error](https://en.wikipedia.org/wiki/Sampling_error) in the 
+parameter estimates than other less efficient estimators. In the case of the [WLS](https://www.d3xsystems.com/morpheus/wls/#efficiency) 
+example, the relative efficiency versus OLS in the presence of [heteroscedastic](https://en.wikipedia.org/wiki/Heteroscedasticity) 
+errors was fairly stark. As it turns out, for the GLS data generating process introduced earlier (see `sample()` function 
+above), the comparative efficiency with OLS is only marginally better. In this example, I have therefore increased the 
+value of \\(\sigma\\) to 20 and the value of \\(\rho\\) to 0.8 in order to get a noticeable difference in the 
 resulting frequency distributions.
 
-The code below again generates 100,000 data samples and runs both OLS and GLS regressions on these. In each case the OLS residuals
-are used to compute the autocorrelation coefficient with lag 1 which serves as the \\(\rho\\) value that is then used to create the
-\\(\Omega\\) matrix for the GLS regression. Both the OLS and GLS parameters are captured in a `DataFrame` and the results are used
-to generate the frequency distributions below. The story is slightly less compelling than for the WLS example, however the superior 
-efficiency of GLS in this case is still apparent.
+The code below again generates 100,000 data samples and runs both OLS and GLS regressions on these. In each case the 
+OLS residuals are used to compute the autocorrelation coefficient with lag 1 which serves as the \\(\rho\\) value that 
+is then used to create the \\(\Omega\\) matrix for the GLS regression. Both the OLS and GLS parameters are captured 
+in a `DataFrame` and the results are used to generate the frequency distributions below. The story is slightly less 
+compelling than for the WLS example, however the superior efficiency of GLS in this case is still apparent.
 
 <?prettify?>
 ```java
@@ -462,13 +483,15 @@ Array.of("Alpha", "Beta").forEach(coeff -> {
 
 ### Consistency
 
-Finally we consider the consistency of the GLS estimator. A consistent estimator is one where the variance in the estimates decreases
-as the sample size increases, which was demonstrated empirically to be true for both [OLS](ols/#consistency) and [WLS](wls/#consistency).
-In this case we follow the same procedure whereby we manufacture 100,000 random samples from our data generating process and proceed to
-fit both OLS and GLS models to each sample. In this case we repeat the process 5 times for sample sizes ranging from 20 to 100 inclusive
-in steps of 20, and capture all estimates in a `DataFrame` before plotting the resulting frequency distributions of the parameter estimates.
-The plots below clearly demonstrate the reduction in estimation variance as the sample size increases, which confirms the consistency of
-the estimator, at least empirically.
+Finally we consider the consistency of the GLS estimator. A consistent estimator is one where the variance in the 
+estimates decreases as the sample size increases, which was demonstrated empirically to be true for both 
+[OLS](https://www.d3xsystems.com/morpheus/ols/#consistency) and [WLS](https://www.d3xsystems.com/morpheus/wls/#consistency). 
+In this case we follow the same procedure whereby we manufacture 100,000 random samples from our data generating 
+process and proceed to fit both OLS and GLS models to each sample. In this case we repeat the process 5 times for 
+sample sizes ranging from 20 to 100 inclusive in steps of 20, and capture all estimates in a `DataFrame` before 
+plotting the resulting frequency distributions of the parameter estimates.The plots below clearly demonstrate the 
+reduction in estimation variance as the sample size increases, which confirms the consistency of the estimator, at 
+least empirically.
 
 <?prettify?>
 ```java

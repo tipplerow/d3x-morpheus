@@ -5,7 +5,7 @@ In order to scale large datasets on the [Java Virtual Machine](https://en.wikipe
 memory allocation & de-allocation perspective. The reason for this is that primitive arrays are represented 
 as a single Object and a **contiguous block of memory**. Object arrays on the other hand not only incur the 
 memory overhead of each object header in the array, but also impose a significant burden on the Garbage 
-Collector. The section on [performance](performance) provides some hard numbers to demonstrate the comparative 
+Collector. The section on [performance](https://www.d3xsystems.com/morpheus/array-perf) provides some hard numbers to demonstrate the comparative 
 costs of primitive arrays and their boxed counterparts. Future versions of Java which will likely 
 introduce support for value types as described [here](http://cr.openjdk.java.net/~jrose/values/shady-values.html),
 and improved array support as described [here](http://cr.openjdk.java.net/~jrose/pres/201207-Arrays-2.pdf), 
@@ -55,23 +55,23 @@ var mappedArray1 = Array.map(Double.class, 1000, Double.NaN);
 var mappedArray2 = Array.map(Double.class, 1000, Double.NaN, "test.dat");
 
 //Assert that each array is of the type we expect
-Assert.assertTrue(denseArray.type() == Double.class);
-Assert.assertTrue(sparseArray.type() == Double.class);
-Assert.assertTrue(mappedArray1.type() == Double.class);
-Assert.assertTrue(mappedArray2.type() == Double.class);
+assertTrue(denseArray.type() == Double.class);
+assertTrue(sparseArray.type() == Double.class);
+assertTrue(mappedArray1.type() == Double.class);
+assertTrue(mappedArray2.type() == Double.class);
 
 //Assert that each array is of the style we expect
-Assert.assertTrue(denseArray.style() == ArrayStyle.DENSE);
-Assert.assertTrue(sparseArray.style() == ArrayStyle.SPARSE);
-Assert.assertTrue(mappedArray1.style() == ArrayStyle.MAPPED);
-Assert.assertTrue(mappedArray2.style() == ArrayStyle.MAPPED);
+assertTrue(denseArray.style() == ArrayStyle.DENSE);
+assertTrue(sparseArray.style() == ArrayStyle.SPARSE);
+assertTrue(mappedArray1.style() == ArrayStyle.MAPPED);
+assertTrue(mappedArray2.style() == ArrayStyle.MAPPED);
 
 //Confirm all elements are initialized as expected for each Array
 IntStream.range(0, 1000).forEach(i -> {
-    Assert.assertTrue(Double.isNaN(denseArray.getDouble(i)));
-    Assert.assertTrue(sparseArray.getDouble(i) == 0d);
-    Assert.assertTrue(Double.isNaN(mappedArray1.getDouble(i)));
-    Assert.assertTrue(Double.isNaN(mappedArray2.getDouble(i)));
+    assertTrue(Double.isNaN(denseArray.getDouble(i)));
+    assertTrue(sparseArray.getDouble(i) == 0d);
+    assertTrue(Double.isNaN(mappedArray1.getDouble(i)));
+    assertTrue(Double.isNaN(mappedArray2.getDouble(i)));
 });
 ```
 
@@ -129,22 +129,23 @@ methods to allow fast iteration without any boxing cost. Consider the example be
 //Create dense array of 20K random doubles
 var array = Array.of(Double.class, 20000, Double.NaN).applyDoubles(v -> Math.random());
 //Iterate values by boxing doubles
-array.forEach(value -> Assert.assertTrue(value > 0d));
+array.forEach(value -> assertTrue(value > 0d));
 //Iterate values and avoid boxing
-array.forEachDouble(v -> Assert.assertTrue(v > 0d));
+array.forEachDouble(v -> assertTrue(v > 0d));
 ```
 
 This can also be performed using **parallel processing** which can provide a significant performance boost on 
 multi-core processor architectures that are mostly the norm these days. In fact, many functions on a Morpheus 
 `Array` are parallel aware, and can result in significant boosts in performance as illustrated in the section 
-on [performance](performance). The Fork & Join framework is used internally as a divide and conquer algorithm.
+on [performance](https://www.d3xsystems.com/morpheus/array-perf). The Fork & Join framework is used internally 
+as a divide and conquer algorithm.
 
 <?prettify?>
 ```java
 //Parallel iterate values by boxing doubles
-array.parallel().forEach(value -> Assert.assertTrue(value > 0d));
+array.parallel().forEach(value -> assertTrue(value > 0d));
 //Parallel iterate values and avoid boxing
-array.parallel().forEachDouble(v -> Assert.assertTrue(v > 0d));
+array.parallel().forEachDouble(v -> assertTrue(v > 0d));
 ```
 
 When iterating over an `Array`, it is sometimes not only useful to have access to the **value** but also the 
@@ -201,7 +202,7 @@ array.applyDoubles(v -> Math.random() * 100d);
 //Cap Values to be no larger than 50
 array.applyDoubles(v -> Math.min(50d, v.getDouble()));
 //Assert values are capped
-array.forEachValue(v -> Assert.assertTrue(v.getDouble() <= 50d));
+array.forEachValue(v -> assertTrue(v.getDouble() <= 50d));
 ```
 
 This can obviously be done in parallel since the order of operations in this case does not matter.
@@ -213,7 +214,7 @@ array.parallel().applyDoubles(v -> Math.random() * 100d);
 //Parallel Cap Values to be no larger than 50
 array.parallel().applyDoubles(v -> Math.min(50d, v.getDouble()));
 //Assert values are capped
-array.parallel().forEachValue(v -> Assert.assertTrue(v.getDouble() <= 50d));
+array.parallel().forEachValue(v -> assertTrue(v.getDouble() <= 50d));
 ```
 
 ### Mapping
@@ -241,7 +242,7 @@ dayCounts.forEachValue(v -> {
     long dayCount = v.getLong();
     LocalDate expected = dates.getValue(v.index());
     LocalDate actual = LocalDate.now().minusDays(dayCount);
-    Assert.assertEquals(actual, expected);
+    assertEquals(actual, expected);
 });
 ``` 
 
@@ -291,22 +292,22 @@ proceed to compute summary statistics.
 Array<Double> array = Array.of(Double.class, 1000, Double.NaN).applyDoubles(ArrayValue::index);
 
 //Compute stats
-Assert.assertEquals(array.stats().count(), 1000d);
-Assert.assertEquals(array.stats().min(), 0d);
-Assert.assertEquals(array.stats().max(), 999d);
-Assert.assertEquals(array.stats().mean(), 499.5d);
-Assert.assertEquals(array.stats().variance(), 83416.66666666667d);
-Assert.assertEquals(array.stats().stdDev(), 288.8194360957494d);
-Assert.assertEquals(array.stats().skew(), 0d);
-Assert.assertEquals(array.stats().kurtosis(), -1.2000000000000004d);
-Assert.assertEquals(array.stats().median(), 499.5d);
-Assert.assertEquals(array.stats().mad(), 250.00000000000003d);
-Assert.assertEquals(array.stats().sem(), 9.133272505880171d);
-Assert.assertEquals(array.stats().geoMean(), 0d);
-Assert.assertEquals(array.stats().sum(), 499500.0d);
-Assert.assertEquals(array.stats().sumSquares(), 3.328335E8);
-Assert.assertEquals(array.stats().autocorr(1), 1d);
-Assert.assertEquals(array.stats().percentile(0.5d), 499.5d);
+assertEquals(array.stats().count(), 1000d);
+assertEquals(array.stats().min(), 0d);
+assertEquals(array.stats().max(), 999d);
+assertEquals(array.stats().mean(), 499.5d);
+assertEquals(array.stats().variance(), 83416.66666666667d);
+assertEquals(array.stats().stdDev(), 288.8194360957494d);
+assertEquals(array.stats().skew(), 0d);
+assertEquals(array.stats().kurtosis(), -1.2000000000000004d);
+assertEquals(array.stats().median(), 499.5d);
+assertEquals(array.stats().mad(), 250.00000000000003d);
+assertEquals(array.stats().sem(), 9.133272505880171d);
+assertEquals(array.stats().geoMean(), 0d);
+assertEquals(array.stats().sum(), 499500.0d);
+assertEquals(array.stats().sumSquares(), 3.328335E8);
+assertEquals(array.stats().autocorr(1), 1d);
+assertEquals(array.stats().percentile(0.5d), 499.5d);
 ```
 
 ### Searching
@@ -327,17 +328,17 @@ var random = new Random(3);
 var array = Array.of(Double.class, 1000, Double.NaN).applyDoubles(v -> random.nextDouble() * 55d);
 
 //Find first value above 50
-Assert.assertTrue(array.first(v -> v.getDouble() > 50d).isPresent());
+assertTrue(array.first(v -> v.getDouble() > 50d).isPresent());
 array.first(v -> v.getDouble() > 50d).ifPresent(v -> {
-    Assert.assertEquals(v.getDouble(), 51.997892373318116d, 0.000001);
-    Assert.assertEquals(v.index(), 9);
+    assertEquals(v.getDouble(), 51.997892373318116d, 0.000001);
+    assertEquals(v.index(), 9);
 });
 
 //Find last value above 50
-Assert.assertTrue(array.last(v -> v.getDouble() > 50d).isPresent());
+assertTrue(array.last(v -> v.getDouble() > 50d).isPresent());
 array.last(v -> v.getDouble() > 50d).ifPresent(v -> {
-    Assert.assertEquals(v.getDouble(), 51.864302849037315d, 0.000001);
-    Assert.assertEquals(v.index(), 992);
+    assertEquals(v.getDouble(), 51.864302849037315d, 0.000001);
+    assertEquals(v.index(), 992);
 });
 ```
 
@@ -361,7 +362,7 @@ that we get a match at the expected location.
 IntStream.of(27, 45, 145, 378, 945).forEach(index -> {
     double value = sorted.getDouble(index);
     int actual = sorted.binarySearch(0, 1000, value);
-    Assert.assertEquals(actual, index);
+    assertEquals(actual, index);
 });
 ```
 
@@ -379,10 +380,10 @@ IntStream.of(27, 45, 145, 378, 945).forEach(index -> {
     double mean = (value1 + value2) / 2d;
     //Find next value given a value that does not exist in the array
     var nextValue = sorted.next(mean);
-    Assert.assertTrue(nextValue.isPresent());
+    assertTrue(nextValue.isPresent());
     nextValue.ifPresent(v -> {
-        Assert.assertEquals(v.getDouble(), value2);
-        Assert.assertEquals(v.index(), index + 1);
+        assertEquals(v.getDouble(), value2);
+        assertEquals(v.index(), index + 1);
     });
 });
 
@@ -393,10 +394,10 @@ IntStream.of(27, 45, 145, 378, 945).forEach(index -> {
     double mean = (value1 + value2) / 2d;
     //Find prior value given a value that does not exist in the array
     var priorValue = sorted.previous(mean);
-    Assert.assertTrue(priorValue.isPresent());
+    assertTrue(priorValue.isPresent());
     priorValue.ifPresent(v -> {
-        Assert.assertEquals(v.getDouble(), value1);
-        Assert.assertEquals(v.index(), index);
+        assertEquals(v.getDouble(), value1);
+        assertEquals(v.index(), index);
     });
 });
 ```
@@ -463,7 +464,7 @@ IntStream.range(101, 200).forEach(index -> {
     var prior = Math.abs(array.getDouble(index-1));
     var current = Math.abs(array.getDouble(index));
     var compare = Double.compare(prior, current);
-    Assert.assertTrue(compare <= 0);
+    assertTrue(compare <= 0);
 });
 ```
 
@@ -502,20 +503,20 @@ var copy2 = array.copy(100, 200);
 var copy3 = array.copy(new int[] {25, 304, 674, 485, 873});
 
 //Assert lengths as expected
-Assert.assertEquals(copy1.length(), array.length());
-Assert.assertEquals(copy2.length(), 100);
-Assert.assertEquals(copy3.length(), 5);
+assertEquals(copy1.length(), array.length());
+assertEquals(copy2.length(), 100);
+assertEquals(copy3.length(), 5);
 
 //Asset values as expected
-IntStream.range(0, 1000).forEach(i -> Assert.assertEquals(copy1.getDouble(i), array.getDouble(i)));
-IntStream.range(0, 100).forEach(i -> Assert.assertEquals(copy2.getDouble(i), array.getDouble(i+100)));
+IntStream.range(0, 1000).forEach(i -> assertEquals(copy1.getDouble(i), array.getDouble(i)));
+IntStream.range(0, 100).forEach(i -> assertEquals(copy2.getDouble(i), array.getDouble(i+100)));
 IntStream.of(0, 5).forEach(i -> {
     switch (i) {
-        case 0: Assert.assertEquals(copy3.getDouble(i), array.getDouble(25));   break;
-        case 1: Assert.assertEquals(copy3.getDouble(i), array.getDouble(304));   break;
-        case 2: Assert.assertEquals(copy3.getDouble(i), array.getDouble(674));   break;
-        case 3: Assert.assertEquals(copy3.getDouble(i), array.getDouble(485));   break;
-        case 4: Assert.assertEquals(copy3.getDouble(i), array.getDouble(873));   break;
+        case 0: assertEquals(copy3.getDouble(i), array.getDouble(25));   break;
+        case 1: assertEquals(copy3.getDouble(i), array.getDouble(304));   break;
+        case 2: assertEquals(copy3.getDouble(i), array.getDouble(674));   break;
+        case 3: assertEquals(copy3.getDouble(i), array.getDouble(485));   break;
+        case 4: assertEquals(copy3.getDouble(i), array.getDouble(873));   break;
         default:
     }
 });
@@ -560,9 +561,9 @@ var array = Array.of(Double.class, 10, -1d).applyDoubles(v -> Math.random());
 //Double the size of the array
 array.expand(20);
 //Confirm new length is as expected
-Assert.assertEquals(array.length(), 20);
+assertEquals(array.length(), 20);
 //Confirm new values initialized with default value
-IntStream.range(10, 20).forEach(i -> Assert.assertEquals(array.getDouble(i), -1d));
+IntStream.range(10, 20).forEach(i -> assertEquals(array.getDouble(i), -1d));
 ```
 
 ### Filtering
@@ -582,9 +583,9 @@ var array = Array.of(Double.class, 1000, Double.NaN).applyDoubles(v -> random.ne
 //Filter to include all values > 5
 var filter = array.filter(v -> v.getDouble() > 5d);
 //Assert length as expected
-Assert.assertEquals(filter.length(), 486);
+assertEquals(filter.length(), 486);
 //Assert all value are > 5
-filter.forEachValue(v -> Assert.assertTrue(v.getDouble() > 5d));
+filter.forEachValue(v -> assertTrue(v.getDouble() > 5d));
 ```
 
 ### Read-Only
@@ -617,7 +618,7 @@ var array = Array.of(Double.class, 1000, Double.NaN);
 array.fill(25d, 10, 20);
 //Check results
 IntStream.range(10, 20).forEach(i -> {
-    Assert.assertEquals(array.getDouble(i), 25d);
+    assertEquals(array.getDouble(i), 25d);
 });
 ```
 
@@ -642,8 +643,8 @@ var distinct1 = dates.distinct();
 //Generate distinct limiting to first 5 matches
 var distinct2 = dates.distinct(5);
 //Check expected results
-Assert.assertEquals(distinct1.length(), 20);
-Assert.assertEquals(distinct2.length(), 5);
+assertEquals(distinct1.length(), 20);
+assertEquals(distinct2.length(), 5);
 ```
 
 ### Bounds
@@ -665,15 +666,15 @@ var array = Array.of(Double.class, 1000).applyDoubles(v -> random.nextDouble() *
 //Compute upper and lower bounds in one pass
 var bounds = array.bounds();
 //Confirm we have bounds
-Assert.assertTrue(bounds.isPresent());
+assertTrue(bounds.isPresent());
 //Confirm expected results
 bounds.ifPresent(b -> {
-    Assert.assertEquals(b.lower(), 0.13021930271921445);
-    Assert.assertEquals(b.upper(), 99.9557586162974);
-    Assert.assertEquals(b.lower(), array.min().get());
-    Assert.assertEquals(b.upper(), array.max().get());
-    Assert.assertEquals(b.lower(), array.stats().min());
-    Assert.assertEquals(b.upper(), array.stats().max());
+    assertEquals(b.lower(), 0.13021930271921445);
+    assertEquals(b.upper(), 99.9557586162974);
+    assertEquals(b.lower(), array.min().get());
+    assertEquals(b.upper(), array.max().get());
+    assertEquals(b.lower(), array.stats().min());
+    assertEquals(b.upper(), array.stats().max());
 });
 ```
 
@@ -698,7 +699,7 @@ array.fill(null, 20, 30);
 //Filter out NaN values using is null
 var filtered = array.filter(v -> !v.isNull());
 //Assert length
-Assert.assertEquals(filtered.length(), array.length() - 20);
+assertEquals(filtered.length(), array.length() - 20);
 ```
 
 ### Swapping
@@ -715,6 +716,6 @@ var array = Array.of(10d, 20d, 30d, 40d);
 //Swap values
 array.swap(0, 3);
 //Assert values swapped
-Assert.assertEquals(array.getDouble(0), 40d);
-Assert.assertEquals(array.getDouble(3), 10d);
+assertEquals(array.getDouble(0), 40d);
+assertEquals(array.getDouble(3), 10d);
 ```

@@ -26,16 +26,16 @@ import com.zavtech.morpheus.frame.DataFrame;
 import com.zavtech.morpheus.range.Range;
 
 //Create a list of column keys
-Iterable<Month> months = Array.of(Month.class, Month.values());
+var months = Array.of(Month.class, Month.values());
 //Create a list of row keys
-Iterable<Year> years = Range.of(1995, 2000).map(Year::of);
+var years = Range.of(1995, 2000).map(Year::of);
 
 //Create frames optimized to hold various types of data.
-DataFrame<Year,Month> booleans = DataFrame.ofBooleans(years, months);
-DataFrame<Year,Month> integers = DataFrame.ofInts(years, months);
-DataFrame<Year,Month> longs = DataFrame.ofLongs(years, months);
-DataFrame<Year,Month> doubles = DataFrame.ofDoubles(years, months);
-DataFrame<Year,Month> objects = DataFrame.ofValues(years, months);
+var booleans = DataFrame.ofBooleans(years, months);
+var integers = DataFrame.ofInts(years, months);
+var longs = DataFrame.ofLongs(years, months);
+var doubles = DataFrame.ofDoubles(years, months);
+var objects = DataFrame.ofValues(years, months);
 ```
 #### Single Column
 
@@ -44,11 +44,11 @@ Factory methods are provided to easily create a frame with one column.
 <?prettify?>
 ```java
 //Create a frame with a single column initially
-DataFrame<Year,Month> booleans = DataFrame.ofBooleans(years, Month.JANUARY);
-DataFrame<Year,Month> integers = DataFrame.ofInts(years, Month.JANUARY);
-DataFrame<Year,Month> longs = DataFrame.ofLongs(years, Month.JANUARY);
-DataFrame<Year,Month> doubles = DataFrame.ofDoubles(years, Month.JANUARY);
-DataFrame<Year,Month> objects = DataFrame.ofValues(years, Month.JANUARY);
+var booleans = DataFrame.ofBooleans(years, Month.JANUARY);
+var integers = DataFrame.ofInts(years, Month.JANUARY);
+var longs = DataFrame.ofLongs(years, Month.JANUARY);
+var doubles = DataFrame.ofDoubles(years, Month.JANUARY);
+var objects = DataFrame.ofValues(years, Month.JANUARY);
 ```
 #### Single Row
 
@@ -57,11 +57,11 @@ Factory methods are provided to easily create a frame with one row.
 <?prettify?>
 ```java
 //Create a frame with a single row initially
-DataFrame<Year,Month> booleans = DataFrame.ofBooleans(Year.of(2014), months);
-DataFrame<Year,Month> integers = DataFrame.ofInts(Year.of(2014), months);
-DataFrame<Year,Month> longs = DataFrame.ofLongs(Year.of(2014), months);
-DataFrame<Year,Month> doubles = DataFrame.ofDoubles(Year.of(2014), months);
-DataFrame<Year,Month> objects = DataFrame.ofValues(Year.of(2014), months);
+var booleans = DataFrame.ofBooleans(Year.of(2014), months);
+var integers = DataFrame.ofInts(Year.of(2014), months);
+var longs = DataFrame.ofLongs(Year.of(2014), months);
+var doubles = DataFrame.ofDoubles(Year.of(2014), months);
+var objects = DataFrame.ofValues(Year.of(2014), months);
 ```
 #### Mixed Column Types
 
