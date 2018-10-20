@@ -283,48 +283,48 @@ see the section on visualization [here](https://www.d3xsystems.com/morpheus/char
 
 <table width="100%" border="0">
     <tr style="background-color:white;">
-        <td style="background-color:white;"><img class="chart img-fluid" src="/images/morpheus/gallery/chart-1.png"/></td>
-        <td style="background-color:white;"><img class="chart img-fluid" src="/images/morpheus/gallery/chart-2.png"/></td>
+        <td style="background-color:white;"><img class="chart img-fluid" src="/morpheus-docs/docs/images/morpheus/gallery/chart-1.png"/></td>
+        <td style="background-color:white;"><img class="chart img-fluid" src="/morpheus-docs/docs/images/morpheus/gallery/chart-2.png"/></td>
     </tr>
     <tr style="background-color:white;">
-        <td style="background-color:white;"><img class="chart img-fluid" src="/images/morpheus/gallery/chart-3.png"/></td>
-        <td style="background-color:white;"><img class="chart img-fluid" src="/images/morpheus/gallery/chart-4.png"/></td>
+        <td style="background-color:white;"><img class="chart img-fluid" src="/morpheus-docs/docs/images/morpheus/gallery/chart-3.png"/></td>
+        <td style="background-color:white;"><img class="chart img-fluid" src="/morpheus-docs/docs/images/morpheus/gallery/chart-4.png"/></td>
     </tr>
     <tr style="background-color:white;">
-        <td style="background-color:white;"><img class="chart img-fluid" src="/images/morpheus/gallery/chart-5.png"/></td>
-        <td style="background-color:white;"><img class="chart img-fluid" src="/images/morpheus/gallery/chart-6.png"/></td>
+        <td style="background-color:white;"><img class="chart img-fluid" src="/morpheus-docs/docs/images/morpheus/gallery/chart-5.png"/></td>
+        <td style="background-color:white;"><img class="chart img-fluid" src="/morpheus-docs/docs/images/morpheus/gallery/chart-6.png"/></td>
     </tr>
     <tr style="background-color:white;">
-        <td style="background-color:white;"><img class="chart img-fluid" src="/images/morpheus/gallery/chart-7.png"/></td>
-        <td style="background-color:white;"><img class="chart img-fluid" src="/images/morpheus/gallery/chart-8.png"/></td>
+        <td style="background-color:white;"><img class="chart img-fluid" src="/morpheus-docs/docs/images/morpheus/gallery/chart-7.png"/></td>
+        <td style="background-color:white;"><img class="chart img-fluid" src="/morpheus-docs/docs/images/morpheus/gallery/chart-8.png"/></td>
     </tr>
     <tr style="background-color:white;">
-        <td style="background-color:white;"><img class="chart img-fluid" src="/images/morpheus/gallery/chart-9.png"/></td>
-        <td style="background-color:white;"><img class="chart img-fluid" src="/images/morpheus/gallery/chart-10.png"/></td>
+        <td style="background-color:white;"><img class="chart img-fluid" src="/morpheus-docs/docs/images/morpheus/gallery/chart-9.png"/></td>
+        <td style="background-color:white;"><img class="chart img-fluid" src="/morpheus-docs/docs/images/morpheus/gallery/chart-10.png"/></td>
     </tr>
     <tr style="background-color:white;">
-        <td style="background-color:white;"><img class="chart img-fluid" src="/images/morpheus/gallery/chart-11.png"/></td>
-        <td style="background-color:white;"><img class="chart img-fluid" src="/images/morpheus/gallery/chart-12.png"/></td>
+        <td style="background-color:white;"><img class="chart img-fluid" src="/morpheus-docs/docs/images/morpheus/gallery/chart-11.png"/></td>
+        <td style="background-color:white;"><img class="chart img-fluid" src="/morpheus-docs/docs/images/morpheus/gallery/chart-12.png"/></td>
     </tr>
     <tr style="background-color:white;">
-        <td style="background-color:white;"><img class="chart img-fluid" src="/images/morpheus/gallery/chart-13.png"/></td>
-        <td style="background-color:white;"><img class="chart img-fluid" src="/images/morpheus/gallery/chart-14.png"/></td>
+        <td style="background-color:white;"><img class="chart img-fluid" src="/morpheus-docs/docs/images/morpheus/gallery/chart-13.png"/></td>
+        <td style="background-color:white;"><img class="chart img-fluid" src="/morpheus-docs/docs/images/morpheus/gallery/chart-14.png"/></td>
     </tr>
     <tr style="background-color:white;">
-        <td style="background-color:white;"><img class="chart img-fluid" src="/images/morpheus/gallery/chart-15.png"/></td>
-        <td style="background-color:white;"><img class="chart img-fluid" src="/images/morpheus/gallery/chart-16.png"/></td>
+        <td style="background-color:white;"><img class="chart img-fluid" src="/morpheus-docs/docs/images/morpheus/gallery/chart-15.png"/></td>
+        <td style="background-color:white;"><img class="chart img-fluid" src="/morpheus-docs/docs/images/morpheus/gallery/chart-16.png"/></td>
     </tr>
     <tr style="background-color:white;">
-        <td style="background-color:white;"><img class="chart img-fluid" src="/images/morpheus/gallery/chart-17.png"/></td>
-        <td style="background-color:white;"><img class="chart img-fluid" src="/images/morpheus/gallery/chart-18.png"/></td>
+        <td style="background-color:white;"><img class="chart img-fluid" src="/morpheus-docs/docs/images/morpheus/gallery/chart-17.png"/></td>
+        <td style="background-color:white;"><img class="chart img-fluid" src="/morpheus-docs/docs/images/morpheus/gallery/chart-18.png"/></td>
     </tr>
     <tr style="background-color:white;">
-        <td style="background-color:white;"><img class="chart img-fluid" src="/images/morpheus/gallery/chart-19.png"/></td>
-        <td style="background-color:white;"><img class="chart img-fluid" src="/images/morpheus/gallery/chart-20.png"/></td>
+        <td style="background-color:white;"><img class="chart img-fluid" src="/morpheus-docs/docs/images/morpheus/gallery/chart-19.png"/></td>
+        <td style="background-color:white;"><img class="chart img-fluid" src="/morpheus-docs/docs/images/morpheus/gallery/chart-20.png"/></td>
     </tr>
     <tr style="background-color:white;">
-        <td style="background-color:white;"><img class="chart img-fluid" src="/images/morpheus/gallery/chart-21.png"/></td>
-        <td style="background-color:white;"><img class="chart img-fluid" src="/images/morpheus/gallery/chart-22.png"/></td>
+        <td style="background-color:white;"><img class="chart img-fluid" src="/morpheus-docs/docs/images/morpheus/gallery/chart-21.png"/></td>
+        <td style="background-color:white;"><img class="chart img-fluid" src="/morpheus-docs/docs/images/morpheus/gallery/chart-22.png"/></td>
     </tr>
 </table>
 
