@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.d3xsystems</groupId>
     <artifactId>morpheus</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <packaging>pom</packaging>
 
     <modules>
@@ -14,7 +14,6 @@
         <module>morpheus-db/pom.xml</module>
         <module>morpheus-json/pom.xml</module>
         <module>morpheus-excel/pom.xml</module>
-        <module>morpheus-docs/pom.xml</module>
         <module>morpheus-quandl/pom.xml</module>
         <module>morpheus-jblas/pom.xml</module>
         <module>morpheus-worldbank/pom.xml</module>
