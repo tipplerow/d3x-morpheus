@@ -2,7 +2,7 @@
 
 This document serves as a quick start guide to working with the Morpheus library. It provides various code examples
 of how to affect commonly used operations on Morpheus `Arrays` and `DataFrames`. For the most part, the examples
-involve the `cars93.csv` dataset which can be accessed [here](http://zavtech.com/data/samples/cars93.csv), and for which
+involve the `cars93.csv` dataset which can be accessed [here](https://www.d3xsystems.com/public/data/samples/cars93.csv), and for which
 the first 10 rows are displayed below.
 
 <pre class="frame">
@@ -50,19 +50,19 @@ Morpheus ships with a versatile reader to initialize a `DataFrame` from a CSV fi
 ```java
 //Load from a URL and initialise the row axis based on an auto incrementing integer.
 DataFrame<Integer,String> frame = DataFrame.read().csv(options -> {
-    options.setResource("http://zavtech.com/data/samples/cars93.csv");
+    options.setResource("https://www.d3xsystems.com/public/data/samples/cars93.csv");
 });
 
 //Exclude the first column from the frame, and instead use it to initialize the row axis.
 DataFrame<Integer,String> frame = DataFrame.read().<Integer>csv(options -> {
-    options.setResource("http://zavtech.com/data/samples/cars93.csv");
+    options.setResource("https://www.d3xsystems.com/public/data/samples/cars93.csv");
     options.setRowKeyParser(Integer.class, tokens -> Integer.parseInt(tokens[0]));
     options.setExcludeColumnIndexes(0);
 });
 
 //Only select the rows that represent a specific make of car, namely **Buick** in this example.
 DataFrame<Integer,String> frame = DataFrame.read().csv(options -> {
-    options.setResource("http://zavtech.com/data/samples/cars93.csv");
+    options.setResource("https://www.d3xsystems.com/public/data/samples/cars93.csv");
     options.setRowKeyParser(Integer.class, tokens -> Integer.parseInt(tokens[0]));
     options.setExcludeColumnIndexes(0);
     options.setRowPredicate(tokens -> tokens[1].equalsIgnoreCase("Buick"));
@@ -70,7 +70,7 @@ DataFrame<Integer,String> frame = DataFrame.read().csv(options -> {
 
 //Select a subset of columns based on their names (the CSV file must include a header for this to work).
 DataFrame<Integer,String> frame = DataFrame.read().csv(options -> {
-    options.setResource("http://zavtech.com/data/samples/cars93.csv");
+    options.setResource("https://www.d3xsystems.com/public/data/samples/cars93.csv");
     options.setRowKeyParser(Integer.class, tokens -> Integer.parseInt(tokens[0]));
     options.setExcludeColumnIndexes(0);
     options.setRowPredicate(tokens -> tokens[1].equalsIgnoreCase("Buick"));
@@ -79,7 +79,7 @@ DataFrame<Integer,String> frame = DataFrame.read().csv(options -> {
 
 //Rename columns by providing a column name mapping function
 DataFrame<Integer,String> frame = DataFrame.read().csv(options -> {
-    options.setResource("http://zavtech.com/data/samples/cars93.csv");
+    options.setResource("https://www.d3xsystems.com/public/data/samples/cars93.csv");
     options.setRowKeyParser(Integer.class, tokens -> Integer.parseInt(tokens[0]));
     options.setExcludeColumnIndexes(0);
     options.setRowPredicate(tokens -> tokens[1].equalsIgnoreCase("Buick"));
@@ -221,7 +221,7 @@ than integers (to make it easier to distinguish between ordinal and key access i
 <?prettify?>
 ```java
 DataFrame<String,String> frame = DataFrame.read().<Integer>csv(options -> {
-    options.setResource("http://zavtech.com/data/samples/cars93.csv");
+    options.setResource("https://www.d3xsystems.com/public/data/samples/cars93.csv");
     options.setRowKeyParser(Integer.class, tokens -> Integer.parseInt(tokens[0]));
     options.setExcludeColumnIndexes(0);
 }).rows().mapKeys(row -> {
@@ -302,7 +302,7 @@ integers (to make it easier to distinguish between ordinal and key access in the
 <?prettify?>
 ```java
 DataFrame<String,String> frame = DataFrame.read().<Integer>csv(options -> {
-    options.setResource("http://zavtech.com/data/samples/cars93.csv");
+    options.setResource("https://www.d3xsystems.com/public/data/samples/cars93.csv");
     options.setRowKeyParser(Integer.class, tokens -> Integer.parseInt(tokens[0]));
     options.setExcludeColumnIndexes(0);
 }).rows().mapKeys(row -> {

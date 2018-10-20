@@ -49,7 +49,7 @@ public class OverviewDocs {
     @Test()
     public void cars93Example() {
         DataFrame.read().csv(options -> {
-            options.setResource("http://zavtech.com/data/samples/cars93.csv");
+            options.setResource("https://www.d3xsystems.com/public/data/samples/cars93.csv");
             options.setExcludeColumnIndexes(0);
         }).rows().select(row -> {
             var weightKG = row.getDouble("Weight") * 0.453592d;
@@ -79,7 +79,7 @@ public class OverviewDocs {
 
         //Load the data
         var data = DataFrame.read().csv(options -> {
-            options.setResource("http://zavtech.com/data/samples/cars93.csv");
+            options.setResource("https://www.d3xsystems.com/public/data/samples/cars93.csv");
             options.setExcludeColumnIndexes(0);
         });
 
