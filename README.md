@@ -162,7 +162,7 @@ Durbin-Watson:                        1.9591
 </pre>
 
 <p align="center">
-    <img class="chart img-fluid" src="/images/morpheus/ols/data-frame-ols.png"/>
+    <img class="chart img-fluid" src="/morpheus-docs/docs/images/morpheus/ols/data-frame-ols.png"/>
 </p>
 
 #### UK House Price Trends
@@ -270,7 +270,7 @@ any nominal price reduction, there was certainly a fairly severe correction in t
 depreciated heavily against these currencies during the GFC.
 
 <p align="center">
-    <img class="chart img-fluid" src="/images/morpheus/uk-house-prices.png"/>
+    <img class="chart img-fluid" src="/morpheus-docs/docs/images/morpheus/uk-house-prices.png"/>
 </p>
 
 ### Visualization
