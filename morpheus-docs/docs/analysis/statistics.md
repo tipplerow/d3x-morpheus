@@ -10,9 +10,10 @@ structures.
 
 The table below enumerates the uni-variate statistics currently supported. Computing descriptive statistics on sample 
 data reduces dimensionality in that an `Array` can be reduced to a scalar, or stats on `DataFrame` columns can be 
-reduced to an array of values representing the statistic for each column. To that end, the [Stats]() interface, which 
-exposes all the uni-variate statistics methods, is parameterized by the return type of the functions it declares so that 
-it can either return a scalar value, or some other data structure aggregate.
+reduced to an array of values representing the statistic for each column. To that end, the 
+[Stats](https://github.com/d3xsystems/d3x-morpheus/blob/master/morpheus-core/src/main/java/com/d3x/morpheus/stats/Stats.java) 
+interface, which exposes all the uni-variate statistics methods, is parameterized by the return type of the functions 
+it declares so that it can either return a scalar value, or some other data structure aggregate.
 
 | Method                    | Description                                                                                   | Details
 |---------------------------|-----------------------------------------------------------------------------------------------|---------------------------------------------------------------------|
@@ -36,7 +37,8 @@ it can either return a scalar value, or some other data structure aggregate.
 
 The following sections mostly operate on a `DataFrame` of random double precision values with an arbitrary number of
 rows and columns, which can be manufactured with the code below. In other examples the motor vehicle dataset introduced 
-in the [overview](../../index.html) will be used to demonstrate how statistics functions behave on frames with mixed data types.
+in the [overview](https://www.d3xsystems.com/morpheus/docs#morpheus-at-a-glance) will be used to demonstrate how statistics 
+functions behave on frames with mixed data types.
 
 <?prettify?>
 ```java
@@ -433,12 +435,14 @@ because we require at least a window size of 5 periods to yield a statistic.
 
 ### Non-Numeric Data Handling
 
-The Morpheus statistics API always presents results as `double` precision values, however it can operate on `int` and `long`
-input values by making the appropriate casts. Attempting to compute statistics on non-numeric data will result in an `Exception`, 
-however when computing bulk row or column statistics, Morpheus will automatically restrict its operations to numeric vectors.
+The Morpheus statistics API always presents results as `double` precision values, however it can operate on `int` and 
+`long` input values by making the appropriate casts. Attempting to compute statistics on non-numeric data will result 
+in an `Exception`, however when computing bulk row or column statistics, Morpheus will automatically restrict its 
+operations to numeric vectors.
 
-For example, consider the motor vehicle dataset first introduced in the [overview](../../index.html) which has a number of
-non-numeric columns such as `Manufacturer`, `Model`, `Type` and so on. The first 10 rows of the dataset are shown below.
+For example, consider the motor vehicle dataset first introduced in the [overview](https://www.d3xsystems.com/morpheus/docs) 
+which has a number of non-numeric columns such as `Manufacturer`, `Model`, `Type` and so on. The first 10 rows of the 
+dataset are shown below.
  
 <div class="frame"><pre class="frame">
   Index  |  Manufacturer  |    Model     |   Type    |  Min.Price  |   Price   |  Max.Price  |  MPG.city  |  MPG.highway  |       AirBags        |  DriveTrain  |  Cylinders  |  EngineSize  |  Horsepower  |  RPM   |  Rev.per.mile  |  Man.trans.avail  |  Fuel.tank.capacity  |  Passengers  |  Length  |  Wheelbase  |  Width  |  Turn.circle  |  Rear.seat.room  |  Luggage.room  |  Weight  |  Origin   |        Make        |
@@ -483,17 +487,19 @@ To be completed...
 
 ## Bi-Variate Statistics
 
-The Morpheus API makes it easy to compute the covariance or correlation between any two rows or columns, or compute the covariance and
-correlation matrix for an entire dataset. The statistics package in Morpheus uses an **online algorithm** enabling these calculations to
-be performed on an infinitely large dataset. In addition, the calculation of the covariance and correlation matrix of a dataset is an
-[embarrassingly parallel](https://en.wikipedia.org/wiki/Embarrassingly_parallel) problem that is well suited to a Fork & Join decomposition 
-in order to improve performance on current multi-core microprocessor architectures.
+The Morpheus API makes it easy to compute the covariance or correlation between any two rows or columns, or compute the 
+covariance and correlation matrix for an entire dataset. The statistics package in Morpheus uses an **online algorithm** 
+enabling these calculations to be performed on an infinitely large dataset. In addition, the calculation of the covariance 
+and correlation matrix of a dataset is an [embarrassingly parallel](https://en.wikipedia.org/wiki/Embarrassingly_parallel) 
+problem that is well suited to a Fork & Join decomposition in order to improve performance on current multi-core 
+microprocessor architectures.
 
 ### Covariance
 
-The `DataFrameAxisStats<R,C>` interface exposes two overloaded `covariance()` methods, one of which can be used to compute the covariance of 
-any two vectors in either the row or the column dimension, while the other yields the full covariance matrix for the dataset. Let us consider 
-the motor vehicle dataset first introduced in the [overview](../../index.html) and compute the covariance between `Price` and `Horsepower`, 
+The `DataFrameAxisStats<R,C>` interface exposes two overloaded `covariance()` methods, one of which can be used to 
+compute the covariance of any two vectors in either the row or the column dimension, while the other yields the full 
+covariance matrix for the dataset. Let us consider the motor vehicle dataset first introduced in the 
+[overview](https://www.d3xsystems.com/morpheus/docs) and compute the covariance between `Price` and `Horsepower`, 
 which we expect to be positive, and the covariance between `EngineSize` and `MPG.city` which we expected to be negative.
 
 <?prettify?>
@@ -542,15 +548,17 @@ covMatrix.out().print(100, formats -> {
              Weight  |   3438.919  |   3687.667  |   3937.552  |  -2795.095  |    -2549.655  |     517.133  |   22825.505  |  -150636.133  |   -215349.676  |            1729.468  |     339.095  |   6945.161  |   3507.549  |   1950.472  |     1479.365  |   347977.893  |
 </pre></div>
 
-Computing covariance in the row dimension is identical to the above example but operates on `DataFrameAxisStats<R,C>` returned 
-from a call to the `frame.rows().stats()` method.
+Computing covariance in the row dimension is identical to the above example but operates on `DataFrameAxisStats<R,C>` 
+returned from a call to the `frame.rows().stats()` method.
 
 ### Correlation
 
-The `DataFrameAxisStats<R,C>` interface exposes two overloaded `correlation()` methods, one of which can be used to compute the correlation of 
-any two vectors in either the row or the column dimension, while the other yields the full correlation matrix for the dataset. Let us consider 
-the motor vehicle dataset first introduced in the [overview](../../index.html) and compute the correlation between `Price` and `Horsepower`, 
-which we expect to be positive, and the correlation between `EngineSize` and `MPG.city` which we expected to be negative.
+The `DataFrameAxisStats<R,C>` interface exposes two overloaded `correlation()` methods, one of which can be used to 
+compute the correlation of any two vectors in either the row or the column dimension, while the other yields the full 
+correlation matrix for the dataset. Let us consider the motor vehicle dataset first introduced in the 
+[overview](https://www.d3xsystems.com/morpheus/docs) and compute the correlation between `Price` and `Horsepower`, 
+which we expect to be positive, and the correlation between `EngineSize` and `MPG.city` which we expected to be 
+negative.
 
 <?prettify?>
 ```java
@@ -566,8 +574,8 @@ Correlation between Price & Horsepower = 0.79
 Correlation between EngineSize and MPG.city = -0.71
 </pre></div>
 
-It is also easy to compute the correlation matrix for all numeric columns in the frame as shown below. As expected, the diagonal
-values of this `DataFrame` are equal to one as the correlation of a signal with itself is always one.
+It is also easy to compute the correlation matrix for all numeric columns in the frame as shown below. As expected, 
+the diagonal values of this `DataFrame` are equal to one as the correlation of a signal with itself is always one.
 
 <?prettify?>
 ```java
@@ -599,30 +607,31 @@ correlMatrix.out().print(100, formats -> {
              Weight  |      0.667  |   0.647  |      0.605  |    -0.843  |       -0.811  |       0.845  |       0.739  |  -0.428  |        -0.735  |               0.894  |       0.553  |   0.806  |      0.872  |   0.875  |        0.778  |   1.000  |
 </pre></div>
 
-Computing correlation in the row dimension is identical to the above example but operates on `DataFrameAxisStats<R,C>` returned 
-from a call to the `frame.rows().stats()` method.
+Computing correlation in the row dimension is identical to the above example but operates on `DataFrameAxisStats<R,C>` 
+returned from a call to the `frame.rows().stats()` method.
 
 ## Performance
 
 #### Demean Example
 
-Earlier, two separate techniques were presented as a way of de-meaning the values of a `DataFrame` in the row dimension. The first
-approach used the `forEach()` method to iterate over all rows, while the second used a traditional for-loop creating a new row object
-for each iteration in the loop. 
+Earlier, two separate techniques were presented as a way of de-meaning the values of a `DataFrame` in the row dimension. 
+The first approach used the `forEach()` method to iterate over all rows, while the second used a traditional for-loop 
+creating a new row object for each iteration in the loop. 
 
-Below we assess the relative performance of these techniques. For the former case, we use both **sequential** and **parallel** iteration 
-which is natively supported in the Morpheus API. The latter approach cannot be parallelized without writing a lot of code. The results 
-are as follows.
+Below we assess the relative performance of these techniques. For the former case, we use both **sequential** and 
+**parallel** iteration which is natively supported in the Morpheus API. The latter approach cannot be parallelized 
+without writing a lot of code. The results are as follows.
 
 <p align="center">
     <img class="chart img-fluid" src="/images/morpheus/frame/data-frame-row-demean.png"/>
 </p>
 
-Firstly, kudos to the Java Virtual Machine in that the so called **Bad** approach is not that much slower than the **Good(sequential)** approach,
-even given that far more objecs are created in the former scenario. They are all very short lived objects, and we know the current generation
-garbage collection algorithms are heavily optimized to deal with that kind of trash. The `forEach()` approach is easily parallelizable 
-simply by calling the `parallel()` method on `DataFrameRows` before starting the iteration. This clearly makes a big difference in relative
-performance. The code for this analysis is shown below.
+Firstly, kudos to the Java Virtual Machine in that the so called **Bad** approach is not that much slower than the 
+**Good(sequential)** approach,even given that far more objecs are created in the former scenario. They are all very 
+short lived objects, and we know the current generation garbage collection algorithms are heavily optimized to deal 
+with that kind of trash. The `forEach()` approach is easily parallelizable simply by calling the `parallel()` method 
+on `DataFrameRows` before starting the iteration. This clearly makes a big difference in relative performance. The 
+code for this analysis is shown below.
 
 <?prettify?>
 ```java
@@ -674,18 +683,20 @@ Chart.create().withBarPlot(timing, false, chart -> {
 
 #### Correlation Example
 
-It was suggested that computing the covariance or correlation matrix for a dataset was an [embarrassingly parallel](https://en.wikipedia.org/wiki/Embarrassingly_parallel) 
-problem. The example below creates a `DataFrame` of 1 million rows by 10 columns, and computes the correlation in the column
-dimension using both **sequential** and **parallel** execution, and then plots the results.
+It was suggested that computing the covariance or correlation matrix for a dataset was an 
+[embarrassingly parallel](https://en.wikipedia.org/wiki/Embarrassingly_parallel) problem. The example below creates a 
+`DataFrame` of 1 million rows by 10 columns, and computes the correlation in the column dimension using both 
+**sequential** and **parallel** execution, and then plots the results.
 
 <p align="center">
     <img class="chart img-fluid" src="/images/morpheus/frame/data-frame-column-correl.png"/>
 </p>
 
-These results suggest a roughly 3 times improvement in performance in parallel execution for this example. The performance 
-differential for such a scenario is likely to be sensitive to many factors, especially the shape of the `DataFrame`, so take 
-these results with a pinch of salt (as with all benchmark results). Nevertheless, this does demonstrate that parallel execution 
-can give a significant boost, so it is worth exploring in a performance critical scenario. The code for this example is as follows:
+These results suggest a roughly 3 times improvement in performance in parallel execution for this example. The 
+performance differential for such a scenario is likely to be sensitive to many factors, especially the shape of 
+the `DataFrame`, so take these results with a pinch of salt (as with all benchmark results). Nevertheless, this does 
+demonstrate that parallel execution can give a significant boost, so it is worth exploring in a performance critical 
+scenario. The code for this example is as follows:
 
 <?prettify?>
 ```java

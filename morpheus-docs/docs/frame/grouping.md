@@ -13,9 +13,9 @@ to capture the month associated with each date (see examples below).
 #### Example Data
 
 In this section, we will continue to use the ATP 2013 dataset that was introduced earlier in the filtering 
-discussion [here](./filtering/#example-data). This dataset makes for an ideal grouping candidate given the large 
-number of categorical items such as `Surface`, `Tournament`, `Round` and so on. As a reminder, here are the first 
-10 rows of the 2013 ATP match `DataFrame`.
+discussion [here](https://www.d3xsystems.com/morpheus/frame/filter/#example-data). This dataset makes for an 
+ideal grouping candidate given the large number of categorical items such as `Surface`, `Tournament`, `Round` 
+and so on. As a reminder, here are the first 10 rows of the 2013 ATP match `DataFrame`.
 
 <div class="frame"><pre class="frame">
  Index  |  Location  |        Tournament        |     Date     |  Series  |   Court   |  Surface  |    Round    |  Best of  |     Winner     |     Loser      |  WRank  |  LRank  |  WPts  |  LPts  |  W1  |  L1  |  W2  |  L2  |  W3  |  L3  |  W4  |  L4  |  W5  |  L5  |  Wsets  |  Lsets  |   Comment   |  B365W   |  B365L   |   EXW    |   EXL    |   LBW    |   LBL    |   PSW    |   PSL    |   SJW    |   SJL    |   MaxW   |   MaxL   |   AvgW   |   AvgL   |

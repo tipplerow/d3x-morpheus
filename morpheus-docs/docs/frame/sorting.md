@@ -13,7 +13,7 @@ library, so a thank you goes out to [Sebastiano Vigna](http://vigna.di.unimi.it/
 #### Example Data
 
 In this section, we will continue to use the ATP 2013 dataset that was introduced earlier in the filtering discussion 
-[here](./filtering/#example-data). In some examples a custom frame is created of random double precision values in order to
+[here](https://www.d3xsystems.com/morpheus/frame/filter/#example-data). In some examples a custom frame is created of random double precision values in order to
 demonstrate how to sort columns by row values. The ATP match `DataFrame` does not have homogeneous types along the rows, and 
 therefore a column sort based on these values is nonsensical. In addition, the section on performance creates much larger frames
 with millions of rows in order to get more measurable timing statistics.
@@ -283,8 +283,8 @@ frame.out().print(10);
 
 #### Filters
 
-Slicing or filtering a `DataFrame` is a common operation and is discussed in some detail [here](./filtering). There are 
-structural immutability constraints on filtered frames, however sorting in both the row and column dimensions is 
+Slicing or filtering a `DataFrame` is a common operation and is discussed in some detail [here](https://www.d3xsystems.com/morpheus/frame/filter). 
+There are structural immutability constraints on filtered frames, however sorting in both the row and column dimensions is 
 supported.
 
 The example below first filters the 2013 ATP match results so as to capture all rows in which Novak Djokovic was the victor, 
@@ -319,11 +319,12 @@ filter.out().print(10);
 #### Performance
 
 Morpheus has been designed specifically to deal with very large data, and the section on general performance
-which is discussed [here]() and [here]() describes some of the implementation choices and their rationale. 
-Morpheus is not a traditional Big Data solution in that it is focused on addressing a class of problem that 
-can fit in the memory space of a single operating system process. These days it is not uncommon to find machines 
-with 250GB of physical memory, which can certainly be used to analyze substantial data. A distributed solution
-using Morpheus while possible, is not addressed as part of the framework, at least not at the time of writing.
+which is discussed [here](https://www.d3xsystems.com/morpheus/array-perf) and [here](https://www.d3xsystems.com/morpheus/frame-perf) 
+describes some of the implementation choices and their rationale. Morpheus is not a traditional Big Data solution in 
+that it is focused on addressing a class of problem that can fit in the memory space of a single operating system process. 
+These days it is not uncommon to find machines with 250GB of physical memory, which can certainly be used to analyze 
+substantial data. A distributed solution using Morpheus while possible, is not addressed as part of the framework, 
+at least not at the time of writing.
  
 Great care has been spent designing efficient data structures that scale well on the Java Virtual Machine, and
 many of the common `DataFrame` operations can execute in **parallel** based on internal algorithms that leverage

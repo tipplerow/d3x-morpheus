@@ -46,7 +46,7 @@ data to be loaded from [Quandl](https://www.quandl.com/), [The Federal Reserve](
 
 #### A Simple Example
 
-Consider a dataset of motor vehicle characteristics accessible [here](http://zavtech.com/data/samples/cars93.csv).
+Consider a dataset of motor vehicle characteristics accessible [here](https://www.d3xsystems.com/public/data/samples/cars93.csv).
 The code below loads this CSV data into a Morpheus `DataFrame`, filters the rows to only include those vehicles that have a power 
 to weight ratio > 0.1 (where *weight* is converted into kilograms), then adds a column to record the relative efficiency between highway 
 and city mileage (MPG), sorts the rows by this newly added column in descending order, and finally records this transformed result 
@@ -55,7 +55,7 @@ to a CSV file.
 <?prettify?>
 ```java
 DataFrame.read().csv(options -> {
-    options.setResource("http://zavtech.com/data/samples/cars93.csv");
+    options.setResource("https://www.d3xsystems.com/public/data/samples/cars93.csv");
     options.setExcludeColumnIndexes(0);
 }).rows().select(row -> {
     var weightKG = row.getDouble("Weight") * 0.453592d;
@@ -94,8 +94,8 @@ on the far right of the frame.
 
 #### A Regression Example
 
-The Morpheus API includes a regression interface in order to fit data to a linear model using either [OLS](regression/ols/), 
-[WLS](regression/wls/) or [GLS](regression/gls/). The code below uses the same car dataset introduced in the previous example, 
+The Morpheus API includes a regression interface in order to fit data to a linear model using either [OLS](https://www.d3xsystems.com/morpheus/ols), 
+[WLS](https://www.d3xsystems.com/morpheus/wls) or [GLS](https://www.d3xsystems.com/morpheus/gls). The code below uses the same car dataset introduced in the previous example, 
 and regresses **Horsepower** on **EngineSize**. The code example prints the model results to standard out, which is shown below, 
 and then creates a scatter chart with the regression line clearly displayed.
 
@@ -103,7 +103,7 @@ and then creates a scatter chart with the regression line clearly displayed.
 ```java
 //Load the data
 var data = DataFrame.read().csv(options -> {
-    options.setResource("http://zavtech.com/data/samples/cars93.csv");
+    options.setResource("https://www.d3xsystems.com/public/data/samples/cars93.csv");
     options.setExcludeColumnIndexes(0);
 });
 
@@ -264,7 +264,7 @@ Visualizing data in Morpheus `DataFrames` is made easy via a **simple chart abst
 [JFreeChart](http://www.jfree.org/jfreechart/) as well as [Google Charts](https://developers.google.com/chart/) (with others
 to follow by popular demand). This design makes it possible to generate interactive [Java Swing](https://en.wikipedia.org/wiki/Swing_(Java)) 
 charts as well as HTML5 browser based charts via the same programmatic interface. For more details on how to use this API, 
-see the section on visualization [here](./viz/charts/overview/), and the code [here](https://github.com/zavtech/morpheus-viz).
+see the section on visualization [here](https://www.d3xsystems.com/morpheus/charts), and the code [here](https://github.com/d3xsystems/d3x-morpheus/tree/master/morpheus-viz).
 
 <table width="100%" border="0">
     <tr style="background-color:white;">
@@ -328,7 +328,7 @@ The core library that contains Morpheus Arrays, DataFrames and other key interfa
 <dependency>
     <groupId>com.d3xsystems</groupId>
     <artifactId>morpheus-core</artifactId>
-    <version>${morpheus-version}</version>
+    <version>1.0.2</version>
 </dependency>
 ```
 
@@ -340,7 +340,7 @@ An adapter to load Excel spreadsheets into a Morpheus DataFrame
 <dependency>
     <groupId>com.d3xsystems</groupId>
     <artifactId>morpheus-excel</artifactId>
-    <version>${morpheus-version}</version>
+    <version>1.0.2</version>
 </dependency>
 ```
 
@@ -352,7 +352,7 @@ An adapter to read and write Morpheus DataFrames in an efficient JSON format lev
 <dependency>
     <groupId>com.d3xsystems</groupId>
     <artifactId>morpheus-json</artifactId>
-    <version>${morpheus-version}</version>
+    <version>1.0.2</version>
 </dependency>
 ```
 
@@ -364,7 +364,7 @@ An adapter to read and write Morpheus DataFrames against a SQL data store.
 <dependency>
     <groupId>com.d3xsystems</groupId>
     <artifactId>morpheus-db</artifactId>
-    <version>${morpheus-version}</version>
+    <version>1.0.2</version>
 </dependency>
 ```
 
@@ -376,7 +376,7 @@ A library of components to display Morpheus `DataFrames` in charts and tables.
 <dependency>
     <groupId>com.d3xsystems</groupId>
     <artifactId>morpheus-viz</artifactId>
-    <version>${morpheus-version}</version>
+    <version>1.0.2</version>
 </dependency>
 ```
 
@@ -388,7 +388,7 @@ An adapter to load data from [Quandl](http://www.quandl.com) into a Morpheus Dat
 <dependency>
     <groupId>com.d3xsystems</groupId>
     <artifactId>morpheus-quandl</artifactId>
-    <version>${morpheus-version}</version>
+    <version>1.0.2</version>
 </dependency>
 ```
 
@@ -400,7 +400,7 @@ An adapter to load data from the [Worldbank](https://data.worldbank.org/) into a
 <dependency>
     <groupId>com.d3xsystems</groupId>
     <artifactId>morpheus-worldbank</artifactId>
-    <version>${morpheus-version}</version>
+    <version>1.0.2</version>
 </dependency>
 ```
 
@@ -411,7 +411,7 @@ A Questions & Answers forum has been setup using Google Groups and is accessible
 
 ### Javadocs
 
-Morpheus Javadocs can be accessed online [here](http://www.zavtech.com/morpheus/api).
+Morpheus Javadocs can be accessed online [here](https://www.d3xsystems.com/api-docs/morpheus).
 
 ### Build Status
 
