@@ -444,5 +444,5 @@ A Continuous Integration build server can be accessed [here](http://builds.d3xsy
 Morpheus is released under the [Apache Software Foundation License Version 2](https://www.apache.org/licenses/LICENSE-2.0).
 
 <p align="center">
-    <img style="background: none; border: none;" src="/images/morpheus/morpheus-logo.svg" width="400"/>
+    <img style="background: none; border: none;" src="https://www.d3xsystems.com/images/common/morpheus-logo.svg" width="400"/>
 </p>
