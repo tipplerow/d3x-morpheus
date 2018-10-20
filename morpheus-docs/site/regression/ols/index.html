@@ -479,7 +479,7 @@ is also included for inspection, and in this exercise we are going to be interes
 
 <pre><code class="java">static DataFrame&lt;Integer,String&gt; loadCarDataset() {
     return DataFrame.read().csv(options -&gt; {
-        options.setResource(&quot;http://zavtech.com/data/samples/cars93.csv&quot;);
+        options.setResource(&quot;https://www.d3xsystems.com/public/data/samples/cars93.csv&quot;);
         options.setExcludeColumnIndexes(0);
     });
 }

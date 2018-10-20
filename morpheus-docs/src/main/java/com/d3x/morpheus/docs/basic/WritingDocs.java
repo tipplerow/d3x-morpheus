@@ -52,7 +52,7 @@ public class WritingDocs {
     @Test()
     public void testCars() {
         DataFrame.read().<Integer>csv(options -> {
-            options.setResource("http://zavtech.com/data/samples/cars93.csv");
+            options.setResource("https://www.d3xsystems.com/public/data/samples/cars93.csv");
             options.setRowKeyParser(Integer.class, values -> Integer.parseInt(values[0]));
             options.setExcludeColumnIndexes(0);
         }).cols().add("WeightKG", Double.class, value -> {

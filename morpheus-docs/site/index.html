@@ -310,7 +310,7 @@ data to be loaded from <a href="https://www.quandl.com/">Quandl</a>, <a href="ht
 <a href="http://www.worldbank.org/">The World Bank</a>, <a href="http://finance.yahoo.com/">Yahoo Finance</a> and <a href="https://www.google.com/finance">Google Finance</a>.</p>
 <h3 id="morpheus-at-a-glance">Morpheus at a Glance</h3>
 <h4 id="a-simple-example">A Simple Example</h4>
-<p>Consider a dataset of motor vehicle characteristics accessible <a href="http://zavtech.com/data/samples/cars93.csv">here</a>.
+<p>Consider a dataset of motor vehicle characteristics accessible <a href="https://www.d3xsystems.com/public/data/samples/cars93.csv">here</a>.
 The code below loads this CSV data into a Morpheus <code>DataFrame</code>, filters the rows to only include those vehicles that have a power
 to weight ratio &gt; 0.1 (where <em>weight</em> is converted into kilograms), then adds a column to record the relative efficiency between highway
 and city mileage (MPG), sorts the rows by this newly added column in descending order, and finally records this transformed result
@@ -318,7 +318,7 @@ to a CSV file.</p>
 <?prettify?>
 
 <pre><code class="java">DataFrame.read().csv(options -&gt; {
-    options.setResource(&quot;http://zavtech.com/data/samples/cars93.csv&quot;);
+    options.setResource(&quot;https://www.d3xsystems.com/public/data/samples/cars93.csv&quot;);
     options.setExcludeColumnIndexes(0);
 }).rows().select(row -&gt; {
     double weightKG = row.getDouble(&quot;Weight&quot;) * 0.453592d;
@@ -363,7 +363,7 @@ and then creates a scatter chart with the regression line clearly displayed.</p>
 
 <pre><code class="java">//Load the data
 DataFrame&lt;Integer,String&gt; data = DataFrame.read().csv(options -&gt; {
-    options.setResource(&quot;http://zavtech.com/data/samples/cars93.csv&quot;);
+    options.setResource(&quot;https://www.d3xsystems.com/public/data/samples/cars93.csv&quot;);
     options.setExcludeColumnIndexes(0);
 });
 

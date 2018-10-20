@@ -41,7 +41,7 @@ public class StatsDocs {
      */
     static DataFrame<Integer,String> loadCarDataset() {
         return DataFrame.read().csv(options -> {
-            options.setResource("http://zavtech.com/data/samples/cars93.csv");
+            options.setResource("https://www.d3xsystems.com/public/data/samples/cars93.csv");
             options.setExcludeColumnIndexes(0);
         });
     }
