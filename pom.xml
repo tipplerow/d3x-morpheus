@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.d3xsystems</groupId>
     <artifactId>morpheus</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
     <packaging>pom</packaging>
 
     <modules>
@@ -17,6 +17,7 @@
         <module>morpheus-quandl/pom.xml</module>
         <module>morpheus-jblas/pom.xml</module>
         <module>morpheus-worldbank/pom.xml</module>
+        <module>morpheus-docs/pom.xml</module>
     </modules>
 
     <name>morpheus</name>
@@ -61,9 +62,9 @@
     </licenses>
 
     <properties>
-        <jdk.version>1.8</jdk.version>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <jdk.version>8</jdk.version>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -88,15 +89,19 @@
 
 
     <profiles>
+
         <profile>
+
             <id>release</id>
+
             <build>
+
                 <plugins>
 
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-source-plugin</artifactId>
-                        <version>2.2.1</version>
+                        <version>3.0.1</version>
                         <configuration>
                             <outputDirectory>${project.build.directory}</outputDirectory>
                             <finalName>${project.build.finalName}</finalName>
@@ -116,22 +121,24 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>2.10.4</version>
+                        <version>3.0.1</version>
                         <configuration>
                             <show>private</show>
                             <nohelp>true</nohelp>
                             <author>true</author>
+                            <additionalOptions>-html5</additionalOptions>
+                            <additionalOptions>-Xdoclint:none</additionalOptions>
                             <bottom>
                                 <![CDATA[Copyright 2014-2018, <a href="https://www.d3xsystems.com">D3X Systems<a>]]></bottom>
-                            <additionalparam>-Xdoclint:none</additionalparam>
                             <excludePackageNames>
-                                com.com.d3x.morpheus.reference,
-                                com.com.d3x.morpheus.reference.regress,
-                                com.com.d3x.morpheus.reference.algebra
+                                com.d3x.morpheus.reference,
+                                com.d3x.morpheus.reference.regress,
+                                com.d3x.morpheus.reference.algebra
                             </excludePackageNames>
                         </configuration>
                         <executions>
                             <execution>
+                                <phase>package</phase>
                                 <id>attach-javadocs</id>
                                 <goals>
                                     <goal>jar</goal>
@@ -141,9 +148,28 @@
                     </plugin>
 
                     <plugin>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <version>3.1.0</version>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>assembly.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>create-archive</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.5</version>
+                        <version>1.6</version>
                         <executions>
                             <execution>
                                 <id>sign-artifacts</id>
@@ -175,9 +201,10 @@
 
     <build>
 
-        <directory>${user.home}/builds/${project.name}</directory>
+        <directory>${user.home}/builds/morpheus/${project.name}</directory>
 
         <pluginManagement>
+
             <plugins>
 
                 <plugin>
@@ -199,7 +226,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>2.4</version>
+                    <version>3.1.0</version>
                     <configuration>
                         <archive>
                             <manifest>
@@ -217,7 +244,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>2.9</version>
+                    <version>2.22.1</version>
                     <configuration>
                         <argLine>-Xmx4G</argLine>
                     </configuration>
@@ -226,13 +253,13 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId>
-                    <version>2.6</version>
+                    <version>3.1.0</version>
                 </plugin>
 
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-source-plugin</artifactId>
-                    <version>2.2.1</version>
+                    <version>3.0.1</version>
                 </plugin>
 
             </plugins>
@@ -244,13 +271,13 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.1</version>
+                <version>3.8.0</version>
             </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>2.6</version>
+                <version>3.1.0</version>
                 <configuration>
                     <encoding>UTF-8</encoding>
                 </configuration>
@@ -259,16 +286,13 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>2.4</version>
-                <configuration>
-                    <useDefaultManifestFile>true</useDefaultManifestFile>
-                </configuration>
+                <version>3.1.0</version>
             </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.19</version>
+                <version>2.22.1</version>
                 <configuration>
                     <redirectTestOutputToFile>false</redirectTestOutputToFile>
                     <suiteXmlFiles>
