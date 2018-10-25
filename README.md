@@ -433,7 +433,7 @@ A Questions & Answers forum has been setup using Google Groups and is accessible
 
 ### Javadocs
 
-Morpheus Javadocs can be accessed online [here](https://www.d3xsystems.com/api-docs/morpheus).
+Morpheus Javadocs can be accessed online [here](http://www.d3xsystems.com/static/javadocs/morpheus/index.html?overview-summary.html).
 
 ### Build Status
 
