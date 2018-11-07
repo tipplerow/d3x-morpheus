@@ -41,13 +41,13 @@ import com.d3x.morpheus.util.LazyValue;
  * @see <a href="http://jblas.org/">JBLAS</a>
  * @author  Xavier Witdouck
  */
-class XDataFrameAlgebraJBlas<R,C> extends XDataFrameAlgebra<R,C> {
+public class XDataFrameAlgebraJBlas<R,C> extends XDataFrameAlgebra<R,C> {
 
     /**
      * Constructor
      * @param frame     the frame reference
      */
-    XDataFrameAlgebraJBlas(DataFrame<R,C> frame) {
+    public XDataFrameAlgebraJBlas(DataFrame<R,C> frame) {
         super(frame);
     }
 
