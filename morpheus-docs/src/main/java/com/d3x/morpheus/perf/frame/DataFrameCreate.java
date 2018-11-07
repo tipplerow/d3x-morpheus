@@ -20,14 +20,17 @@ import java.awt.*;
 import java.io.File;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import com.d3x.morpheus.util.IO;
 import org.testng.annotations.Test;
 
 import com.d3x.morpheus.viz.chart.Chart;
@@ -166,5 +169,23 @@ public class DataFrameCreate {
 
         Thread.currentThread().join();
     }
+
+
+    @Test()
+    public void slidingWindow() {
+        var windowSize = 5;
+        var rowKeys = Range.ofLocalDates("2014-01-01", "2014-01-11");
+        var colKeys = Range.of(0, 5).map(i -> "Column-" + i);
+        var frame = DataFrame.ofDoubles(rowKeys, colKeys, value -> Math.random() * 10d);
+        frame.out().print();
+        IO.println("\n\nPrinting sliding windows...");
+        IntStream.range(windowSize-1, frame.rowCount()).mapToObj(lastRow -> {
+            var startRow = lastRow - windowSize;
+            return frame.rows().select(row -> row.ordinal() <= lastRow && row.ordinal() > startRow);
+        }).forEach(window -> {
+            ((DataFrame) window).out().print();
+        });
+    }
+
 
 }
