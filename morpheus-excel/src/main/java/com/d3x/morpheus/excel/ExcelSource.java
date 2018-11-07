@@ -74,15 +74,17 @@ public class ExcelSource extends DataFrameSource<Integer,String, ExcelSource.Opt
             final List<ArrayBuilder<Object>> valueList = createValues(rowCount, colCount);
             for (int i = rowStart; i<=rowEnd; ++i) {
                 final Row row = sheet.getRow(i);
-                if (options.rowPredicate == null || options.rowPredicate.test(row)) {
-                    final int rowNum = row.getRowNum();
-                    rowKeys.add(rowNum);
-                    for (int j=0; j<header.length(); ++j) {
-                        final int colIndex = colStart + j;
-                        final ArrayBuilder<Object> values = valueList.get(j);
-                        final Cell cell = row.getCell(colIndex, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL);
-                        final Object value = getCellValue(cell);
-                        values.add(value);
+                if (row != null) {
+                    if (options.rowPredicate == null || options.rowPredicate.test(row)) {
+                        final int rowNum = row.getRowNum();
+                        rowKeys.add(rowNum);
+                        for (int j=0; j<header.length(); ++j) {
+                            final int colIndex = colStart + j;
+                            final ArrayBuilder<Object> values = valueList.get(j);
+                            final Cell cell = row.getCell(colIndex, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL);
+                            final Object value = getCellValue(cell);
+                            values.add(value);
+                        }
                     }
                 }
             }
