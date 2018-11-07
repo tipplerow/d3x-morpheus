@@ -129,11 +129,8 @@
                             <additionalOptions>-html5</additionalOptions>
                             <additionalOptions>-Xdoclint:none</additionalOptions>
                             <bottom>
-                                <![CDATA[Copyright 2014-2018, <a href="https://www.d3xsystems.com">D3X Systems<a>]]></bottom>
-                            <excludePackageNames>
-                                com.d3x.morpheus.reference,
-                                com.d3x.morpheus.reference.regress
-                            </excludePackageNames>
+                                <![CDATA[Copyright 2014-2018, <a href="https://www.d3xsystems.com">D3X Systems<a>]]>
+                            </bottom>
                         </configuration>
                         <executions>
                             <execution>
@@ -146,7 +143,7 @@
                         </executions>
                     </plugin>
 
-                    <plugin>
+                    <!--plugin>
                         <artifactId>maven-assembly-plugin</artifactId>
                         <version>3.1.0</version>
                         <configuration>
@@ -163,7 +160,7 @@
                                 </goals>
                             </execution>
                         </executions>
-                    </plugin>
+                    </plugin-->
 
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
