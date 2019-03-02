@@ -36,22 +36,18 @@ public interface DataFrameRows<R,C> extends DataFrameAxis<R,C,R,C,DataFrameRow<R
 
     /**
      * Adds a new row key to this axis if the key does not already exists
-     * By default, ignores duplicates unless run within DataFrameOptions.whileNotIgnoringDuplicates()
      * @param key   the key to add
-     * @return      true if a new row was added
-     * @see DataFrameOptions
+     * @return      the ordinal for the row
      */
-    boolean add(R key) throws DataFrameException;
+    int add(R key) throws DataFrameException;
 
     /**
      * Adds a new row key to this axis if the key does not already exists
-     * By default, ignores duplicates unless run within DataFrameOptions.whileNotIgnoringDuplicates()
      * @param key       the key to add
-     * @param initials  the function that provides initial values, null permitted
-     * @return          true if a new row was added
-     * @see DataFrameOptions
+     * @param initials  the function that provides initial values, only called if key did not exist
+     * @return          the ordinal for the row
      */
-    boolean add(R key, Function<DataFrameValue<R,C>,?> initials);
+    int add(R key, Function<DataFrameValue<R,C>,?> initials);
 
     /**
      * Adds multiple row keys, ignoring any keys that already exist in the axis

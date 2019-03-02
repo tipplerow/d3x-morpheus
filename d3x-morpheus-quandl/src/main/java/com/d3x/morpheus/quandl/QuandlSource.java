@@ -228,21 +228,19 @@ public class QuandlSource {
             reader.beginArray();
             while (reader.hasNext()) {
                 final QuandlDatasetInfo info = gson.fromJson(reader, QuandlDatasetInfo.class);
-                final int rowIndex = frame.rowCount();
-                if (frame.rows().add(info.getId())) {
-                    frame.rows().setValueAt(rowIndex, QuandlField.DATABASE_CODE, info.getDatabaseCode());
-                    frame.rows().setValueAt(rowIndex, QuandlField.DATASET_CODE, info.getDatasetCode());
-                    frame.rows().setValueAt(rowIndex, QuandlField.NAME, info.getName());
-                    frame.rows().setValueAt(rowIndex, QuandlField.DESCRIPTION, info.getDescription());
-                    frame.rows().setValueAt(rowIndex, QuandlField.LAST_REFRESH_TIME, info.getRefreshedAt());
-                    frame.rows().setValueAt(rowIndex, QuandlField.START_DATE, info.getOldestAvailableDate());
-                    frame.rows().setValueAt(rowIndex, QuandlField.END_DATE, info.getNewestAvailableDate());
-                    frame.rows().setValueAt(rowIndex, QuandlField.COLUMN_NAMES, info.getColumnNames());
-                    frame.rows().setValueAt(rowIndex, QuandlField.FREQUENCY, info.getFrequency());
-                    frame.rows().setValueAt(rowIndex, QuandlField.DATASET_TYPE, info.getType());
-                    frame.rows().setValueAt(rowIndex, QuandlField.PREMIUM, info.isPremium());
-                    frame.rows().setValueAt(rowIndex, QuandlField.DATABASE_ID, info.getDatabaseId());
-                }
+                final int row = frame.rows().add(info.getId());
+                frame.rows().setValueAt(row, QuandlField.DATABASE_CODE, info.getDatabaseCode());
+                frame.rows().setValueAt(row, QuandlField.DATASET_CODE, info.getDatasetCode());
+                frame.rows().setValueAt(row, QuandlField.NAME, info.getName());
+                frame.rows().setValueAt(row, QuandlField.DESCRIPTION, info.getDescription());
+                frame.rows().setValueAt(row, QuandlField.LAST_REFRESH_TIME, info.getRefreshedAt());
+                frame.rows().setValueAt(row, QuandlField.START_DATE, info.getOldestAvailableDate());
+                frame.rows().setValueAt(row, QuandlField.END_DATE, info.getNewestAvailableDate());
+                frame.rows().setValueAt(row, QuandlField.COLUMN_NAMES, info.getColumnNames());
+                frame.rows().setValueAt(row, QuandlField.FREQUENCY, info.getFrequency());
+                frame.rows().setValueAt(row, QuandlField.DATASET_TYPE, info.getType());
+                frame.rows().setValueAt(row, QuandlField.PREMIUM, info.isPremium());
+                frame.rows().setValueAt(row, QuandlField.DATABASE_ID, info.getDatabaseId());
             }
             return frame;
         } catch (Exception ex) {
@@ -491,18 +489,16 @@ public class QuandlSource {
                     System.err.println("Ignoring line: " + String.join(",", row));
                 } else {
                     final String ticker = row[0].trim();
-                    final int rowIndex = frame.rowCount();
-                    if (frame.rows().add(ticker)) {
-                        final String name = row[1];
-                        frame.setValueAt(rowIndex, 0, name);
-                        if (row.length == 6) {
-                            final LocalDateTime timestamp = LocalDateTime.parse(row[3], formatter);
-                            final ZonedDateTime zonedDateTime = ZonedDateTime.of(timestamp, ZoneId.of("America/New_York"));
-                            frame.setValueAt(rowIndex, 0, row[1]);
-                            frame.setValueAt(rowIndex, 1, zonedDateTime);
-                            frame.setValueAt(rowIndex, 2, LocalDate.parse(row[4]));
-                            frame.setValueAt(rowIndex, 3, LocalDate.parse(row[5]));
-                        }
+                    final String name = row[1];
+                    final int rowIndex = frame.rows().add(ticker);
+                    frame.setValueAt(rowIndex, 0, name);
+                    if (row.length == 6) {
+                        final LocalDateTime timestamp = LocalDateTime.parse(row[3], formatter);
+                        final ZonedDateTime zonedDateTime = ZonedDateTime.of(timestamp, ZoneId.of("America/New_York"));
+                        frame.setValueAt(rowIndex, 0, row[1]);
+                        frame.setValueAt(rowIndex, 1, zonedDateTime);
+                        frame.setValueAt(rowIndex, 2, LocalDate.parse(row[4]));
+                        frame.setValueAt(rowIndex, 3, LocalDate.parse(row[5]));
                     }
                 }
             } catch (Exception ex) {

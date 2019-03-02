@@ -177,7 +177,9 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
      * @return  the newly created cursor
      */
     final DataFrameCursor<R,C> cursor(XDataFrame<R,C> frame) {
-        return new Cursor().init(frame, 0, 0);
+        final int row = frame.rowCount() > 0 ? 0 : -1;
+        final int col = frame.colCount() > 0 ? 0 : -1;
+        return new Cursor().init(frame, row, col);
     }
 
 
