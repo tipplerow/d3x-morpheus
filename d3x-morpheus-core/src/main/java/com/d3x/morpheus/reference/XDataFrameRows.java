@@ -63,7 +63,7 @@ class XDataFrameRows<R,C> extends XDataFrameAxisBase<R,C,R,C,DataFrameRow<R,C>,D
 
 
     @Override
-    public boolean add(R key) throws DataFrameException {
+    public int add(R key) throws DataFrameException {
         return add(key, null);
     }
 
@@ -75,13 +75,15 @@ class XDataFrameRows<R,C> extends XDataFrameAxisBase<R,C,R,C,DataFrameRow<R,C>,D
 
 
     @Override
-    public final boolean add(R key, Function<DataFrameValue<R,C>,?> initials) {
+    public final int add(R key, Function<DataFrameValue<R,C>,?> initials) {
         final XDataFrameContent<R,C> content = frame().content();
         final boolean added = content.addRow(key);
         final boolean ignoreDuplicates = DataFrameOptions.isIgnoreDuplicates();
         if (!added && !ignoreDuplicates) {
             throw new DataFrameException("Attempt to add duplicate row key: " + key);
-        } else if (added) {
+        } else if (!added) {
+            return content.rowKeys().getOrdinal(key);
+        } else {
             final XDataFrame<R,C> frame = frame();
             final int ordinal = content.rowKeys().getOrdinal(key);
             if (initials != null) {
@@ -97,8 +99,8 @@ class XDataFrameRows<R,C> extends XDataFrameAxisBase<R,C,R,C,DataFrameRow<R,C>,D
                 final DataFrameEvent event = DataFrameEvent.createRowAdd(frame, keyList);
                 frame.events().fireDataFrameEvent(event);
             }
+            return ordinal;
         }
-        return added;
     }
 
 
