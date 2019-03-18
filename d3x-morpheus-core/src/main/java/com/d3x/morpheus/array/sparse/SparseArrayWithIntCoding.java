@@ -268,10 +268,20 @@ class SparseArrayWithIntCoding<T> extends ArrayBase<T> {
         return coding.getValue(code);
     }
 
+    @Override
+    public int setInt(int index, int value) {
+        final int oldValue = getInt(index);
+        if (value == defaultCode) {
+            this.codes.remove(index);
+            return oldValue;
+        } else {
+            this.codes.put(index, value);
+            return oldValue;
+        }
+    }
 
     @Override
     public final T setValue(int index, T value) {
-        this.checkBounds(index, length);
         final T oldValue = getValue(index);
         final int code = coding.getCode(value);
         if (code == defaultCode) {

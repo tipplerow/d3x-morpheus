@@ -352,7 +352,10 @@ public class CsvSource<R> implements DataFrameSource<R,String,CsvSourceOptions<R
                     final Array<R> keys = batch.keys();
                     final int fromRowOrdinal = frame.rowCount();
                     final Array<R> rowKeys = rowCount < options.getReadBatchSize() ? keys.copy(0, rowCount) : keys;
-                    this.frame.rows().addAll(rowKeys);
+                    final Array<R> added = this.frame.rows().addAll(rowKeys);
+                    if (added.length() < rowKeys.length()) {
+                        throw new DataFrameException("Duplicate row keys encountered in csv source");
+                    }
                     final DataFrameCursor<R,String> cursor = frame.cursor();
                     for (int j=0; j<colIndexes.length; ++j) {
                         final String[] colValues = batch.colData(j);
@@ -499,15 +502,15 @@ public class CsvSource<R> implements DataFrameSource<R,String,CsvSourceOptions<R
 
 
     public static void main(String[] args) {
-        final long t1 = System.currentTimeMillis();
-        final String path = "/Users/witdxav/Dropbox/data/uk-house-prices/uk-house-prices-2006.csv";
-        final DataFrame<Integer,String> frame = DataFrame.read().csv(options -> {
-            options.setResource(path);
-            options.setHeader(false);
+        DataFrame<String,String> frame = DataFrame.read().csv(options -> {
+            options.setHeader(true);
+            options.setReadBatchSize(100);
+            options.setExcludeColumnIndexes(0);
+            options.setResource("/Users/witdxav/d3x/sedol-to-cusip.csv");
+            options.setRowKeyParser(String.class, row -> row[0]);
         });
-        final long t2 = System.currentTimeMillis();
+
         frame.out().print();
-        System.out.printf("\n\nLoaded DataFrame with %s row in %s millis", frame.rowCount(), t2 - t1);
     }
 
 }

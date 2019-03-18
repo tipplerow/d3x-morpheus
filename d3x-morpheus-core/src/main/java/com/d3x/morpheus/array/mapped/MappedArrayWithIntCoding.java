@@ -324,6 +324,13 @@ class MappedArrayWithIntCoding<T> extends ArrayBase<T> implements WithIntCoding<
 
 
     @Override
+    public int setInt(int index, int value) {
+        final int oldValue = getInt(index);
+        this.buffer.put(index, value);
+        return oldValue;
+    }
+
+    @Override
     public final T setValue(int index, T value) {
         this.checkBounds(index, length);
         final T oldValue = getValue(index);
