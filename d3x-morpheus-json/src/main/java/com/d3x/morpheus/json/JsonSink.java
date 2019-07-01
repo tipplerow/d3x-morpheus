@@ -17,10 +17,16 @@ package com.d3x.morpheus.json;
 
 import java.io.File;
 import java.io.OutputStream;
+import java.sql.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZonedDateTime;
+import java.util.Map;
 import java.util.function.Consumer;
 
 import com.d3x.morpheus.frame.DataFrame;
-import com.d3x.morpheus.util.Initialiser;
+import com.d3x.morpheus.util.Collect;
 import com.d3x.morpheus.util.Resource;
 import com.d3x.morpheus.util.text.Formats;
 
@@ -33,6 +39,19 @@ import com.d3x.morpheus.util.text.Formats;
  */
 public interface JsonSink<R,C> {
 
+    /** The map of common data types keyed by their label */
+    Map<String,Class<?>> typeMap = Collect.asMap(v -> {
+        v.put("boolean", Boolean.class);
+        v.put("integer", Integer.class);
+        v.put("long", Long.class);
+        v.put("double", Double.class);
+        v.put("string", String.class);
+        v.put("date-util", Date.class);
+        v.put("date", LocalDate.class);
+        v.put("time", LocalTime.class);
+        v.put("datetime", LocalDateTime.class);
+        v.put("datetime-tz", ZonedDateTime.class);
+    });
 
     /**
      * Returns a newly created JsonSink
@@ -52,8 +71,8 @@ public interface JsonSink<R,C> {
      */
     default void write(DataFrame<R,C> frame, JsonStyle style, File file) {
         this.write(frame, options -> {
-            options.setFile(file);
-            options.setStyle(style);
+            options.resource(Resource.of(file));
+            options.style(style);
         });
     }
 
@@ -66,8 +85,8 @@ public interface JsonSink<R,C> {
      */
     default void write(DataFrame<R,C> frame, JsonStyle style, OutputStream os) {
         this.write(frame, options -> {
-            options.setOutputStream(os);
-            options.setStyle(style);
+            options.resource(Resource.of(os));
+            options.style(style);
         });
     }
 
@@ -77,8 +96,31 @@ public interface JsonSink<R,C> {
      * @param frame         the frame to write
      * @param configurator  the options configurator
      */
-    default void write(DataFrame<R,C> frame, Consumer<Options> configurator) {
-        write(frame, Initialiser.apply(Options.class, configurator));
+    default void write(DataFrame<R,C> frame, Consumer<Options.OptionsBuilder> configurator) {
+        write(frame, Options.create(configurator));
+    }
+
+
+    /**
+     * Returns the data type implied by the label
+     * @param label the label for data type
+     * @param <T>   the expected type
+     * @return      the class for label
+     */
+    @SuppressWarnings("unchecked")
+    static <T> Class<T> getDataType(String label) {
+        try {
+            var type = typeMap.get(label);
+            if (type != null) {
+                return (Class<T>)type;
+            } else if (label.startsWith("enum:")) {
+                return (Class<T>)Class.forName(label.replace("enum:", ""));
+            } else {
+                return (Class<T>)Class.forName(label);
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException("Unable to resolve type for label: " + label, ex);
+        }
     }
 
 
@@ -115,61 +157,41 @@ public interface JsonSink<R,C> {
      * The options for this sink
      */
     @lombok.Data()
+    @lombok.Builder()
+    @lombok.ToString()
+    @lombok.NoArgsConstructor()
+    @lombok.AllArgsConstructor()
     class Options {
 
-        /** The JSON style to output */
-        private JsonStyle style;
-        /** The formats to parse JSON values */
-        private Formats formats;
         /** The resource to load the frame from */
+        @lombok.NonNull
         private Resource resource;
+        /** The JSON style to output */
+        @lombok.NonNull @lombok.Builder.Default
+        private JsonStyle style = JsonStyle.DEFAULT;
+        /** The formats to parse JSON values */
+        @lombok.NonNull @lombok.Builder.Default
+        private Formats formats = new Formats();
         /** The charset encoding for content */
-        private String encoding;
+        @lombok.NonNull @lombok.Builder.Default
+        private String encoding = "UTF-8";
+        /** True to pretty print json */
+        @lombok.Builder.Default
+        private boolean pretty = false;
+        /** True to serialize nulls json */
+        @lombok.Builder.Default
+        private boolean nulls = true;
+
 
         /**
-         * Constructor
+         * Returns new options initialized by consumer
+         * @param consumer  the consumer reference
+         * @return          the new options
          */
-        public Options() {
-            this.style = JsonStyle.DEFAULT;
-            this.formats = new Formats();
-            this.encoding = "UTF-8";
-        }
-
-        /**
-         * Sets the resource output stream for these options
-         * @param os    the output stream to write to
-         */
-        public void setOutputStream(OutputStream os) {
-            this.resource = Resource.of(os);
-        }
-
-        /**
-         * Sets the resource file for these options
-         * @param file  the output file to write to
-         */
-        public void setFile(File file) {
-            this.resource = Resource.of(file);
-        }
-
-        /**
-         * Sets the resource file for these options
-         * @param path  the output file path to write to
-         */
-        public void setFile(String path) {
-            this.resource = Resource.of(new File(path));
-        }
-
-        /**
-         * Sets the formats to use for output to CSV
-         * @param configure   the formats to apply
-         */
-        public void withFormats(Consumer<Formats> configure) {
-            if (formats != null) {
-                configure.accept(formats);
-            } else {
-                this.formats = new Formats();
-                configure.accept(formats);
-            }
+        public static Options create(Consumer<Options.OptionsBuilder> consumer) {
+            var builder = Options.builder();
+            consumer.accept(builder);
+            return builder.build();
         }
     }
 

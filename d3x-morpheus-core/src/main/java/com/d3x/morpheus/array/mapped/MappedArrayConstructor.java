@@ -72,6 +72,11 @@ public class MappedArrayConstructor implements ArrayFactory.Constructor {
 
 
     @Override
+    public <T> Array<T> apply(Class<T> type, int length, double fillPct, T defaultValue) {
+        return apply(type, length, defaultValue, null);
+    }
+
+    @Override
     @SuppressWarnings("unchecked")
     public <T> Array<T> apply(Class<T> type, int length, T defaultValue, String path) {
         final File file = path == null ? randomFile(true) : createDir(new File(path));

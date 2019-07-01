@@ -278,6 +278,23 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
 
 
     /**
+     * Returns true if the value is null at the coordinates specified
+     * @param rowCoord  the row coordinate
+     * @param colCoord  the column coordinate
+     * @return          true if value is null
+     */
+    final boolean isNullAt(int rowCoord, int colCoord) {
+        if (columnStore) {
+            var colArray = data.get(colCoord);
+            return colArray.isNull(rowCoord);
+        } else {
+            var rowArray = data.get(rowCoord);
+            return rowArray.isNull(colCoord);
+        }
+    }
+
+
+    /**
      * Returns the array type for the vector implied by the row key specified
      * @param rowKey    the row key
      * @return          the array type for row key
@@ -585,7 +602,7 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
     @SuppressWarnings("unchecked")
     final <T> XDataFrameContent<R,C> mapToObjects(XDataFrame<R,C> frame, C colKey, Class<T> type, Function<DataFrameValue<R,C>,T> mapper) {
         if (!isColumnStore()) {
-            throw new DataFrameException("Cannot apply columns of a transposed DataFrame");
+            throw new DataFrameException("Cannot map columns of a transposed DataFrame, call copy() first");
         } else {
             final int rowCount = rowKeys.size();
             final boolean parallel  = frame.isParallel();
@@ -615,19 +632,7 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
      * @param newColKeys   the optionally filtered column keys
      */
     final XDataFrameContent<R,C> filter(Index<R> newRowKeys, Index<C> newColKeys) {
-        if (newColKeys.size() == this.colKeys.size()) {
-            return new XDataFrameContent<>(newRowKeys, newColKeys, columnStore, data);
-        } else if (columnStore) {
-            final IntStream indexes = newColKeys.keys().mapToInt(k -> this.colKeys.getCoordinate(k));
-            final Index<C> colAxis = Index.of(newColKeys.toArray());
-            final List<Array<?>> newData = indexes.mapToObj(data::get).collect(Collectors.toList());
-            return new XDataFrameContent<>(newRowKeys, colAxis, columnStore, newData);
-        } else {
-            final IntStream indexes = newRowKeys.keys().mapToInt(k -> this.rowKeys.getCoordinate(k));
-            final Index<C> colAxis = Index.of(newColKeys.toArray());
-            final List<Array<?>> newData = indexes.mapToObj(data::get).collect(Collectors.toList());
-            return new XDataFrameContent<>(newRowKeys, colAxis, columnStore, newData);
-        }
+        return new XDataFrameContent<>(newRowKeys, newColKeys, columnStore, data);
     }
 
 
@@ -736,7 +741,7 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
             final Class<?> dataType = colType(colKey);
             final ArrayType type = ArrayType.of(dataType);
             final int colIndex = colKeys.getCoordinate(colKey);
-            final Array<Object> array = Array.<Object>of(dataType, rowCount);
+            final Array<Object> array = Array.of((Class<Object>)dataType, rowCount);
             newContent.addColumn(colKey, array);
             if (type.isBoolean()) {
                 for (int i=0; i<rowCount; ++i) {

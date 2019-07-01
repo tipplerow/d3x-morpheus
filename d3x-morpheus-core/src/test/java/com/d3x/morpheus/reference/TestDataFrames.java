@@ -164,7 +164,7 @@ public class TestDataFrames {
         if (type == Integer.class) {
             return Range.of(0, count).map(v -> (T)v);
         } else if (type == Long.class) {
-            return Range.of(0, count).map(v -> (T)new Long(v.longValue()));
+            return Range.of(0, count).map(v -> (T)Long.valueOf(v.longValue()));
         } else if (type == String.class) {
             return Range.of(0, count).map(v -> (T)("R" + v));
         } else if (type == LocalDate.class) {

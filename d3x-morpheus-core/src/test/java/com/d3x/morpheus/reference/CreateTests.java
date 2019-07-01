@@ -36,7 +36,7 @@ import org.testng.annotations.Test;
  */
 public class CreateTests {
 
-    final Index<String> rowKeys = Index.of("R1", "R2", "R3", "R4", "R5", "R6", "R7");
+    final Index<String> rowKeys = Index.ofObjects("R1", "R2", "R3", "R4", "R5", "R6", "R7");
     final DataFrame<String,String> template = DataFrame.of(rowKeys, String.class, columns -> {
         columns.add("C1", Double.class);
         columns.add("C2", Integer.class);
@@ -98,7 +98,7 @@ public class CreateTests {
         final LocalDate start = LocalDate.of(1900, 1, 1);
         final Index<LocalDate> dates = Range.of(0, 5000000).map(start::plusDays).toIndex(LocalDate.class);
         final long t2 = System.nanoTime();
-        final Index<String> colKeys = Index.of("C1", "C2", "C3", "C4", "C5");
+        final Index<String> colKeys = Index.ofObjects("C1", "C2", "C3", "C4", "C5");
         final long t3 = System.nanoTime();
         final DataFrame<LocalDate,String> frame = DataFrame.ofDoubles(dates, colKeys);
         final long t4 = System.nanoTime();

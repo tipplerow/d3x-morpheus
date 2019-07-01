@@ -350,7 +350,7 @@ class GXyDataset<X extends Comparable,S extends Comparable> implements XyDataset
 
     public static void main(String[] args) {
         final Range<LocalDate> rowAxis = Range.ofLocalDates("2017-01-01", "2017-06-01");
-        final Array<String> colAxis = Array.of("A", "B", "C", "D");
+        final Array<String> colAxis = Array.ofObjects("A", "B", "C", "D");
         final DataFrame<LocalDate,String> frame = DataFrame.ofDoubles(rowAxis, colAxis, v -> Math.random());
         final GXyDataset dataset = GXyDataset.of(() -> frame);
         final JsCode js = new JsCode();

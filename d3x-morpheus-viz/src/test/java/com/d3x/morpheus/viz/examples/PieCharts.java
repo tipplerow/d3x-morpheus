@@ -38,8 +38,8 @@ public class PieCharts {
     public void pieChart1() throws Exception {
 
         DataFrame<String,String> frame = DataFrame.ofDoubles(
-            Array.of("AUS", "GBR", "USA", "DEU", "ITA", "ESP", "ZAF"),
-            Array.of("Random"),
+            Array.ofObjects("AUS", "GBR", "USA", "DEU", "ITA", "ESP", "ZAF"),
+            Array.ofObjects("Random"),
             value -> Math.random() * 10d
         );
 

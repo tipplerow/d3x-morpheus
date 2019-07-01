@@ -361,14 +361,33 @@ public class Formats {
      * @return          the formatted string
      */
     @SuppressWarnings("unchecked")
-    public <T> String format(T value) {
+    public final <T> String format(T value) {
         if (value == null) {
             return "null";
         } else {
-            final Class<T> type = (Class<T>)value.getClass();
-            return getPrinterOrFail(type, null).apply(value);
+            var type = (Class<T>)value.getClass();
+            var printer = getPrinterOrFail(type, Object.class);
+            return printer.apply(value);
         }
     }
+
+
+    /**
+     * Parses text into some object representation using the parser registered against the key provided
+     * @param key       the parser key to use
+     * @param text      the text to parse
+     * @param <T>       the data type
+     * @return          the resulting value
+     */
+    public final <T> T parse(Object key, String text) {
+        if (text == null) {
+            return null;
+        } else {
+            var parser = this.<T>getParserOrFail(key);
+            return parser.apply(text);
+        }
+    }
+
 
     /**
      * Returns a Printer for the key specified

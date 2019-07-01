@@ -444,7 +444,7 @@ public interface ChartFactory {
      */
     default <R extends Comparable,C extends Comparable> Chart<XyPlot<Integer>> withAcf(DataFrameLeastSquares<R,C> model, int maxLags, double alpha, Consumer<Chart<XyPlot<Integer>>> consumer) {
         final DataFrame<Integer,String> acf = model.getResidualsAcf(maxLags);
-        final Array<String> bounds = Array.of("Upper", "Lower");
+        final Array<String> bounds = Array.ofObjects("Upper", "Lower");
         final Array<Integer> lags = acf.rows().keyArray();
         final double erfInv = Math.sqrt(2d) * Erf.erfInv(1d - alpha);
         final double upper = 1d * erfInv / Math.sqrt(maxLags);

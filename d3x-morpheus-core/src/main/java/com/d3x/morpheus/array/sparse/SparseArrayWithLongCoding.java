@@ -55,16 +55,17 @@ class SparseArrayWithLongCoding<T> extends ArrayBase<T> {
     /**
      * Constructor
      * @param length        the length for this array
+     * @param fillPct   the fill percent for array (0.2 implies 20% filled)
      * @param defaultValue  the default value for array
      * @param coding        the coding for this array
      */
-    SparseArrayWithLongCoding(int length, T defaultValue, LongCoding<T> coding) {
+    SparseArrayWithLongCoding(int length, double fillPct, T defaultValue, LongCoding<T> coding) {
         super(coding.getType(), ArrayStyle.SPARSE, false);
         this.length = length;
         this.coding = coding;
         this.defaultValue = defaultValue;
         this.defaultCode = coding.getCode(defaultValue);
-        this.codes = new TIntLongHashMap((int)Math.max(length * 0.5, 10d), 0.8f, -1, defaultCode);
+        this.codes = new TIntLongHashMap((int)Math.max(length * fillPct, 10d), 0.85f, -1, defaultCode);
     }
 
     /**
@@ -130,9 +131,10 @@ class SparseArrayWithLongCoding<T> extends ArrayBase<T> {
 
     @Override()
     public final Array<T> copy(int[] indexes) {
-        final SparseArrayWithLongCoding<T> clone = new SparseArrayWithLongCoding<>(indexes.length, defaultValue, coding);
+        var fillPct = (double)codes.size() / length();
+        var clone = new SparseArrayWithLongCoding<T>(indexes.length, fillPct, defaultValue, coding);
         for (int i = 0; i < indexes.length; ++i) {
-            final long code = getLong(indexes[i]);
+            var code = getLong(indexes[i]);
             clone.codes.put(i, code);
         }
         return clone;
@@ -141,10 +143,11 @@ class SparseArrayWithLongCoding<T> extends ArrayBase<T> {
 
     @Override()
     public final Array<T> copy(int start, int end) {
-        final int length = end - start;
-        final SparseArrayWithLongCoding<T> clone = new SparseArrayWithLongCoding<>(length, defaultValue, coding);
+        var length = end - start;
+        var fillPct = (double)codes.size() / length();
+        var clone = new SparseArrayWithLongCoding<T>(length, fillPct, defaultValue, coding);
         for (int i=0; i<length; ++i) {
-            final long code = getLong(start+i);
+            var code = getLong(start+i);
             if (code != defaultCode) {
                 clone.codes.put(i, code);
             }

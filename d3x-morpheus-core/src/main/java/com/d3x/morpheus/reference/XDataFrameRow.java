@@ -269,6 +269,22 @@ class XDataFrameRow<R,C> extends XDataFrameVector<R,C,R,C,DataFrameRow<R,C>> imp
     }
 
 
+    @Override
+    public boolean isNull(C key) {
+        var rowCoord = data.rowCoordinate(rowKey);
+        var colCoord = data.colCoordinate(key);
+        return data.isNullAt(rowCoord, colCoord);
+    }
+
+
+    @Override
+    public boolean isNullAt(int ordinal) {
+        var rowCoord = data.rowCoordinate(rowKey);
+        var colCoord = data.colCoordinateAt(ordinal);
+        return data.isNullAt(rowCoord, colCoord);
+    }
+
+
     @Override()
     public final DataFrame<R,C> rank() {
         final double[] values = toDoubleStream().toArray();

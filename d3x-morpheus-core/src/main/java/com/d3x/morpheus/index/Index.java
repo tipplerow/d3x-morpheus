@@ -379,14 +379,55 @@ public interface Index<K> extends Iterable<K>, Cloneable, Serializable {
         return Index.of(Array.singleton(key));
     }
 
+
+    /**
+     * Returns a newly created index to hold values provided
+     * @param values    the values to build index from
+     * @return          the newly created Index
+     */
+    static Index<Boolean> ofBooleans(boolean... values) {
+        return IndexFactory.getInstance().create(Array.of(values));
+    }
+
+
+    /**
+     * Returns a newly created index to hold values provided
+     * @param values    the values to build index from
+     * @return          the newly created Index
+     */
+    static Index<Integer> ofInts(int... values) {
+        return IndexFactory.getInstance().create(Array.of(values));
+    }
+
+
+    /**
+     * Returns a newly created index to hold values provided
+     * @param values    the values to build index from
+     * @return          the newly created Index
+     */
+    static Index<Long> ofLongs(long... values) {
+        return IndexFactory.getInstance().create(Array.of(values));
+    }
+
+
+    /**
+     * Returns a newly created index to hold values provided
+     * @param values    the values to build index from
+     * @return          the newly created Index
+     */
+    static Index<Double> ofLongs(double... values) {
+        return IndexFactory.getInstance().create(Array.of(values));
+    }
+
+
     /**
      * Returns a newly created index to hold values provided
      * @param values    the values to build index from
      * @return          the newly created Index
      */
     @SafeVarargs
-    static <V> Index<V> of(V... values) {
-        return IndexFactory.getInstance().create(Array.of(values));
+    static <V> Index<V> ofObjects(V... values) {
+        return IndexFactory.getInstance().create(Array.ofObjects(values));
     }
 
 }

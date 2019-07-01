@@ -298,7 +298,7 @@ public class MinMaxTests {
     }
 
 
-    @Test()
+    @Test(enabled = false)
     public void testPopulation() {
 
         //Load ONS population dataset

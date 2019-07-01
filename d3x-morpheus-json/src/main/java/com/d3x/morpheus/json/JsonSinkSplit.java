@@ -15,41 +15,46 @@
  */
 package com.d3x.morpheus.json;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
+import java.time.LocalDate;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import com.d3x.morpheus.frame.DataFrame;
 import com.d3x.morpheus.frame.DataFrameColumn;
 import com.d3x.morpheus.frame.DataFrameException;
 import com.d3x.morpheus.frame.DataFrameRow;
 import com.d3x.morpheus.frame.DataFrameValue;
-import com.d3x.morpheus.util.IO;
+import com.d3x.morpheus.range.Range;
+import com.d3x.morpheus.util.Resource;
 import com.d3x.morpheus.util.text.Formats;
 import com.d3x.morpheus.util.text.printer.Printer;
 import com.google.gson.stream.JsonWriter;
 
 /**
- * A JsonSink.Handler that outputs a format compatible with Pandas "split" orientation
+ * A JsonSink implementation that writes json compatible with Pandas "index" json format
+ *
+ * @param <R>   the row key type
+ * @param <C>   the column key type
  *
  * <p><strong>This is open source software released under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 License</a></strong></p>
  *
  * @author Xavier Witdouck
  */
-class JsonSinkSplit<R,C> implements JsonSink<R,C> {
+public class JsonSinkSplit<R,C> extends JsonSinkBase<R,C> {
 
     private JsonWriter writer;
     private JsonSink.Options options;
 
 
-    @Override
-    public synchronized void write(DataFrame<R,C> frame, Options options) {
+    @Override()
+    public synchronized void write(JsonWriter writer, DataFrame<R,C> frame, Options options) {
         try {
-            final String encoding = options.getEncoding();
-            final OutputStream os = options.getResource().toOutputStream();
             this.options = options;
-            this.writer = new JsonWriter(new OutputStreamWriter(os, encoding));
-            this.writer.setIndent("  ");
+            this.writer = writer;
             this.writer.beginObject();
             this.writer.name("columns");
             this.writer.beginArray();
@@ -66,8 +71,6 @@ class JsonSinkSplit<R,C> implements JsonSink<R,C> {
             this.writer.endObject();
         } catch (Exception ex) {
             throw new DataFrameException("Failed to write DataFrame to JSON output", ex);
-        } finally {
-            IO.close(writer);
         }
     }
 
@@ -93,7 +96,7 @@ class JsonSinkSplit<R,C> implements JsonSink<R,C> {
      * @throws IOException  if there is an I/O error
      */
     private void writeRowKeys(DataFrame<?,?> frame) throws IOException {
-        final Class<?> type = frame.rows().keyType();
+        var type = frame.rows().keyType();
         if (type.equals(Integer.class)) {
             for (DataFrameRow<?,?> row : frame.rows()) {
                 writer.value((Integer)row.key());
@@ -111,8 +114,8 @@ class JsonSinkSplit<R,C> implements JsonSink<R,C> {
                 writer.value((Number)row.key());
             }
         } else {
-            final Formats formats = options.getFormats();
-            final Printer<Object> printer = formats.getPrinterOrFail(type);
+            var formats = options.getFormats();
+            var printer = formats.getPrinterOrFail(type);
             for (DataFrameRow<?,?> row : frame.rows()) {
                 final Object rowKey = row.key();
                 final String value = printer.apply(rowKey);
@@ -151,6 +154,18 @@ class JsonSinkSplit<R,C> implements JsonSink<R,C> {
             }
             writer.endArray();
         }
+    }
+
+
+    public static void main(String[] args) throws Exception {
+        var range = Range.of(LocalDate.parse("2000-01-01"), LocalDate.parse("2019-05-10"));
+        var columns = IntStream.range(0, 100).mapToObj(i -> "Column-" + i).collect(Collectors.toList());
+        var frame = DataFrame.ofDoubles(range, columns, v -> Math.random());
+        var sink = new JsonSinkSplit<LocalDate,String>();
+        var os = new BufferedOutputStream(new FileOutputStream(new File("frame-as-split.json")));
+        sink.write(frame, Options.create(v -> {
+            v.resource(Resource.of(os));
+        }));
     }
 
 }

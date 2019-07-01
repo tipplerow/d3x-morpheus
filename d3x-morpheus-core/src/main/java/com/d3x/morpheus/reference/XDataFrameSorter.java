@@ -20,6 +20,7 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Stream;
 
 import com.d3x.morpheus.array.Array;
 import com.d3x.morpheus.frame.DataFrame;
@@ -166,7 +167,7 @@ class XDataFrameSorter {
     public static void main(String[] args) {
         final LocalDateTime start = LocalDateTime.now();
         final Array<LocalDateTime> rowKeys = Range.of(start, start.plusSeconds(10000000), Duration.ofSeconds(1)).toArray().shuffle(1);
-        final Array<String> colKeys = Array.of("A", "B", "C", "D");
+        final Array<String> colKeys = Array.of(Stream.of("A", "B", "C", "D"));
         final DataFrame<LocalDateTime,String> frame = DataFrame.ofDoubles(rowKeys, colKeys).applyDoubles(v -> Math.random());
         for (int i=0; i<20; ++i) {
             frame.applyDoubles(v -> Math.random());

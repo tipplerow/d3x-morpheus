@@ -169,9 +169,9 @@ public class IndexCreateTests {
 
     @Test()
     public void testAdditionalCreateMethods() {
-        final Index<Integer> index1 = Index.of(1, 2, 3, 4, 5, 6, 7);
-        final Index<Long> index2 = Index.of(5L, 4L, 3L, 2L, 1L, 0L, -1L);
-        final Index<String> index3 = Index.of("a", "b", "c", "d", "e", "f", "g");
+        final Index<Integer> index1 = Index.ofInts(1, 2, 3, 4, 5, 6, 7);
+        final Index<Long> index2 = Index.ofLongs(5L, 4L, 3L, 2L, 1L, 0L, -1L);
+        final Index<String> index3 = Index.ofObjects("a", "b", "c", "d", "e", "f", "g");
         final Index<DayOfWeek> index4 = Index.of(DayOfWeek.class, DayOfWeek.values());
         Assert.assertEquals(index1.size(), 7);
         Assert.assertEquals(index2.size(), 7);

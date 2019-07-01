@@ -113,7 +113,7 @@ public class WLSTests {
     @Test(dataProvider = "data2")
     public void testMultipleWithIntercept(DataFrame<Integer,String> data) {
         final Array<Double> weights = computeWeightsMultiple(data);
-        data.regress().wls("Y", Array.of("X1", "X2"), weights, true, model -> {
+        data.regress().wls("Y", Array.ofObjects("X1", "X2"), weights, true, model -> {
 
             System.out.println(model);
 
@@ -152,7 +152,7 @@ public class WLSTests {
     @Test(dataProvider = "data2")
     public void testMultipleWithoutIntercept(DataFrame<Integer,String> data) {
         final Array<Double> weights = computeWeightsMultiple(data);
-        data.regress().wls("Y", Array.of("X1", "X2"), weights, false, model -> {
+        data.regress().wls("Y", Array.ofObjects("X1", "X2"), weights, false, model -> {
 
             System.out.println(model);
 
@@ -207,7 +207,7 @@ public class WLSTests {
      * @return          the weight vector for diagonal matrix in WLS
      */
     private Array<Double> computeWeightsMultiple(DataFrame<Integer,String> frame) {
-        return frame.regress().ols("Y", Array.of("X1", "X2"), true, model -> {
+        return frame.regress().ols("Y", Array.ofObjects("X1", "X2"), true, model -> {
             final DataFrame<Integer,String> residuals = model.getResiduals();
             final DataFrame<Integer,String> residualsAbs = residuals.mapToDoubles(v -> Math.abs(v.getDouble()));
             final DataFrame<Integer,String> xValues = frame.cols().select("X1");

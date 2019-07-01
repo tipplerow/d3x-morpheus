@@ -92,6 +92,20 @@ public interface DataFrameVector<X,Y,R,C,Z> extends DataFrameOperations<R,C,Z>, 
     boolean hasNulls();
 
     /**
+     * Returns true if the value for key is null
+     * @param key   the row or column key if this represents a column or row respectively
+     * @return      true if null
+     */
+    boolean isNull(Y key);
+
+    /**
+     * Returns true if the value at ordinal is null
+     * @param ordinal   the row or column ordinal if this represents a column or row respectively
+     * @return          true if null
+     */
+    boolean isNullAt(int ordinal);
+
+    /**
      * Returns the row keys for this vector, one key if this is a row
      * @return  the stream of row keys for vector
      */

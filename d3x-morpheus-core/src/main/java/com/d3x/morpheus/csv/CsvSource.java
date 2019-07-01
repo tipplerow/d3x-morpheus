@@ -16,6 +16,7 @@
 package com.d3x.morpheus.csv;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -506,7 +507,7 @@ public class CsvSource<R> implements DataFrameSource<R,String,CsvSourceOptions<R
             options.setHeader(true);
             options.setReadBatchSize(100);
             options.setExcludeColumnIndexes(0);
-            options.setResource("/Users/witdxav/d3x/sedol-to-cusip.csv");
+            options.setResource("/Users/witdxav/temp/opt-models/31c9ef7d-f7c2-4f6f-a804-901a322c7ae4/data/attribute-asset_lower_bound_attribute.csv");
             options.setRowKeyParser(String.class, row -> row[0]);
         });
 

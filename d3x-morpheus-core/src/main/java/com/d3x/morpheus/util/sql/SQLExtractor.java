@@ -272,7 +272,7 @@ public class SQLExtractor implements Cloneable {
         @SuppressWarnings("unchecked")
         public <V> V getValue(ResultSet rs, int colIndex) throws SQLException {
             final double value = rs.getDouble(colIndex);
-            return rs.wasNull() ? null : (V)new Double(value);
+            return rs.wasNull() ? null : (V)Double.valueOf(value);
         }
     }
 
@@ -290,7 +290,7 @@ public class SQLExtractor implements Cloneable {
         @SuppressWarnings("unchecked")
         public <V> V getValue(ResultSet rs, int colIndex) throws SQLException {
             final int value = rs.getInt(colIndex);
-            return rs.wasNull() ? null : (V)new Integer(value);
+            return rs.wasNull() ? null : (V)Integer.valueOf(value);
         }
     }
 
@@ -308,7 +308,7 @@ public class SQLExtractor implements Cloneable {
         @SuppressWarnings("unchecked")
         public <V> V getValue(ResultSet rs, int colIndex) throws SQLException {
             final long value = rs.getLong(colIndex);
-            return rs.wasNull() ? null : (V)new Long(value);
+            return rs.wasNull() ? null : (V)Long.valueOf(value);
         }
     }
 

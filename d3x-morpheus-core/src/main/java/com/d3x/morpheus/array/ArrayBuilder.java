@@ -217,7 +217,7 @@ public class ArrayBuilder<T> {
             this.checkType = typeCode != ArrayType.OBJECT;
             this.length = array.length();
         } else if (checkType && !isMatch(dataType)) {
-            final Array<T> newArray = Array.ofObjects(array.length());
+            var newArray = Array.<T>ofObjects(array.length());
             for (int i=0; i<array.length(); ++i) newArray.setValue(i, array.getValue(i));
             this.array = newArray;
             this.type = (Class<T>)Object.class;

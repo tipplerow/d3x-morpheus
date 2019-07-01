@@ -49,13 +49,14 @@ class SparseArrayOfObjects<T> extends ArrayBase<T> {
      * Constructor
      * @param type      the type for this array
      * @param length    the length for this array
+     * @param fillPct   the fill percent for array (0.2 implies 20% filled)
      * @param defaultValue  the default value
      */
-    SparseArrayOfObjects(Class<T> type, int length, T defaultValue) {
+    SparseArrayOfObjects(Class<T> type, int length, double fillPct, T defaultValue) {
         super(type, ArrayStyle.SPARSE, false);
         this.length = length;
         this.defaultValue = defaultValue;
-        this.values = new TIntObjectHashMap<>((int)Math.max(length * 0.5, 10d), 0.8f, -1);
+        this.values = new TIntObjectHashMap<>((int)Math.max(length * fillPct, 10d), 0.85f, -1);
     }
 
     /**
@@ -116,9 +117,10 @@ class SparseArrayOfObjects<T> extends ArrayBase<T> {
 
     @Override()
     public final Array<T> copy(int[] indexes) {
-        final SparseArrayOfObjects<T> clone = new SparseArrayOfObjects<>(type(), indexes.length, defaultValue);
+        var fillPct = (double)values.size() / length();
+        var clone = new SparseArrayOfObjects<T>(type(), indexes.length, fillPct, defaultValue);
         for (int i = 0; i < indexes.length; ++i) {
-            final T value = getValue(indexes[i]);
+            var value = getValue(indexes[i]);
             clone.setValue(i, value);
         }
         return clone;
@@ -127,10 +129,11 @@ class SparseArrayOfObjects<T> extends ArrayBase<T> {
 
     @Override()
     public final Array<T> copy(int start, int end) {
-        final int length = end - start;
-        final SparseArrayOfObjects<T> clone = new SparseArrayOfObjects<>(type(), length, defaultValue);
+        var length = end - start;
+        var fillPct = (double)values.size() / length();
+        var clone = new SparseArrayOfObjects<T>(type(), length, fillPct, defaultValue);
         for (int i=0; i<length; ++i) {
-            final T value = getValue(start+i);
+            var value = getValue(start+i);
             //todo: Fix object equality check
             if (value != defaultValue) {
                 clone.setValue(i, value);
@@ -327,7 +330,7 @@ class SparseArrayOfObjects<T> extends ArrayBase<T> {
     public final int setInt(int index, int value) {
         this.checkBounds(index, length);
         final int oldValue = getInt(index);
-        this.setValue(index, (T)new Integer(value));
+        this.setValue(index, (T)Integer.valueOf(value));
         return oldValue;
     }
 
@@ -337,7 +340,7 @@ class SparseArrayOfObjects<T> extends ArrayBase<T> {
     public final long setLong(int index, long value) {
         this.checkBounds(index, length);
         final long oldValue = getLong(index);
-        this.setValue(index, (T)new Long(value));
+        this.setValue(index, (T)Long.valueOf(value));
         return oldValue;
     }
 
@@ -347,7 +350,7 @@ class SparseArrayOfObjects<T> extends ArrayBase<T> {
     public final double setDouble(int index, double value) {
         this.checkBounds(index, length);
         final double oldValue = getDouble(index);
-        this.setValue(index, (T)new Double(value));
+        this.setValue(index, (T)Double.valueOf(value));
         return oldValue;
     }
 

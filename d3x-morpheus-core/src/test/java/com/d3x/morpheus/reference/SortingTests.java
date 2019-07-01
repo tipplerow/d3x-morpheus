@@ -281,7 +281,7 @@ public class SortingTests {
     @Test()
     public void testSortColumns() throws Exception {
         final Index<LocalDate> rowKeys = Index.of(LocalDate.class, 100);
-        final Index<String> colKeys = Index.of("AAPL", "ORCL", "GOOGL", "BLK", "YHOO");
+        final Index<String> colKeys = Index.ofObjects("AAPL", "ORCL", "GOOGL", "BLK", "YHOO");
         final DataFrame<LocalDate,String> frame = DataFrame.ofDoubles(rowKeys, colKeys);
         frame.rows().add(LocalDate.of(2013, 6, 2), v -> 10d * Math.random());
         frame.rows().add(LocalDate.of(2013, 6, 3), v -> 10d * Math.random());
@@ -513,7 +513,7 @@ public class SortingTests {
     public void testIntegerRowSortByKeys(boolean ascending, boolean parallel) {
         final Random random = new Random();
         final Array<Integer> rowKeys = Range.of(0, 10000).toArray().shuffle(2);
-        final Array<String> colKeys = Array.of("A", "B", "C", "D");
+        final Array<String> colKeys = Array.ofObjects("A", "B", "C", "D");
         final DataFrame<Integer,String> frame = DataFrame.ofDoubles(rowKeys, colKeys).applyDoubles(v -> random.nextDouble());
         frame.out().print();
         final DataFrame<Integer,String> sorted = parallel ? frame.rows().parallel().sort(ascending) : frame.rows().sequential().sort(ascending);
@@ -536,7 +536,7 @@ public class SortingTests {
     public void testLocalDateRowSortByKeys(boolean ascending, boolean parallel) {
         final Random random = new Random();
         final Array<LocalDate> rowKeys = Range.ofLocalDates("2000-01-01", "2010-01-01").toArray().shuffle(2);
-        final Array<String> colKeys = Array.of("A", "B", "C", "D");
+        final Array<String> colKeys = Array.ofObjects("A", "B", "C", "D");
         final DataFrame<LocalDate,String> frame = DataFrame.ofDoubles(rowKeys, colKeys).applyDoubles(v -> random.nextDouble());
         frame.out().print();
         final DataFrame<LocalDate,String> sorted = parallel ? frame.rows().parallel().sort(ascending) : frame.rows().sequential().sort(ascending);

@@ -103,12 +103,12 @@ abstract class XDataFrameAxisBase<X,Y,R,C,V extends DataFrameVector<?,?,R,C,?>,T
     @SuppressWarnings("unchecked")
     private DataFrame<R,C> createFilter(XDataFrame<R,C> frame, Iterable<X> keys) {
         if (axisType.isRow()) {
-            final Index<R> newRowKeys = frame.rowKeys().filter((Iterable<R>)keys);
-            final Index<C> newColKeys = frame.colKeys().copy();
+            var newRowKeys = frame.rowKeys().filter((Iterable<R>)keys);
+            var newColKeys = frame.colKeys().copy();
             return frame.filter(newRowKeys, newColKeys);
         } else {
-            final Index<R> newRowKeys = frame.rowKeys().copy();
-            final Index<C> newColKeys = frame.colKeys().filter((Iterable<C>)keys);
+            var newRowKeys = frame.rowKeys().copy();
+            var newColKeys = frame.colKeys().filter((Iterable<C>)keys);
             return frame.filter(newRowKeys, newColKeys);
         }
     }
@@ -296,8 +296,8 @@ abstract class XDataFrameAxisBase<X,Y,R,C,V extends DataFrameVector<?,?,R,C,?>,T
     @SuppressWarnings("unchecked")
     public final G groupBy(Y... keys) {
         switch (axisType) {
-            case ROWS:  return (G)XDataFrameGroupingRows.of(frame, isParallel(), (Array<C>)Array.of(keys));
-            case COLS:  return (G)XDataFrameGroupingCols.of(frame, isParallel(), (Array<R>)Array.of(keys));
+            case ROWS:  return (G)XDataFrameGroupingRows.of(frame, isParallel(), (Array<C>)Array.of(Stream.of(keys)));
+            case COLS:  return (G)XDataFrameGroupingCols.of(frame, isParallel(), (Array<R>)Array.of(Stream.of(keys)));
             default:    throw new DataFrameException("Unsupported axis type: " + axisType);
         }
     }
@@ -362,7 +362,7 @@ abstract class XDataFrameAxisBase<X,Y,R,C,V extends DataFrameVector<?,?,R,C,?>,T
     @Override
     @SafeVarargs
     public final DataFrame<R,C> select(X... keys) {
-        return createFilter(frame, Array.of(keys));
+        return createFilter(frame, Array.of(Stream.of(keys)));
     }
 
 

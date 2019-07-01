@@ -25,6 +25,7 @@ import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
 import java.util.function.ToIntFunction;
 import java.util.function.ToLongFunction;
+import java.util.stream.Stream;
 
 import com.d3x.morpheus.array.Array;
 import com.d3x.morpheus.array.ArrayType;
@@ -166,7 +167,7 @@ class XDataFrameColumns<R,C> extends XDataFrameAxisBase<C,R,R,C,DataFrameColumn<
     @Override
     @SafeVarargs
     public final DataFrame<Double,C> hist(int binCount, C... columns) {
-        return hist(binCount, (columns == null || columns.length == 0) ? keyArray() : Array.of(columns));
+        return hist(binCount, (columns == null || columns.length == 0) ? keyArray() : Array.of(Stream.of(columns)));
     }
 
 
@@ -316,7 +317,7 @@ class XDataFrameColumns<R,C> extends XDataFrameAxisBase<C,R,R,C,DataFrameColumn<
 
     @Override
     public final DataFrame<C,StatType> describe(StatType... stats) {
-        final Array<StatType> statKeys = Array.of(stats);
+        final Array<StatType> statKeys = Array.of(Stream.of(stats));
         final Array<C> colKeys = filter(DataFrameColumn::isNumeric).keyArray();
         final DataFrame<C,StatType> result = DataFrame.ofDoubles(colKeys, statKeys);
         final DataFrameCursor<C,StatType> cursor = result.cursor();

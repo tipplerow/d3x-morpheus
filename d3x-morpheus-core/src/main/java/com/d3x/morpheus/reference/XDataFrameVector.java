@@ -356,7 +356,7 @@ abstract class XDataFrameVector<X,Y,R,C,Z> implements DataFrameVector<X,Y,R,C,Z>
     @Override
     @SuppressWarnings("unchecked")
     public final <V> Stream<V> toValueStream() {
-        return values().map(v -> (V)v.getValue());
+        return values().map(DataFrameValue::getValue);
     }
 
 

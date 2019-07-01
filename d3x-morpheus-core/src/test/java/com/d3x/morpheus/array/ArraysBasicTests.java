@@ -32,6 +32,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
@@ -46,7 +47,7 @@ import org.testng.annotations.Test;
  */
 public class ArraysBasicTests {
 
-    private static Currency[] currencies = Currency.getAvailableCurrencies().stream().toArray(Currency[]::new);
+    private static Currency[] currencies = Currency.getAvailableCurrencies().toArray(Currency[]::new);
 
     private static Class[] classes = new Class[] {
         Object.class,
@@ -104,16 +105,10 @@ public class ArraysBasicTests {
     @Test()
     public void testArrayType() {
         Assert.assertEquals(Array.of(true, false, true, false).getClass().getSimpleName(), "DenseArrayOfBooleans");
-        Assert.assertEquals(Array.of(new boolean[] {true, false, true, false}).getClass().getSimpleName(), "DenseArrayOfBooleans");
         Assert.assertEquals(Array.of(1, 2, 3, 4, 5).getClass().getSimpleName(), "DenseArrayOfInts");
-        Assert.assertEquals(Array.of(new int[] {1, 2, 3, 4, 5}).getClass().getSimpleName(), "DenseArrayOfInts");
         Assert.assertEquals(Array.of(1L, 2L, 3L, 4L, 5L).getClass().getSimpleName(), "DenseArrayOfLongs");
-        Assert.assertEquals(Array.of(new long[] {1L, 2L, 3L, 4L, 5L}).getClass().getSimpleName(), "DenseArrayOfLongs");
         Assert.assertEquals(Array.of(1d, 2d, 3d, 4d, 5d).getClass().getSimpleName(), "DenseArrayOfDoubles");
-        Assert.assertEquals(Array.of(new double[] {1d, 2d, 3d, 4d, 5d}).getClass().getSimpleName(), "DenseArrayOfDoubles");
-        Assert.assertEquals(Array.of("Hello", LocalDate.of(1998, 1, 1), Month.JANUARY, 56.45d, true).getClass().getSimpleName(), "DenseArrayOfObjects");
-        Assert.assertEquals(Array.of(new Object[] {"Hello", LocalDate.of(1998, 1, 1), Month.JANUARY, 56.45d, true}).getClass().getSimpleName(), "DenseArrayOfObjects");
-        Assert.assertEquals(Array.of(new Object[] {"Hello", LocalDate.of(1998, 1, 1), Month.JANUARY, 56.45d, true}).length(), 5);
+        Assert.assertEquals(Array.of(Stream.of("Hello", LocalDate.of(1998, 1, 1), Month.JANUARY, 56.45d, true)).getClass().getSimpleName(), "DenseArrayOfObjects");
     }
 
 
@@ -748,7 +743,7 @@ public class ArraysBasicTests {
         final Array<Integer> integerArray = Array.of(integers);
         final Array<Long> longArray = Array.of(longs);
         final Array<Double> doubleArray = Array.of(doubles);
-        final Array<LocalDate> objectArray = Array.of(localDates);
+        final Array<LocalDate> objectArray = Array.of(Stream.of(localDates));
         for (int i=0; i<size; ++i) {
             Assert.assertEquals(booleans[i], booleanArray.getBoolean(i), "Booleans match at " + i);
             Assert.assertEquals(integers[i], integerArray.getInt(i), "Integers match at " + i);
@@ -893,7 +888,7 @@ public class ArraysBasicTests {
 
     @Test()
     public void testLowerAndHigherValueOnSortedStringArray() {
-        final Array<String> array = Array.of("a", "c", "e", "g", "i", "k", "m", "o", "q", "s", "u", "w", "y");
+        final Array<String> array = Array.ofObjects("a", "c", "e", "g", "i", "k", "m", "o", "q", "s", "u", "w", "y");
 
         Assert.assertEquals(array.previous("e").map(ArrayValue::getValue).get(), "c", "Lower value than e");
         Assert.assertEquals(array.previous("g").map(ArrayValue::getValue).get(), "e", "Lower value than g");

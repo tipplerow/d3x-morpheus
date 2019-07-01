@@ -1,0 +1,40 @@
+{
+  "rowCount": 1000,
+  "colCount": 100,
+  "rowType": "date",
+  "columns": [
+    {
+      "key": "column1",
+      "keyType": "string",
+      "dataType": "double",
+      "default": null,
+      "sparse": false
+    },
+    {
+      "key": "column2",
+      "keyType": "string",
+      "dataType": "double",
+      "default": null,
+      "sparse": false
+    },
+    {
+      "key": "column3",
+      "keyType": "string",
+      "dataType": "double",
+      "default": null,
+      "sparse": false
+    }
+  ],
+  "data": {
+    "2019-04-03": {
+      "column1": 0.0982314767,
+      "column2": -0.4976211273,
+      "column3": 1.2985677377
+    },
+    "2019-04-04": {
+      "column1": 2.0420401581,
+      "column2": -1.1733957719,
+      "column3": 1.103161875
+    }
+  }
+}

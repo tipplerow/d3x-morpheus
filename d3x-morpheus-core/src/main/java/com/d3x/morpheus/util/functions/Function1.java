@@ -190,13 +190,13 @@ public class Function1<I,O> implements Function<I,O> {
             return applyAsBoolean(value) ? (O)Boolean.TRUE : (O)Boolean.FALSE;
         } else if (style == FunctionStyle.INTEGER) {
             final int intValue = applyAsInt(value);
-            return intValue == 0 ? (O)ZERO_INT : (O)new Integer(intValue);
+            return intValue == 0 ? (O)ZERO_INT : (O)Integer.valueOf(intValue);
         } else if (style == FunctionStyle.LONG) {
             final long longValue = applyAsLong(value);
-            return longValue == 0L ? (O)ZERO_LONG : (O)new Long(longValue);
+            return longValue == 0L ? (O)ZERO_LONG : (O)Long.valueOf(longValue);
         } else if (style == FunctionStyle.DOUBLE) {
             final double doubleValue = applyAsDouble(value);
-            return Double.isNaN(doubleValue) ? (O)NAN_DOUBLE : doubleValue == 0d ? (O)ZERO_DOUBLE : (O)new Double(doubleValue);
+            return Double.isNaN(doubleValue) ? (O)NAN_DOUBLE : doubleValue == 0d ? (O)ZERO_DOUBLE : (O)Double.valueOf(doubleValue);
         } else {
             throw new UnsupportedOperationException("This function is not implemented: " + style);
         }

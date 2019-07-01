@@ -91,7 +91,7 @@ public class StructureTests {
     @Test(dataProvider="frameTypes")
     public void testAddingOneRow(Class type) {
         final DataFrame<String,String> expected = TestDataFrames.random(type, rows, columns);
-        final DataFrame<String,String> actual = TestDataFrames.random(type, Index.of(rows.getKey(0)), columns);
+        final DataFrame<String,String> actual = TestDataFrames.random(type, Index.singleton(rows.getKey(0)), columns);
         expected.rows().keys().forEach(key -> {
             actual.rows().add(key);
             actual.row(key).applyValues(v -> expected.getValue(v.rowKey(), v.colKey()));
@@ -102,7 +102,7 @@ public class StructureTests {
     @Test(dataProvider="frameTypes")
     public void testAddingMultipleRows(Class type) throws Exception {
         final DataFrame<String,String> expected = TestDataFrames.random(type, rows, columns);
-        final DataFrame<String,String> actual = TestDataFrames.random(type, Index.of(rows.getKey(0)), columns);
+        final DataFrame<String,String> actual = TestDataFrames.random(type, Index.singleton(rows.getKey(0)), columns);
         actual.rows().addAll(expected.rows().keyArray());
         actual.rows().forEach(row -> row.forEachValue(v -> {
             final String rowKey = v.rowKey();
@@ -117,7 +117,7 @@ public class StructureTests {
     @Test(dataProvider="frameTypes")
     public void testAddingOneColumn(Class type) throws Exception {
         final DataFrame<String,String> expected = TestDataFrames.random(type, rows, columns);
-        final DataFrame<String,String> actual = TestDataFrames.random(type, rows, Index.of(columns.getKey(0)));
+        final DataFrame<String,String> actual = TestDataFrames.random(type, rows, Index.singleton(columns.getKey(0)));
         expected.cols().keys().forEach(key -> {
             actual.cols().add(key, type);
             actual.col(key).forEachValue(v -> v.setValue(expected.getValue(v.rowKey(), v.colKey())));
@@ -129,7 +129,7 @@ public class StructureTests {
     @Test(dataProvider="frameTypes")
     public void testAddingMultipleColumns(Class type) throws Exception {
         final DataFrame<String,String> expected = TestDataFrames.random(type, rows, columns);
-        final DataFrame<String,String> actual = TestDataFrames.random(type, rows, Index.of(columns.getKey(0)));
+        final DataFrame<String,String> actual = TestDataFrames.random(type, rows, Index.singleton(columns.getKey(0)));
         final Array<String> colKeys = expected.cols().keyArray();
         actual.cols().addAll(colKeys, type);
         actual.cols().keys().forEach(key -> {
@@ -167,8 +167,8 @@ public class StructureTests {
 
     @Test(dataProvider="frameTypes", expectedExceptions = {DataFrameException.class})
     public void testDataFrameSelection(Class type) throws Exception {
-        final Index<String> rowKeys = Index.of("R1", "R7", "R9", "R14");
-        final Index<String> colKeys = Index.of("C4", "C5", "C9", "C22", "C18");
+        final Index<String> rowKeys = Index.ofObjects("R1", "R7", "R9", "R14");
+        final Index<String> colKeys = Index.ofObjects("C4", "C5", "C9", "C22", "C18");
         final DataFrame<String,String> frame = TestDataFrames.random(type, rowKeys, colKeys);
         final DataFrame<String,String> selection = frame.select(r -> rowKeys.contains(r.key()), c -> colKeys.contains(c.key()));
         assertEquals(4, selection.rowCount(), "The slice row count");

@@ -19,6 +19,7 @@ import java.util.Random;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import com.d3x.morpheus.util.IO;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.LUDecomposition;
 import org.apache.commons.math3.linear.QRDecomposition;
@@ -344,6 +345,20 @@ public class AlgebraTests {
             final RealMatrix matrix = new QRDecomposition(toMatrix(frame)).getSolver().getInverse();
             assertEquals(inverse, matrix);
         });
+    }
+
+
+
+    @Test()
+    public void testMultiply() {
+        DataFrame<Integer,Integer> weights = random(3000, 1, false, Double.class);
+        DataFrame<Integer,Integer> loadings = random(3000, 100, false, Double.class);
+        for (int i=0; i<10; ++i) {
+            long t1 = System.currentTimeMillis();
+            DataFrame<Integer,Integer> exposures = weights.transpose().dot(loadings);
+            long t2 = System.currentTimeMillis();
+            IO.println("exposures in " + (t2-t1) + " millis");
+        }
     }
 
 }

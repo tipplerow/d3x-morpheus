@@ -19,7 +19,7 @@
 
     <test name="Excel Tests">
         <packages>
-            <package name="com.com.d3x.morpheus.io.*"/>
+            <package name="com.com.d3x.morpheus.json.*"/>
         </packages>
     </test>
 

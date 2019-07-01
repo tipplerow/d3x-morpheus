@@ -60,7 +60,7 @@ public enum ArrayType {
     private static final Double DEFAULT_DOUBLE = Double.NaN;
     private static final Map<Class<?>,ArrayType> typeMap = new HashMap<>();
 
-    /**
+    /*
      * Static initializer
      */
     static {

@@ -72,7 +72,7 @@ public class WBClimateSource implements DataFrameSource<WBClimateKey,Month,WBCli
         try {
             final Options options = initOptions(new Options(), configurator);
             final Index<WBClimateKey> rowIndex = Index.of(WBClimateKey.class, 1000);
-            final DataFrame<WBClimateKey,Month> result = DataFrame.ofDoubles(rowIndex, Array.of(Month.values()));
+            final DataFrame<WBClimateKey,Month> result = DataFrame.ofDoubles(rowIndex, Array.ofObjects(Month.values()));
             YEAR_RANGES.forEach(range -> {
                 HttpClient.getDefault().doGet(request -> {
                     final long t1 = System.currentTimeMillis();

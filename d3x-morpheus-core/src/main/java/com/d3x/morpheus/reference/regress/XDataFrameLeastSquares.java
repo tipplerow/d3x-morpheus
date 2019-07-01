@@ -518,7 +518,7 @@ abstract class XDataFrameLeastSquares<R,C> implements DataFrameLeastSquares<R,C>
             final double intercept = getInterceptValue(Field.PARAMETER);
             final double[] slopes = regressors.stream().mapToDouble(c -> getBetaValue(c, Field.PARAMETER)).toArray();
             final DataFrameCursor<R,C> cursor = frame.cursor();
-            return DataFrame.ofDoubles(frame.rows().keyArray(), Array.of("Fitted"), v -> {
+            return DataFrame.ofDoubles(frame.rows().keyArray(), Array.singleton("Fitted"), v -> {
                 final R rowKey = v.rowKey();
                 double fitted = intercept;
                 for (int i=0; i<regressors.size(); ++i) {
@@ -561,7 +561,7 @@ abstract class XDataFrameLeastSquares<R,C> implements DataFrameLeastSquares<R,C>
         try {
             this.computeIf();
             final Range<Integer> lags = Range.of(0, maxLag);
-            return DataFrame.ofDoubles(lags, Array.of("Residual(ACF)"), v -> {
+            return DataFrame.ofDoubles(lags, Array.singleton("Residual(ACF)"), v -> {
                 final int lag = v.rowKey();
                 return residuals.colAt(0).stats().autocorr(lag);
             });

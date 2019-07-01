@@ -173,7 +173,7 @@ public class QuoteTests {
         LocalDate startDate = LocalDate.MIN;
         LocalDate endDate = LocalDate.MAX;
         final Index<LocalDate> rowKeys = Index.of(LocalDate.class, 100);
-        final Index<String> tickers = Index.of("BLK", "CSCO", "SPY", "YHOO", "VNQI", "VGLT", "VCLT");
+        final Index<String> tickers = Index.ofObjects("BLK", "CSCO", "SPY", "YHOO", "VNQI", "VGLT", "VCLT");
         final DataFrame<LocalDate,String> closePrices = DataFrame.ofDoubles(rowKeys, tickers);
         for (String ticker : tickers) {
             System.out.println("Loading data for ticker " + ticker);

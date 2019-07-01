@@ -459,7 +459,7 @@ public class RowTests {
 
     @Test(dataProvider= "args1")
     public void testRowMapping2(Class type) {
-        final Index<String> keys = Index.of("a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k");
+        final Index<String> keys = Index.ofObjects("a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k");
         final DataFrame<String,String> source = TestDataFrames.random(type, keys, keys);
         final DataFrame<String,String> target = TestDataFrames.random(type, keys, keys);
         if (type == boolean.class) {
@@ -608,7 +608,7 @@ public class RowTests {
     public void testStreamOfRows() {
         final int[] rowCount = new int[1];
         final LocalDate start = LocalDate.now().minusYears(10);
-        final Index<String> columns = Index.of("X", "Y", "Z");
+        final Index<String> columns = Index.ofObjects("X", "Y", "Z");
         final Index<LocalDate> dates = Range.of(0, 5000).map(start::plusDays).toIndex(LocalDate.class);
         final DataFrame<LocalDate,String> frame = DataFrame.of(dates, columns, Double.class);
         frame.applyDoubles(v -> Math.random() * 100);
@@ -633,7 +633,7 @@ public class RowTests {
         int rowCount = 0;
         final LocalDate start = LocalDate.now().minusYears(10);
         final Index<LocalDate> dates = Range.of(0, 5000).map(start::plusDays).toIndex(LocalDate.class);
-        final DataFrame<LocalDate,String> frame = DataFrame.of(dates, Index.of("X", "Y", "Z"), Double.class);
+        final DataFrame<LocalDate,String> frame = DataFrame.of(dates, Index.ofObjects("X", "Y", "Z"), Double.class);
         frame.applyDoubles(v -> Math.random() * 100);
         final Iterator<DataFrameRow<LocalDate,String>> iterator = frame.rows().iterator();
         while (iterator.hasNext()) {

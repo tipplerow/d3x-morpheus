@@ -93,7 +93,7 @@ class XDataFrameColumn<R,C> extends XDataFrameVector<C,R,R,C,DataFrameColumn<R,C
     public final Iterator<DataFrameValue<R,C>> iterator() {
         final int colOrdinal = ordinal();
         final DataFrameCursor<R,C> cursor = frame.cursor().atCol(colOrdinal);
-        return new Iterator<DataFrameValue<R,C>>() {
+        return new Iterator<>() {
             private int ordinal = 0;
             @Override
             public DataFrameValue<R,C> next() {
@@ -111,7 +111,7 @@ class XDataFrameColumn<R,C> extends XDataFrameVector<C,R,R,C,DataFrameColumn<R,C
     public final Iterator<DataFrameValue<R,C>> iterator(Predicate<DataFrameValue<R,C>> predicate) {
         final int colOrdinal = ordinal();
         final DataFrameCursor<R,C> cursor = frame.cursor().atCol(colOrdinal);
-        return new Iterator<DataFrameValue<R,C>>() {
+        return new Iterator<>() {
             private int ordinal = 0;
             @Override
             public DataFrameValue<R,C> next() {
@@ -268,6 +268,23 @@ class XDataFrameColumn<R,C> extends XDataFrameVector<C,R,R,C,DataFrameColumn<R,C
             });
         }
     }
+
+
+    @Override
+    public boolean isNull(R key) {
+        var rowCoord = data.rowCoordinate(key);
+        var colCoord = data.colCoordinate(colKey);
+        return data.isNullAt(rowCoord, colCoord);
+    }
+
+
+    @Override
+    public boolean isNullAt(int ordinal) {
+        var rowCoord = data.rowCoordinateAt(ordinal);
+        var colCoord = data.colCoordinate(colKey);
+        return data.isNullAt(rowCoord, colCoord);
+    }
+
 
 
     @Override()

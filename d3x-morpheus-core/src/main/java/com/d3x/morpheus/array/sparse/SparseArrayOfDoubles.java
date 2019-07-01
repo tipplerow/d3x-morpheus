@@ -51,13 +51,14 @@ class SparseArrayOfDoubles extends ArrayBase<Double> {
     /**
      * Constructor
      * @param length    the length for this array
+     * @param fillPct   the fill percent for array (0.2 implies 20% filled)
      * @param defaultValue  the default value for array
      */
-    SparseArrayOfDoubles(int length, Double defaultValue) {
+    SparseArrayOfDoubles(int length, double fillPct, Double defaultValue) {
         super(Double.class, ArrayStyle.SPARSE, false);
         this.length = length;
         this.defaultValue = defaultValue != null ? defaultValue : Double.NaN;
-        this.values = new TIntDoubleHashMap((int)Math.max(length * 0.5, 10d), 0.8f, -1, this.defaultValue);
+        this.values = new TIntDoubleHashMap((int)Math.max(length * fillPct, 10d), 0.85f, -1, this.defaultValue);
     }
 
     /**
@@ -118,9 +119,10 @@ class SparseArrayOfDoubles extends ArrayBase<Double> {
 
     @Override()
     public final Array<Double> copy(int[] indexes) {
-        final SparseArrayOfDoubles clone = new SparseArrayOfDoubles(indexes.length, defaultValue);
+        var fillPct = (double)values.size() / length();
+        var clone = new SparseArrayOfDoubles(indexes.length, fillPct, defaultValue);
         for (int i = 0; i < indexes.length; ++i) {
-            final double value = getDouble(indexes[i]);
+            var value = getDouble(indexes[i]);
             clone.setDouble(i, value);
         }
         return clone;
@@ -129,10 +131,11 @@ class SparseArrayOfDoubles extends ArrayBase<Double> {
 
     @Override()
     public final Array<Double> copy(int start, int end) {
-        final int length = end - start;
-        final SparseArrayOfDoubles clone = new SparseArrayOfDoubles(length, defaultValue);
+        var length = end - start;
+        var fillPct = (double)values.size() / length();
+        var clone = new SparseArrayOfDoubles(length, fillPct, defaultValue);
         for (int i=0; i<length; ++i) {
-            final double value = getDouble(start+i);
+            var value = getDouble(start+i);
             if (Double.compare(value, defaultValue) != 0) {
                 clone.setValue(i, value);
             }

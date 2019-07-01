@@ -73,17 +73,17 @@ public class ArrayFillTests {
                 break;
             case INTEGER:
                 array1.forEachValue(v -> Assert.assertEquals(v.getInt(), 0));
-                array1.fill((T)new Integer(25));
+                array1.fill((T)Integer.valueOf(25));
                 array1.forEachValue(v -> Assert.assertEquals(v.getInt(), 25));
                 break;
             case LONG:
                 array1.forEachValue(v -> Assert.assertEquals(v.getLong(), 0L));
-                array1.fill((T)new Long(18));
+                array1.fill((T)Long.valueOf(18));
                 array1.forEachValue(v -> Assert.assertEquals(v.getLong(), 18L));
                 break;
             case DOUBLE:
                 array1.forEachValue(v -> Assert.assertTrue(Double.isNaN(v.getDouble())));
-                array1.fill((T)new Double(76.34));
+                array1.fill((T)Double.valueOf(76.34));
                 array1.forEachValue(v -> Assert.assertEquals(v.getDouble(), 76.34d));
                 break;
             case STRING:
@@ -128,7 +128,7 @@ public class ArrayFillTests {
                 break;
             case OBJECT:
                 array1.forEachValue(v -> Assert.assertEquals(v.getValue(), array1.defaultValue()));
-                array1.fill((T)new Double(76.34));
+                array1.fill((T)Double.valueOf(76.34));
                 array1.forEachValue(v -> Assert.assertEquals(v.getDouble(), 76.34d));
                 break;
             default:
@@ -151,21 +151,21 @@ public class ArrayFillTests {
                 break;
             case INTEGER:
                 array1.forEachValue(v -> Assert.assertEquals(v.getInt(), 0));
-                array1.fill((T)new Integer(25), 200, 400);
+                array1.fill((T)Integer.valueOf(25), 200, 400);
                 array1.copy(0, 200).forEachValue(v -> Assert.assertEquals(v.getInt(), 0));
                 array1.copy(200, 400).forEachValue(v -> Assert.assertEquals(v.getInt(), 25));
                 array1.copy(400, array1.length()).forEachValue(v -> Assert.assertEquals(v.getInt(), 0));
                 break;
             case LONG:
                 array1.forEachValue(v -> Assert.assertEquals(v.getLong(), 0L));
-                array1.fill((T)new Long(18), 200, 400);
+                array1.fill((T)Long.valueOf(18), 200, 400);
                 array1.copy(0, 200).forEachValue(v -> Assert.assertEquals(v.getLong(), 0L));
                 array1.copy(200, 400).forEachValue(v -> Assert.assertEquals(v.getLong(), 18L));
                 array1.copy(400, array1.length()).forEachValue(v -> Assert.assertEquals(v.getLong(), 0L));
                 break;
             case DOUBLE:
                 array1.forEachValue(v -> Assert.assertEquals(v.getDouble(), Double.NaN));
-                array1.fill((T)new Double(76.34), 200, 400);
+                array1.fill((T)Double.valueOf(76.34), 200, 400);
                 array1.copy(0, 200).forEachValue(v -> Assert.assertEquals(v.getDouble(), Double.NaN));
                 array1.copy(200, 400).forEachValue(v -> Assert.assertEquals(v.getDouble(), 76.34d));
                 array1.copy(400, array1.length()).forEachValue(v -> Assert.assertEquals(v.getDouble(), Double.NaN));
@@ -228,7 +228,7 @@ public class ArrayFillTests {
                 break;
             case OBJECT:
                 array1.forEachValue(v -> Assert.assertEquals(v.getValue(), array1.defaultValue()));
-                array1.fill((T)new Double(76.34), 200, 400);
+                array1.fill((T)Double.valueOf(76.34), 200, 400);
                 array1.copy(0, 200).forEachValue(v -> Assert.assertEquals(v.getValue(), array1.defaultValue()));
                 array1.copy(200, 400).forEachValue(v -> Assert.assertEquals(v.getDouble(), 76.34d));
                 array1.copy(400, array1.length()).forEachValue(v -> Assert.assertEquals(v.getValue(), array1.defaultValue()));
@@ -241,8 +241,8 @@ public class ArrayFillTests {
 
     @Test(dataProvider = "styles")
     public void testWithDefaultValue(ArrayStyle style) {
-        final LocalDate defaultValue = LocalDate.of(2000, 1, 1);
-        final Array<LocalDate> array = style.isMapped() ? Array.map(LocalDate.class, 1000, defaultValue) : Array.of(LocalDate.class, 1000, defaultValue, style.isSparse() ? 0.5f : 1f);
+        var defaultValue = LocalDate.of(2000, 1, 1);
+        var array = style.isMapped() ? Array.map(LocalDate.class, 1000, defaultValue) : Array.of(LocalDate.class, 1000, defaultValue, style.isSparse() ? 0.5f : 1f);
         array.forEachValue(v -> Assert.assertEquals(v.getValue(), defaultValue));
         array.fill(null, 20, 30);
         IntStream.range(0, 20).forEach(i -> Assert.assertEquals(array.getValue(i), defaultValue));

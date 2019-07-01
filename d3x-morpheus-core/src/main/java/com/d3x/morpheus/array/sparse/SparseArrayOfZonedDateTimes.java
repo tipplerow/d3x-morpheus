@@ -51,7 +51,7 @@ class SparseArrayOfZonedDateTimes extends ArrayBase<ZonedDateTime> {
     private static final Map<ZoneId,Short> zoneIdMap1 = new HashMap<>();
     private static final Map<Short,ZoneId> zoneIdMap2 = new HashMap<>();
 
-    /**
+    /*
      * Static initializer
      */
     static {
@@ -78,15 +78,16 @@ class SparseArrayOfZonedDateTimes extends ArrayBase<ZonedDateTime> {
     /**
      * Constructor
      * @param length    the length for this array
+     * @param fillPct   the fill percent for array (0.2 implies 20% filled)
      */
-    SparseArrayOfZonedDateTimes(int length, ZonedDateTime defaultValue) {
+    SparseArrayOfZonedDateTimes(int length, double fillPct, ZonedDateTime defaultValue) {
         super(ZonedDateTime.class, ArrayStyle.SPARSE, false);
         this.length = length;
         this.defaultValue = defaultValue;
         this.defaultValueAsLong = defaultValue != null ? defaultValue.toInstant().toEpochMilli() : nullValue;
         this.defaultZoneId = defaultValue != null ? zoneIdMap1.get(defaultValue.getZone()) : NULL_ZONE;
-        this.values = new TIntLongHashMap((int)Math.max(length * 0.5, 10d), 0.8f, -1, defaultValueAsLong);
-        this.zoneIds = new TIntShortHashMap((int)Math.max(length * 0.5, 10d), 0.8f, -1, defaultZoneId);
+        this.values = new TIntLongHashMap((int)Math.max(length * fillPct, 10d), 0.85f, -1, defaultValueAsLong);
+        this.zoneIds = new TIntShortHashMap((int)Math.max(length * fillPct, 10d), 0.85f, -1, defaultZoneId);
     }
 
     /**
@@ -151,9 +152,10 @@ class SparseArrayOfZonedDateTimes extends ArrayBase<ZonedDateTime> {
 
     @Override()
     public final Array<ZonedDateTime> copy(int[] indexes) {
-        final SparseArrayOfZonedDateTimes clone = new SparseArrayOfZonedDateTimes(indexes.length, defaultValue);
+        var fillPct = (double)values.size() / length();
+        var clone = new SparseArrayOfZonedDateTimes(indexes.length, fillPct, defaultValue);
         for (int i = 0; i < indexes.length; ++i) {
-            final long value = getLong(indexes[i]);
+            var value = getLong(indexes[i]);
             if (value != defaultValueAsLong) {
                 clone.values.put(i, value);
                 clone.zoneIds.put(i, this.zoneIds.get(i));
@@ -165,12 +167,13 @@ class SparseArrayOfZonedDateTimes extends ArrayBase<ZonedDateTime> {
 
     @Override()
     public final Array<ZonedDateTime> copy(int start, int end) {
-        final int length = end - start;
-        final SparseArrayOfZonedDateTimes clone = new SparseArrayOfZonedDateTimes(length, defaultValue);
+        var length = end - start;
+        var fillPct = (double)values.size() / length();
+        var clone = new SparseArrayOfZonedDateTimes(length, fillPct, defaultValue);
         for (int i=0; i<length; ++i) {
-            final long value = getLong(start+i);
+            var value = getLong(start+i);
             if (value != defaultValueAsLong) {
-                final short zoneId = zoneIds.get(start+i);
+                var zoneId = zoneIds.get(start+i);
                 clone.setLong(i, value);
                 clone.zoneIds.put(i, zoneId);
             }

@@ -123,7 +123,7 @@ public class GLSTests {
     public void testLongleyMultipleWithIntercept() {
         final String regressand = "TOTEMP";
         final double rho = -0.3634294908770692;
-        final Array<String> regressors = Array.of("GNPDEFL", "GNP", "UNEMP", "ARMED", "POP", "YEAR");
+        final Array<String> regressors = Array.ofObjects("GNPDEFL", "GNP", "UNEMP", "ARMED", "POP", "YEAR");
         final DataFrame<Year,String> frame = longley();
         final DataFrame<Integer,Integer> omega = createOmega(16, rho);
 
@@ -199,7 +199,7 @@ public class GLSTests {
         final DataFrame<Year,String> frame = longley();
         final DataFrame<Integer,Integer> omega = createOmega(16, rho);
         final String regressand = "TOTEMP";
-        final Array<String> regressors = Array.of("GNPDEFL", "GNP", "UNEMP", "ARMED", "POP", "YEAR");
+        final Array<String> regressors = Array.ofObjects("GNPDEFL", "GNP", "UNEMP", "ARMED", "POP", "YEAR");
 
         frame.regress().gls(regressand, regressors, omega, false, model -> {
 

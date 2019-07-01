@@ -39,7 +39,7 @@ public class ContentTests {
     @Test()
     public void testTranspose() {
         final Index<LocalDate> rowKeys = Range.ofLocalDates("2000-01-01", "2005-01-01").toIndex(LocalDate.class);
-        final Index<String> colKeys = Index.of(Array.of("C1", "C2", "C3", "C4", "C5"));
+        final Index<String> colKeys = Index.of(Array.ofObjects("C1", "C2", "C3", "C4", "C5"));
         final XDataFrame<LocalDate,String> frame = (XDataFrame<LocalDate,String>)DataFrame.ofDoubles(rowKeys, colKeys);
         final XDataFrame<String,LocalDate> transpose = (XDataFrame<String,LocalDate>)frame.transpose();
         final DataFrameCursor<LocalDate,String> cursor0 = frame.cursor();

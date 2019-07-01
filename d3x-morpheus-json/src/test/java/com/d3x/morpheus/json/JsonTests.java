@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.d3x.morpheus.io;
+package com.d3x.morpheus.json;
 
 import java.io.File;
 import java.time.LocalDate;
@@ -23,9 +23,7 @@ import java.time.ZonedDateTime;
 
 import com.d3x.morpheus.frame.DataFrame;
 import com.d3x.morpheus.frame.DataFrameAsserts;
-import com.d3x.morpheus.json.JsonSink;
-import com.d3x.morpheus.json.JsonSource;
-import com.d3x.morpheus.json.JsonStyle;
+import com.d3x.morpheus.util.Resource;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -135,8 +133,8 @@ public class JsonTests {
     private <T> void readAndValidate(DataFrame<T,String> original, JsonStyle style, File file) {
         final JsonSource<T,String> source = JsonSource.create();
         final DataFrame<T,String> result = source.read(options -> {
-            options.setFile(file);
-            options.setStyle(style);
+            options.resource(Resource.of(file));
+            options.style(style);
         });
         original.out().print();
         result.out().print();

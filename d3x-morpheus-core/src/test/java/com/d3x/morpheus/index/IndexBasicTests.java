@@ -57,7 +57,7 @@ public class IndexBasicTests {
             { Range.of(LocalTime.of(0,0), LocalTime.of(12, 0), Duration.ofSeconds(1)).toArray() },
             { Range.of(LocalDateTime.now(), LocalDateTime.now().plusDays(2), Duration.ofMinutes(1)).toArray() },
             { Range.of(ZonedDateTime.now(), ZonedDateTime.now().plusDays(2), Duration.ofMinutes(1)).toArray() },
-            { Array.of(Range.of(2000d, 5000d).toArray().stream().values().toArray()) },
+            { Array.ofObjects(Range.of(2000d, 5000d).toArray().stream().values().toArray()) },
         };
     }
 
@@ -78,8 +78,8 @@ public class IndexBasicTests {
                     switch (i % 10) {
                         case 0: key = LocalDate.now().plusDays(i);  break;
                         case 1: key = LocalTime.of(12,0).plusNanos(i);  break;
-                        case 2: key = new Long(i);      break;
-                        case 3: key = new Double(i);    break;
+                        case 2: key = Long.valueOf(i);      break;
+                        case 3: key = Double.valueOf(i);    break;
                         default: key = i;  break;
                     }
                     return key;

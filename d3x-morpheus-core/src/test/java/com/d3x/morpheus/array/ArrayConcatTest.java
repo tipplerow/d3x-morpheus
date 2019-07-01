@@ -15,19 +15,19 @@ import java.time.Month;
  * <p><strong>This is open source software released under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 License</a></strong></p>
  */
 public class ArrayConcatTest {
-    private final DataFrame<Integer, Month> df1 = DataFrame.ofDoubles(Array.of(0), Array.of(Month.JANUARY), v -> 0);
-    private final DataFrame<Integer, Month> df2 = DataFrame.ofDoubles(Array.of(1), Array.of(Month.FEBRUARY), v -> 1);
-    private final DataFrame<Integer, Month> df3 = DataFrame.ofDoubles(Array.of(2), Array.of(Month.MARCH), v -> 2);
-    private final DataFrame<Integer, Month> df4 = DataFrame.ofDoubles(Array.of(3), Array.of(Month.APRIL), v -> 3);
+    private final DataFrame<Integer, Month> df1 = DataFrame.ofDoubles(Array.of(0), Array.ofObjects(Month.JANUARY), v -> 0);
+    private final DataFrame<Integer, Month> df2 = DataFrame.ofDoubles(Array.of(1), Array.ofObjects(Month.FEBRUARY), v -> 1);
+    private final DataFrame<Integer, Month> df3 = DataFrame.ofDoubles(Array.of(2), Array.ofObjects(Month.MARCH), v -> 2);
+    private final DataFrame<Integer, Month> df4 = DataFrame.ofDoubles(Array.of(3), Array.ofObjects(Month.APRIL), v -> 3);
 
     private Array<DataFrame<Integer, Month>> a1;
-    private final Array<DataFrame<Integer, Month>> a2 = Array.of(df2);
-    private final Array<DataFrame<Integer, Month>> a3 = Array.of(df3);
-    private final Array<DataFrame<Integer, Month>> a4 = Array.of(df4);
+    private final Array<DataFrame<Integer, Month>> a2 = Array.ofObjects(df2);
+    private final Array<DataFrame<Integer, Month>> a3 = Array.ofObjects(df3);
+    private final Array<DataFrame<Integer, Month>> a4 = Array.ofObjects(df4);
 
     @BeforeMethod
     public void setUp(){
-        a1 = Array.of(df1);
+        a1 = Array.ofObjects(df1);
     }
 
     @Test
