@@ -25,11 +25,17 @@ package com.d3x.morpheus.stats;
 public interface Sample {
 
     /**
+     * Returns the sample size
+     * @return  the sample size
+     */
+    int size();
+
+    /**
      * Returns the value in the sample at the index specified
      * @param index     the index for requested value
      * @return          the value at the index
      */
-    double getDouble(int index);
+    double getDoubleAt(int index);
 
     /**
      * Returns a Sample that wraps the double array
@@ -37,6 +43,16 @@ public interface Sample {
      * @return          the sample wrapper
      */
     static Sample of(double... values) {
-        return index -> values[index];
+        return new Sample() {
+            @Override
+            public int size() {
+                return values.length;
+            }
+
+            @Override
+            public double getDoubleAt(int index) {
+                return values[index];
+            }
+        };
     }
 }

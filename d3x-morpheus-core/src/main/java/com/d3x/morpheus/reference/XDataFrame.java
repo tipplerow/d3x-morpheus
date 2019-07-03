@@ -480,11 +480,11 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
         final DataFrameCursor<R,C> cursor1 = this.cursor();
         final DataFrameCursor<R,C> cursor2 = result.cursor();
         for (int i=0; i<rowCount; ++i) {
-            cursor1.atRow(i);
-            cursor2.atRow(i);
+            cursor1.toRowAt(i);
+            cursor2.toRowAt(i);
             for (int j=0; j<colCount; ++j) {
-                cursor1.atCol(j);
-                cursor2.atCol(j);
+                cursor1.toColAt(j);
+                cursor2.toColAt(j);
                 final double value = cursor1.getDouble();
                 cursor2.setInt(0);
                 if (value > 0d) {
@@ -675,11 +675,11 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
             final DataFrameCursor<R,C> sourceCursor = other.cursor();
             final DataFrameCursor<R,C> targetCursor = this.cursor();
             for (int i=0; i<sourceRows.length; ++i) {
-                sourceCursor.atRow(sourceRows[i]);
-                targetCursor.atRow(targetRows[i]);
+                sourceCursor.toRowAt(sourceRows[i]);
+                targetCursor.toRowAt(targetRows[i]);
                 for (int j=0; j<sourceCols.length; ++j) {
-                    sourceCursor.atCol(sourceCols[j]);
-                    targetCursor.atCol(targetCols[j]);
+                    sourceCursor.toColAt(sourceCols[j]);
+                    targetCursor.toColAt(targetCols[j]);
                     final Object value = sourceCursor.getValue();
                     targetCursor.setValue(value);
                 }
@@ -1104,11 +1104,11 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
                 final DataFrameCursor<R,C> left = this.cursor();
                 final DataFrameCursor<R,C> right = other.cursor();
                 for (int i=0; i<rowCount; ++i) {
-                    left.atRow(i);
-                    right.atRow(i);
+                    left.toRowAt(i);
+                    right.toRowAt(i);
                     for (int j=0; j<colCount; ++j) {
-                        left.atCol(j);
-                        right.atCol(j);
+                        left.toColAt(j);
+                        right.toColAt(j);
                         if (!left.isEqualTo(right.getValue())) {
                             return false;
                         }
@@ -1709,10 +1709,10 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
                     DataFrameCursor<R,C> value = cursor();
                     final int rowStart = result.rowOrdinal() - offset;
                     for (int i=rowStart; i<length; ++i) {
-                        value.atRow(offset + i);
+                        value.toRowAt(offset + i);
                         final int colStart = i == rowStart ? result.colOrdinal() : 0;
                         for (int j=colStart; j<colCount(); ++j) {
-                            value.atCol(j);
+                            value.toColAt(j);
                             if (predicate.test(value)) {
                                 if (min && value.compareTo(result) < 0) {
                                     result.at(value.rowOrdinal(), value.colOrdinal());
@@ -1729,10 +1729,10 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
                     DataFrameCursor<R,C> value = cursor();
                     final int colStart = result.colOrdinal() - offset;
                     for (int i=colStart; i<length; ++i) {
-                        value.atCol(offset + i);
+                        value.toColAt(offset + i);
                         final int rowStart = i == colStart ? result.rowOrdinal() : 0;
                         for (int j=rowStart; j<rowCount(); ++j) {
-                            value.atRow(j);
+                            value.toRowAt(j);
                             if (predicate.test(value)) {
                                 if (min && value.compareTo(result) < 0) {
                                     result.at(value.rowOrdinal(), value.colOrdinal());
@@ -1757,9 +1757,9 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
                 result.at(offset, 0);
                 for (int i=0; i<length; ++i) {
                     if (predicate.test(result)) break;
-                    result.atRow(offset + i);
+                    result.toRowAt(offset + i);
                     for (int j=0; j<colCount(); ++j) {
-                        result.atCol(j);
+                        result.toColAt(j);
                         if (predicate.test(result)) {
                             break;
                         }
@@ -1769,9 +1769,9 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
                 result.at(0, offset);
                 for (int i=0; i<length; ++i) {
                     if (predicate.test(result)) break;
-                    result.atCol(offset + i);
+                    result.toColAt(offset + i);
                     for (int j=0; j<rowCount(); ++j) {
-                        result.atRow(j);
+                        result.toRowAt(j);
                         if (predicate.test(result)) {
                             break;
                         }
@@ -1848,10 +1848,10 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
                     final DataFrameCursor<R,C> max = initial.copy();
                     final int rowStart = initial.rowOrdinal() - offset;
                     for (int i=rowStart; i<length; ++i) {
-                        value.atRow(offset + i);
+                        value.toRowAt(offset + i);
                         final int colStart = i == rowStart ? initial.colOrdinal() : 0;
                         for (int j=colStart; j<colCount(); ++j) {
-                            value.atCol(j);
+                            value.toColAt(j);
                             if (predicate.test(value)) {
                                 if (value.compareTo(min) < 0) {
                                     min.at(value.rowOrdinal(), value.colOrdinal());
@@ -1872,10 +1872,10 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
                     final DataFrameCursor<R,C> max = initial.copy();
                     final int colStart = initial.colOrdinal() - offset;
                     for (int i=colStart; i<length; ++i) {
-                        value.atCol(offset + i);
+                        value.toColAt(offset + i);
                         final int rowStart = i == colStart ? initial.rowOrdinal() : 0;
                         for (int j=rowStart; j<rowCount(); ++j) {
-                            value.atRow(j);
+                            value.toRowAt(j);
                             if (predicate.test(value)) {
                                 if (value.compareTo(min) < 0) {
                                     min.at(value.rowOrdinal(), value.colOrdinal());
@@ -1902,9 +1902,9 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
                 result.at(offset, 0);
                 for (int i=0; i<length; ++i) {
                     if (predicate.test(result)) break;
-                    result.atRow(offset + i);
+                    result.toRowAt(offset + i);
                     for (int j=0; j<colCount(); ++j) {
-                        result.atCol(j);
+                        result.toColAt(j);
                         if (predicate.test(result)) {
                             break;
                         }
@@ -1914,9 +1914,9 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
                 result.at(0, offset);
                 for (int i=0; i<length; ++i) {
                     if (predicate.test(result)) break;
-                    result.atCol(offset + i);
+                    result.toColAt(offset + i);
                     for (int j=0; j<rowCount(); ++j) {
-                        result.atRow(j);
+                        result.toRowAt(j);
                         if (predicate.test(result)) {
                             break;
                         }

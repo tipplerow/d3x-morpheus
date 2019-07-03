@@ -18,9 +18,8 @@ package com.d3x.morpheus.frame;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.function.Consumer;
 
-import com.d3x.morpheus.csv.CsvSourceOptions;
+import com.d3x.morpheus.csv.CsvSource;
 
 /**
  * An interface used to read a DataFrame stored in various formats from some underlying storage devices.
@@ -37,7 +36,7 @@ public interface DataFrameRead {
      * @param <R>       the row key type
      * @return          the resulting DataFrame
      */
-    <R> DataFrame<R,String> csv(File file);
+    <R> CsvSource<R> csv(File file);
 
     /**
      * Reads a DataFrame from a CSV file
@@ -45,7 +44,7 @@ public interface DataFrameRead {
      * @param <R>       the row key type
      * @return          the resulting DataFrame
      */
-    <R> DataFrame<R,String> csv(URL url);
+    <R> CsvSource<R> csv(URL url);
 
     /**
      * Reads a DataFrame from a CSV file
@@ -53,7 +52,7 @@ public interface DataFrameRead {
      * @param <R>       the row key type
      * @return          the resulting DataFrame
      */
-    <R> DataFrame<R,String> csv(InputStream is);
+    <R> CsvSource<R> csv(InputStream is);
 
     /**
      * Reads a DataFrame from a CSV resource
@@ -61,14 +60,6 @@ public interface DataFrameRead {
      * @param <R>           the row key type
      * @return              the resulting DataFrame
      */
-    <R> DataFrame<R,String> csv(String resource);
-
-    /**
-     * Reads a DataFrame from a CSV resource based on the options configurator
-     * @param configurator  the configurator for CSV options
-     * @param <R>           the row key type
-     * @return              the resulting DataFrame
-     */
-    <R> DataFrame<R,String> csv(Consumer<CsvSourceOptions<R>> configurator);
+    <R> CsvSource<R> csv(String resource);
 
 }

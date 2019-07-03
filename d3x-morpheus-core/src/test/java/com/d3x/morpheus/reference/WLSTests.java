@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2014-2017 Xavier Witdouck
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -41,17 +41,14 @@ public class WLSTests {
 
     @DataProvider(name = "data1")
     public Object[][] testData1() {
-        return wrap(DataFrame.read().csv(options -> {
-            options.setResource("/csv/supervisor.csv");
-        }));
+        return wrap(DataFrame.read().csv("/csv/supervisor.csv").read());
     }
 
 
     @DataProvider(name = "data2")
     public Object[][] testData2() {
-        return wrap(DataFrame.read().csv(options -> {
-            options.setResource("/csv/wls-2.csv");
-            options.setExcludeColumnIndexes(0);
+        return wrap(DataFrame.read().csv("/csv/wls-2.csv").read(options -> {
+            options.setRowKeyColumnName("DataFrame");
         }));
     }
 

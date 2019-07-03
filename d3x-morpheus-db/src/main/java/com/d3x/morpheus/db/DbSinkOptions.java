@@ -15,10 +15,7 @@
  */
 package com.d3x.morpheus.db;
 
-import java.sql.Connection;
 import java.sql.Date;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -27,11 +24,8 @@ import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import javax.sql.DataSource;
 
 import com.d3x.morpheus.frame.DataFrameException;
 import com.d3x.morpheus.frame.DataFrameValue;
@@ -46,11 +40,11 @@ import com.d3x.morpheus.util.sql.SQLPlatform;
  *
  * @author  Xavier Witdouck
  */
+@lombok.Data()
 public class DbSinkOptions<R,C> {
 
     private int batchSize;
     private String tableName;
-    private Connection connection;
     private SQLPlatform platform;
     private ColumnMappings columnMappings;
     private String autoIncrementColumnName;
@@ -58,148 +52,20 @@ public class DbSinkOptions<R,C> {
     private String rowKeyColumn;
     private Class<?> rowKeySqlClass;
     private Function1<R,?> rowKeyMapper;
+    private Function<String,String> colKeyMapper;
 
     /**
      * Constructor
      */
-    public DbSinkOptions() {
+    DbSinkOptions() {
         this.batchSize = 1000;
-        this.columnNames = Object::toString;
         this.columnMappings = new ColumnMappings();
-    }
-
-    /**
-     * Returns the batch size for inserts
-     * @return  the batch size
-     */
-    int getBatchSize() {
-        return batchSize;
-    }
-
-    /**
-     * Returns the table name to write to
-     * @return  the table name
-     */
-    String getTableName() {
-        return tableName;
-    }
-
-    /**
-     * Returns the SQL platform for these options
-     * @return      the SQL platform
-     */
-    Optional<SQLPlatform> getPlatform() {
-        return Optional.ofNullable(platform);
-    }
-
-    /**
-     * Returns the connection for these options
-     * @return  the database connection
-     */
-    Connection getConnection() {
-        return connection;
-    }
-
-    /**
-     * Returns the column name to store DataFrame row keys in
-     * @return  the optional column to store row keys
-     */
-    Optional<String> getRowKeyColumn() {
-        return Optional.ofNullable(rowKeyColumn);
-    }
-
-    /**
-     * Returns the SQL type to apply row keys to
-     * @return  the SQL type for row keys
-     */
-    Optional<Class<?>> getRowKeySqlClass() {
-        return Optional.ofNullable(rowKeySqlClass);
-    }
-
-    /**
-     * Returns the mapper that maps row keys to the appropriate JDBC type
-     * @return      the row key mapper if specified
-     */
-    Optional<Function1<R,?>> getRowKeyMapper() {
-        return Optional.ofNullable(rowKeyMapper);
-    }
-
-    /**
-     * Returns the optional column name for the auto increment field
-     * @return  the optional auto increment column name
-     */
-    Optional<String> getAutoIncrementColumnName() {
-        return Optional.ofNullable(autoIncrementColumnName);
-    }
-
-    /**
-     * Returns the column mappings for these options
-     * @return      the column mappings
-     */
-    public ColumnMappings getColumnMappings() {
-        return columnMappings;
-    }
-
-    /**
-     * Returns the function that yield column names for DataFrame column keys
-     * @return      the function that yields column names for frame column keys
-     */
-    Function<C,String> getColumnNames() {
-        return columnNames;
-    }
-
-    /**
-     * Sets the batch size for write operations
-     * @param batchSize the batch size
-     */
-    public void setBatchSize(int batchSize) {
-        this.batchSize = batchSize;
-    }
-
-    /**
-     * Sets the target table name to write to
-     * @param tableName the fully qualified table name
-     */
-    public void setTableName(String tableName) {
-        this.tableName = tableName;
-    }
-
-    /**
-     * Sets the JDBC connection for this request
-     * @param connection    the connection for this request
-     */
-    public void setConnection(Connection connection) {
-        Objects.requireNonNull(connection, "The SQL connection cannot be null");
-        this.connection = connection;
-    }
-
-    /**
-     * Sets the JDBC data source for this request
-     * @param dataSource    the DataSource the grab a connection from
-     */
-    public void setConnection(DataSource dataSource) {
-        Objects.requireNonNull(dataSource, "The SQL data source cannot be null");
-        try {
-            this.connection = dataSource.getConnection();
-        } catch (SQLException ex) {
-            throw new RuntimeException("Failed to access a DB connection from DataSource", ex);
-        }
-    }
-
-    /**
-     * Sets the JDBC connection URL and optional credentials
-     * This method should ideally only be used for testing, a connection pool is preferable for production
-     * @param url       the JDBC connection url
-     * @param username  the JDBC connection username, can be null
-     * @param password  the JDBC connection password, can be null
-     */
-    public void setConnection(String url, String username, String password) {
-        try {
-            Objects.requireNonNull(url, "The JDBC URL cannnot be null");
-            this.connection = DriverManager.getConnection(url, username, password);
-        } catch (SQLException ex) {
-            throw new DataFrameException("Failed to create connection for URL:" + url, ex);
-        }
+        this.columnNames = v -> v.toString()
+            .toLowerCase()
+            .replace(" ", "_")
+            .replace("%", "pct")
+            .replace("-", "_")
+            .replace("/", "_");
     }
 
     /**
@@ -215,29 +81,6 @@ public class DbSinkOptions<R,C> {
         this.rowKeyMapper = Asserts.notNull(mapper, "The row key mapper cannot be null");
     }
 
-    /**
-     * Sets the name of an auto increment column name if one exists in the table
-     * @param autoIncrementColumnName   the auto increment column name
-     */
-    public void setAutoIncrementColumnName(String autoIncrementColumnName) {
-        this.autoIncrementColumnName = autoIncrementColumnName;
-    }
-
-    /**
-     * Sets the target SQL platform for these options
-     * @param platform      the target SQL platform
-     */
-    public void setPlatform(SQLPlatform platform) {
-        this.platform = platform;
-    }
-
-    /**
-     * Sets the column name generating function
-     * @param columnNames   the column name generating function
-     */
-    public void setColumnNames(Function<C,String> columnNames) {
-        this.columnNames = columnNames;
-    }
 
     /**
      * Sets the column mappings for these options

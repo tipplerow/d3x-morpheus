@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2018 D3X Systems - All Rights Reserved
+ * Copyright (C) 2018-2019 D3X Systems - All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,17 @@
  */
 package com.d3x.morpheus.series;
 
-import java.util.stream.IntStream;
+import java.lang.reflect.ParameterizedType;
+import java.util.function.Function;
 
+import com.d3x.core.util.Generic;
 import com.d3x.morpheus.array.Array;
-import com.d3x.morpheus.util.IO;
+import com.d3x.morpheus.index.Index;
+import com.d3x.morpheus.stats.Sample;
+import com.d3x.morpheus.stats.Stats;
 
 /**
- * A type specific series for double values
+ * A type specific series for optimized to hold primitive double values
  *
  * @param <K> the key type
  *
@@ -29,7 +33,7 @@ import com.d3x.morpheus.util.IO;
  *
  * @author  Xavier Witdouck
  */
-public class DoubleSeries<K> extends DataSeries<K,Double> {
+public class DoubleSeries<K> extends DataSeries<K,Double> implements Sample {
 
     /**
      * Constructor
@@ -37,7 +41,7 @@ public class DoubleSeries<K> extends DataSeries<K,Double> {
      * @param values    the array of values
      */
     private DoubleSeries(
-        @lombok.NonNull Array<K> keys,
+        @lombok.NonNull Index<K> keys,
         @lombok.NonNull Array<Double> values) {
         super(keys, values);
     }
@@ -53,13 +57,13 @@ public class DoubleSeries<K> extends DataSeries<K,Double> {
 
 
     /**
-     * Returns a newly created builder with initial capacity
-     * @param capacity the initial capacity
-     * @param <T>       the builder type
-     * @return          the new builder
+     * Returns a parameterized type of this class with key type
+     * @param keyType   the key type for series
+     * @param <K>       key type
+     * @return          newly created parameterized type
      */
-    public static <T> Builder<T> builder(int capacity) {
-        return new Builder<>(capacity);
+    public static <K> ParameterizedType typeOf(Class<K> keyType) {
+        return Generic.of(DoubleSeries.class, keyType, Double.class);
     }
 
 
@@ -70,6 +74,17 @@ public class DoubleSeries<K> extends DataSeries<K,Double> {
      */
     public double getDouble(K key) {
         var coord = index.getCoordinate(key);
+        return coord >= 0 ? values.getDouble(coord) : Double.NaN;
+    }
+
+
+    /**
+     * Returns the value at the index
+     * @param index the index location
+     * @return      the value or null
+     */
+    public double getDoubleAt(int index) {
+        var coord = this.index.getCoordinateAt(index);
         return coord >= 0 ? values.getDouble(coord) : Double.NaN;
     }
 
@@ -87,17 +102,6 @@ public class DoubleSeries<K> extends DataSeries<K,Double> {
 
 
     /**
-     * Returns the value at the index
-     * @param index the index location
-     * @return      the value or null
-     */
-    public double getDoubleAt(int index) {
-        var coord = this.index.getCoordinateAt(index);
-        return coord >= 0 ? values.getDouble(coord) : Double.NaN;
-    }
-
-
-    /**
      * Returns the value for key
      * @param index     the index location
      * @param fallback  the fallback value if no match for key
@@ -110,46 +114,67 @@ public class DoubleSeries<K> extends DataSeries<K,Double> {
 
 
     /**
-     * A builder class for DoubleSeries
-     * @param <K>   the key type
+     * Returns the stats interface for this series
+     * @return  the stats interface for series
      */
-    public static class Builder<K> extends DataSeries.Builder<K,Double,DoubleSeries<K>> {
-
-        /**
-         * Constructor
-         * @param capacity  the initial capacity for builder
-         */
-        Builder(int capacity) {
-            super(capacity);
-        }
+    public Stats<Double> stats() {
+        return Stats.of(this);
+    }
 
 
-        @Override
-        public DoubleSeries<K> build() {
-            return new DoubleSeries<>(keys.toArray(), values.toArray());
-        }
+    /**
+     * Returns a mapping of this series with the keys mapped
+     * @param mapper    the key mapper
+     * @param <T>       the type for mapper
+     * @return          the mapped series
+     */
+    public <T> DoubleSeries<T> mapKeys(Function<K,T> mapper) {
+        var result = index.map((key, index) -> mapper.apply(key));
+        return new DoubleSeries<>(result, values);
+    }
 
 
-        /**
-         * Adds a double to this series builder
-         * @param key       the key for entry
-         * @param value     the value for entry
-         * @return          this builder
-         */
-        public Builder addDouble(K key, double value) {
-            this.keys.add(key);
-            this.values.addDouble(value);
-            return this;
+    /**
+     * Returns a filter of this series by applying the predicate
+     * @param predicate     the predicate to filter on
+     * @return              the filtered series
+     */
+    public DoubleSeries<K> filterDoubles(Predicate<K> predicate) {
+        var builder = DataSeries.<K,Double>builder();
+        builder.capacity(this.size() / 2);
+        this.forEach((key, ordinal, value) -> {
+            if (predicate.test(key, ordinal, value)) {
+                builder.addDouble(key, value);
+            }
+        });
+        return builder.build().toDoubles();
+    }
+
+
+    /**
+     * Iterates over entries in this series and applies them to consumer
+     * @param consumer  the consumer to receive entries from this series
+     */
+    public void forEach(Consumer<K> consumer) {
+        var size = this.size();
+        for (int i=0; i<size; ++i) {
+            var key = getKey(i);
+            var value = getDoubleAt(i);
+            consumer.apply(key, i, value);
         }
     }
 
 
 
-    public static void main(String[] args) {
-        var builder = DoubleSeries.<String>builder(1000);
-        IntStream.range(0, 1200).forEach(i -> builder.addDouble("S" + i, Math.random()));
-        var series = builder.build();
-        IO.println(series);
+    interface Predicate<K> {
+
+        boolean test(K key, int ordinal, double value);
+    }
+
+
+    interface Consumer<K> {
+
+        void apply(K key, int ordinal, double value);
     }
 
 }

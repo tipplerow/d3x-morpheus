@@ -18,6 +18,7 @@ package com.d3x.morpheus.reference;
 import java.time.Year;
 import java.util.Optional;
 
+import com.d3x.morpheus.util.text.parser.Parser;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -41,11 +42,10 @@ public class GLSTests {
      * @return  longley dataset
      */
     private DataFrame<Year,String> longley() {
-        return DataFrame.read().csv(options -> {
+        return DataFrame.read().<Year>csv("/csv/longley-2.csv").read(options -> {
             options.setHeader(true);
-            options.setExcludeColumnIndexes(0);
-            options.setResource("/csv/longley-2.csv");
-            options.setRowKeyParser(Year.class, values -> Year.of(Integer.parseInt(values[0])));
+            options.setRowKeyColumnName("Obs");
+            options.getFormats().setParser("Obs", Parser.forObject(Year.class, v -> Year.of(Integer.parseInt(v))));
         });
     }
 

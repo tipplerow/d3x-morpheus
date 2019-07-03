@@ -172,7 +172,7 @@ public class CombineTests {
 
         IntStream.range(5, frame3.rowCount()).forEach(rowIndex -> {
             Array.ofObjects("D", "E").forEach(colKey -> {
-                final double expected = frame2.cursor().atRow(rowIndex-5).atColKey(colKey).getDouble();
+                final double expected = frame2.cursor().toRowAt(rowIndex-5).toCol(colKey).getDouble();
                 final double actual = cursor.atKeys(rowIndex, colKey).getDouble();
                 Assert.assertEquals(actual, expected);
             });

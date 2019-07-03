@@ -87,9 +87,9 @@ class XDataFrameRows<R,C> extends XDataFrameAxisBase<R,C,R,C,DataFrameRow<R,C>,D
             final XDataFrame<R,C> frame = frame();
             final int ordinal = content.rowKeys().getOrdinal(key);
             if (initials != null) {
-                final DataFrameCursor<R,C> value = frame.cursor().atRow(ordinal);
+                final DataFrameCursor<R,C> value = frame.cursor().toRowAt(ordinal);
                 for (int i=0; i<frame.colCount(); ++i) {
-                    value.atCol(i);
+                    value.toColAt(i);
                     final Object result = initials.apply(value);
                     value.setValue(result);
                 }
@@ -111,9 +111,9 @@ class XDataFrameRows<R,C> extends XDataFrameAxisBase<R,C,R,C,DataFrameRow<R,C>,D
         if (initials != null) {
             final DataFrameCursor<R,C> cursor = frame().cursor();
             added.forEach(rowKey -> {
-                cursor.atRowKey(rowKey);
+                cursor.toRow(rowKey);
                 for (int i=0; i<frame().colCount(); ++i) {
-                    cursor.atCol(i);
+                    cursor.toColAt(i);
                     Object value = initials.apply(cursor);
                     cursor.setValue(value);
                 }
@@ -221,12 +221,12 @@ class XDataFrameRows<R,C> extends XDataFrameAxisBase<R,C,R,C,DataFrameRow<R,C>,D
         final DataFrameCursor<R,StatType> cursor = result.cursor();
         this.filter(DataFrameRow::isNumeric).forEach(row -> {
             final R key = row.key();
-            cursor.atRowKey(key);
+            cursor.toRow(key);
             final Stats<Double> rowStats = row.stats();
             for (int j = 0; j < statKeys.length(); ++j) {
                 final StatType stat = statKeys.getValue(j);
                 final double value = stat.apply(rowStats);
-                cursor.atCol(j).setDouble(value);
+                cursor.toColAt(j).setDouble(value);
             }
         });
         return result;
@@ -236,9 +236,9 @@ class XDataFrameRows<R,C> extends XDataFrameAxisBase<R,C,R,C,DataFrameRow<R,C>,D
     @Override
     public final void forEachValue(R key, Consumer<DataFrameValue<R, C>> consumer) {
         final int colCount = frame().colCount();
-        final DataFrameCursor<R,C> cursor = frame().cursor().atRowKey(key);
+        final DataFrameCursor<R,C> cursor = frame().cursor().toRow(key);
         for (int j=0; j<colCount; ++j) {
-            cursor.atCol(j);
+            cursor.toColAt(j);
             consumer.accept(cursor);
         }
     }
@@ -247,9 +247,9 @@ class XDataFrameRows<R,C> extends XDataFrameAxisBase<R,C,R,C,DataFrameRow<R,C>,D
     @Override
     public final DataFrame<R,C> applyBooleans(R key, ToBooleanFunction<DataFrameValue<R,C>> function) {
         final int colCount = frame().colCount();
-        final DataFrameCursor<R,C> cursor = frame().cursor().atRowKey(key);
+        final DataFrameCursor<R,C> cursor = frame().cursor().toRow(key);
         for (int j=0; j<colCount; ++j) {
-            final boolean value = function.applyAsBoolean(cursor.atCol(j));
+            final boolean value = function.applyAsBoolean(cursor.toColAt(j));
             cursor.setBoolean(value);
         }
         return frame();
@@ -259,9 +259,9 @@ class XDataFrameRows<R,C> extends XDataFrameAxisBase<R,C,R,C,DataFrameRow<R,C>,D
     @Override
     public final DataFrame<R,C> applyInts(R key, ToIntFunction<DataFrameValue<R,C>> function) {
         final int colCount = frame().colCount();
-        final DataFrameCursor<R,C> cursor = frame().cursor().atRowKey(key);
+        final DataFrameCursor<R,C> cursor = frame().cursor().toRow(key);
         for (int j=0; j<colCount; ++j) {
-            final int value = function.applyAsInt(cursor.atCol(j));
+            final int value = function.applyAsInt(cursor.toColAt(j));
             cursor.setInt(value);
         }
         return frame();
@@ -271,9 +271,9 @@ class XDataFrameRows<R,C> extends XDataFrameAxisBase<R,C,R,C,DataFrameRow<R,C>,D
     @Override
     public final DataFrame<R,C> applyLongs(R key, ToLongFunction<DataFrameValue<R,C>> function) {
         final int colCount = frame().colCount();
-        final DataFrameCursor<R,C> cursor = frame().cursor().atRowKey(key);
+        final DataFrameCursor<R,C> cursor = frame().cursor().toRow(key);
         for (int j=0; j<colCount; ++j) {
-            final long value = function.applyAsLong(cursor.atCol(j));
+            final long value = function.applyAsLong(cursor.toColAt(j));
             cursor.setLong(value);
         }
         return frame();
@@ -283,9 +283,9 @@ class XDataFrameRows<R,C> extends XDataFrameAxisBase<R,C,R,C,DataFrameRow<R,C>,D
     @Override
     public final DataFrame<R,C> applyDoubles(R key, ToDoubleFunction<DataFrameValue<R,C>> function) {
         final int colCount = frame().colCount();
-        final DataFrameCursor<R,C> cursor = frame().cursor().atRowKey(key);
+        final DataFrameCursor<R,C> cursor = frame().cursor().toRow(key);
         for (int j=0; j<colCount; ++j) {
-            final double value = function.applyAsDouble(cursor.atCol(j));
+            final double value = function.applyAsDouble(cursor.toColAt(j));
             cursor.setDouble(value);
         }
         return frame();
@@ -295,9 +295,9 @@ class XDataFrameRows<R,C> extends XDataFrameAxisBase<R,C,R,C,DataFrameRow<R,C>,D
     @Override
     public final <T> DataFrame<R,C> applyValues(R key, Function<DataFrameValue<R,C>, T> function) {
         final int colCount = frame().colCount();
-        final DataFrameCursor<R,C> cursor = frame().cursor().atRowKey(key);
+        final DataFrameCursor<R,C> cursor = frame().cursor().toRow(key);
         for (int j=0; j<colCount; ++j) {
-            final T value = function.apply(cursor.atCol(j));
+            final T value = function.apply(cursor.toColAt(j));
             cursor.setValue(value);
         }
         return frame();

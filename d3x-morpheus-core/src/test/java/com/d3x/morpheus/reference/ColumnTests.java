@@ -462,7 +462,7 @@ public class ColumnTests {
         if (type == boolean.class) {
             target.cols().keys().forEach(colKey -> {
                 target.col(colKey).applyBooleans(v -> {
-                    return cursor.atRow(v.rowOrdinal()).atColKey(colKey).getBoolean();
+                    return cursor.toRowAt(v.rowOrdinal()).toCol(colKey).getBoolean();
                 });
             });
             DataFrameAsserts.assertEqualsByIndex(source, target);

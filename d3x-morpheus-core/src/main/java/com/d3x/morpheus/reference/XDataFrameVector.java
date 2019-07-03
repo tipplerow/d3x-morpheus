@@ -209,12 +209,12 @@ abstract class XDataFrameVector<X,Y,R,C,Z> implements DataFrameVector<X,Y,R,C,Z>
         final double stepSize = (maxValue - minValue) / binCount;
         final Range<Double> rowKeys = Range.of(minValue, maxValue + stepSize, stepSize);
         final DataFrame<Double,String> hist = DataFrame.ofInts(rowKeys, "Count");
-        final DataFrameCursor<Double,String> cursor = hist.cursor().atCol(0);
+        final DataFrameCursor<Double,String> cursor = hist.cursor().toColAt(0);
         this.forEachValue(v -> {
             final double value = v.getDouble();
             hist.rows().lowerKey(value).ifPresent(lowerKey -> {
                 final int rowOrdinal = hist.rows().ordinal(lowerKey);
-                final int count = cursor.atRow(rowOrdinal).getInt();
+                final int count = cursor.toRowAt(rowOrdinal).getInt();
                 cursor.setInt(count + 1);
             });
         });
@@ -286,11 +286,11 @@ abstract class XDataFrameVector<X,Y,R,C,Z> implements DataFrameVector<X,Y,R,C,Z>
                 } else if (isRow()) {
                     final R rowKey = (R)key();
                     final DataFrameCursor<R,C> cursor = frame.cursor();
-                    return Optional.of(cursor.atRowKey(rowKey).atCol(midIndex));
+                    return Optional.of(cursor.toRow(rowKey).toColAt(midIndex));
                 } else {
                     final C colKey = (C)key();
                     final DataFrameCursor<R,C> cursor = frame.cursor();
-                    return Optional.of(cursor.atRow(midIndex).atColKey(colKey));
+                    return Optional.of(cursor.toRowAt(midIndex).toCol(colKey));
                 }
             }
             return Optional.empty();
@@ -463,14 +463,14 @@ abstract class XDataFrameVector<X,Y,R,C,Z> implements DataFrameVector<X,Y,R,C,Z>
             this.length = length;
             this.splitThreshold = splitThreshold;
             this.value = (DataFrameCursor<A,B>)frame.cursor();
-            this.value = isRow() ? value.atRow(ordinal()) : value.atCol(ordinal());
+            this.value = isRow() ? value.toRowAt(ordinal()) : value.toColAt(ordinal());
         }
 
         @Override
         public boolean tryAdvance(Consumer<? super DataFrameValue<A,B>> action) {
             Asserts.check(action != null, "The consumer action cannot be null");
             if (position <= end) {
-                this.value = isRow() ? value.atCol(position) : value.atRow(position);
+                this.value = isRow() ? value.toColAt(position) : value.toRowAt(position);
                 this.position++;
                 action.accept(value);
                 return true;

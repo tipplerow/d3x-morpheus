@@ -22,7 +22,7 @@ public class PerfTest1 {
                 for (int i=0; i<frame.rowCount(); ++i) {
                     for (int j=0; j<frame.colCount(); ++j) {
                         DataFrameCursor<Integer,String> cursor = frame.cursor();
-                        cursor.atRow(i).atCol(j).setDouble(1d);
+                        cursor.toRowAt(i).toColAt(j).setDouble(1d);
                     }
                 }
                 return 0d;
@@ -32,7 +32,7 @@ public class PerfTest1 {
                 for (int i=0; i<frame.rowCount(); ++i) {
                     DataFrameCursor<Integer,String> cursor = frame.cursor();
                     for (int j=0; j<frame.colCount(); ++j) {
-                        cursor.atRow(i).atCol(j).setDouble(2d);
+                        cursor.toRowAt(i).toColAt(j).setDouble(2d);
                     }
                 }
                 return 0d;
@@ -41,9 +41,9 @@ public class PerfTest1 {
             tasks.put("Task-3", () -> {
                 for (int i=0; i<frame.rowCount(); ++i) {
                     DataFrameCursor<Integer,String> cursor = frame.cursor();
-                    cursor.atRow(i);
+                    cursor.toRowAt(i);
                     for (int j=0; j<frame.colCount(); ++j) {
-                        cursor.atCol(j).setDouble(3d);
+                        cursor.toColAt(j).setDouble(3d);
                     }
                 }
                 return 0d;
@@ -52,9 +52,9 @@ public class PerfTest1 {
             tasks.put("Task-4", () -> {
                 DataFrameCursor<Integer,String> cursor = frame.cursor();
                 for (int i=0; i<frame.rowCount(); ++i) {
-                    cursor.atRow(i);
+                    cursor.toRowAt(i);
                     for (int j=0; j<frame.colCount(); ++j) {
-                        cursor.atCol(j).setDouble(4d);
+                        cursor.toColAt(j).setDouble(4d);
                     }
                 }
                 return 0d;
@@ -63,7 +63,7 @@ public class PerfTest1 {
             tasks.put("Task-5", () -> {
                 for (int i=0; i<frame.rowCount(); ++i) {
                     for (int j=0; j<frame.colCount(); ++j) {
-                        frame.cursor().atRow(i).atCol(j).setDouble(5d);
+                        frame.cursor().toRowAt(i).toColAt(j).setDouble(5d);
                     }
                 }
                 return 0d;
@@ -90,9 +90,9 @@ public class PerfTest1 {
 
             tasks.put("Task-9", () -> {
             for (int i=0; i<frame.colCount(); ++i) {
-                DataFrameCursor<Integer,String> cursor = frame.cursor().atCol(i);
+                DataFrameCursor<Integer,String> cursor = frame.cursor().toColAt(i);
                 for (int j=0; j<frame.rowCount(); ++j) {
-                    cursor.atRow(j).setDouble(9d);
+                    cursor.toRowAt(j).setDouble(9d);
                 }
             }
             return 0d;

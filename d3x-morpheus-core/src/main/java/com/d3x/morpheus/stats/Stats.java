@@ -150,4 +150,104 @@ public interface Stats<T> {
      */
     T percentile(double nth);
 
+
+    /**
+     * Returns summary stats for a sample
+     * @param sample    the sample reference
+     * @return          the summary stats
+     */
+    static Stats<Double> of(Sample sample) {
+        return new Stats<>() {
+
+            /**
+             * Returns the summary statistic for the sample
+             * @param statistic     the statistic definition
+             * @return              the resulting value
+             */
+            private double compute(Statistic1 statistic) {
+                var size = sample.size();
+                for (int i=0; i<size; ++i) {
+                    var value = sample.getDoubleAt(i);
+                    if (!Double.isNaN(value)) {
+                        statistic.add(value);
+                    }
+                }
+                return statistic.getValue();
+            }
+
+            @Override
+            public Double count() {
+                return compute(new Count());
+            }
+            @Override
+            public Double min() {
+                return compute(new Min());
+            }
+            @Override
+            public Double max() {
+                return compute(new Max());
+            }
+            @Override
+            public Double mean() {
+                return compute(new Mean());
+            }
+            @Override
+            public Double median() {
+                return compute(new Median());
+            }
+            @Override
+            public Double mad() {
+                return compute(new MeanAbsDev());
+            }
+            @Override
+            public Double stdDev() {
+                return compute(new StdDev(true));
+            }
+            @Override
+            public Double sem() {
+                return compute(new StdErrorMean());
+            }
+            @Override
+            public Double sum() {
+                return compute(new Sum());
+            }
+            @Override
+            public Double sumLogs() {
+                return compute(new SumLogs());
+            }
+            @Override
+            public Double sumSquares() {
+                return compute(new SumSquares());
+            }
+            @Override
+            public Double variance() {
+                return compute(new Variance(true));
+            }
+            @Override
+            public Double kurtosis() {
+                return compute(new Kurtosis());
+            }
+            @Override
+            public Double skew() {
+                return compute(new Skew());
+            }
+            @Override
+            public Double geoMean() {
+                return compute(new GeoMean());
+            }
+            @Override
+            public Double product() {
+                return compute(new Product());
+            }
+            @Override
+            public Double autocorr(int lag) {
+                return compute(new AutoCorrelation(lag));
+            }
+            @Override
+            public Double percentile(double nth) {
+                return compute(new Percentile(nth));
+            }
+        };
+    };
+
 }

@@ -25,9 +25,11 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.sql.DataSource;
 
+import com.d3x.morpheus.util.IO;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
@@ -48,13 +50,10 @@ import com.d3x.morpheus.util.functions.Function1;
  */
 public class DbTests {
 
-    private static final File readDbDir = new File("src/test/resources/databases");
-    private static final File testDir = new File(System.getProperty("java.io.tmpdir"), "databases");
+    private static final File testDir = new File(System.getProperty("user.home"), "temp/morpheus/databases");
 
     private enum DbType { H2, HSQL, SQLITE }
 
-    private DbSink dbSink = new DbSink();
-    private DbSource dbSource = new DbSource();
     private Map<String,DataSource> dataSourceMap = new LinkedHashMap<>();
 
 
@@ -67,22 +66,28 @@ public class DbTests {
     private static DataSource createDataSource(DbType dbType, File path) {
         System.out.println("Creating DataSource for " + path.getAbsolutePath());
         path.getParentFile().mkdirs();
-        final BasicDataSource dataSource = new BasicDataSource();
+        var dataSource = new BasicDataSource();
         dataSource.setDefaultAutoCommit(true);
         switch (dbType) {
             case H2:
+                var h2Url = "jdbc:h2://" + path.getAbsolutePath();
+                IO.println(h2Url);
                 dataSource.setDriverClassName("org.h2.Driver");
-                dataSource.setUrl("jdbc:h2://" + path.getAbsolutePath());
+                dataSource.setUrl(h2Url);
                 dataSource.setUsername("sa");
                 return dataSource;
             case HSQL:
+                var hsqlUrl = "jdbc:hsqldb:" + path.getAbsolutePath();
+                IO.println(hsqlUrl);
                 dataSource.setDriverClassName("org.hsqldb.jdbcDriver");
-                dataSource.setUrl("jdbc:hsqldb:" + path.getAbsolutePath());
+                dataSource.setUrl(hsqlUrl);
                 dataSource.setUsername("sa");
                 return dataSource;
             case SQLITE:
+                var sqliteUrl = "jdbc:sqlite:" + path.getAbsolutePath();
+                IO.println(sqliteUrl);
                 dataSource.setDriverClassName("org.sqlite.JDBC");
-                dataSource.setUrl("jdbc:sqlite:" + path.getAbsolutePath());
+                dataSource.setUrl(sqliteUrl);
                 dataSource.setUsername("");
                 dataSource.setPassword("");
                 return dataSource;
@@ -93,22 +98,12 @@ public class DbTests {
 
 
 
-    @DataProvider(name = "readDatabases")
-    public Object[][] readDatabases() {
+    @DataProvider(name = "databases")
+    public Object[][] databases() {
         return new Object[][] {
-            { "read/h2-db" },
-            { "read/hsql-db" },
-            { "read/sqlite-db" }
-        };
-    }
-
-
-    @DataProvider(name = "writeDatabases")
-    public Object[][] writeDatabases() {
-        return new Object[][] {
-            { "write/h2-db" },
-            { "write/hsql-db" },
-            { "write/sqlite-db" }
+            { "h2-db" },
+            { "hsql-db" },
+            { "sqlite-db" }
         };
     }
 
@@ -154,40 +149,56 @@ public class DbTests {
 
 
     @BeforeClass
-    public void setup() throws Exception {
+    public void setup() {
         delete(testDir);
-        dataSourceMap.put("read/h2-db", createDataSource(DbType.H2, new File(readDbDir, "h2-db/testDb")));
-        dataSourceMap.put("read/hsql-db", createDataSource(DbType.HSQL, new File(readDbDir, "hsql-db/testDb")));
-        dataSourceMap.put("read/sqlite-db", createDataSource(DbType.SQLITE, new File(readDbDir, "sqlite-db/testDb")));
-        dataSourceMap.put("write/h2-db", createDataSource(DbType.H2, new File(testDir, "h2-db/testDb")));
-        dataSourceMap.put("write/hsql-db", createDataSource(DbType.HSQL, new File(testDir, "hsql-db/testDb")));
-        dataSourceMap.put("write/sqlite-db", createDataSource(DbType.SQLITE, new File(testDir, "sqlite-db/testDb")));
+        dataSourceMap.put("h2-db", createDataSource(DbType.H2, new File(testDir, "h2-db/testDb")));
+        dataSourceMap.put("hsql-db", createDataSource(DbType.HSQL, new File(testDir, "hsql-db/testDb")));
+        dataSourceMap.put("sqlite-db", createDataSource(DbType.SQLITE, new File(testDir, "sqlite-db/testDb")));
     }
 
 
 
-    @Test(dataProvider="readDatabases")
-    public void testRead1(String dbName) {
-        final DataFrame<Integer,String> frame = dbSource.read(options -> {
-            options.withConnection(dataSourceMap.get(dbName));
-            options.withSql("select * from \"ProcessLog\"");
+    @Test(dataProvider="databases", dependsOnMethods="testWriteProcessLog")
+    public void testProcessLog1(String dbName) {
+        var source = new DbSource(dataSourceMap.get(dbName));
+        var frame = source.read(options -> {
+            options.setSql("select * from ProcessLog");
+            options.setColKeyMapper(v -> {
+                switch (v.toLowerCase()) {
+                    case "node":                    return "Node";
+                    case "executablepath":          return "ExecutablePath";
+                    case "terminationdate":         return "TerminationDate";
+                    case "minimumworkingsetsize":   return "MinimumWorkingSetSize";
+                    default:                        return v;
+                }
+            });
         });
-        Assert.assertEquals(frame.colCount(), 47);
+        Assert.assertEquals(frame.colCount(), 46);
         Assert.assertTrue(frame.cols().containsAll(Arrays.asList("Node", "ExecutablePath", "TerminationDate", "MinimumWorkingSetSize")));
-        Assert.assertEquals(frame.rowCount(), 39);
+        Assert.assertEquals(frame.rowCount(), 43);
         Assert.assertTrue(frame.rows().containsAll(Arrays.asList(1, 2, 3)));
         Assert.assertTrue(frame.col("ExecutablePath").toValueStream().anyMatch("C:\\Windows\\system32\\taskhost.exe"::equals));
         Assert.assertEquals(frame.col("TerminationDate").typeInfo(), LocalDate.class);
-        Assert.assertEquals(frame.col("MinimumWorkingSetSize").typeInfo(), Long.class);
+        Assert.assertEquals(frame.col("MinimumWorkingSetSize").typeInfo(), Double.class);
         frame.out().print();
     }
 
 
-    @Test(dataProvider="readDatabases")
-    public void testRead2(String dbName) {
-        final DataFrame<String,String> frame = dbSource.read(options -> {
-            options.withConnection(dataSourceMap.get(dbName));
-            options.withSql("select \"Ticker\", \"Fund Name\", \"Issuer\", \"AUM\", \"P/E\" from \"ETF\"");
+    @Test(dataProvider="databases", dependsOnMethods="testEtfWrite")
+    public void testEtfRead(String dbName) {
+        var source = new DbSource(dataSourceMap.get(dbName));
+        final DataFrame<String,String> frame = source.read(options -> {
+            options.setSql("select Ticker, Fund_Name, Issuer, AUM, P_E from ETF");
+            options.setColKeyMapper(v -> {
+                switch (v.toLowerCase()) {
+                    case "ticker":      return "Ticker";
+                    case "fund_name":   return "Fund Name";
+                    case "issuer":      return "Issuer";
+                    case "aum":         return "AUM";
+                    case "p_e":         return "P/E";
+                    default:            return v;
+                }
+            });
         });
         Assert.assertEquals(frame.colCount(), 5);
         Assert.assertTrue(frame.cols().containsAll(Arrays.asList("Ticker", "Fund Name", "Issuer", "AUM", "P/E")));
@@ -200,63 +211,31 @@ public class DbTests {
     }
 
 
-    @Test(dataProvider="readDatabases")
-    public void testRead3(String dbName) {
-        final DataFrame<Integer,String> frame = dbSource.read(options -> {
-            options.withConnection(dataSourceMap.get(dbName));
-            options.withSql("select * from \"TestTable\"");
-        });
-        Assert.assertEquals(frame.colCount(), 13);
-        Assert.assertTrue(frame.cols().containsAll(Arrays.asList("Name", "Size", "Volume", "Price", "SomeDate", "SomeTimestamp")));
-        Assert.assertEquals(frame.rowCount(), 3);
-        Assert.assertTrue(frame.rows().containsAll(Arrays.asList(1, 2, 3)));
-        Assert.assertTrue(frame.col("Name").toValueStream().anyMatch("Apple Computer"::equals));
-        Assert.assertEquals(frame.col("Name").typeInfo(), String.class);
-        Assert.assertEquals(frame.col("IsNew").typeInfo(), Boolean.class);
-        Assert.assertEquals(frame.col("Size").typeInfo(), Double.class);
-        Assert.assertEquals(frame.col("Price").typeInfo(), Double.class);
-        Assert.assertEquals(frame.col("Volume").typeInfo(), Long.class);
-        Assert.assertEquals(frame.col("SomeTimestamp").typeInfo(), LocalDateTime.class);
-        Assert.assertEquals(frame.col("SomeDateTime").typeInfo(), LocalDateTime.class);
-        Assert.assertEquals(frame.col("SomeDate").typeInfo(), LocalDate.class);
-        Assert.assertEquals(frame.col("CharData").typeInfo(), String.class);
-        Assert.assertEquals(frame.col("TinyIntData").typeInfo(), Integer.class);
-        Assert.assertEquals(frame.col("SmallIntData").typeInfo(), Integer.class);
-        Assert.assertEquals(frame.col("RealData").typeInfo(), Double.class);
-        frame.out().print();
-    }
 
-
-
-    @Test(dataProvider = "writeDatabases")
+    @Test(dataProvider = "databases")
     public void testEtfWrite(String dbName) {
-        final DataSource source = dataSourceMap.get(dbName);
-        final DataFrame<String,String> frame = DataFrame.read().csv(options -> {
-            options.setResource("/csv/etf.csv");
-            options.setExcludeColumns("Ticker");
+        var source = dataSourceMap.get(dbName);
+        var frame = DataFrame.read().<String>csv("/csv/etf.csv").read(options -> {
+            options.setRowKeyColumnName("Ticker");
             options.setColumnType("Geography", String.class);
-            options.setRowKeyParser(String.class, values -> values[0]);
         });
 
+        var sink = new DbSink(source);
         frame.rows().select(row -> row.key().equalsIgnoreCase("TDV")).out().print();
-        dbSink.write(frame, options -> {
-            options.setConnection(source);
+        sink.write(frame, options -> {
             options.setTableName("ETF");
             options.setRowKeyMapping("Ticker", String.class, Function1.toValue(v -> v));
             options.setBatchSize(1000);
-
         });
-
         frame.out().print();
     }
 
 
-    @Test(dataProvider = "writeDatabases")
-    public void testDatabaseWriteProcessLog(String dbName) {
-        final DataFrame<Integer,String> frame = DataFrame.read().csv(options -> {
-            options.setResource("/csv/process.csv");
-            options.setExcludeColumns("PID");
-            options.setRowKeyParser(Integer.class, values -> Integer.parseInt(values[25]));
+    @Test(dataProvider = "databases")
+    public void testWriteProcessLog(String dbName) {
+        var path = "/csv/process.csv";
+        var frame = DataFrame.read().<Integer>csv(path).read(options -> {
+            options.setRowKeyColumnName("ProcessId");
             options.setCharset(StandardCharsets.UTF_16);
             options.setColumnType("ExecutionState", String.class);
             options.setColumnType("InstallDate", LocalDate.class);
@@ -265,34 +244,36 @@ public class DbTests {
             options.setColumnType("KernelModeTime", Long.class);
         });
 
-        dbSink.write(frame, options -> {
+        frame.out().print();
+        frame.cols().forEach(col -> {
+            IO.println(col.key() + ", type: " + col.typeInfo());
+        });
+
+        var sink = new DbSink(dataSourceMap.get(dbName));
+        sink.write(frame, options -> {
             options.setBatchSize(1000);
             options.setAutoIncrementColumnName("RecordId");
             options.setTableName("ProcessLog");
-            options.setConnection(dataSourceMap.get(dbName));
         });
     }
 
 
-    @Test(dataProvider = "writeDatabases")
+    @Test(dataProvider = "databases")
     public void testWriteFollowedByRead(String dbName) {
-
-        final DataFrame<Integer,String> frame1 = createRandomFrame(10);
-
-        DbSink sink = new DbSink();
+        var frame1 = createRandomFrame(10);
+        var sink = new DbSink(dataSourceMap.get(dbName));
         sink.write(frame1, options -> {
             options.setBatchSize(1000);
             options.setTableName("RandomTable");
-            options.setConnection(dataSourceMap.get(dbName));
             options.setAutoIncrementColumnName("RecordId");
         });
 
-        final AtomicInteger counter = new AtomicInteger();
-        final DataFrame<Integer,String> frame2 = dbSource.read(options -> {
-            options.withConnection(dataSourceMap.get(dbName));
-            options.withSql("select * from \"RandomTable\"");
-            options.withExcludeColumns("RecordId");
-            options.withRowKeyFunction(rs -> counter.incrementAndGet());
+        var counter = new AtomicInteger();
+        var source = new DbSource(dataSourceMap.get(dbName));
+        final DataFrame<Integer,String> frame2 = source.read(options -> {
+            options.setSql("select * from RandomTable");
+            options.setExcludeColumnSet(Set.of("RecordId"));
+            options.setRowKeyMapper(rs -> counter.incrementAndGet());
         });
 
         frame1.out().print();

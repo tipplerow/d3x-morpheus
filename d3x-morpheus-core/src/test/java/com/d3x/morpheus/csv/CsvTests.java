@@ -26,7 +26,6 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Optional;
-import java.util.function.Function;
 
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -81,13 +80,12 @@ public class CsvTests {
 
 
     @Test(dataProvider="types")
-    public <T> void testLocalDateAxis(Class<T> rowType) throws Exception {
-        final String tmpDir = System.getProperty("java.io.tmpdir");
-        final File file = new File(tmpDir, "DataFrame-" + rowType.getSimpleName() + ".csv");
-        final DataFrame<T,String> frame = TestDataFrames.createMixedRandomFrame(rowType, 100);
+    public <T> void testLocalDateAxis(Class<T> rowType) {
+        var tmpDir = System.getProperty("java.io.tmpdir");
+        var file = new File(tmpDir, "DataFrame-" + rowType.getSimpleName() + ".csv");
+        var frame = TestDataFrames.createMixedRandomFrame(rowType, 100);
         System.out.println("Writing to " + file.getAbsolutePath());
-        frame.write().csv(options -> {
-            options.setFile(file);
+        frame.write().csv(file).apply(options -> {
             options.withFormats(formats -> {
                 formats.setPrinter("LocalDateTimeColumn", Printer.ofLocalDateTime(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
                 formats.setPrinter("ZonedDateTimeColumn", Printer.ofZonedDateTime(DateTimeFormatter.ISO_ZONED_DATE_TIME));
@@ -104,13 +102,12 @@ public class CsvTests {
      * @param file      the file to read from
      */
     private <T> void readAndValidate(DataFrame<T,String> original, Class<T> rowType, File file) {
-        final Formats formats = new Formats();
-        final Function<String,T> parser = formats.getParserOrFail(rowType);
-        final DataFrame<T,String> result = DataFrame.read().csv(options -> {
-            options.setResource(file.getAbsolutePath());
+        var formats = new Formats();
+        var parser = formats.<T>getParserOrFail(rowType);
+        var result = DataFrame.read().<T>csv(file).read(options -> {
             options.setFormats(formats);
-            options.setRowKeyParser(rowType, values -> parser.apply(values[0]));
-            options.setExcludeColumns("DataFrame");
+            options.setRowKeyColumnName("DataFrame");
+            options.getFormats().setParser("DataFrame", parser);
             options.getFormats().setParser("DoubleColumn", Double.class);
             options.getFormats().setParser("EnumColumn", Month.class);
             options.getFormats().setParser("LongColumn", Long.class);
@@ -126,12 +123,11 @@ public class CsvTests {
 
     @Test()
     public void testBasicRead() {
-        final DataFrame<Integer,String> frame = DataFrame.read().csv(options -> {
-            options.setResource("/csv/aapl.csv");
+        var frame = DataFrame.read().<Integer>csv("/csv/aapl.csv").read(options -> {
             options.getFormats().setParser("Volume", Long.class);
         });
         assertTrue(frame.rows().count() > 0, "There is at least one row");
-        assertTrue(frame.cols().count() == 7, "There are 7 columns");
+        assertEquals(frame.cols().count(),  7, "There are 7 columns");
         assertTrue(frame.cols().keys().allMatch(Predicates.in(quoteFields)), "Contains all expected columns");
         assertEquals(frame.rowCount(), 8503);
         assertEquals(frame.cols().type("Date"), LocalDate.class);
@@ -141,36 +137,36 @@ public class CsvTests {
         assertEquals(frame.cols().type("Close"), Double.class);
         assertEquals(frame.cols().type("Volume"), Long.class);
         assertEquals(frame.cols().type("Adj Close"), Double.class);
-        assertTrue(frame.rows().firstKey().equals(Optional.of(0)));
-        assertTrue(frame.rows().lastKey().equals(Optional.of(8502)));
+        assertEquals(frame.rows().firstKey(), Optional.of(0));
+        assertEquals(frame.rows().lastKey(), Optional.of(8502));
 
         final DataFrameCursor<Integer,String> cursor = frame.cursor();
-        cursor.atRow(0);
-        assertEquals(cursor.atColKey("Date").getValue(), LocalDate.of(1980, 12, 12));
-        assertEquals(cursor.atColKey("Open").getDouble(), 28.74984, 0.00001);
-        assertEquals(cursor.atColKey("High").getDouble(), 28.87472, 0.00001);
-        assertEquals(cursor.atColKey("Low").getDouble(), 28.74984, 0.00001);
-        assertEquals(cursor.atColKey("Close").getDouble(), 28.74984, 0.00001);
-        assertEquals(cursor.atColKey("Volume").getLong(), 117258400L);
-        assertEquals(cursor.atColKey("Adj Close").getDouble(), 0.44203, 0.00001);
+        cursor.toRowAt(0);
+        assertEquals(cursor.toCol("Date").getValue(), LocalDate.of(1980, 12, 12));
+        assertEquals(cursor.toCol("Open").getDouble(), 28.74984, 0.00001);
+        assertEquals(cursor.toCol("High").getDouble(), 28.87472, 0.00001);
+        assertEquals(cursor.toCol("Low").getDouble(), 28.74984, 0.00001);
+        assertEquals(cursor.toCol("Close").getDouble(), 28.74984, 0.00001);
+        assertEquals(cursor.toCol("Volume").getLong(), 117258400L);
+        assertEquals(cursor.toCol("Adj Close").getDouble(), 0.44203, 0.00001);
 
-        cursor.atRow(7690);
-        assertEquals(cursor.atColKey("Date").getValue(), LocalDate.of(2011, 6, 8));
-        assertEquals(cursor.atColKey("Open").getDouble(), 331.77997, 0.00001);
-        assertEquals(cursor.atColKey("High").getDouble(), 334.79999, 0.00001);
-        assertEquals(cursor.atColKey("Low").getDouble(), 330.64996, 0.00001);
-        assertEquals(cursor.atColKey("Close").getDouble(), 332.24002, 0.00001);
-        assertEquals(cursor.atColKey("Volume").getLong(), 83430900L);
-        assertEquals(cursor.atColKey("Adj Close").getDouble(), 44.76965, 0.00001);
+        cursor.toRowAt(7690);
+        assertEquals(cursor.toCol("Date").getValue(), LocalDate.of(2011, 6, 8));
+        assertEquals(cursor.toCol("Open").getDouble(), 331.77997, 0.00001);
+        assertEquals(cursor.toCol("High").getDouble(), 334.79999, 0.00001);
+        assertEquals(cursor.toCol("Low").getDouble(), 330.64996, 0.00001);
+        assertEquals(cursor.toCol("Close").getDouble(), 332.24002, 0.00001);
+        assertEquals(cursor.toCol("Volume").getLong(), 83430900L);
+        assertEquals(cursor.toCol("Adj Close").getDouble(), 44.76965, 0.00001);
 
-        cursor.atRow(8502);
-        assertEquals(cursor.atColKey("Date").getValue(), LocalDate.of(2014, 8, 29));
-        assertEquals(cursor.atColKey("Open").getDouble(), 102.86, 0.00001);
-        assertEquals(cursor.atColKey("High").getDouble(), 102.9, 0.00001);
-        assertEquals(cursor.atColKey("Low").getDouble(), 102.2, 0.00001);
-        assertEquals(cursor.atColKey("Close").getDouble(), 102.5, 0.00001);
-        assertEquals(cursor.atColKey("Volume").getLong(), 44595000L);
-        assertEquals(cursor.atColKey("Adj Close").getDouble(), 101.65627, 0.00001);
+        cursor.toRowAt(8502);
+        assertEquals(cursor.toCol("Date").getValue(), LocalDate.of(2014, 8, 29));
+        assertEquals(cursor.toCol("Open").getDouble(), 102.86, 0.00001);
+        assertEquals(cursor.toCol("High").getDouble(), 102.9, 0.00001);
+        assertEquals(cursor.toCol("Low").getDouble(), 102.2, 0.00001);
+        assertEquals(cursor.toCol("Close").getDouble(), 102.5, 0.00001);
+        assertEquals(cursor.toCol("Volume").getLong(), 44595000L);
+        assertEquals(cursor.toCol("Adj Close").getDouble(), 101.65627, 0.00001);
 
         for (int i=0; i<frame.rows().count(); ++i) {
             final Integer rowKey = frame.rows().key(i);
@@ -180,10 +176,8 @@ public class CsvTests {
 
     @Test()
     public void testRowKeyParser() {
-        final DataFrame<LocalDate,String> frame = DataFrame.read().csv(options -> {
-            options.setResource("/csv/aapl.csv");
-            options.setExcludeColumns("Date");
-            options.setRowKeyParser(LocalDate.class, values -> LocalDate.parse(values[0]));
+        var frame = DataFrame.read().<LocalDate>csv("/csv/aapl.csv").read(options -> {
+            options.setRowKeyColumnName("Date");
             options.getFormats().copyParser(Long.class, "Volume");
         });
         assertEquals(frame.rowCount(), 8503);
@@ -200,31 +194,31 @@ public class CsvTests {
         assertEquals(frame.rows().key(0), LocalDate.of(1980, 12, 12));
 
         final DataFrameCursor<LocalDate,String> cursor = frame.cursor();
-        cursor.atRowKey(LocalDate.of(1980, 12, 12));
-        assertEquals(cursor.atColKey("Open").getDouble(), 28.74984, 0.00001);
-        assertEquals(cursor.atColKey("High").getDouble(), 28.87472, 0.00001);
-        assertEquals(cursor.atColKey("Low").getDouble(), 28.74984, 0.00001);
-        assertEquals(cursor.atColKey("Close").getDouble(), 28.74984, 0.00001);
-        assertEquals(cursor.atColKey("Volume").getLong(), 117258400L);
-        assertEquals(cursor.atColKey("Adj Close").getDouble(), 0.44203, 0.00001);
+        cursor.toRow(LocalDate.of(1980, 12, 12));
+        assertEquals(cursor.toCol("Open").getDouble(), 28.74984, 0.00001);
+        assertEquals(cursor.toCol("High").getDouble(), 28.87472, 0.00001);
+        assertEquals(cursor.toCol("Low").getDouble(), 28.74984, 0.00001);
+        assertEquals(cursor.toCol("Close").getDouble(), 28.74984, 0.00001);
+        assertEquals(cursor.toCol("Volume").getLong(), 117258400L);
+        assertEquals(cursor.toCol("Adj Close").getDouble(), 0.44203, 0.00001);
 
-        cursor.atRowKey(LocalDate.of(2011, 6, 8));
+        cursor.toRow(LocalDate.of(2011, 6, 8));
         assertEquals(frame.rows().key(7690), LocalDate.of(2011, 6, 8));
-        assertEquals(cursor.atColKey("Open").getDouble(), 331.77997, 0.00001);
-        assertEquals(cursor.atColKey("High").getDouble(), 334.79999, 0.00001);
-        assertEquals(cursor.atColKey("Low").getDouble(), 330.64996, 0.00001);
-        assertEquals(cursor.atColKey("Close").getDouble(), 332.24002, 0.00001);
-        assertEquals(cursor.atColKey("Volume").getLong(), 83430900L);
-        assertEquals(cursor.atColKey("Adj Close").getDouble(), 44.76965, 0.00001);
+        assertEquals(cursor.toCol("Open").getDouble(), 331.77997, 0.00001);
+        assertEquals(cursor.toCol("High").getDouble(), 334.79999, 0.00001);
+        assertEquals(cursor.toCol("Low").getDouble(), 330.64996, 0.00001);
+        assertEquals(cursor.toCol("Close").getDouble(), 332.24002, 0.00001);
+        assertEquals(cursor.toCol("Volume").getLong(), 83430900L);
+        assertEquals(cursor.toCol("Adj Close").getDouble(), 44.76965, 0.00001);
 
-        cursor.atRowKey(LocalDate.of(2014, 8, 29));
+        cursor.toRow(LocalDate.of(2014, 8, 29));
         assertEquals(frame.rows().key(8502), LocalDate.of(2014, 8, 29));
-        assertEquals(cursor.atColKey("Open").getDouble(), 102.86, 0.00001);
-        assertEquals(cursor.atColKey("High").getDouble(), 102.9, 0.00001);
-        assertEquals(cursor.atColKey("Low").getDouble(), 102.2, 0.00001);
-        assertEquals(cursor.atColKey("Close").getDouble(), 102.5, 0.00001);
-        assertEquals(cursor.atColKey("Volume").getLong(), 44595000L);
-        assertEquals(cursor.atColKey("Adj Close").getDouble(), 101.65627, 0.00001);
+        assertEquals(cursor.toCol("Open").getDouble(), 102.86, 0.00001);
+        assertEquals(cursor.toCol("High").getDouble(), 102.9, 0.00001);
+        assertEquals(cursor.toCol("Low").getDouble(), 102.2, 0.00001);
+        assertEquals(cursor.toCol("Close").getDouble(), 102.5, 0.00001);
+        assertEquals(cursor.toCol("Volume").getLong(), 44595000L);
+        assertEquals(cursor.toCol("Adj Close").getDouble(), 101.65627, 0.00001);
 
         for (int i=0; i<frame.rows().count(); ++i) {
             final LocalDate rowKey = frame.rows().key(i);
@@ -235,8 +229,7 @@ public class CsvTests {
 
     @Test()
     public void testRowPredicate() {
-        final DataFrame<Integer,String> frame = DataFrame.read().csv(options -> {
-            options.setResource("/csv/aapl.csv");
+        var frame = DataFrame.read().<Integer>csv("/csv/aapl.csv").read(options -> {
             options.setRowPredicate(values -> values[0].startsWith("2012"));
             options.getFormats().copyParser(Long.class, "Volume");
         });
@@ -253,23 +246,23 @@ public class CsvTests {
         assertEquals(frame.cols().type("Adj Close"), Double.class);
 
         final DataFrameCursor<Integer,String> cursor = frame.cursor();
-        cursor.atRow(0);
-        assertEquals(cursor.atColKey("Date").getValue(), LocalDate.of(2012, 1, 3));
-        assertEquals(cursor.atColKey("Open").getDouble(), 409.39996, 0.00001);
-        assertEquals(cursor.atColKey("High").getDouble(), 412.5, 0.00001);
-        assertEquals(cursor.atColKey("Low").getDouble(), 409, 0.00001);
-        assertEquals(cursor.atColKey("Close").getDouble(), 411.22998, 0.00001);
-        assertEquals(cursor.atColKey("Volume").getLong(), 75555200L);
-        assertEquals(cursor.atColKey("Adj Close").getDouble(), 55.41362, 0.00001);
+        cursor.toRowAt(0);
+        assertEquals(cursor.toCol("Date").getValue(), LocalDate.of(2012, 1, 3));
+        assertEquals(cursor.toCol("Open").getDouble(), 409.39996, 0.00001);
+        assertEquals(cursor.toCol("High").getDouble(), 412.5, 0.00001);
+        assertEquals(cursor.toCol("Low").getDouble(), 409, 0.00001);
+        assertEquals(cursor.toCol("Close").getDouble(), 411.22998, 0.00001);
+        assertEquals(cursor.toCol("Volume").getLong(), 75555200L);
+        assertEquals(cursor.toCol("Adj Close").getDouble(), 55.41362, 0.00001);
 
-        cursor.atRow(249);
-        assertEquals(cursor.atColKey("Date").getValue(), LocalDate.of(2012, 12, 31));
-        assertEquals(cursor.atColKey("Open").getDouble(), 510.53003, 0.00001);
-        assertEquals(cursor.atColKey("High").getDouble(), 535.39996, 0.00001);
-        assertEquals(cursor.atColKey("Low").getDouble(), 509, 0.00001);
-        assertEquals(cursor.atColKey("Close").getDouble(), 532.17004, 0.00001);
-        assertEquals(cursor.atColKey("Volume").getLong(), 164873100L);
-        assertEquals(cursor.atColKey("Adj Close").getDouble(), 72.34723, 0.00001);
+        cursor.toRowAt(249);
+        assertEquals(cursor.toCol("Date").getValue(), LocalDate.of(2012, 12, 31));
+        assertEquals(cursor.toCol("Open").getDouble(), 510.53003, 0.00001);
+        assertEquals(cursor.toCol("High").getDouble(), 535.39996, 0.00001);
+        assertEquals(cursor.toCol("Low").getDouble(), 509, 0.00001);
+        assertEquals(cursor.toCol("Close").getDouble(), 532.17004, 0.00001);
+        assertEquals(cursor.toCol("Volume").getLong(), 164873100L);
+        assertEquals(cursor.toCol("Adj Close").getDouble(), 72.34723, 0.00001);
 
         frame.rows().forEach(row -> assertTrue(row.<LocalDate>getValue("Date").getYear() == 2012));
     }
@@ -278,13 +271,11 @@ public class CsvTests {
     @Test()
     public void testColumnPredicate() {
         final String[] columns = {"Date", "Close", "Volume"};
-        final DataFrame<Integer,String> frame = DataFrame.read().csv(options -> {
-            options.setResource("/csv/aapl.csv");
+        var frame = DataFrame.read().<Integer>csv("/csv/aapl.csv").read(options -> {
             options.setIncludeColumns(columns);
             options.getFormats().setParser("Volume", Long.class);
         });
-        final DataFrame<Integer,String> expected = DataFrame.read().csv(options -> {
-            options.setResource("/csv/aapl.csv");
+        var expected = DataFrame.read().<Integer>csv("/csv/aapl.csv").read(options -> {
             options.getFormats().setParser("Volume", Long.class);
         });
         assertEquals(frame.rowCount(), 8503);
@@ -297,7 +288,7 @@ public class CsvTests {
         frame.rows().forEach(row -> {
             for (String column : columns) {
                 final Object actual = row.getValue(column);
-                final Object expect = cursor.atRowKey(row.key()).atColKey(column).getValue();
+                final Object expect = cursor.toRow(row.key()).toCol(column).getValue();
                 assertEquals(actual, expect, "The values match for " + row.key() + ", " + column);
             }
         });
@@ -307,15 +298,13 @@ public class CsvTests {
     @Test()
     public void testRowAndColumnPredicate() {
         final String[] columns = {"Date", "Close", "Volume"};
-        final DataFrame<Integer,String> frame = DataFrame.read().csv(options -> {
-            options.setResource("/csv/aapl.csv");
+        var frame = DataFrame.read().<Integer>csv("/csv/aapl.csv").read(options -> {
             options.setRowPredicate(values -> values[0].startsWith("2012"));
             options.setColNamePredicate(Predicates.in(columns));
             options.getFormats().copyParser(Long.class, "Volume");
         });
-        final DataFrame<LocalDate,String> expected = DataFrame.read().csv(options -> {
-            options.setResource("/csv/aapl.csv");
-            options.setRowKeyParser(LocalDate.class, values -> LocalDate.parse(values[0]));
+        var expected = DataFrame.read().<LocalDate>csv("/csv/aapl.csv").read(options -> {
+            options.setRowKeyColumnName("Date");
             options.getFormats().copyParser(Long.class, "Volume");
         });
         assertEquals(frame.rows().count(), 250);
@@ -331,7 +320,7 @@ public class CsvTests {
             assertTrue(date.getYear() == 2012);
             for (String column : Arrays.asList("Close", "Volume")) {
                 final Object actual = row.getValue(column);
-                final Object expect = cursor.atRowKey(date).atColKey(column).getValue();
+                final Object expect = cursor.toRow(date).toCol(column).getValue();
                 assertEquals(actual, expect, "The values match for " + row.key() + ", " + column);
             }
         });
@@ -341,18 +330,14 @@ public class CsvTests {
     @Test()
     public void testWriteFollowedByRead() {
         final File file = new File(tmpDir, "aapl.csv");
-        final DataFrame<LocalDate,String> frame1 = DataFrame.read().csv(options -> {
-            options.setResource("/csv/aapl.csv");
-            options.setExcludeColumns("Date");
-            options.setRowKeyParser(LocalDate.class, values -> LocalDate.parse(values[0]));
+        var frame1 = DataFrame.read().<Integer>csv("/csv/aapl.csv").read(options -> {
+            options.setRowKeyColumnName("Date");
             options.getFormats().setParser("Volume", Long.class);
         });
-        frame1.write().csv(o -> o.setFile(file));
-        final DataFrame<LocalDate,String> frame2 = DataFrame.read().csv(options -> {
-            options.setResource(file.getAbsolutePath());
-            options.setExcludeColumns("DataFrame");
+        frame1.write().csv(file).apply();
+        var frame2 = DataFrame.read().<Integer>csv(file).read(options -> {
+            options.setRowKeyColumnName("DataFrame");
             options.getFormats().setParser("Volume", Long.class);
-            options.setRowKeyParser(LocalDate.class, values -> LocalDate.parse(values[0]));
         });
         DataFrameAsserts.assertEqualsByIndex(frame1, frame2);
     }
@@ -360,10 +345,8 @@ public class CsvTests {
 
     @Test()
     public void testCustomParsers() {
-        final DataFrame<LocalDate,String> frame = DataFrame.read().csv(options -> {
-            options.setResource("/csv/aapl.csv");
-            options.setExcludeColumns("Date");
-            options.setRowKeyParser(LocalDate.class, values -> LocalDate.parse(values[0]));
+        var frame = DataFrame.read().<Integer>csv("/csv/aapl.csv").read(options -> {
+            options.setRowKeyColumnName("Date");
             options.getFormats().copyParser(Double.class, "Volume");
             options.getFormats().copyParser(BigDecimal.class, "Close");
         });
@@ -382,11 +365,9 @@ public class CsvTests {
     @Test()
     public void testWindowsTasks() {
         final String[] columns = {"Image Name", "PID", "Session Name", "Session#", "Mem Usage", "Status", "User Name", "CPU Time", "Window Title"};
-        final DataFrame<Integer,String> frame = DataFrame.read().csv(options -> {
-            options.setResource("/csv/tasks.csv");
-            options.setRowKeyParser(Integer.class, values -> Integer.parseInt(values[1]));
+        var frame = DataFrame.read().<Integer>csv("/csv/tasks.csv").read(options -> {
             options.setColNamePredicate(Predicates.in(columns));
-            options.setExcludeColumns("PID");
+            options.setRowKeyColumnName("PID");
         });
         assertEquals(frame.rowCount(), 45, "Frame row count is as expected");
         assertEquals(frame.colCount(), columns.length-1, "Frame column count as expected");
@@ -396,34 +377,34 @@ public class CsvTests {
 
     @Test()
     public void testWindowsTasksColumnInclude() {
-        final String[] columns1 = {"Image Name", "Session Name", "Session#", "Mem Usage", "Status", "User Name", "CPU Time", "Window Title"};
-        final String[] columns2 = {"Image Name", "Mem Usage", "User Name", "CPU Time"};
-        final DataFrame<Integer,String> frame1 = DataFrame.read().csv(options -> {
-            options.setResource("/csv/tasks.csv");
-            options.setRowKeyParser(Integer.class, values -> Integer.parseInt(values[1]));
+        final String[] columns1 = {"Image Name", "Session Name", "Session#", "Mem Usage", "Status", "User Name", "CPU Time", "Window Title", "PID"};
+        final String[] columns2 = {"Image Name", "Mem Usage", "User Name", "CPU Time", "PID"};
+        var frame1 = DataFrame.read().<Integer>csv("/csv/tasks.csv").read(options -> {
+            options.setRowKeyColumnName("PID");
+            options.setParser("PID", Parser.ofInteger());
             options.setColNamePredicate(Predicates.in(columns1));
         });
-        final DataFrame<Integer,String> frame2 = DataFrame.read().csv(options -> {
-            options.setResource("/csv/tasks.csv");
-            options.setRowKeyParser(Integer.class, values -> Integer.parseInt(values[1]));
+        var frame2 = DataFrame.read().<Integer>csv("/csv/tasks.csv").read(options -> {
+            options.setRowKeyColumnName("PID");
+            options.setParser("PID", Parser.ofInteger());
             options.setColNamePredicate(Predicates.in(columns2));
         });
+        frame1.out().print();
+        frame2.out().print();
         assertEquals(frame1.rowCount(), 45, "Frame1 row count is as expected");
         assertEquals(frame2.rowCount(), 45, "Frame2 row count is as expected");
         assertTrue(frame1.colCount() > frame2.colCount(), "First frame has more columns");
-        assertEquals(frame1.colCount(), columns1.length, "Frame1 column count as expected");
-        assertEquals(frame2.colCount(), columns2.length, "Frame2 column count as expected");
-        Arrays.stream(columns1).forEach(column -> assertTrue(frame1.cols().contains(column)));
-        Arrays.stream(columns2).forEach(column -> assertTrue(frame2.cols().contains(column)));
+        assertEquals(frame1.colCount()+1, columns1.length, "Frame1 column count as expected");
+        assertEquals(frame2.colCount()+1, columns2.length, "Frame2 column count as expected");
+        Arrays.stream(columns1).filter(v -> !v.equals("PID")).forEach(column -> assertTrue(frame1.cols().contains(column)));
+        Arrays.stream(columns2).filter(v -> !v.equals("PID")).forEach(column -> assertTrue(frame2.cols().contains(column)));
     }
 
     @Test()
     public void testCustomCharset() {
-        final DataFrame<Integer,String> frame = DataFrame.read().csv(options -> {
-            options.setResource("/csv/process.csv");
-            options.setRowKeyParser(Integer.class, values -> Integer.parseInt(values[29]));
+        var frame = DataFrame.read().csv("/csv/process.csv").read(options -> {
             options.setCharset(StandardCharsets.UTF_16);
-            options.setExcludeColumns("ProcessId");
+            options.setRowKeyColumnName("ProcessId");
             options.getFormats().copyParser(Long.class, "KernelModeTime");
         });
         assertEquals(frame.rowCount(), 43, "Frame row count is as expected");
@@ -433,11 +414,9 @@ public class CsvTests {
 
     @Test()
     public void testMultipleColumnPredicates() {
-        final DataFrame<LocalDate,String> frame = DataFrame.read().csv(options -> {
-            options.setResource("/csv/aapl.csv");
-            options.setExcludeColumnIndexes(0);
+        var frame = DataFrame.read().<LocalDate>csv("/csv/aapl.csv").read(options -> {
             options.setExcludeColumns("Open");
-            options.setRowKeyParser(LocalDate.class, values -> LocalDate.parse(values[0]));
+            options.setRowKeyColumnName("Date");
             options.getFormats().copyParser(Long.class, "Volume");
         });
 
@@ -452,38 +431,37 @@ public class CsvTests {
         assertEquals(frame.cols().type("Adj Close"), Double.class);
 
         final DataFrameCursor<LocalDate,String> cursor = frame.cursor();
-        cursor.atRowKey(LocalDate.of(1980, 12, 12));
+        cursor.toRow(LocalDate.of(1980, 12, 12));
         assertEquals(frame.rows().key(0), LocalDate.of(1980, 12, 12));
-        assertEquals(cursor.atColKey("High").getDouble(), 28.87472, 0.00001);
-        assertEquals(cursor.atColKey("Low").getDouble(), 28.74984, 0.00001);
-        assertEquals(cursor.atColKey("Close").getDouble(), 28.74984, 0.00001);
-        assertEquals(cursor.atColKey("Volume").getLong(), 117258400L);
-        assertEquals(cursor.atColKey("Adj Close").getDouble(), 0.44203, 0.00001);
+        assertEquals(cursor.toCol("High").getDouble(), 28.87472, 0.00001);
+        assertEquals(cursor.toCol("Low").getDouble(), 28.74984, 0.00001);
+        assertEquals(cursor.toCol("Close").getDouble(), 28.74984, 0.00001);
+        assertEquals(cursor.toCol("Volume").getLong(), 117258400L);
+        assertEquals(cursor.toCol("Adj Close").getDouble(), 0.44203, 0.00001);
 
-        cursor.atRowKey(LocalDate.of(2011, 6, 8));
+        cursor.toRow(LocalDate.of(2011, 6, 8));
         assertEquals(frame.rows().key(7690), LocalDate.of(2011, 6, 8));
-        assertEquals(cursor.atColKey("High").getDouble(), 334.79999, 0.00001);
-        assertEquals(cursor.atColKey("Low").getDouble(), 330.64996, 0.00001);
-        assertEquals(cursor.atColKey("Close").getDouble(), 332.24002, 0.00001);
-        assertEquals(cursor.atColKey("Volume").getLong(), 83430900L);
-        assertEquals(cursor.atColKey("Adj Close").getDouble(), 44.76965, 0.00001);
+        assertEquals(cursor.toCol("High").getDouble(), 334.79999, 0.00001);
+        assertEquals(cursor.toCol("Low").getDouble(), 330.64996, 0.00001);
+        assertEquals(cursor.toCol("Close").getDouble(), 332.24002, 0.00001);
+        assertEquals(cursor.toCol("Volume").getLong(), 83430900L);
+        assertEquals(cursor.toCol("Adj Close").getDouble(), 44.76965, 0.00001);
 
-        cursor.atRowKey(LocalDate.of(2014, 8, 29));
+        cursor.toRow(LocalDate.of(2014, 8, 29));
         assertEquals(frame.rows().key(8502), LocalDate.of(2014, 8, 29));
-        assertEquals(cursor.atColKey("High").getDouble(), 102.9, 0.00001);
-        assertEquals(cursor.atColKey("Low").getDouble(), 102.2, 0.00001);
-        assertEquals(cursor.atColKey("Close").getDouble(), 102.5, 0.00001);
-        assertEquals(cursor.atColKey("Volume").getLong(), 44595000L);
-        assertEquals(cursor.atColKey("Adj Close").getDouble(), 101.65627, 0.00001);
+        assertEquals(cursor.toCol("High").getDouble(), 102.9, 0.00001);
+        assertEquals(cursor.toCol("Low").getDouble(), 102.2, 0.00001);
+        assertEquals(cursor.toCol("Close").getDouble(), 102.5, 0.00001);
+        assertEquals(cursor.toCol("Volume").getLong(), 44595000L);
+        assertEquals(cursor.toCol("Adj Close").getDouble(), 101.65627, 0.00001);
     }
 
 
     @Test()
     public void testIncludeColumnIndexes() {
-        final DataFrame<LocalDate,String> frame = DataFrame.read().csv(options -> {
-            options.setResource("/csv/aapl.csv");
-            options.setIncludeColumnIndexes(2, 3, 4, 5, 6);
-            options.setRowKeyParser(LocalDate.class, values -> LocalDate.parse(values[0]));
+        var frame = DataFrame.read().<LocalDate>csv("/csv/aapl.csv").read(options -> {
+            options.setRowKeyColumnName("Date");
+            options.setIncludeColumnIndexes(0, 2, 3, 4, 5, 6);
             options.getFormats().copyParser(Long.class, "Volume");
         });
 
@@ -498,29 +476,29 @@ public class CsvTests {
         assertEquals(frame.cols().type("Adj Close"), Double.class);
 
         final DataFrameCursor<LocalDate,String> cursor = frame.cursor();
-        cursor.atRowKey(LocalDate.of(1980, 12, 12));
+        cursor.toRow(LocalDate.of(1980, 12, 12));
         assertEquals(frame.rows().key(0), LocalDate.of(1980, 12, 12));
-        assertEquals(cursor.atColKey("High").getDouble(), 28.87472, 0.00001);
-        assertEquals(cursor.atColKey("Low").getDouble(), 28.74984, 0.00001);
-        assertEquals(cursor.atColKey("Close").getDouble(), 28.74984, 0.00001);
-        assertEquals(cursor.atColKey("Volume").getLong(), 117258400L);
-        assertEquals(cursor.atColKey("Adj Close").getDouble(), 0.44203, 0.00001);
+        assertEquals(cursor.toCol("High").getDouble(), 28.87472, 0.00001);
+        assertEquals(cursor.toCol("Low").getDouble(), 28.74984, 0.00001);
+        assertEquals(cursor.toCol("Close").getDouble(), 28.74984, 0.00001);
+        assertEquals(cursor.toCol("Volume").getLong(), 117258400L);
+        assertEquals(cursor.toCol("Adj Close").getDouble(), 0.44203, 0.00001);
 
-        cursor.atRowKey(LocalDate.of(2011, 6, 8));
+        cursor.toRow(LocalDate.of(2011, 6, 8));
         assertEquals(frame.rows().key(7690), LocalDate.of(2011, 6, 8));
-        assertEquals(cursor.atColKey("High").getDouble(), 334.79999, 0.00001);
-        assertEquals(cursor.atColKey("Low").getDouble(), 330.64996, 0.00001);
-        assertEquals(cursor.atColKey("Close").getDouble(), 332.24002, 0.00001);
-        assertEquals(cursor.atColKey("Volume").getLong(), 83430900L);
-        assertEquals(cursor.atColKey("Adj Close").getDouble(), 44.76965, 0.00001);
+        assertEquals(cursor.toCol("High").getDouble(), 334.79999, 0.00001);
+        assertEquals(cursor.toCol("Low").getDouble(), 330.64996, 0.00001);
+        assertEquals(cursor.toCol("Close").getDouble(), 332.24002, 0.00001);
+        assertEquals(cursor.toCol("Volume").getLong(), 83430900L);
+        assertEquals(cursor.toCol("Adj Close").getDouble(), 44.76965, 0.00001);
 
-        cursor.atRowKey(LocalDate.of(2014, 8, 29));
+        cursor.toRow(LocalDate.of(2014, 8, 29));
         assertEquals(frame.rows().key(8502), LocalDate.of(2014, 8, 29));
-        assertEquals(cursor.atColKey("High").getDouble(), 102.9, 0.00001);
-        assertEquals(cursor.atColKey("Low").getDouble(), 102.2, 0.00001);
-        assertEquals(cursor.atColKey("Close").getDouble(), 102.5, 0.00001);
-        assertEquals(cursor.atColKey("Volume").getLong(), 44595000L);
-        assertEquals(cursor.atColKey("Adj Close").getDouble(), 101.65627, 0.00001);
+        assertEquals(cursor.toCol("High").getDouble(), 102.9, 0.00001);
+        assertEquals(cursor.toCol("Low").getDouble(), 102.2, 0.00001);
+        assertEquals(cursor.toCol("Close").getDouble(), 102.5, 0.00001);
+        assertEquals(cursor.toCol("Volume").getLong(), 44595000L);
+        assertEquals(cursor.toCol("Adj Close").getDouble(), 101.65627, 0.00001);
     }
 
 

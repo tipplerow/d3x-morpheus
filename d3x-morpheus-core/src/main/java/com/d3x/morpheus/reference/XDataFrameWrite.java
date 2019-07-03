@@ -15,12 +15,15 @@
  */
 package com.d3x.morpheus.reference;
 
-import java.util.function.Consumer;
+import java.io.File;
+import java.io.InputStream;
+import java.net.URL;
 
 import com.d3x.morpheus.csv.CsvSink;
-import com.d3x.morpheus.csv.CsvSinkOptions;
+import com.d3x.morpheus.csv.CsvSinkDefault;
 import com.d3x.morpheus.frame.DataFrame;
 import com.d3x.morpheus.frame.DataFrameWrite;
+import com.d3x.morpheus.util.Resource;
 
 /**
  * The reference implementation of the DataFrameWrite interface to enable DataFrames to be written out to a storage device.
@@ -29,21 +32,28 @@ import com.d3x.morpheus.frame.DataFrameWrite;
  *
  * @author  Xavier Witdouck
  */
+@lombok.AllArgsConstructor()
 class XDataFrameWrite<R,C> implements DataFrameWrite<R,C> {
 
     private DataFrame<R,C> frame;
 
-    /**
-     * Constructor
-     * @param frame the frame reference
-     */
-    XDataFrameWrite(DataFrame<R,C> frame) {
-        this.frame = frame;
+    @Override
+    public CsvSink<R, C> csv(File file) {
+        return new CsvSinkDefault<>(Resource.of(file), frame);
     }
 
     @Override
-    public final void csv(Consumer<CsvSinkOptions<R>> configurator) {
-        new CsvSink<R,C>().write(frame, configurator);
+    public CsvSink<R, C> csv(URL url) {
+        return new CsvSinkDefault<>(Resource.of(url), frame);
     }
 
+    @Override
+    public CsvSink<R, C> csv(InputStream is) {
+        return new CsvSinkDefault<>(Resource.of(is), frame);
+    }
+
+    @Override
+    public CsvSink<R, C> csv(String resource) {
+        return new CsvSinkDefault<>(Resource.of(resource), frame);
+    }
 }

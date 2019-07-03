@@ -46,62 +46,62 @@ class XDataFrameCopy {
         final int[] readRowOrdinals = source.rowKeys().ordinals(rowKeys).toArray();
         final int[] writeRowOrdinals = target.rowKeys().ordinals(rowKeys).toArray();
         for (C colKey : colKeys) {
-            readCursor.atColKey(colKey);
-            writeCursor.atColKey(colKey);
+            readCursor.toCol(colKey);
+            writeCursor.toCol(colKey);
             switch (ArrayType.of(source.cols().type(colKey))) {
                 case BOOLEAN:
                     for (int i=0; i<rowKeys.length(); ++i) {
-                        readCursor.atRow(readRowOrdinals[i]);
-                        writeCursor.atRow(writeRowOrdinals[i]);
+                        readCursor.toRowAt(readRowOrdinals[i]);
+                        writeCursor.toRowAt(writeRowOrdinals[i]);
                         writeCursor.setBoolean(readCursor.getBoolean());
                     }
                     break;
                 case INTEGER:
                     for (int i=0; i<rowKeys.length(); ++i) {
-                        readCursor.atRow(readRowOrdinals[i]);
-                        writeCursor.atRow(writeRowOrdinals[i]);
+                        readCursor.toRowAt(readRowOrdinals[i]);
+                        writeCursor.toRowAt(writeRowOrdinals[i]);
                         writeCursor.setInt(readCursor.getInt());
                     }
                     break;
                 case LONG:
                     for (int i=0; i<rowKeys.length(); ++i) {
-                        readCursor.atRow(readRowOrdinals[i]);
-                        writeCursor.atRow(writeRowOrdinals[i]);
+                        readCursor.toRowAt(readRowOrdinals[i]);
+                        writeCursor.toRowAt(writeRowOrdinals[i]);
                         writeCursor.setLong(readCursor.getLong());
                     }
                     break;
                 case DOUBLE:
                     for (int i=0; i<rowKeys.length(); ++i) {
-                        readCursor.atRow(readRowOrdinals[i]);
-                        writeCursor.atRow(writeRowOrdinals[i]);
+                        readCursor.toRowAt(readRowOrdinals[i]);
+                        writeCursor.toRowAt(writeRowOrdinals[i]);
                         writeCursor.setDouble(readCursor.getDouble());
                     }
                     break;
                 case DATE:
                     for (int i=0; i<rowKeys.length(); ++i) {
-                        readCursor.atRow(readRowOrdinals[i]);
-                        writeCursor.atRow(writeRowOrdinals[i]);
+                        readCursor.toRowAt(readRowOrdinals[i]);
+                        writeCursor.toRowAt(writeRowOrdinals[i]);
                         writeCursor.setLong(readCursor.getLong());
                     }
                     break;
                 case LOCAL_DATE:
                     for (int i=0; i<rowKeys.length(); ++i) {
-                        readCursor.atRow(readRowOrdinals[i]);
-                        writeCursor.atRow(writeRowOrdinals[i]);
+                        readCursor.toRowAt(readRowOrdinals[i]);
+                        writeCursor.toRowAt(writeRowOrdinals[i]);
                         writeCursor.setLong(readCursor.getLong());
                     }
                     break;
                 case LOCAL_TIME:
                     for (int i=0; i<rowKeys.length(); ++i) {
-                        readCursor.atRow(readRowOrdinals[i]);
-                        writeCursor.atRow(writeRowOrdinals[i]);
+                        readCursor.toRowAt(readRowOrdinals[i]);
+                        writeCursor.toRowAt(writeRowOrdinals[i]);
                         writeCursor.setLong(readCursor.getLong());
                     }
                     break;
                 default:
                     for (int i=0; i<rowKeys.length(); ++i) {
-                        readCursor.atRow(readRowOrdinals[i]);
-                        writeCursor.atRow(writeRowOrdinals[i]);
+                        readCursor.toRowAt(readRowOrdinals[i]);
+                        writeCursor.toRowAt(writeRowOrdinals[i]);
                         writeCursor.setValue(readCursor.getValue());
                     }
                     break;

@@ -318,8 +318,12 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
         if (!isColumnStore()) {
             return typeInfo();
         } else {
-            final int colIndex = colKeys.getCoordinate(colKey);
-            return data.get(colIndex).type();
+            var colIndex = colKeys.getCoordinate(colKey);
+            if (colIndex < 0) {
+                throw new DataFrameException("No match for col key: " + colKey);
+            } else {
+                return data.get(colIndex).type();
+            }
         }
     }
 
@@ -478,7 +482,7 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
                     final Array<?> targetValues = Array.of(Boolean.class, array.length());
                     final Cursor cursor = new Cursor().init(frame, rowKeys.isEmpty() ? -1 : 0, colOrdinal);
                     for (int i = 0; i < rowCount; ++i) {
-                        cursor.atRow(i);
+                        cursor.toRowAt(i);
                         final boolean value = mapper.applyAsBoolean(cursor);
                         targetValues.setBoolean(cursor.rowIndex, value);
                     }
@@ -512,7 +516,7 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
                     final Array<?> targetValues = Array.of(Integer.class, array.length());
                     final Cursor cursor = new Cursor().init(frame, rowKeys.isEmpty() ? -1 : 0, colOrdinal);
                     for (int i = 0; i < rowCount; ++i) {
-                        cursor.atRow(i);
+                        cursor.toRowAt(i);
                         final int value = mapper.applyAsInt(cursor);
                         targetValues.setInt(cursor.rowIndex, value);
                     }
@@ -546,7 +550,7 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
                     final Array<?> targetValues = Array.of(Long.class, array.length());
                     final Cursor cursor = new Cursor().init(frame, rowKeys.isEmpty() ? -1 : 0, colOrdinal);
                     for (int i = 0; i < rowCount; ++i) {
-                        cursor.atRow(i);
+                        cursor.toRowAt(i);
                         final long value = mapper.applyAsLong(cursor);
                         targetValues.setLong(cursor.rowIndex, value);
                     }
@@ -580,7 +584,7 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
                     final Array<?> targetValues = Array.of(Double.class, array.length());
                     final Cursor cursor = new Cursor().init(frame, rowKeys.isEmpty() ? -1 : 0, colOrdinal);
                     for (int i = 0; i < rowCount; ++i) {
-                        cursor.atRow(i);
+                        cursor.toRowAt(i);
                         final double value = mapper.applyAsDouble(cursor);
                         targetValues.setDouble(cursor.rowIndex, value);
                     }
@@ -615,7 +619,7 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
                     final Array<T> targetValues = Array.of(type, array.length());
                     final Cursor cursor = new Cursor().init(frame, rowKeys.isEmpty() ? -1 : 0, colOrdinal);
                     for (int i = 0; i < rowCount; ++i) {
-                        cursor.atRow(i);
+                        cursor.toRowAt(i);
                         final T value = mapper.apply(cursor);
                         targetValues.setValue(cursor.rowIndex, value);
                     }
@@ -1111,8 +1115,8 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
          */
         private Cursor init(XDataFrame<R,C> frame, int rowOrdinal, int colOrdinal) {
             this.frame = frame;
-            if (rowOrdinal >= 0) atRow(rowOrdinal);
-            if (colOrdinal >= 0) atCol(colOrdinal);
+            if (rowOrdinal >= 0) toRowAt(rowOrdinal);
+            if (colOrdinal >= 0) toColAt(colOrdinal);
             return this;
         }
 
@@ -1371,7 +1375,7 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
         }
 
         @Override
-        public final DataFrameCursor<R,C> atRow(int ordinal) {
+        public final DataFrameCursor<R,C> toRowAt(int ordinal) {
             try {
                 this.rowIndex = rowKeys.getCoordinateAt(ordinal);
                 this.array = columnStore ? array : data.get(rowIndex);
@@ -1383,7 +1387,7 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
         }
 
         @Override
-        public final DataFrameCursor<R,C> atCol(int ordinal) {
+        public final DataFrameCursor<R,C> toColAt(int ordinal) {
             try {
                 this.colIndex = colKeys.getCoordinateAt(ordinal);
                 this.array = columnStore ? data.get(colIndex) : array;
@@ -1400,10 +1404,10 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
         }
 
         @Override
-        public final DataFrameCursor<R,C> atRowKey(R key) {
+        public final DataFrameCursor<R,C> toRow(R key) {
             try {
                 final int ordinal = rowKeys.getOrdinal(key);
-                return atRow(ordinal);
+                return toRowAt(ordinal);
             } catch (DataFrameException ex) {
                 throw ex;
             } catch (Throwable t) {
@@ -1412,10 +1416,10 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
         }
 
         @Override
-        public final DataFrameCursor<R,C> atColKey(C key) {
+        public final DataFrameCursor<R,C> toCol(C key) {
             try {
                 final int ordinal = colKeys.getOrdinal(key);
-                return atCol(ordinal);
+                return toColAt(ordinal);
             } catch (DataFrameException ex) {
                 throw ex;
             } catch (Throwable t) {
@@ -1425,12 +1429,12 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
 
         @Override
         public final DataFrameCursor<R,C> atKeys(R rowKey, C colKey) {
-            return atRowKey(rowKey).atColKey(colKey);
+            return toRow(rowKey).toCol(colKey);
         }
 
         @Override
         public final DataFrameCursor<R,C> at(int rowOrdinal, int colOrdinal) {
-            return atRow(rowOrdinal).atCol(colOrdinal);
+            return toRowAt(rowOrdinal).toColAt(colOrdinal);
         }
 
         @Override

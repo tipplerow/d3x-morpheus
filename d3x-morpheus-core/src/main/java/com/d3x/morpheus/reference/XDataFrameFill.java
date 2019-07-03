@@ -50,13 +50,13 @@ class XDataFrameFill<R,C> implements DataFrameFill {
             final DataFrameCursor<R,C> cursor = frame.cursor();
             for (int j=0; j<colCount; ++j) {
                 int fillCount = 0;
-                cursor.atCol(j);
+                cursor.toColAt(j);
                 for (int i=rowCount-2; i>=0; --i) {
-                    final Object current = cursor.atRow(i).getValue();
+                    final Object current = cursor.toRowAt(i).getValue();
                     if (current == null || (current instanceof Number && Double.isNaN(((Number)current).doubleValue()))) {
                         if (fillCount < intervals) {
-                            final Object next = cursor.atRow(i + 1).getValue();
-                            cursor.atRow(i).setValue(next);
+                            final Object next = cursor.toRowAt(i + 1).getValue();
+                            cursor.toRowAt(i).setValue(next);
                             fillCount++;
                             totalCount++;
                         }
@@ -81,13 +81,13 @@ class XDataFrameFill<R,C> implements DataFrameFill {
             final DataFrameCursor<R,C> cursor = frame.cursor();
             for (int j=0; j<colCount; ++j) {
                 int fillCount = 0;
-                cursor.atCol(j);
+                cursor.toColAt(j);
                 for (int i=1; i<rowCount; ++i) {
-                    final Object current = cursor.atRow(i).getValue();
+                    final Object current = cursor.toRowAt(i).getValue();
                     if (current == null || (current instanceof Number && Double.isNaN(((Number)current).doubleValue()))) {
                         if (fillCount < intervals) {
-                            final Object previous = cursor.atRow(i-1).getValue();
-                            cursor.atRow(i).setValue(previous);
+                            final Object previous = cursor.toRowAt(i-1).getValue();
+                            cursor.toRowAt(i).setValue(previous);
                             fillCount++;
                             totalCount++;
                         }
@@ -112,14 +112,14 @@ class XDataFrameFill<R,C> implements DataFrameFill {
             final DataFrameCursor<R,C> cursor = frame.cursor();
             for (int rowIndex=0; rowIndex<rowCount; ++rowIndex) {
                 int fillCount = 0;
-                cursor.atRow(rowIndex);
+                cursor.toRowAt(rowIndex);
                 for (int colIndex=colCount-2; colIndex >= 0; --colIndex) {
-                    final Object current = cursor.atCol(colIndex).getValue();
+                    final Object current = cursor.toColAt(colIndex).getValue();
                     if (current == null || (current instanceof Number && Double.isNaN(((Number)current).doubleValue()))) {
                         if (fillCount < intervals) {
-                            cursor.atCol(colIndex+1).getValue();
-                            final Object previous = cursor.atCol(colIndex+1).getValue();
-                            cursor.atCol(colIndex).setValue(previous);
+                            cursor.toColAt(colIndex+1).getValue();
+                            final Object previous = cursor.toColAt(colIndex+1).getValue();
+                            cursor.toColAt(colIndex).setValue(previous);
                             fillCount++;
                             totalCount++;
                         }
@@ -146,14 +146,14 @@ class XDataFrameFill<R,C> implements DataFrameFill {
             final DataFrameCursor<R,C> cursor = frame.cursor();
             for (int rowIndex=0; rowIndex<rowCount; ++rowIndex) {
                 int fillCount = 0;
-                cursor.atRow(rowIndex);
+                cursor.toRowAt(rowIndex);
                 for (int colIndex=1; colIndex<colCount; ++colIndex) {
                     final Object nullValue = nullValues[colIndex];
-                    final Object current = cursor.atCol(colIndex).getValue();
+                    final Object current = cursor.toColAt(colIndex).getValue();
                     if (equals(current, nullValue)) {
                         if (fillCount < intervals) {
-                            final Object previous = cursor.atCol(colIndex-1).getValue();
-                            cursor.atCol(colIndex).setValue(previous);
+                            final Object previous = cursor.toColAt(colIndex-1).getValue();
+                            cursor.toColAt(colIndex).setValue(previous);
                             fillCount++;
                             totalCount++;
                         }

@@ -119,12 +119,12 @@ class XDataFrameStatsExpanding<R,C> extends XDataFrameStatsBase<R,C> {
                 final DataFrameCursor<R,C> readCursor = frame.cursor();
                 final DataFrameCursor<R,C> writeCursor = result.cursor();
                 for (int rowIndex = from; rowIndex <= to; ++rowIndex) {
-                    readCursor.atRow(rowIndex);
-                    writeCursor.atRow(rowIndex);
+                    readCursor.toRowAt(rowIndex);
+                    writeCursor.toRowAt(rowIndex);
                     this.statistic.reset();
                     for (int colIndex = 0; colIndex < colCount; colIndex++) {
-                        readCursor.atCol(colIndex);
-                        writeCursor.atCol(colIndex);
+                        readCursor.toColAt(colIndex);
+                        writeCursor.toColAt(colIndex);
                         final double value = readCursor.getDouble();
                         this.statistic.add(value);
                         if (statistic.getN() < minPeriods) {
@@ -181,11 +181,11 @@ class XDataFrameStatsExpanding<R,C> extends XDataFrameStatsBase<R,C> {
                 final DataFrameCursor<R,C> writeCursor = result.cursor();
                 for (int colIndex=from; colIndex <= to; ++colIndex) {
                     this.statistic.reset();
-                    readCursor.atCol(colIndex);
-                    writeCursor.atCol(colIndex);
+                    readCursor.toColAt(colIndex);
+                    writeCursor.toColAt(colIndex);
                     for (int rowIndex = 0; rowIndex < rowCount; ++rowIndex) {
-                        readCursor.atRow(rowIndex);
-                        writeCursor.atRow(rowIndex);
+                        readCursor.toRowAt(rowIndex);
+                        writeCursor.toRowAt(rowIndex);
                         final double value = readCursor.getDouble();
                         this.statistic.add(value);
                         if (statistic.getN() < minPeriods) {

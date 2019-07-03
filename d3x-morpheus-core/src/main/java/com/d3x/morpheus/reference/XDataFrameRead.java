@@ -18,12 +18,11 @@ package com.d3x.morpheus.reference;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.function.Consumer;
 
 import com.d3x.morpheus.csv.CsvSource;
-import com.d3x.morpheus.csv.CsvSourceOptions;
-import com.d3x.morpheus.frame.DataFrame;
+import com.d3x.morpheus.csv.CsvSourceDefault;
 import com.d3x.morpheus.frame.DataFrameRead;
+import com.d3x.morpheus.util.Resource;
 
 /**
  * The default implementation of the DataFrame read interface
@@ -34,37 +33,23 @@ import com.d3x.morpheus.frame.DataFrameRead;
  */
 class XDataFrameRead implements DataFrameRead {
 
-
-    /**
-     * Constructor
-     */
-    XDataFrameRead() {
-        super();
+    @Override
+    public <R> CsvSource<R> csv(File file) {
+        return new CsvSourceDefault<>(Resource.of(file));
     }
 
     @Override
-    public <R> DataFrame<R, String> csv(File file) {
-        return csv(options -> options.setFile(file));
+    public <R> CsvSource<R> csv(URL url) {
+        return new CsvSourceDefault<>(Resource.of(url));
     }
 
     @Override
-    public <R> DataFrame<R, String> csv(URL url) {
-        return csv(options -> options.setURL(url));
+    public <R> CsvSource<R> csv(InputStream is) {
+        return new CsvSourceDefault<>(Resource.of(is));
     }
 
     @Override
-    public <R> DataFrame<R, String> csv(InputStream is) {
-        return csv(options -> options.setInputStream(is));
-    }
-
-    @Override
-    public <R> DataFrame<R,String> csv(String resource) {
-        return csv(options -> options.setResource(resource));
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public <R> DataFrame<R,String> csv(Consumer<CsvSourceOptions<R>> configurator) {
-        return new CsvSource<R>().read(configurator);
+    public <R> CsvSource<R> csv(String resource) {
+        return new CsvSourceDefault<>(Resource.of(resource));
     }
 }

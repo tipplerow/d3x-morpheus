@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2014-2017 Xavier Witdouck
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,15 +15,11 @@
  */
 package com.d3x.morpheus.reference;
 
-import java.io.File;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 import com.d3x.morpheus.TestSuite;
 import com.d3x.morpheus.frame.DataFrame;
@@ -31,6 +27,8 @@ import com.d3x.morpheus.frame.DataFrameColumn;
 import com.d3x.morpheus.index.Index;
 import com.d3x.morpheus.stats.Stats;
 import com.d3x.morpheus.util.PerfStat;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 /**
  * Unit test on the data frame of quote data.
@@ -83,11 +81,9 @@ public class QuoteTests {
 
 
     @Test()
-    public void testStats() throws Exception {
-        final DataFrame<LocalDate,String> frame = DataFrame.read().csv(options -> {
-            options.setExcludeColumns("Date");
-            options.setResource("/quotes/quote.csv");
-            options.setRowKeyParser(LocalDate.class, values -> LocalDate.parse(values[0]));
+    public void testStats() {
+        var frame = DataFrame.read().<LocalDate>csv("/quotes/quote.csv").read(options -> {
+            options.setRowKeyColumnName("Date");
         });
         frame.cols().keys().forEach(columnKey -> {
             if (meanMap.containsKey(columnKey)) {
@@ -107,11 +103,9 @@ public class QuoteTests {
 
 
     @Test()
-    public void testRowStats() throws Exception {
-        final DataFrame<LocalDate,String> frame = DataFrame.read().csv(options -> {
-            options.setExcludeColumns("Date");
-            options.setResource("/quotes/quote.csv");
-            options.setRowKeyParser(LocalDate.class, values -> LocalDate.parse(values[0]));
+    public void testRowStats() {
+        var frame = DataFrame.read().<LocalDate>csv("/quotes/quote.csv").read(options -> {
+            options.setRowKeyColumnName("Date");
         });
         for (int i=0; i<10; ++i) {
             final long t1 = System.currentTimeMillis();
@@ -132,11 +126,9 @@ public class QuoteTests {
 
 
     @Test()
-    public void testColumnStats() throws Exception {
-        final DataFrame<LocalDate,String> frame = DataFrame.read().csv(options -> {
-            options.setExcludeColumns("Date");
-            options.setResource("/quotes/quote.csv");
-            options.setRowKeyParser(LocalDate.class, values -> LocalDate.parse(values[0]));
+    public void testColumnStats()  {
+        var frame = DataFrame.read().<LocalDate>csv("/quotes/quote.csv").read(options -> {
+            options.setRowKeyColumnName("Date");
         });
         PerfStat.timeInMicros("Column stats", 20, () -> {
             final double[] sum = new double[1];
@@ -152,11 +144,9 @@ public class QuoteTests {
         });
     }
 
-    public void testRowDemean() throws Exception {
-        final DataFrame<LocalDate,String> frame = DataFrame.read().csv(options -> {
-            options.setExcludeColumns("Date");
-            options.setResource("/quotes/quote.csv");
-            options.setRowKeyParser(LocalDate.class, values -> LocalDate.parse(values[0]));
+    public void testRowDemean() {
+        var frame = DataFrame.read().<LocalDate>csv("/quotes/quote.csv").read(options -> {
+            options.setRowKeyColumnName("Date");
         });
         PerfStat.timeInMillis("Row demean", 20, () -> {
             frame.rows().keys().forEach(rowKey -> {
@@ -172,16 +162,16 @@ public class QuoteTests {
     public void testCrossSectionalReturns() throws Exception {
         LocalDate startDate = LocalDate.MIN;
         LocalDate endDate = LocalDate.MAX;
-        final Index<LocalDate> rowKeys = Index.of(LocalDate.class, 100);
-        final Index<String> tickers = Index.ofObjects("BLK", "CSCO", "SPY", "YHOO", "VNQI", "VGLT", "VCLT");
-        final DataFrame<LocalDate,String> closePrices = DataFrame.ofDoubles(rowKeys, tickers);
+        var rowKeys = Index.of(LocalDate.class, 100);
+        var tickers = Index.ofObjects("BLK", "CSCO", "SPY", "YHOO", "VNQI", "VGLT", "VCLT");
+        var closePrices = DataFrame.ofDoubles(rowKeys, tickers);
         for (String ticker : tickers) {
             System.out.println("Loading data for ticker " + ticker);
-            final DataFrame<LocalDate,String> quotes = TestDataFrames.getQuotes(ticker);
+            var quotes = TestDataFrames.getQuotes(ticker);
             quotes.tail(10).out().print();
             closePrices.rows().addAll(quotes.rows().keyArray());
-            final LocalDate firstKey = quotes.rows().firstKey().get();
-            final LocalDate lastKey = quotes.rows().lastKey().get();
+            var firstKey = quotes.rows().firstKey().get();
+            var lastKey = quotes.rows().lastKey().get();
             startDate = firstKey.isAfter(startDate) ? firstKey : startDate;
             endDate = lastKey.isBefore(endDate) ? lastKey : endDate;
             quotes.rows().forEach(row -> {
@@ -203,9 +193,9 @@ public class QuoteTests {
             }
         }));
 
-        final DataFrame<LocalDate,String> selection = closePrices.rows().select(row -> !nanDates.contains(row.key()));
-        final DataFrame<LocalDate,String> sorted = selection.rows().sort((row1, row2) -> row1.key().compareTo(row2.key()));
-        final DataFrame<LocalDate,String> returns = sorted.calc().percentChanges();
+        var selection = closePrices.rows().select(row -> !nanDates.contains(row.key()));
+        var sorted = selection.rows().sort((row1, row2) -> row1.key().compareTo(row2.key()));
+        var returns = sorted.calc().percentChanges();
         returns.rows().first().get().applyDoubles(v -> 0d);
         returns.head(10).out().print();
         returns.cols().stats().correlation().out().print();
@@ -214,14 +204,12 @@ public class QuoteTests {
 
     @Test()
     public void testSimpleMovingAverage() throws Exception {
-        final File file = TestSuite.getOutputFile("quote-tests", "sma.csv");
-        final DataFrame<LocalDate,String> quotes = TestDataFrames.getQuotes("blk");
-        final DataFrame<LocalDate,String> prices = quotes.cols().select(column -> !column.key().equalsIgnoreCase("Volume"));
-        final DataFrame<LocalDate,String> sma = prices.calc().sma(50).cols().mapKeys(col -> col.key() + "(SMA)");
+        var file = TestSuite.getOutputFile("quote-tests", "sma.csv");
+        var quotes = TestDataFrames.getQuotes("blk");
+        var prices = quotes.cols().select(column -> !column.key().equalsIgnoreCase("Volume"));
+        var sma = prices.calc().sma(50).cols().mapKeys(col -> col.key() + "(SMA)");
         sma.update(prices, false, true);
-        sma.write().csv(options -> {
-            options.setFile(file);
-        });
+        sma.write().csv(file).apply();
     }
 
 }

@@ -91,8 +91,8 @@ public class AccessTests {
             for (int j = 0; j<frame.colCount(); ++j) {
                 final String colKey = frame.cols().key(j);
                 final boolean v1 =  frame.at(i,j).getBoolean();
-                final boolean v2 =  frame.cursor().atRowKey(rowKey).atCol(j).getBoolean();
-                final boolean v3 =  frame.cursor().atRow(i).atColKey(colKey).getBoolean();
+                final boolean v2 =  frame.cursor().toRow(rowKey).toColAt(j).getBoolean();
+                final boolean v3 =  frame.cursor().toRowAt(i).toCol(colKey).getBoolean();
                 final boolean v4 =  frame.get(rowKey, colKey).getBoolean();
                 final boolean v5 =  frame.row(rowKey).getBooleanAt(j);
                 final boolean v6 =  frame.col(colKey).getBooleanAt(i);
@@ -136,8 +136,8 @@ public class AccessTests {
             for (int j = 0; j<frame.colCount(); ++j) {
                 final String colKey = frame.cols().key(j);
                 final int v1 = frame.at(i,j).getInt();
-                final int v2 = frame.cursor().atRowKey(rowKey).atCol(j).getInt();
-                final int v3 = frame.cursor().atRow(i).atColKey(colKey).getInt();
+                final int v2 = frame.cursor().toRow(rowKey).toColAt(j).getInt();
+                final int v3 = frame.cursor().toRowAt(i).toCol(colKey).getInt();
                 final int v4 = frame.get(rowKey, colKey).getInt();
                 final int v5 = frame.row(rowKey).getIntAt(j);
                 final int v6 = frame.col(colKey).getIntAt(i);
@@ -181,8 +181,8 @@ public class AccessTests {
             for (int j = 0; j<frame.colCount(); ++j) {
                 final String colKey = frame.cols().key(j);
                 final long v1 = frame.at(i,j).getLong();
-                final long v2 = frame.cursor().atRowKey(rowKey).atCol(j).getLong();
-                final long v3 = frame.cursor().atRow(i).atColKey(colKey).getLong();
+                final long v2 = frame.cursor().toRow(rowKey).toColAt(j).getLong();
+                final long v3 = frame.cursor().toRowAt(i).toCol(colKey).getLong();
                 final long v4 = frame.get(rowKey, colKey).getLong();
                 final long v5 = frame.row(rowKey).getLongAt(j);
                 final long v6 = frame.col(colKey).getLongAt(i);
@@ -226,8 +226,8 @@ public class AccessTests {
             for (int j = 0; j<frame.colCount(); ++j) {
                 final String colKey = frame.cols().key(j);
                 final double v1 = frame.at(i,j).getDouble();
-                final double v2 = frame.cursor().atRowKey(rowKey).atCol(j).getDouble();
-                final double v3 = frame.cursor().atRow(i).atColKey(colKey).getDouble();
+                final double v2 = frame.cursor().toRow(rowKey).toColAt(j).getDouble();
+                final double v3 = frame.cursor().toRowAt(i).toCol(colKey).getDouble();
                 final double v4 = frame.get(rowKey, colKey).getDouble();
                 final double v5 = frame.row(rowKey).getDoubleAt(j);
                 final double v6 = frame.col(colKey).getDoubleAt(i);
@@ -271,8 +271,8 @@ public class AccessTests {
             for (int j = 0; j<frame.colCount(); ++j) {
                 final String colKey = frame.cols().key(j);
                 final String v1 = frame.at(i,j).getValue();
-                final String v2 = frame.cursor().atRowKey(rowKey).atCol(j).getValue();
-                final String v3 = frame.cursor().atRow(i).atColKey(colKey).getValue();
+                final String v2 = frame.cursor().toRow(rowKey).toColAt(j).getValue();
+                final String v3 = frame.cursor().toRowAt(i).toCol(colKey).getValue();
                 final String v4 = frame.get(rowKey, colKey).getValue();
                 final String v5 = frame.row(rowKey).getValueAt(j);
                 final String v6 = frame.col(colKey).getValueAt(i);
