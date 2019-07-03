@@ -208,7 +208,7 @@ class XDataFrameRows<R,C> extends XDataFrameAxisBase<R,C,R,C,DataFrameRow<R,C>,D
         if (frame().rowKeys().isFilter()) {
             throw new DataFrameException("Row axis is immutable for this frame, call copy() first");
         } else {
-            final XDataFrameRow<R,C> row = new XDataFrameRow<>(frame(), false);
+            var row = new XDataFrameRow<R,C>(frame(), false);
             return frame().mapRowKeys((key, ordinal) -> mapper.apply(row.moveTo(ordinal)));
         }
     }

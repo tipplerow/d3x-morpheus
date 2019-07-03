@@ -347,6 +347,28 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
 
 
     /**
+     * Returns a shallow copy of this content with the row key index replaced
+     * @param rowKeys   the replacement row key index
+     * @param <X>       the replacement key type
+     * @return          the shallow copy of content
+     */
+    final <X> XDataFrameContent<X,C> withRowKeys(Index<X> rowKeys) {
+        return new XDataFrameContent<>(rowKeys, colKeys, columnStore, data);
+    }
+
+
+    /**
+     * Returns a shallow copy of this content with the column key index replaced
+     * @param colKeys   the replacement column key index
+     * @param <Y>       the replacement key type
+     * @return          the shallow copy of content
+     */
+    final <Y> XDataFrameContent<R,Y> withColKeys(Index<Y> colKeys) {
+        return new XDataFrameContent<>(rowKeys, colKeys, columnStore, data);
+    }
+
+
+    /**
      * Returns a shallow copy of this content after mapping the row keys
      * @param mapper    the row key mapping function
      * @param <T>       the new row key type
@@ -800,15 +822,15 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
                 return new XDataFrameContent<>(newRowAxis, newColAxis, columnStore, newData);
             } else if (colKeys().isFilter()) {
                 final Array<C> colKeys = this.colKeys.toArray();
-                final Index<R> newRowAxis = rowKeys.copy();
+                final Index<R> newRowAxis = rowKeys.copy(true);
                 final Index<C> newColAxis = Index.of(colKeys);
                 final List<Array<?>> newData = this.colKeys.keys().map(c -> getArray(c).copy()).collect(Collectors.toList());
                 return new XDataFrameContent<>(newRowAxis, newColAxis, columnStore, newData);
             } else {
                 final XDataFrameContent<R,C> clone = (XDataFrameContent<R,C>)super.clone();
                 clone.data = this.data.stream().map(Array::copy).collect(Collectors.toList());
-                clone.rowKeys = this.rowKeys.copy();
-                clone.colKeys = this.colKeys.copy();
+                clone.rowKeys = this.rowKeys.copy(true);
+                clone.colKeys = this.colKeys.copy(true);
                 return clone;
             }
         } catch (CloneNotSupportedException ex) {

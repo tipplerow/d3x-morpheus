@@ -16,13 +16,19 @@
 package com.d3x.morpheus.series;
 
 import java.lang.reflect.ParameterizedType;
+import java.util.Comparator;
 import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.IntStream;
 
 import com.d3x.core.util.Generic;
+import com.d3x.core.util.StopWatch;
 import com.d3x.morpheus.array.Array;
+import com.d3x.morpheus.array.ArrayBuilder;
 import com.d3x.morpheus.index.Index;
 import com.d3x.morpheus.stats.Sample;
 import com.d3x.morpheus.stats.Stats;
+import com.d3x.morpheus.util.IO;
 
 /**
  * A type specific series for optimized to hold primitive double values
@@ -57,6 +63,16 @@ public class DoubleSeries<K> extends DataSeries<K,Double> implements Sample {
 
 
     /**
+     * Returns a newly created builder for this class
+     * @param <K>   the key type
+     * @return      the new builder
+     */
+    public static <K> Builder<K> builder() {
+        return new Builder<>();
+    }
+
+
+    /**
      * Returns a parameterized type of this class with key type
      * @param keyType   the key type for series
      * @param <K>       key type
@@ -72,7 +88,7 @@ public class DoubleSeries<K> extends DataSeries<K,Double> implements Sample {
      * @param key   the key item
      * @return      the value or null
      */
-    public double getDouble(K key) {
+    public final double getDouble(K key) {
         var coord = index.getCoordinate(key);
         return coord >= 0 ? values.getDouble(coord) : Double.NaN;
     }
@@ -83,7 +99,7 @@ public class DoubleSeries<K> extends DataSeries<K,Double> implements Sample {
      * @param index the index location
      * @return      the value or null
      */
-    public double getDoubleAt(int index) {
+    public final double getDoubleAt(int index) {
         var coord = this.index.getCoordinateAt(index);
         return coord >= 0 ? values.getDouble(coord) : Double.NaN;
     }
@@ -95,7 +111,7 @@ public class DoubleSeries<K> extends DataSeries<K,Double> implements Sample {
      * @param fallback  the fallback value if no match for key
      * @return      the value or null
      */
-    public double getDoubleOrElse(K key, double fallback) {
+    public final double getDoubleOrElse(K key, double fallback) {
         var coord = index.getCoordinate(key);
         return coord >= 0 ? values.getDouble(coord) : fallback;
     }
@@ -107,7 +123,7 @@ public class DoubleSeries<K> extends DataSeries<K,Double> implements Sample {
      * @param fallback  the fallback value if no match for key
      * @return          the value or null
      */
-    public double getDoubleAtOrElse(int index, double fallback) {
+    public final double getDoubleAtOrElse(int index, double fallback) {
         var coord = this.index.getCoordinateAt(index);
         return coord >= 0 ? values.getDouble(coord) : fallback;
     }
@@ -129,52 +145,118 @@ public class DoubleSeries<K> extends DataSeries<K,Double> implements Sample {
      * @return          the mapped series
      */
     public <T> DoubleSeries<T> mapKeys(Function<K,T> mapper) {
-        var result = index.map((key, index) -> mapper.apply(key));
-        return new DoubleSeries<>(result, values);
+        return new DoubleSeries<>(super.mapKeys(mapper));
     }
 
 
     /**
-     * Returns a filter of this series by applying the predicate
-     * @param predicate     the predicate to filter on
-     * @return              the filtered series
+     * Returns a filtered copy of this series
+     * @param predicate the predicate to select items
+     * @return          the filtered series
      */
-    public DoubleSeries<K> filterDoubles(Predicate<K> predicate) {
-        var builder = DataSeries.<K,Double>builder();
-        builder.capacity(this.size() / 2);
-        this.forEach((key, ordinal, value) -> {
-            if (predicate.test(key, ordinal, value)) {
-                builder.addDouble(key, value);
+    public DoubleSeries<K> filter(Predicate<Entry<K,Double>> predicate) {
+        return new DoubleSeries<>(super.filter(predicate));
+    }
+
+
+    /**
+     * Returns a shallow copy of this series sorted according to comparator
+     * @param comparator    the comparator to apply sorting to entries
+     * @return              the shallow copy sorted series
+     */
+    public DoubleSeries<K> sort(Comparator<Entry<K,Double>> comparator) {
+        return new DoubleSeries<>(super.sort(false, comparator));
+    }
+
+
+    /**
+     * Returns a shallow copy of this series sorted according to comparator
+     * @param parallel      true to apply parallel sorting algo
+     * @param comparator    the comparator to apply sorting to entries
+     * @return              the shallow copy sorted series
+     */
+    public DoubleSeries<K> sort(boolean parallel, Comparator<Entry<K,Double>> comparator) {
+        return new DoubleSeries<>(super.sort(parallel, comparator));
+    }
+
+
+    @Override
+    Entry<K,Double> createEntry() {
+        return new Entry<>(this) {
+            @Override
+            public final double getDouble() {
+                return getDoubleAt(ordinal());
             }
-        });
-        return builder.build().toDoubles();
+        };
     }
 
 
+    @Override
+    public String toString() {
+        return "DoubleSeries type: " + valueType() + ", size: " + size() + ", first: " + firstKey().orNull() + ", last: " + lastKey().orNull();
+    }
+
+
+
     /**
-     * Iterates over entries in this series and applies them to consumer
-     * @param consumer  the consumer to receive entries from this series
+     * An incremental builder for DataSeries
+     * @param <K>   the key type
      */
-    public void forEach(Consumer<K> consumer) {
-        var size = this.size();
-        for (int i=0; i<size; ++i) {
-            var key = getKey(i);
-            var value = getDoubleAt(i);
-            consumer.apply(key, i, value);
+    public static class Builder<K> {
+
+        protected ArrayBuilder<K> keys;
+        protected ArrayBuilder<Double> values;
+
+        /**
+         * Sets the initial capacity for this builder
+         * @param capacity  the initial capacity
+         * @return          this builder
+         */
+        public Builder<K> capacity(int capacity) {
+            if (keys != null) {
+                return this;
+            } else {
+                this.keys = ArrayBuilder.of(capacity);
+                this.values = ArrayBuilder.of(capacity, Double.class);
+                return this;
+            }
+        }
+
+        /**
+         * Returns a new series created from the state of this builder
+         * @return      the newly created series
+         */
+        public DoubleSeries<K> build() {
+            this.capacity(10);
+            return new DoubleSeries<>(Index.of(keys.toArray()), values.toArray());
+        }
+
+        /**
+         * Adds a double to this series builder
+         * @param key       the key for entry
+         * @param value     the value for entry
+         * @return          this builder
+         */
+        public Builder<K> addDouble(@lombok.NonNull K key, double value) {
+            this.capacity(100);
+            this.keys.add(key);
+            this.values.addDouble(value);
+            return this;
         }
     }
 
 
-
-    interface Predicate<K> {
-
-        boolean test(K key, int ordinal, double value);
+    public static void main(String[] args) {
+        var size = 1000000;
+        var builder = DoubleSeries.<Integer>builder().capacity(size);
+        IntStream.range(0, size).forEach(i -> builder.addDouble(i, Math.random() * 100d));
+        var series = builder.build();
+        for (int i=0; i<10; ++i) {
+            var time = StopWatch.time(() -> series.sort(true, Comparator.comparingDouble(Entry::getDouble)));
+            //var time = StopWatch.time(() -> series.values.sort(true));
+            IO.println("Sorted " + size + " entries in " + time.getMillis() + " millis");
+        }
     }
 
-
-    interface Consumer<K> {
-
-        void apply(K key, int ordinal, double value);
-    }
 
 }

@@ -15,18 +15,12 @@
  */
 package com.d3x.morpheus.reference;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Stream;
 
-import com.d3x.morpheus.array.Array;
-import com.d3x.morpheus.frame.DataFrame;
 import com.d3x.morpheus.frame.DataFrameColumn;
 import com.d3x.morpheus.frame.DataFrameRow;
-import com.d3x.morpheus.range.Range;
 
 /**
  * A class that is designed to sort a DataFrame in either the row or column dimension
@@ -101,11 +95,11 @@ class XDataFrameSorter {
      * @return              the sorted DataFrame
      */
     static <R,C> XDataFrame<R,C> sortRows(XDataFrame<R,C> frame, List<C> colKeys, boolean ascending, boolean parallel) {
-        final int multiplier = ascending ? 1 : -1;
-        final XDataFrameContent<R,C> content = frame.content();
-        final XDataFrameComparator comparator = content.createRowComparator(colKeys, multiplier);
-        frame.rowKeys().sort(parallel, comparator);
-        return frame;
+        var multiplier = ascending ? 1 : -1;
+        var result = frame.withRowKeys(frame.rowKeys().copy(false));
+        var comparator = result.content().createRowComparator(colKeys, multiplier);
+        result.rowKeys().sort(parallel, comparator);
+        return result;
     }
 
 
@@ -118,11 +112,11 @@ class XDataFrameSorter {
      * @return              the sorted DataFrame
      */
     static <R,C> XDataFrame<R,C> sortCols(XDataFrame<R,C> frame, List<R> rowKeys, boolean ascending, boolean parallel) {
-        final int multiplier = ascending ? 1 : -1;
-        final XDataFrameContent<R,C> content = frame.content();
-        final XDataFrameComparator comparator = content.createColComparator(rowKeys, multiplier);
-        frame.colKeys().sort(parallel, comparator);
-        return frame;
+        var multiplier = ascending ? 1 : -1;
+        var result = frame.withColKeys(frame.colKeys().copy(false));
+        var comparator = result.content().createColComparator(rowKeys, multiplier);
+        result.colKeys().sort(parallel, comparator);
+        return result;
     }
 
 
@@ -134,13 +128,14 @@ class XDataFrameSorter {
      * @return              the sorted DataFrame
      */
     static <R,C> XDataFrame<R,C> sortRows(XDataFrame<R,C> frame, boolean parallel, Comparator<DataFrameRow<R,C>> comparator) {
+        var result = frame.withRowKeys(frame.rowKeys().copy(false));
         if (comparator == null) {
-            frame.rowKeys().resetOrder();
-            return frame;
+            result.rowKeys().resetOrder();
+            return result;
         } else {
-            final XDataFrameComparator rowComparator = XDataFrameComparator.createRowComparator(frame, comparator);
-            frame.rowKeys().sort(parallel, rowComparator);
-            return frame;
+            var rowComparator = XDataFrameComparator.createRowComparator(result, comparator);
+            result.rowKeys().sort(parallel, rowComparator);
+            return result;
         }
     }
 
@@ -153,42 +148,14 @@ class XDataFrameSorter {
      * @return              the sorted DataFrame
      */
     static <R,C> XDataFrame<R,C> sortCols(XDataFrame<R,C> frame, boolean parallel, Comparator<DataFrameColumn<R,C>> comparator) {
+        var result = frame.withColKeys(frame.colKeys().copy(false));
         if (comparator == null) {
-            frame.colKeys().sort(parallel, null);
-            return frame;
+            result.colKeys().resetOrder();
+            return result;
         } else {
-            final XDataFrameComparator colComparator = XDataFrameComparator.createColComparator(frame, comparator);
-            frame.colKeys().sort(parallel, colComparator);
-            return frame;
+            var colComparator = XDataFrameComparator.createColComparator(result, comparator);
+            result.colKeys().sort(parallel, colComparator);
+            return result;
         }
     }
-
-
-    public static void main(String[] args) {
-        final LocalDateTime start = LocalDateTime.now();
-        final Array<LocalDateTime> rowKeys = Range.of(start, start.plusSeconds(10000000), Duration.ofSeconds(1)).toArray().shuffle(1);
-        final Array<String> colKeys = Array.of(Stream.of("A", "B", "C", "D"));
-        final DataFrame<LocalDateTime,String> frame = DataFrame.ofDoubles(rowKeys, colKeys).applyDoubles(v -> Math.random());
-        for (int i=0; i<20; ++i) {
-            frame.applyDoubles(v -> Math.random());
-            final MyComparator comp = new MyComparator();
-            final long t1 = System.nanoTime();
-            //frame.rows().parallel().sort(true);
-            frame.rows().parallel().sort(true);
-            //frame.rows().parallel().sort(true, "A");
-            final long t2 = System.nanoTime();
-            System.out.println("Sorted DataFrame in " + ((t2-t1)/1000000) + " millis");
-        }
-    }
-
-
-    private static class MyComparator implements Comparator<DataFrameRow<LocalDateTime,String>> {
-        @Override
-        public final int compare(DataFrameRow<LocalDateTime,String> row1, DataFrameRow<LocalDateTime,String> row2) {
-            final double v1 = row1.getDoubleAt(0);
-            final double v2 = row2.getDoubleAt(0);
-            return Double.compare(v1, v2);
-        }
-    }
-
 }

@@ -104,10 +104,10 @@ abstract class XDataFrameAxisBase<X,Y,R,C,V extends DataFrameVector<?,?,R,C,?>,T
     private DataFrame<R,C> createFilter(XDataFrame<R,C> frame, Iterable<X> keys) {
         if (axisType.isRow()) {
             var newRowKeys = frame.rowKeys().filter((Iterable<R>)keys);
-            var newColKeys = frame.colKeys().copy();
+            var newColKeys = frame.colKeys().copy(true);
             return frame.filter(newRowKeys, newColKeys);
         } else {
-            var newRowKeys = frame.rowKeys().copy();
+            var newRowKeys = frame.rowKeys().copy(true);
             var newColKeys = frame.colKeys().filter((Iterable<C>)keys);
             return frame.filter(newRowKeys, newColKeys);
         }

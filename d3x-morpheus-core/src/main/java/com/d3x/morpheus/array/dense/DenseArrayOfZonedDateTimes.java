@@ -154,10 +154,21 @@ class DenseArrayOfZonedDateTimes extends ArrayBase<ZonedDateTime> {
 
     @Override()
     public final Array<ZonedDateTime> copy(int[] indexes) {
-        final DenseArrayOfZonedDateTimes clone = new DenseArrayOfZonedDateTimes(indexes.length, defaultValue);
+        var clone = new DenseArrayOfZonedDateTimes(indexes.length, defaultValue);
         for (int i = 0; i < indexes.length; ++i) {
             clone.values[i] = this.values[indexes[i]];
             clone.zoneIds[i] = this.zoneIds[indexes[i]];
+        }
+        return clone;
+    }
+
+
+    @Override
+    public Array<ZonedDateTime> copy(Array<Integer> indexes) {
+        var clone = new DenseArrayOfZonedDateTimes(indexes.length(), defaultValue);
+        for (int i = 0; i < indexes.length(); ++i) {
+            clone.values[i] = this.values[indexes.getInt(i)];
+            clone.zoneIds[i] = this.zoneIds[indexes.getInt(i)];
         }
         return clone;
     }

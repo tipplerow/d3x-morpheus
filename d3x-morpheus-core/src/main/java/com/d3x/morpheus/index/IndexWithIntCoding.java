@@ -48,7 +48,7 @@ class IndexWithIntCoding<T> extends IndexBase<T> implements WithIntCoding<T> {
     IndexWithIntCoding(Class<T> type, IntCoding<T> coding, int capacity) {
         super(Array.of(type, capacity));
         this.coding = coding;
-        this.indexMap = new TIntIntHashMap(capacity, 0.75f, -1, -1);
+        this.indexMap = new TIntIntHashMap(capacity, DEFAULT_LOAD_FACTOR, -1, -1);
     }
 
     /**
@@ -59,7 +59,7 @@ class IndexWithIntCoding<T> extends IndexBase<T> implements WithIntCoding<T> {
     IndexWithIntCoding(Iterable<T> iterable, IntCoding<T> coding) {
         super(iterable);
         this.coding = coding;
-        this.indexMap = new TIntIntHashMap(keyArray().length(), 0.75f, -1, -1);
+        this.indexMap = new TIntIntHashMap(keyArray().length(), DEFAULT_LOAD_FACTOR, -1, -1);
         this.keyArray().sequential().forEachValue(v -> {
             final int index = v.index();
             final int code = v.getInt();
@@ -79,7 +79,7 @@ class IndexWithIntCoding<T> extends IndexBase<T> implements WithIntCoding<T> {
     private IndexWithIntCoding(Iterable<T> iterable, IntCoding<T> coding, IndexWithIntCoding<T> parent) {
         super(iterable, parent);
         this.coding = coding;
-        this.indexMap = new TIntIntHashMap(keyArray().length(), 0.75f, -1, -1);
+        this.indexMap = new TIntIntHashMap(keyArray().length(), DEFAULT_LOAD_FACTOR, -1, -1);
         this.keyArray().sequential().forEachValue(v -> {
             final int code = v.getInt();
             final int index = parent.indexMap.get(code);
@@ -161,11 +161,10 @@ class IndexWithIntCoding<T> extends IndexBase<T> implements WithIntCoding<T> {
 
     @Override
     @SuppressWarnings("unchecked")
-    public final Index<T> copy() {
+    public final Index<T> copy(boolean deep) {
         try {
-            final IndexWithIntCoding<T> clone = (IndexWithIntCoding<T>)super.copy();
-            clone.indexMap = new TIntIntHashMap(indexMap);
-            clone.coding = coding;
+            var clone = (IndexWithIntCoding<T>)super.copy(deep);
+            if (deep) clone.indexMap = new TIntIntHashMap(indexMap);
             return clone;
         } catch (Exception ex) {
             throw new IndexException("Failed to clone index", ex);

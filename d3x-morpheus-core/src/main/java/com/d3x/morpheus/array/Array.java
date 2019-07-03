@@ -130,6 +130,13 @@ public interface Array<T> extends Iterable<T>, Serializable, Cloneable {
     Array<T> copy(int[] indexes);
 
     /**
+     * Returns a deep copy of this array including only the values at the indexes specified
+     * @param indexes   the indexes of values to include in the copy
+     * @return          the deep copy of a subset of this array
+     */
+    Array<T> copy(Array<Integer> indexes);
+
+    /**
      * Returns a deep copy of a subset of this array including only the values in the range
      * @param start     the start index of range, inclusive
      * @param end       the end of the range, exclusive

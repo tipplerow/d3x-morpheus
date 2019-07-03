@@ -41,7 +41,7 @@ class IndexOfStrings extends IndexBase<String> {
      */
     IndexOfStrings(int initialSize) {
         super(Array.of(String.class, initialSize));
-        this.indexMap = new TObjectIntHashMap<>(initialSize, 0.75f, -1);
+        this.indexMap = new TObjectIntHashMap<>(initialSize, DEFAULT_LOAD_FACTOR, -1);
     }
 
     /**
@@ -50,7 +50,7 @@ class IndexOfStrings extends IndexBase<String> {
      */
     IndexOfStrings(Iterable<String> iterable) {
         super(iterable);
-        this.indexMap = new TObjectIntHashMap<>(keyArray().length(), 0.75f, -1);
+        this.indexMap = new TObjectIntHashMap<>(keyArray().length(), DEFAULT_LOAD_FACTOR, -1);
         this.keyArray().sequential().forEachValue(v -> {
             final int index = v.index();
             final String key = v.getValue();
@@ -68,7 +68,7 @@ class IndexOfStrings extends IndexBase<String> {
      */
     private IndexOfStrings(Iterable<String> iterable, IndexOfStrings parent) {
         super(iterable, parent);
-        this.indexMap = new TObjectIntHashMap<>(keyArray().length(), 0.75f, -1);
+        this.indexMap = new TObjectIntHashMap<>(keyArray().length(), DEFAULT_LOAD_FACTOR, -1);
         this.keyArray().sequential().forEachValue(v -> {
             final String key = v.getValue();
             final int index = parent.indexMap.get(key);
@@ -139,10 +139,10 @@ class IndexOfStrings extends IndexBase<String> {
     }
 
     @Override
-    public final Index<String> copy() {
+    public final Index<String> copy(boolean deep) {
         try {
-            final IndexOfStrings clone = (IndexOfStrings)super.copy();
-            clone.indexMap = new TObjectIntHashMap<>(indexMap);
+            final IndexOfStrings clone = (IndexOfStrings)super.copy(deep);
+            if (deep) clone.indexMap = new TObjectIntHashMap<>(indexMap);
             return clone;
         } catch (Exception ex) {
             throw new IndexException("Failed to clone index", ex);

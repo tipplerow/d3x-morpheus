@@ -42,7 +42,7 @@ class IndexOfObjects<K> extends IndexBase<K> {
      */
     IndexOfObjects(Class<K> type, int initialSize) {
         super(Array.of(type, initialSize));
-        this.indexMap = new TObjectIntHashMap<>(initialSize, 0.75f, -1);
+        this.indexMap = new TObjectIntHashMap<>(initialSize, DEFAULT_LOAD_FACTOR, -1);
     }
 
     /**
@@ -51,7 +51,7 @@ class IndexOfObjects<K> extends IndexBase<K> {
      */
     IndexOfObjects(Iterable<K> iterable) {
         super(iterable);
-        this.indexMap = new TObjectIntHashMap<>(keyArray().length(), 0.75f, -1);
+        this.indexMap = new TObjectIntHashMap<>(keyArray().length(), DEFAULT_LOAD_FACTOR, -1);
         this.keyArray().sequential().forEachValue(v -> {
             final int index = v.index();
             final K key = v.getValue();
@@ -69,7 +69,7 @@ class IndexOfObjects<K> extends IndexBase<K> {
      */
     private IndexOfObjects(Iterable<K> iterable, IndexOfObjects<K> parent) {
         super(iterable, parent);
-        this.indexMap = new TObjectIntHashMap<>(keyArray().length(), 0.75f, -1);
+        this.indexMap = new TObjectIntHashMap<>(keyArray().length(), DEFAULT_LOAD_FACTOR, -1);
         this.keyArray().sequential().forEachValue(v -> {
             final K key = v.getValue();
             final int index = parent.indexMap.get(key);
@@ -142,10 +142,10 @@ class IndexOfObjects<K> extends IndexBase<K> {
 
     @Override
     @SuppressWarnings("unchecked")
-    public final Index<K> copy() {
+    public final Index<K> copy(boolean deep) {
         try {
-            final IndexOfObjects<K> clone = (IndexOfObjects<K>)super.copy();
-            clone.indexMap = new TObjectIntHashMap<>(indexMap);
+            final IndexOfObjects<K> clone = (IndexOfObjects<K>)super.copy(deep);
+            if (deep) clone.indexMap = new TObjectIntHashMap<>(indexMap);
             return clone;
         } catch (Exception ex) {
             throw new IndexException("Failed to clone index", ex);

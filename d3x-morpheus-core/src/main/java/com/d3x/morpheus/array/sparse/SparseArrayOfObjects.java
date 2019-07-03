@@ -127,6 +127,18 @@ class SparseArrayOfObjects<T> extends ArrayBase<T> {
     }
 
 
+    @Override
+    public Array<T> copy(Array<Integer> indexes) {
+        var fillPct = (double)values.size() / length();
+        var clone = new SparseArrayOfObjects<T>(type(), indexes.length(), fillPct, defaultValue);
+        for (int i = 0; i < indexes.length(); ++i) {
+            var value = getValue(indexes.getInt(i));
+            clone.setValue(i, value);
+        }
+        return clone;
+    }
+
+
     @Override()
     public final Array<T> copy(int start, int end) {
         var length = end - start;

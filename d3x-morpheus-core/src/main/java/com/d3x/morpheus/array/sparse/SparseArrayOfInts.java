@@ -129,6 +129,18 @@ class SparseArrayOfInts extends ArrayBase<Integer> {
     }
 
 
+    @Override
+    public Array<Integer> copy(Array<Integer> indexes) {
+        var fillPct = (double)values.size() / length();
+        var clone = new SparseArrayOfInts(indexes.length(), fillPct, defaultValue);
+        for (int i = 0; i < indexes.length(); ++i) {
+            final int value = getInt(indexes.getInt(i));
+            clone.setInt(i, value);
+        }
+        return clone;
+    }
+
+
     @Override()
     public final Array<Integer> copy(int start, int end) {
         var length = end - start;

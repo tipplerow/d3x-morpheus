@@ -144,11 +144,29 @@ class MappedArrayOfInts extends ArrayBase<Integer> {
     @Override()
     public final Array<Integer> copy(int[] indexes) {
         try {
-            final File newFile = MappedArrayConstructor.randomFile(true);
-            final MappedArrayOfInts copy = new MappedArrayOfInts(indexes.length, defaultValue, newFile);
+            var newFile = MappedArrayConstructor.randomFile(true);
+            var copy = new MappedArrayOfInts(indexes.length, defaultValue, newFile);
             for (int i=0; i<indexes.length; ++i) {
-                final int value = getInt(indexes[i]);
-                if (Integer.compare(value, defaultValue) != 0) {
+                var value = getInt(indexes[i]);
+                if (value != defaultValue) {
+                    copy.buffer.put(i, value);
+                }
+            }
+            return copy;
+        } catch (Exception ex) {
+            throw new ArrayException("Failed top copy subset of Array", ex);
+        }
+    }
+
+
+    @Override
+    public Array<Integer> copy(Array<Integer> indexes) {
+        try {
+            var newFile = MappedArrayConstructor.randomFile(true);
+            var copy = new MappedArrayOfInts(indexes.length(), defaultValue, newFile);
+            for (int i=0; i<indexes.length(); ++i) {
+                var value = getInt(indexes.getInt(i));
+                if (value != defaultValue) {
                     copy.buffer.put(i, value);
                 }
             }

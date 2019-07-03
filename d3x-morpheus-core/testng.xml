@@ -40,6 +40,13 @@
     </test>
 
 
+    <test name="DataSeries Tests">
+        <packages>
+            <package name="com.d3x.morpheus.series.*"/>
+        </packages>
+    </test>
+
+
     <test name="DataFrame Statistics Tests">
         <classes>
             <class name="com.d3x.morpheus.reference.StatsBasicTests"/>

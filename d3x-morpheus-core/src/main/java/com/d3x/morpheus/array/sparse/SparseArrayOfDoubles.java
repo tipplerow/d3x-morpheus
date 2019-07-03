@@ -129,6 +129,18 @@ class SparseArrayOfDoubles extends ArrayBase<Double> {
     }
 
 
+    @Override
+    public Array<Double> copy(Array<Integer> indexes) {
+        var fillPct = (double)values.size() / length();
+        var clone = new SparseArrayOfDoubles(indexes.length(), fillPct, defaultValue);
+        for (int i = 0; i < indexes.length(); ++i) {
+            var value = getDouble(indexes.getInt(i));
+            clone.setDouble(i, value);
+        }
+        return clone;
+    }
+
+
     @Override()
     public final Array<Double> copy(int start, int end) {
         var length = end - start;

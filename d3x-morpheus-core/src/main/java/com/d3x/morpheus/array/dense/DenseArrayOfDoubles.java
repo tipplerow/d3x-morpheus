@@ -114,9 +114,19 @@ class DenseArrayOfDoubles extends ArrayBase<Double> {
 
     @Override()
     public final Array<Double> copy(int[] indexes) {
-        final DenseArrayOfDoubles clone = new DenseArrayOfDoubles(indexes.length, defaultValue);
+        var clone = new DenseArrayOfDoubles(indexes.length, defaultValue);
         for (int i = 0; i < indexes.length; ++i) {
             clone.values[i] = this.values[indexes[i]];
+        }
+        return clone;
+    }
+
+
+    @Override
+    public Array<Double> copy(Array<Integer> indexes) {
+        var clone = new DenseArrayOfDoubles(indexes.length(), defaultValue);
+        for (int i = 0; i < indexes.length(); ++i) {
+            clone.values[i] = this.values[indexes.getInt(i)];
         }
         return clone;
     }

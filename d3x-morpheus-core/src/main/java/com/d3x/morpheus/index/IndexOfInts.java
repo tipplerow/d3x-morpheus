@@ -44,7 +44,7 @@ class IndexOfInts extends IndexBase<Integer> {
      */
     IndexOfInts(int initialSize) {
         super(Array.of(Integer.class, initialSize));
-        this.indexMap = new TIntIntHashMap(initialSize, 0.75f, -1, -1);
+        this.indexMap = new TIntIntHashMap(initialSize, DEFAULT_LOAD_FACTOR, -1, -1);
     }
 
     /**
@@ -54,7 +54,7 @@ class IndexOfInts extends IndexBase<Integer> {
      */
     IndexOfInts(Iterable<Integer> iterable) {
         super(iterable);
-        this.indexMap = new TIntIntHashMap(keyArray().length(), 0.75f, -1, -1);
+        this.indexMap = new TIntIntHashMap(keyArray().length(), DEFAULT_LOAD_FACTOR, -1, -1);
         this.keyArray().sequential().forEachValue(v -> {
             final int index = v.index();
             final int key = v.getInt();
@@ -73,7 +73,7 @@ class IndexOfInts extends IndexBase<Integer> {
      */
     private IndexOfInts(Iterable<Integer> iterable, IndexOfInts parent) {
         super(iterable, parent);
-        this.indexMap = new TIntIntHashMap(keyArray().length(), 0.75f, -1, -1);
+        this.indexMap = new TIntIntHashMap(keyArray().length(), DEFAULT_LOAD_FACTOR, -1, -1);
         this.keyArray().sequential().forEachValue(v -> {
             final int key = v.getInt();
             final int index = parent.indexMap.get(key);
@@ -145,10 +145,10 @@ class IndexOfInts extends IndexBase<Integer> {
     }
 
     @Override
-    public final Index<Integer> copy() {
+    public final Index<Integer> copy(boolean deep) {
         try {
-            final IndexOfInts clone = (IndexOfInts)super.copy();
-            clone.indexMap = new TIntIntHashMap(indexMap);
+            var clone = (IndexOfInts)super.copy(deep);
+            if (deep) clone.indexMap = new TIntIntHashMap(indexMap);
             return clone;
         } catch (Exception ex) {
             throw new IndexException("Failed to clone index", ex);
@@ -210,7 +210,7 @@ class IndexOfInts extends IndexBase<Integer> {
 
 
     @Override
-    public final Index<Integer> sort(boolean parallel, IntComparator comparator) {
+    public final void sort(boolean parallel, IntComparator comparator) {
         super.sort(parallel, comparator);
         if (comparator == null) {
             final Array<Integer> keys = keyArray();
@@ -219,6 +219,5 @@ class IndexOfInts extends IndexBase<Integer> {
                 return true;
             });
         }
-        return this;
    }
 }

@@ -114,7 +114,7 @@ public class IndexBasicTests {
         Assert.assertTrue(Arrays.equals(index.indexes(array).toArray(), index.ordinals(array).toArray()), "Index match ordinals in unsorted index");
         Assert.assertTrue(index.containsAll(array), "Index conntains all expected keys");
         Assert.assertEquals(toArray(index.iterator()), array, "The array from iterator matches source array");
-        assertEquals(index, index.copy());
+        assertEquals(index, index.copy(true));
         final ArrayBuilder<T> builder = ArrayBuilder.of(1000);
         index.forEachEntry((T key, int i) -> builder.add(key));
         Assert.assertEquals(builder.toArray(), array, "The array from iterator matches source array");

@@ -22,10 +22,12 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import com.d3x.core.util.StopWatch;
 import com.d3x.morpheus.array.Array;
 import com.d3x.morpheus.array.ArrayBuilder;
 import com.d3x.morpheus.array.ArrayValue;
 import com.d3x.morpheus.range.Range;
+import com.d3x.morpheus.util.IO;
 import com.d3x.morpheus.util.IntComparator;
 import com.d3x.morpheus.util.SortAlgorithm;
 import com.d3x.morpheus.util.Swapper;
@@ -39,6 +41,8 @@ import com.d3x.morpheus.util.Swapper;
  */
 abstract class IndexBase<K> implements Index<K> {
 
+    static final float DEFAULT_LOAD_FACTOR = 0.85f;
+
     private static final long serialVersionUID = 1L;
 
     private Array<K> keys;
@@ -47,7 +51,6 @@ abstract class IndexBase<K> implements Index<K> {
     private Array<Integer> ordinals;
 
     /**
-     * Constructor
      *
      * @param keys the initial set of keys for this index
      */
@@ -181,12 +184,12 @@ abstract class IndexBase<K> implements Index<K> {
 
     @Override()
     public final Optional<K> first() {
-        return keys.first(v -> true).map(ArrayValue::getValue);
+        return size() == 0 ? Optional.empty() : Optional.of(getKey(0));
     }
 
     @Override()
     public final Optional<K> last() {
-        return size() == 0 ? Optional.empty() : Optional.ofNullable(keys.getValue(size() - 1));
+        return size() == 0 ? Optional.empty() : Optional.ofNullable(getKey(size() - 1));
     }
 
     @Override()
@@ -262,55 +265,55 @@ abstract class IndexBase<K> implements Index<K> {
 
 
     @Override
-    public Index<K> sort(boolean parallel, boolean ascending) {
+    @SuppressWarnings("unchecked")
+    public void sort(boolean parallel, boolean ascending) {
         try {
-            final int multiplier = ascending ? 1 : -1;
+            var multiplier = ascending ? 1 : -1;
             this.indexes = indexes != null ? indexes : Range.of(0, size()).toArray();
-            final IntComparator comparator = (i, j) -> multiplier * keys.compare(i, j);
-            final Swapper swapper = (i, j) ->  { keys.swap(i, j); indexes.swap(i, j); };
+            IntComparator comparator = (i, j) -> multiplier * keys.compare(i, j);
+            Swapper swapper = (i, j) ->  { keys.swap(i, j); indexes.swap(i, j); };
             SortAlgorithm.getDefault(parallel).sort(0, size(), comparator, swapper);
-            return this;
         } catch (Exception ex) {
-            throw new RuntimeException("Failed to sort Index", ex);
-        }
-    }
-
-
-    @Override
-    public Index<K> sort(boolean parallel, IntComparator comparator) {
-        try {
-            if (comparator == null) {
-                this.indexes = null;
-                this.ordinals = null;
-            } else {
-                this.indexes = indexes != null ? indexes : Range.of(0, size()).toArray();
-                final Swapper swapper = (i, j) ->  { keys.swap(i, j); indexes.swap(i, j); };
-                SortAlgorithm.getDefault(parallel).sort(0, size(), comparator, swapper);
-                this.ordinals = ordinals != null ? ordinals : Array.of(Integer.class, indexes.length());
-                for (int i = 0; i < indexes.length(); ++i) {
-                    final int index = indexes.getInt(i);
-                    this.ordinals.setInt(index, i);
-                }
-            }
-            return this;
-        } catch (Exception ex) {
-            throw new RuntimeException("Failed to sort Index", ex);
+            throw new IndexException("Failed to sort Index", ex);
         }
     }
 
 
     @Override
     @SuppressWarnings("unchecked")
-    public Index<K> copy() {
+    public void sort(boolean parallel, IntComparator comparator) {
         try {
-            final IndexBase<K> clone = (IndexBase<K>)super.clone();
+            if (comparator == null) {
+                this.indexes = null;
+                this.ordinals = null;
+            } else {
+                this.indexes = indexes != null ? indexes : Range.of(0, size()).toArray();
+                Swapper swapper = (i, j) ->  { keys.swap(i, j); indexes.swap(i, j); };
+                SortAlgorithm.getDefault(parallel).sort(0, size(), comparator, swapper);
+                this.ordinals = ordinals != null ? ordinals : Array.of(Integer.class, indexes.length());
+                for (int i = 0; i < indexes.length(); ++i) {
+                    var index = indexes.getInt(i);
+                    this.ordinals.setInt(index, i);
+                }
+            }
+        } catch (Exception ex) {
+            throw new IndexException("Failed to sort Index", ex);
+        }
+    }
+
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Index<K> copy(boolean deep) {
+        try {
+            var clone = (IndexBase<K>)super.clone();
             clone.keys = keys.copy();
             clone.parent = parent;
             clone.indexes = indexes != null ? indexes.copy() : null;
             clone.ordinals = ordinals != null ? ordinals.copy() : null;
             return clone;
         } catch (Exception ex) {
-            throw new IndexException("Failed to create deep copy of Index", ex);
+            throw new IndexException("Failed to create copy of Index", ex);
         }
     }
 
@@ -338,7 +341,7 @@ abstract class IndexBase<K> implements Index<K> {
 
     @Override()
     public final Iterator<K> iterator() {
-        return new Iterator<K>() {
+        return new Iterator<>() {
             private int ordinal = -1;
             @Override
             public boolean hasNext() {

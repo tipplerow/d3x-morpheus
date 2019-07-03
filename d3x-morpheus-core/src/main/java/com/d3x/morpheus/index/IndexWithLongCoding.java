@@ -48,7 +48,7 @@ class IndexWithLongCoding<T> extends IndexBase<T> implements WithLongCoding<T> {
     IndexWithLongCoding(Class<T> type, LongCoding<T> coding, int capacity) {
         super(Array.of(type, capacity));
         this.coding = coding;
-        this.indexMap = new TLongIntHashMap(capacity, 0.75f, -1L, -1);
+        this.indexMap = new TLongIntHashMap(capacity, DEFAULT_LOAD_FACTOR, -1L, -1);
     }
 
     /**
@@ -59,7 +59,7 @@ class IndexWithLongCoding<T> extends IndexBase<T> implements WithLongCoding<T> {
     IndexWithLongCoding(Iterable<T> iterable, LongCoding<T> coding) {
         super(iterable);
         this.coding = coding;
-        this.indexMap = new TLongIntHashMap(keyArray().length(), 0.75f, -1L, -1);
+        this.indexMap = new TLongIntHashMap(keyArray().length(), DEFAULT_LOAD_FACTOR, -1L, -1);
         this.keyArray().sequential().forEachValue(v -> {
             final int index = v.index();
             final long code = v.getLong();
@@ -79,7 +79,7 @@ class IndexWithLongCoding<T> extends IndexBase<T> implements WithLongCoding<T> {
     private IndexWithLongCoding(Iterable<T> iterable, LongCoding<T> coding, IndexWithLongCoding<T> parent) {
         super(iterable, parent);
         this.coding = coding;
-        this.indexMap = new TLongIntHashMap(keyArray().length(), 0.75f, -1L, -1);
+        this.indexMap = new TLongIntHashMap(keyArray().length(), DEFAULT_LOAD_FACTOR, -1L, -1);
         this.keyArray().sequential().forEachValue(v -> {
             final long code = v.getLong();
             final int index = parent.indexMap.get(code);
@@ -161,11 +161,10 @@ class IndexWithLongCoding<T> extends IndexBase<T> implements WithLongCoding<T> {
 
     @Override
     @SuppressWarnings("unchecked")
-    public final Index<T> copy() {
+    public final Index<T> copy(boolean deep) {
         try {
-            final IndexWithLongCoding<T> clone = (IndexWithLongCoding<T>)super.copy();
-            clone.indexMap = new TLongIntHashMap(indexMap);
-            clone.coding = coding;
+            var clone = (IndexWithLongCoding<T>)super.copy(deep);
+            if (deep) clone.indexMap = new TLongIntHashMap(indexMap);
             return clone;
         } catch (Exception ex) {
             throw new IndexException("Failed to clone index", ex);

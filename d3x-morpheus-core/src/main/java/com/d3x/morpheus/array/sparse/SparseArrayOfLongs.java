@@ -129,6 +129,18 @@ class SparseArrayOfLongs extends ArrayBase<Long> {
     }
 
 
+    @Override
+    public Array<Long> copy(Array<Integer> indexes) {
+        var fillPct = (double)values.size() / length();
+        var clone = new SparseArrayOfLongs(indexes.length(), fillPct, defaultValue);
+        for (int i = 0; i < indexes.length(); ++i) {
+            final long value = getLong(indexes.getInt(i));
+            clone.setLong(i, value);
+        }
+        return clone;
+    }
+
+
     @Override()
     public final Array<Long> copy(int start, int end) {
         var length = end - start;

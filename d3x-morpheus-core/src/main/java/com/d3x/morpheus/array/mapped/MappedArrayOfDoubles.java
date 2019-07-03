@@ -145,17 +145,35 @@ class MappedArrayOfDoubles extends ArrayBase<Double> {
     @Override()
     public final Array<Double> copy(int[] indexes) {
         try {
-            final File newFile = MappedArrayConstructor.randomFile(true);
-            final MappedArrayOfDoubles copy = new MappedArrayOfDoubles(indexes.length, defaultValue, newFile);
+            var newFile = MappedArrayConstructor.randomFile(true);
+            var copy = new MappedArrayOfDoubles(indexes.length, defaultValue, newFile);
             for (int i=0; i<indexes.length; ++i) {
-                final double value = getDouble(indexes[i]);
+                var value = getDouble(indexes[i]);
                 if (Double.compare(value, defaultValue) != 0) {
                     copy.buffer.put(i, value);
                 }
             }
             return copy;
         } catch (Exception ex) {
-            throw new ArrayException("Failed top copy subset of Array", ex);
+            throw new ArrayException("Failed to copy subset of Array", ex);
+        }
+    }
+
+
+    @Override
+    public Array<Double> copy(Array<Integer> indexes) {
+        try {
+            var newFile = MappedArrayConstructor.randomFile(true);
+            var copy = new MappedArrayOfDoubles(indexes.length(), defaultValue, newFile);
+            for (int i=0; i<indexes.length(); ++i) {
+                var value = getDouble(indexes.getInt(i));
+                if (Double.compare(value, defaultValue) != 0) {
+                    copy.buffer.put(i, value);
+                }
+            }
+            return copy;
+        } catch (Exception ex) {
+            throw new ArrayException("Failed to copy subset of Array", ex);
         }
     }
 

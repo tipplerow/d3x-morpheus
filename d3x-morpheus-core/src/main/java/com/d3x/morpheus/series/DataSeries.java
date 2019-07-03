@@ -19,6 +19,9 @@ import java.io.File;
 import java.io.InputStream;
 import java.lang.reflect.ParameterizedType;
 import java.net.URL;
+import java.util.Comparator;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -46,16 +49,16 @@ public class DataSeries<K,V> {
 
     /**
      * Constructor
-     * @param keys      the keys for series
-     * @param values    the values for series
+     * @param index     the index with keys for series
+     * @param values    the array with values for series
      */
     DataSeries(
-        @lombok.NonNull Index<K> keys,
+        @lombok.NonNull Index<K> index,
         @lombok.NonNull Array<V> values) {
-        if (keys.size() != values.length()) {
+        if (index.size() != values.length()) {
             throw new IllegalArgumentException("Key and value array must have the same length");
         } else {
-            this.index = Index.of(keys);
+            this.index = index;
             this.values = values;
         }
     }
@@ -64,33 +67,33 @@ public class DataSeries<K,V> {
      * Copy constructor
      * @param source    the source to copy
      */
-    DataSeries(DataSeries<K,V> source) {
+    DataSeries(@lombok.NonNull DataSeries<K,V> source) {
         this.index = source.index;
         this.values = source.values;
     }
 
 
     /**
-     * Returns a newly created data series builder
-     * @param <K>   the keyx type for series
-     * @param <V>   the data type for series
-     * @return      the newly created builder
-     */
-    public static <K,V> Builder<K,V> builder() {
-        return new Builder<>();
-    }
-
-
-    /**
-     * Returns a parameterized type of this class with key type
+     * Returns a parameterized type of this class with key and value type
      * @param keyType   the key type for series
-     * @param valueType the value type
+     * @param valueType the value type for series
      * @param <K>       key type
-     * @param <V>       value type
      * @return          newly created parameterized type
      */
     public static <K,V> ParameterizedType typeOf(Class<K> keyType, Class<V> valueType) {
         return Generic.of(DataSeries.class, keyType, valueType);
+    }
+
+
+    /**
+     * Returns a newly created builder for the data type provided
+     * @param dataType      the data type class
+     * @param <K>           key type
+     * @param <V>           data type
+     * @return              the new builder
+     */
+    public static <K,V> Builder<K,V> builder(Class<V> dataType) {
+        return new Builder<>(dataType);
     }
 
 
@@ -138,7 +141,7 @@ public class DataSeries<K,V> {
      * Returns the size of this series
      * @return      the size of series
      */
-    public int size() {
+    public final int size() {
         return values.length();
     }
 
@@ -147,7 +150,7 @@ public class DataSeries<K,V> {
      * Returns the key class for series
      * @return  the key class for series
      */
-    public Class<K> keyClass() {
+    public final Class<K> keyClass() {
         return index.type();
     }
 
@@ -156,26 +159,35 @@ public class DataSeries<K,V> {
      * Returns the key data type for series
      * @return  the key data type
      */
-    public ArrayType keyType() {
+    public final ArrayType keyType() {
         return ArrayType.of(index.type());
     }
 
 
     /**
-     * Returns the class for the data in this series
-     * @return  the class for data
+     * Returns the class for the value in this series
+     * @return  the class for value
      */
-    public Class<?> dataClass() {
+    public final Class<?> valueClass() {
         return values.type();
     }
 
 
     /**
-     * Returns the data type for this series
-     * @return      the data type for series
+     * Returns the value type for this series
+     * @return      the value type for series
      */
-    public ArrayType dataType() {
+    public final ArrayType valueType() {
         return values.typeCode();
+    }
+
+
+    /**
+     * Returns the parameterized type for this class
+     * @return      the parameterized type
+     */
+    public ParameterizedType type() {
+        return Generic.of(getClass(), keyClass(), valueClass());
     }
 
 
@@ -183,7 +195,7 @@ public class DataSeries<K,V> {
      * Returns the stream of keys for series
      * @return   the stream of keys
      */
-    public Stream<K> getKeys() {
+    public final Stream<K> getKeys() {
         return index.keys();
     }
 
@@ -193,8 +205,26 @@ public class DataSeries<K,V> {
      * @param ordinal   the ordinal location
      * @return          the key at location
      */
-    public K getKey(int ordinal) {
+    public final K getKey(int ordinal) {
         return index.getKey(ordinal);
+    }
+
+
+    /**
+     * Returns the first key if size > 0
+     * @return  the first key
+     */
+    public final Option<K> firstKey() {
+        return Option.of(index.first().orElse(null));
+    }
+
+
+    /**
+     * Returns the last key if size > 0
+     * @return  the last key
+     */
+    public final Option<K> lastKey() {
+        return Option.of(index.last().orElse(null));
     }
 
 
@@ -203,7 +233,7 @@ public class DataSeries<K,V> {
      * @param key   the key item
      * @return      the value or null
      */
-    public V getValue(K key) {
+    public final V getValue(K key) {
         var coord = index.getCoordinate(key);
         return coord >= 0 ? values.getValue(coord) : null;
     }
@@ -215,7 +245,7 @@ public class DataSeries<K,V> {
      * @param fallback  the fallback value if no match for key
      * @return      the value or null
      */
-    public V getValueOrElse(K key, V fallback) {
+    public final V getValueOrElse(K key, V fallback) {
         var coord = index.getCoordinate(key);
         return coord >= 0 ? values.getValue(coord) : fallback;
     }
@@ -226,7 +256,7 @@ public class DataSeries<K,V> {
      * @param index the index location
      * @return      the value or null
      */
-    public V getValueAt(int index) {
+    public final V getValueAt(int index) {
         var coord = this.index.getCoordinateAt(index);
         return values.getValue(coord);
     }
@@ -235,10 +265,10 @@ public class DataSeries<K,V> {
     /**
      * Returns the value for key
      * @param index     the index location
-     * @param fallback  the fallback value if no match for key
+     * @param fallback  the fallback value if null at index
      * @return          the value or null
      */
-    public V getValueAtOrElse(int index, V fallback) {
+    public final V getValueAtOrElse(int index, V fallback) {
         var coord = this.index.getCoordinateAt(index);
         var value = values.getValue(coord);
         return value != null ? value : fallback;
@@ -246,32 +276,77 @@ public class DataSeries<K,V> {
 
 
     /**
-     * Returns the first key if size > 0
-     * @return  the first key
+     * Iterates over all entries in this series
+     * @param consumer  the consumer to receive key, oridinal and value
      */
-    public Option<K> firstKey() {
-        return Option.of(index.first().orElse(null));
+    public void forEach(Consumer<Entry<K,V>> consumer) {
+        var size = this.size();
+        var value = createEntry();
+        for (int i=0; i<size; ++i) {
+            consumer.accept(value.locate(i));
+        }
     }
 
 
     /**
-     * Returns the last key if size > 0
-     * @return  the last key
+     * Returns a shallow copy of this series sorted according to comparator
+     * @param comparator    the comparator to apply sorting to entries
+     * @return              the shallow copy sorted series
      */
-    public Option<K> lastKey() {
-        return Option.of(index.last().orElse(null));
+    public DataSeries<K,V> sort(Comparator<Entry<K,V>> comparator) {
+        return sort(false, comparator);
+    }
+
+
+    /**
+     * Returns a shallow copy of this series sorted according to comparator
+     * @param parallel      true to apply parallel sorting algo
+     * @param comparator    the comparator to apply sorting to entries
+     * @return              the shallow copy sorted series
+     */
+    public DataSeries<K,V> sort(boolean parallel, Comparator<Entry<K,V>> comparator) {
+        var clone = (DataSeries<K,V>)new DataSeries<>(index.copy(false), values);
+        var entry1 = clone.createEntry();
+        var entry2 = clone.createEntry();
+        clone.index.sort(parallel, (i1, i2) -> {
+            entry1.locate(i1);
+            entry2.locate(i2);
+            return comparator.compare(entry1, entry2);
+        });
+        return clone;
+    }
+
+
+    /**
+     * Returns a mapping of this series with the keys mapped
+     * @param mapper    the key mapper
+     * @param <T>       the type for mapper
+     * @return          the mapped series
+     */
+    public <T> DataSeries<T,V> mapKeys(Function<K,T> mapper) {
+        var result = index.map((key, index) -> mapper.apply(key));
+        return new DataSeries<>(result, values);
     }
 
 
     /**
      * Returns a filtered copy of this series
-     * @param predicate the predicate to select keys
+     * @param predicate the predicate to select items
      * @return          the filtered series
      */
-    public DataSeries<K,V> filterKeys(Predicate<K> predicate) {
-        var newIndex = index.filter(predicate);
-        var indexes = newIndex.keys().mapToInt(index::getCoordinate).toArray();
-        var newValues = values.copy(indexes);
+    public DataSeries<K,V> filter(Predicate<Entry<K,V>> predicate) {
+        var size = this.size();
+        var keys = ArrayBuilder.of(size, index.type());
+        var indexes = ArrayBuilder.of(size, Integer.class);
+        this.forEach(entry -> {
+            if (predicate.test(entry)) {
+                var key = entry.key();
+                indexes.addInt(index.getCoordinate(key));
+                keys.add(key);
+            }
+        });
+        var newIndex = Index.of(keys.toArray());
+        var newValues = values.copy(indexes.toArray());
         return new DataSeries<>(newIndex, newValues);
     }
 
@@ -287,27 +362,147 @@ public class DataSeries<K,V> {
 
 
     /**
+     * Returns a newly created entry
+     * @return  the newly created entry
+     */
+    Entry<K,V> createEntry() {
+        return new Entry<>(this);
+    }
+
+
+    @Override
+    public String toString() {
+        return "DataSeries type: " + valueType() + ", size: " + size() + ", first: " + firstKey().orNull() + ", last: " + lastKey().orNull();
+    }
+
+    /**
+     * A class used to represent an entry in a data series by exposing the key, ordinal and value
+     */
+    static class Entry<K,V> {
+
+        private int ordinal;
+        private DataSeries<K,V> series;
+
+        /**
+         * Constructor
+         * @param series    the series to wrap
+         */
+        Entry(DataSeries<K,V> series) {
+            this.series = series;
+        }
+
+        /**
+         * Changes the location pointer for this entry
+         * @param ordinal   the new ordinal location
+         * @return          this entry
+         */
+        private Entry<K,V> locate(int ordinal) {
+            this.ordinal = ordinal;
+            return this;
+        }
+
+        /**
+         * Returns the key for this entry
+         * @return      the key for entry
+         */
+        public final K key() {
+            return series.getKey(ordinal);
+        }
+
+        /**
+         * Returns the ordinal location for entry
+         * @return      the ordinal location
+         */
+        public final int ordinal() {
+            return ordinal;
+        }
+
+        /**
+         * Returns the value for this entry as a boolean
+         * @return  the value as a boolean
+         */
+        public boolean getBoolean() {
+            var value = series.getValueAt(ordinal);
+            return value != null ? (Boolean)value : false;
+        }
+
+        /**
+         * Returns the value for this entry as an int
+         * @return  the value as an int
+         */
+        public int getInt() {
+            var value = series.getValueAt(ordinal);
+            return value != null ? ((Number)value).intValue() : 0;
+        }
+
+        /**
+         * Returns the value for this entry as a long
+         * @return  the value as a long
+         */
+        public long getLong() {
+            var value = series.getValueAt(ordinal);
+            return value != null ? ((Number)value).longValue() : 0L;
+        }
+
+        /**
+         * Returns the value for this entry as a double
+         * @return      the value as a double
+         */
+        public double getDouble() {
+            var value = series.getValueAt(ordinal);
+            return value != null ? ((Number)value).doubleValue() : Double.NaN;
+        }
+
+        /**
+         * Returns the value for this entry as an object
+         * @return  the value as an object
+         */
+        public final V getValue() {
+            return series.getValueAt(ordinal);
+        }
+    }
+
+
+
+    /**
      * An incremental builder for DataSeries
      * @param <K>   the key type
      * @param <V>   the value type
      */
     public static class Builder<K,V> {
 
-        protected ArrayBuilder<K> keys;
-        protected ArrayBuilder<V> values;
+        private Class<V> dataType;
+        private ArrayBuilder<K> keys;
+        private ArrayBuilder<V> values;
+
+
+        /**
+         * Constructor
+         */
+        public Builder() {
+            this(null);
+        }
+
+        /**
+         * Constructor
+         * @param dataType  the data type
+         */
+        private Builder(Class<V> dataType) {
+            this.dataType = dataType;
+        }
 
         /**
          * Sets the initial capacity for this builder
-         * @param capacity      the initial capacity
-         * @return  true if capacity assigned, false if already assigned
+         * @param capacity  the initial capacity
+         * @return          this builder
          */
-        public boolean capacity(int capacity) {
+        public Builder<K,V> capacity(int capacity) {
             if (keys != null) {
-                return false;
+                return this;
             } else {
                 this.keys = ArrayBuilder.of(capacity);
-                this.values = ArrayBuilder.of(capacity);
-                return true;
+                this.values = ArrayBuilder.of(capacity, dataType);
+                return this;
             }
         }
 
@@ -328,7 +523,8 @@ public class DataSeries<K,V> {
          * @param value     the value for entry
          * @return          this builder
          */
-        public Builder addBoolean(@lombok.NonNull K key, boolean value) {
+        public Builder<K,V> addBoolean(@lombok.NonNull K key, boolean value) {
+            this.capacity(100);
             this.keys.add(key);
             this.values.addBoolean(value);
             return this;
@@ -341,7 +537,8 @@ public class DataSeries<K,V> {
          * @param value     the value for entry
          * @return          this builder
          */
-        public Builder addInt(@lombok.NonNull K key, int value) {
+        public Builder<K,V> addInt(@lombok.NonNull K key, int value) {
+            this.capacity(100);
             this.keys.add(key);
             this.values.addInt(value);
             return this;
@@ -354,7 +551,8 @@ public class DataSeries<K,V> {
          * @param value     the value for entry
          * @return          this builder
          */
-        public Builder addLong(@lombok.NonNull K key, long value) {
+        public Builder<K,V> addLong(@lombok.NonNull K key, long value) {
+            this.capacity(100);
             this.keys.add(key);
             this.values.addLong(value);
             return this;
@@ -367,7 +565,8 @@ public class DataSeries<K,V> {
          * @param value     the value for entry
          * @return          this builder
          */
-        public Builder addDouble(@lombok.NonNull K key, double value) {
+        public Builder<K,V> addDouble(@lombok.NonNull K key, double value) {
+            this.capacity(100);
             this.keys.add(key);
             this.values.addDouble(value);
             return this;
@@ -380,7 +579,7 @@ public class DataSeries<K,V> {
          * @param value     the value for entry
          * @return          this builder
          */
-        public Builder addValue(K key, V value) {
+        public Builder<K,V> addValue(K key, V value) {
             this.capacity(100);
             this.keys.add(key);
             this.values.add(value);

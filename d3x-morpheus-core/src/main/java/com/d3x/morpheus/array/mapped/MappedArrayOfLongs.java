@@ -144,11 +144,29 @@ class MappedArrayOfLongs extends ArrayBase<Long> {
     @Override()
     public final Array<Long> copy(int[] indexes) {
         try {
-            final File newFile = MappedArrayConstructor.randomFile(true);
-            final MappedArrayOfLongs copy = new MappedArrayOfLongs(indexes.length, defaultValue, newFile);
+            var newFile = MappedArrayConstructor.randomFile(true);
+            var copy = new MappedArrayOfLongs(indexes.length, defaultValue, newFile);
             for (int i=0; i<indexes.length; ++i) {
                 final long value = getLong(indexes[i]);
-                if (Long.compare(value, defaultValue) != 0) {
+                if (value != defaultValue) {
+                    copy.buffer.put(i, value);
+                }
+            }
+            return copy;
+        } catch (Exception ex) {
+            throw new ArrayException("Failed top copy subset of Array", ex);
+        }
+    }
+
+
+    @Override
+    public Array<Long> copy(Array<Integer> indexes) {
+        try {
+            var newFile = MappedArrayConstructor.randomFile(true);
+            var copy = new MappedArrayOfLongs(indexes.length(), defaultValue, newFile);
+            for (int i=0; i<indexes.length(); ++i) {
+                final long value = getLong(indexes.getInt(i));
+                if (value != defaultValue) {
                     copy.buffer.put(i, value);
                 }
             }

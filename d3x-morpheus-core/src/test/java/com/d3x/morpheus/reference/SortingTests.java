@@ -106,15 +106,15 @@ public class SortingTests {
 
     @Test()
     public void testSortingByRowsAscending() throws Exception {
-        final DataFrame<LocalDate,String> frame = TestDataFrames.getQuotes("blk");
-        final DataFrame<LocalDate,String> copy = frame.copy();
+        var frame = TestDataFrames.getQuotes("blk");
+        var copy = frame.copy();
         DataFrameAsserts.assertEqualsByIndex(copy, frame);
-        DataFrame<LocalDate,String> sorted = copy.rows().sort(true, "Close");
+        var sorted = copy.rows().sort(true, "Close");
         sorted.rows().ordinals().forEach(i -> {
             if (i > 0) {
-                final LocalDate date = copy.rows().key(i);
-                final double value0 = sorted.col("Close").getDoubleAt(i - 1);
-                final double value1 = sorted.col("Close").getDoubleAt(i);
+                var date = copy.rows().key(i);
+                var value0 = sorted.col("Close").getDoubleAt(i - 1);
+                var value1 = sorted.col("Close").getDoubleAt(i);
                 Assert.assertTrue(value0 <= value1, "Close: " + value0 + " <= " + value1 + " at " + date);
             }
         });
@@ -123,35 +123,31 @@ public class SortingTests {
 
     @Test()
     public void testSortingByRowsDescending() throws Exception {
-        final DataFrame<LocalDate,String> frame = TestDataFrames.getQuotes("blk");
-        final DataFrame<LocalDate,String> copy = frame.copy();
-        DataFrameAsserts.assertEqualsByIndex(copy, frame);
-        DataFrame<LocalDate,String> sorted = copy.rows().sort(false, "Close");
+        var frame = TestDataFrames.getQuotes("blk");
+        var sorted = frame.rows().sort(false, "Close");
         sorted.rows().ordinals().forEach(i -> {
             if (i > 0) {
-                final LocalDate date = copy.rows().key(i);
-                final double value0 = sorted.col("Close").getDoubleAt(i - 1);
-                final double value1 = sorted.col("Close").getDoubleAt(i);
+                var date = frame.rows().key(i);
+                var value0 = sorted.col("Close").getDoubleAt(i - 1);
+                var value1 = sorted.col("Close").getDoubleAt(i);
                 Assert.assertTrue(value1 <= value0, "Close at " + date + " is <= prior value");
             }
         });
-        DataFrameAsserts.assertEqualsByKey(copy, frame);
+        DataFrameAsserts.assertEqualsByKey(sorted, frame);
     }
 
     @Test()
     public void testSortingByRowKeyAscending() throws Exception {
-        final DataFrame<LocalDate,String> frame = TestDataFrames.getQuotes("blk");
-        final DataFrame<LocalDate,String> copy = frame.copy();
-        DataFrameAsserts.assertEqualsByIndex(copy, frame);
-        copy.rows().sort((row0, row1) -> row0.key().compareTo(row1.key()));
-        copy.rows().ordinals().forEach(i -> {
+        var frame = TestDataFrames.getQuotes("blk");
+        var sorted = frame.rows().sort((row0, row1) -> row0.key().compareTo(row1.key()));
+        sorted.rows().ordinals().forEach(i -> {
             if (i > 0) {
-                final LocalDate value0 = copy.rows().key(i - 1);
-                final LocalDate value1 = copy.rows().key(i);
+                var value0 = sorted.rows().key(i - 1);
+                var value1 = sorted.rows().key(i);
                 Assert.assertTrue(value0.compareTo(value1) <= 0, "Date at " + value0 + "  <= " + value1 + " prior value");
             }
         });
-        DataFrameAsserts.assertEqualsByKey(copy, frame);
+        DataFrameAsserts.assertEqualsByKey(sorted, frame);
     }
 
     @Test()
@@ -399,29 +395,29 @@ public class SortingTests {
 
     @Test(dataProvider="args1")
     public void testMultiDimensionalRowSort2(boolean parallel) {
-        final DataFrame<LocalDate,String> frame = createRowTestFrame(parallel, 10000).rows().sort((row1, row2) -> {
-            final boolean b1 = row1.getBoolean("Booleans");
-            final boolean b2 = row2.getBoolean("Booleans");
+        var frame = createRowTestFrame(parallel, 10000).rows().sort((row1, row2) -> {
+            var b1 = row1.getBoolean("Booleans");
+            var b2 = row2.getBoolean("Booleans");
             if (Boolean.compare(b1, b2) != 0) {
                 return Boolean.compare(b1, b2);
             } else {
-                final int i1 = row1.getInt("Integers");
-                final int i2 = row2.getInt("Integers");
-                if (Integer.compare(i1, i2) != 0) {
+                var i1 = row1.getInt("Integers");
+                var i2 = row2.getInt("Integers");
+                if (i1 != i2) {
                     return Integer.compare(i1, i2);
                 } else {
-                    final long l1 = row1.getLong("Longs");
-                    final long l2 = row2.getLong("Longs");
-                    if (Long.compare(l1, l2) != 0) {
+                    var l1 = row1.getLong("Longs");
+                    var l2 = row2.getLong("Longs");
+                    if (l1 != l2) {
                         return Long.compare(l1, l2);
                     } else {
-                        final double d1 = row1.getDouble("Doubles");
-                        final double d2 = row2.getDouble("Doubles");
+                        var d1 = row1.getDouble("Doubles");
+                        var d2 = row2.getDouble("Doubles");
                         if (Double.compare(d1,d2) != 0) {
                             return Double.compare(d1, d2);
                         } else {
-                            final LocalDate v1 = row1.getValue("Dates");
-                            final LocalDate v2 = row2.getValue("Dates");
+                            var v1 = (LocalDate)row1.getValue("Dates");
+                            var v2 = (LocalDate)row2.getValue("Dates");
                             if (v1.compareTo(v2) != 0) {
                                 return v1.compareTo(v2);
                             } else {
@@ -432,8 +428,12 @@ public class SortingTests {
                 }
             }
         });
+        frame.out().print();
         for (int i=1; i<frame.rowCount(); ++i) {
-            Assert.assertTrue(Boolean.compare(frame.col("Booleans").getBooleanAt(i-1), frame.col("Booleans").getBooleanAt(i)) <= 0, "Booleans are sorted");
+            var b1 = frame.col("Booleans").getBooleanAt(i-1);
+            var b2 = frame.col("Booleans").getBooleanAt(i);
+            var comp = Boolean.compare(b1, b2);
+            Assert.assertTrue(comp <= 0, "Not sorted at index: " + i);
         }
         final boolean[] booleanValues = new boolean[] { true, false };
         for (boolean booleanValue : booleanValues) {

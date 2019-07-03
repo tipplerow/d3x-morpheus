@@ -101,7 +101,7 @@ public class DataSeriesCsv<K,V> {
      */
     @SuppressWarnings("unchecked")
     private DataSeries<K,V> from(DataFrame<Integer,?> frame) {
-        var builder = DataSeries.<K,V>builder();
+        var builder = new DataSeries.Builder<K,V>();
         builder.capacity(frame.rowCount());
         frame.rows().forEach(row -> {
             var key = (K)row.getValueAt(0);

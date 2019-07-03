@@ -165,6 +165,21 @@ class SparseArrayOfZonedDateTimes extends ArrayBase<ZonedDateTime> {
     }
 
 
+    @Override
+    public Array<ZonedDateTime> copy(Array<Integer> indexes) {
+        var fillPct = (double)values.size() / length();
+        var clone = new SparseArrayOfZonedDateTimes(indexes.length(), fillPct, defaultValue);
+        for (int i = 0; i < indexes.length(); ++i) {
+            var value = getLong(indexes.getInt(i));
+            if (value != defaultValueAsLong) {
+                clone.values.put(i, value);
+                clone.zoneIds.put(i, this.zoneIds.get(i));
+            }
+        }
+        return clone;
+    }
+
+
     @Override()
     public final Array<ZonedDateTime> copy(int start, int end) {
         var length = end - start;

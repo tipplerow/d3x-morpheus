@@ -79,14 +79,14 @@ public class IndexSortTests {
         Assert.assertFalse(isAscending(index, 0, index.size()), "The index is not sorted");
         Assert.assertFalse(isDescending(index, 0, index.size()), "The index is not sorted");
 
-        index = index.sort(false, true);
+        index.sort(false, true);
         Assert.assertTrue(isAscending(index, 0, index.size()));
         for (int i = 0; i < array.length(); ++i) {
             final T key = array.getValue(i);
             Assert.assertEquals(index.getCoordinate(key), i, "The index matches expected value");
         }
 
-        index = index.sort(false, false);
+        index.sort(false, false);
         Assert.assertTrue(isDescending(index, 0, index.size()));
         for (int i = 0; i < array.length(); ++i) {
             final T key = array.getValue(i);
@@ -113,7 +113,7 @@ public class IndexSortTests {
         Assert.assertFalse(isAscending(filter, 0, filter.size()), "The index is not sorted");
         Assert.assertFalse(isDescending(filter, 0, filter.size()), "The index is not sorted");
 
-        filter = filter.sort(false, true);
+        filter.sort(false, true);
         Assert.assertFalse(isAscending(index, 0, index.size()), "The index is not sorted");
         Assert.assertFalse(isDescending(index, 0, index.size()), "The index is not sorted");
         Assert.assertTrue(isAscending(filter, 0, filter.size()), "The filter is sorted");
@@ -131,7 +131,7 @@ public class IndexSortTests {
         Index<T> index = Index.of(array.copy());
         Assert.assertFalse(isAscending(index, 0, index.size()), "The index is not sorted");
         Assert.assertFalse(isDescending(index, 0, index.size()), "The index is not sorted");
-        index = index.sort(false, true);
+        index.sort(false, true);
         Assert.assertTrue(isAscending(index, 0, index.size()), "The index is not sorted");
         Assert.assertFalse(index.previousKey(index.first().get()).isPresent(), "No key previous to first");
         Assert.assertFalse(index.nextKey(index.last().get()).isPresent(), "No key next from last");
@@ -176,22 +176,23 @@ public class IndexSortTests {
 
     @Test(dataProvider = "style")
     public void testIndexPerformance(boolean parallel) {
-        final LocalDateTime start = LocalDateTime.now();
-        final LocalDateTime end = start.plusSeconds(1000000);
-        final Array<LocalDateTime> dates = Range.of(start, end, Duration.ofSeconds(1)).toArray().shuffle(3);
-        final Index<LocalDateTime> index = Index.of(dates);
-        final long t1 = System.nanoTime();
-        final Index<LocalDateTime> sorted = index.sort(parallel, true);
-        final long t2 = System.nanoTime();
+        var start = LocalDateTime.now();
+        var end = start.plusSeconds(1000000);
+        var dates = Range.of(start, end, Duration.ofSeconds(1)).toArray().shuffle(3);
+        var index = Index.of(dates);
+        var t1 = System.nanoTime();
+        var sorted = index.copy(false);
+        sorted.sort(parallel, true);
+        var t2 = System.nanoTime();
         System.out.println("Sorted Index in " + ((t2-t1)/1000000 + " millis"));
         for (int j=1; j<index.size(); ++j) {
-            final LocalDateTime d1 = sorted.getKey(j-1);
-            final LocalDateTime d2 = sorted.getKey(j);
+            var d1 = sorted.getKey(j-1);
+            var d2 = sorted.getKey(j);
             if (d1.isAfter(d2)) {
                 throw new RuntimeException("Index keys are not sorted");
             } else {
-                final int i1 = index.getCoordinate(d1);
-                final int i2 = sorted.getCoordinate(d1);
+                var i1 = index.getCoordinate(d1);
+                var i2 = sorted.getCoordinate(d1);
                 if (i1 != i2) {
                     throw new RuntimeException("The indexes do not match between original and sorted");
                 }

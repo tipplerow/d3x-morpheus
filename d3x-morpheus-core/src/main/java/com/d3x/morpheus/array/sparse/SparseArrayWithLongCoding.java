@@ -141,6 +141,18 @@ class SparseArrayWithLongCoding<T> extends ArrayBase<T> {
     }
 
 
+    @Override
+    public Array<T> copy(Array<Integer> indexes) {
+        var fillPct = (double)codes.size() / length();
+        var clone = new SparseArrayWithLongCoding<T>(indexes.length(), fillPct, defaultValue, coding);
+        for (int i = 0; i < indexes.length(); ++i) {
+            var code = getLong(indexes.getInt(i));
+            clone.codes.put(i, code);
+        }
+        return clone;
+    }
+
+
     @Override()
     public final Array<T> copy(int start, int end) {
         var length = end - start;

@@ -132,6 +132,28 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
 
 
     /**
+     * Returns a shallow copy of this frame replacing the row key index
+     * @param rowKeys   the row key index replacement
+     * @param <X>       the row key type
+     * @return          the shallow copy of the frame
+     */
+    final <X> XDataFrame<X,C> withRowKeys(Index<X> rowKeys) {
+        return new XDataFrame<>(data.withRowKeys(rowKeys), isParallel());
+    }
+
+
+    /**
+     * Returns a shallow copy of this frame replacing the row key index
+     * @param colKeys   the column key index replacement
+     * @param <Y>       the column key type
+     * @return          the shallow copy of the frame
+     */
+    final <Y> XDataFrame<R,Y> withColKeys(Index<Y> colKeys) {
+        return new XDataFrame<>(data.withColKeys(colKeys), isParallel());
+    }
+
+
+    /**
      * Returns a filter of this frame based on the row and column dimensions provided
      * @param rowKeys   the row keys for frame, which could include a subset of row keys
      * @param colKeys   the column keys for frame, which could include a subset of column keys

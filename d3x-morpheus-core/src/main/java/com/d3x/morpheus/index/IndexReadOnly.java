@@ -89,8 +89,8 @@ class IndexReadOnly<K> implements Index<K> {
     }
 
     @Override
-    public final Index<K> copy() {
-        return underlying.copy();
+    public final Index<K> copy(boolean deep) {
+        return underlying.copy(deep);
     }
 
     @Override
@@ -214,13 +214,13 @@ class IndexReadOnly<K> implements Index<K> {
     }
 
     @Override
-    public final Index<K> sort(boolean parallel, boolean ascending) {
-        return underlying.sort(parallel, ascending);
+    public final void sort(boolean parallel, boolean ascending) {
+        this.underlying.sort(parallel, ascending);
     }
 
     @Override
-    public final Index<K> sort(boolean parallel, IntComparator comparator) {
-        return underlying.sort(parallel, comparator);
+    public final void sort(boolean parallel, IntComparator comparator) {
+        this.underlying.sort(parallel, comparator);
     }
 
     @Override

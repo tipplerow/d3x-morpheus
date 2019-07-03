@@ -83,7 +83,7 @@ public class DataSeriesJson<K,V,S extends DataSeries<K,V>> implements JsonAdapte
             } else {
                 reader.beginObject();
                 token = reader.peek();
-                var builder = DataSeries.builder();
+                var builder = new DataSeries.Builder<>();
                 var valueType = type.getActualTypeArguments()[1];
                 while (token != JsonToken.END_OBJECT) {
                     var name = reader.nextName();
@@ -179,7 +179,7 @@ public class DataSeriesJson<K,V,S extends DataSeries<K,V>> implements JsonAdapte
                         writeDouble(writer, name, series.getDouble(key));
                     }
                 } else {
-                    var dataClass = (Class<V>)record.dataClass();
+                    var dataClass = (Class<V>)record.valueClass();
                     var output = engine.io(dataClass).output(writer);
                     while (iterator.hasNext()) {
                         var key = iterator.next();
