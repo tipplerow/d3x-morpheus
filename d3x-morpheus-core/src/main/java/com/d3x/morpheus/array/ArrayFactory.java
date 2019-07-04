@@ -185,5 +185,14 @@ public abstract class ArrayFactory {
          */
         <T> Array<T> apply(Class<T> type, int length, T defaultValue, String path);
 
+        /**
+         * Returns a newly created array for type and with initial length and default value
+         * @param type          the array element type
+         * @param length        the initial length
+         * @param fillPct       the fill percent, only relevant for sparse arrays
+         * @param defaultValue  the default value for array
+         * @return              the newly created array
+         */
+        <T> Array<T> apply(Class<T> type, int length, double fillPct, T defaultValue);
     }
 }

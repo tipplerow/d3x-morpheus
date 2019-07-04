@@ -100,9 +100,10 @@ public interface Index<K> extends Iterable<K>, Cloneable, Serializable {
 
     /**
      * Returns a deep copy of this index
-     * @return  a deep copy of this index
+     * @param deep  true for a deep copy, otherwise shallow
+     * @return      a deep or shallow copy of this index
      */
-    Index<K> copy();
+    Index<K> copy(boolean deep);
 
     /**
      * Returns a read-only shallow copy of this index
@@ -277,17 +278,15 @@ public interface Index<K> extends Iterable<K>, Cloneable, Serializable {
      * Sorts the keys in this index in ascending or descending order
      * @param parallel      true for parallel sort, false for sequential
      * @param ascending     true for ascending, false for descending
-     * @return              this index
      */
-    Index<K> sort(boolean parallel, boolean ascending);
+    void sort(boolean parallel, boolean ascending);
 
     /**
-     * Sorts the keys in this index according to the comparator specified
+     * Sorts the keys in this index according to the comparator provided
      * @param parallel      true for parallel sort, false for sequential
-     * @param comparator    the user provided compaator
-     * @return              this index
+     * @param comparator    the user provided comparator
      */
-    Index<K> sort(boolean parallel, IntComparator comparator);
+    void sort(boolean parallel, IntComparator comparator);
 
     /**
      * Returns a filter over this index including only the keys specified
@@ -379,14 +378,55 @@ public interface Index<K> extends Iterable<K>, Cloneable, Serializable {
         return Index.of(Array.singleton(key));
     }
 
+
+    /**
+     * Returns a newly created index to hold values provided
+     * @param values    the values to build index from
+     * @return          the newly created Index
+     */
+    static Index<Boolean> ofBooleans(boolean... values) {
+        return IndexFactory.getInstance().create(Array.of(values));
+    }
+
+
+    /**
+     * Returns a newly created index to hold values provided
+     * @param values    the values to build index from
+     * @return          the newly created Index
+     */
+    static Index<Integer> ofInts(int... values) {
+        return IndexFactory.getInstance().create(Array.of(values));
+    }
+
+
+    /**
+     * Returns a newly created index to hold values provided
+     * @param values    the values to build index from
+     * @return          the newly created Index
+     */
+    static Index<Long> ofLongs(long... values) {
+        return IndexFactory.getInstance().create(Array.of(values));
+    }
+
+
+    /**
+     * Returns a newly created index to hold values provided
+     * @param values    the values to build index from
+     * @return          the newly created Index
+     */
+    static Index<Double> ofLongs(double... values) {
+        return IndexFactory.getInstance().create(Array.of(values));
+    }
+
+
     /**
      * Returns a newly created index to hold values provided
      * @param values    the values to build index from
      * @return          the newly created Index
      */
     @SafeVarargs
-    static <V> Index<V> of(V... values) {
-        return IndexFactory.getInstance().create(Array.of(values));
+    static <V> Index<V> ofObjects(V... values) {
+        return IndexFactory.getInstance().create(Array.ofObjects(values));
     }
 
 }

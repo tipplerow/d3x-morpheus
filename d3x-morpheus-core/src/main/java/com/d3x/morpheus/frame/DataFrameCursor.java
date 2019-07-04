@@ -38,28 +38,28 @@ public interface DataFrameCursor<R,C> extends DataFrameValue<R,C> {
      * @param key   the row key
      * @return      this cursor
      */
-    DataFrameCursor<R,C> atRowKey(R key);
+    DataFrameCursor<R,C> toRow(R key);
 
     /**
      * Moves this cursor to the column key specified, leaving row location unchanged
      * @param colKey    the column key
      * @return          this cursor
      */
-    DataFrameCursor<R,C> atColKey(C colKey);
+    DataFrameCursor<R,C> toCol(C colKey);
 
     /**
      * Moves this cursor to the row ordinal specified, leaving column location unchanged
      * @param ordinal   the row ordinal
      * @return          this cursor
      */
-    DataFrameCursor<R,C> atRow(int ordinal);
+    DataFrameCursor<R,C> toRowAt(int ordinal);
 
     /**
      * Moves this cursor to the column ordinal specified, leaving row location unchanged
      * @param colOrdinal    the column ordinal
      * @return              this cursor
      */
-    DataFrameCursor<R,C> atCol(int colOrdinal);
+    DataFrameCursor<R,C> toColAt(int colOrdinal);
 
     /**
      * Moves this cursor to the row and column key specified

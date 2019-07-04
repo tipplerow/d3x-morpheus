@@ -101,13 +101,13 @@ public class ArraySearchTests {
         final Array<T> array = createArray(type, style).sort(true);
         final T lastValue = array.last(v -> true).map(ArrayValue::getValue).get();
         if (lastValue instanceof Integer) {
-            final int index = array.binarySearch(0, array.length(), (T)new Integer(((Integer)lastValue) + 10));
+            final int index = array.binarySearch(0, array.length(), (T)Integer.valueOf(((Integer)lastValue) + 10));
             Assert.assertEquals(index, -1 * (array.length() + 1), "Index implies length() + 1");
         } else if (lastValue instanceof Long) {
-            final int index = array.binarySearch(0, array.length(), (T)new Long(((Long)lastValue) + 10));
+            final int index = array.binarySearch(0, array.length(), (T)Long.valueOf(((Long)lastValue) + 10));
             Assert.assertEquals(index, -1 * (array.length() + 1), "Index implies length() + 1");
         } else if (lastValue instanceof Double) {
-            final int index = array.binarySearch(0, array.length(), (T) new Double(((Double) lastValue) + 10));
+            final int index = array.binarySearch(0, array.length(), (T)Double.valueOf(((Double) lastValue) + 10));
             Assert.assertEquals(index, -1 * (array.length() + 1), "Index implies length() + 1");
         } else if (lastValue instanceof String) {
             final String stringValue = (String) lastValue;
@@ -148,13 +148,13 @@ public class ArraySearchTests {
         final Array<T> array = createArray(type, style).sort(true);
         final T value = array.first(v -> true).map(ArrayValue::getValue).get();
         if (value instanceof Integer) {
-            final int index = array.binarySearch(0, array.length(), (T)new Integer(((Integer)value) - 10));
+            final int index = array.binarySearch(0, array.length(), (T)Integer.valueOf(((Integer)value) - 10));
             Assert.assertEquals(index, -1, "Index implies length() + 1");
         } else if (value instanceof Long) {
-            final int index = array.binarySearch(0, array.length(), (T)new Long(((Long)value) - 10));
+            final int index = array.binarySearch(0, array.length(), (T)Long.valueOf(((Long)value) - 10));
             Assert.assertEquals(index, -1, "Index implies length() + 1");
         } else if (value instanceof Double) {
-            final int index = array.binarySearch(0, array.length(), (T) new Double(((Double) value) - 10));
+            final int index = array.binarySearch(0, array.length(), (T)Double.valueOf(((Double) value) - 10));
             Assert.assertEquals(index, -1, "Index implies length() + 1");
         } else if (value instanceof String) {
             final int index = array.binarySearch(0, array.length(), (T) "");
@@ -192,9 +192,9 @@ public class ArraySearchTests {
     @SuppressWarnings("unchecked")
     public <T> void testFindPreviousValue(Class<T> type, ArrayStyle style) {
         final Function<T,T> previousResolver = v -> {
-            if (v instanceof Integer) return (T)(new Integer(((Integer)v) - 1));
-            if (v instanceof Long) return (T)(new Long(((Long)v) - 1L));
-            if (v instanceof Double) return (T)new Double(((Double)v) - 1d);
+            if (v instanceof Integer) return (T)(Integer.valueOf(((Integer)v) - 1));
+            if (v instanceof Long) return (T)(Long.valueOf(((Long)v) - 1L));
+            if (v instanceof Double) return (T)Double.valueOf(((Double)v) - 1d);
             if (v instanceof Date) return (T)new Date(((Date)v).getTime() - 5000);
             if (v instanceof LocalDate) return (T)((LocalDate)v).minusDays(1);
             if (v instanceof LocalTime) return (T)((LocalTime)v).minusNanos(1);
@@ -231,9 +231,9 @@ public class ArraySearchTests {
     @SuppressWarnings("unchecked")
     public <T> void testFindNextValue(Class<T> type, ArrayStyle style) {
         final Function<T,T> nextResolver = v -> {
-            if (v instanceof Integer) return (T)(new Integer(((Integer)v) + 1));
-            if (v instanceof Long) return (T)(new Long(((Long)v) + 1L));
-            if (v instanceof Double) return (T)new Double(((Double)v) + 1d);
+            if (v instanceof Integer) return (T)(Integer.valueOf(((Integer)v) + 1));
+            if (v instanceof Long) return (T)(Long.valueOf(((Long)v) + 1L));
+            if (v instanceof Double) return (T)Double.valueOf(((Double)v) + 1d);
             if (v instanceof Date) return (T)new Date(((Date)v).getTime() + 5000);
             if (v instanceof LocalDate) return (T)((LocalDate)v).plusDays(1);
             if (v instanceof LocalTime) return (T)((LocalTime)v).plusNanos(1);
@@ -276,8 +276,8 @@ public class ArraySearchTests {
             case LONG:              result = Range.of(0L, 20000L, 2L);  break;
             case DOUBLE:            result = Range.of(0d, 20000d, 2d);  break;
             case STRING:            result = Array.of(String.class, alphabet).copy(IntStream.range(2, alphabet.length-3).filter(i -> i % 2 == 0).toArray());   break;
-            case CURRENCY:          result = Array.of(currencies).copy(IntStream.range(5, currencies.length-5).filter(i -> i % 2 == 0).toArray());      break;
-            case ENUM:              result = Array.of(Month.values()).copy(IntStream.range(1, 12).filter(i -> i % 2 == 0).toArray());    break;
+            case CURRENCY:          result = Array.ofObjects(currencies).copy(IntStream.range(5, currencies.length-5).filter(i -> i % 2 == 0).toArray());      break;
+            case ENUM:              result = Array.ofObjects(Month.values()).copy(IntStream.range(1, 12).filter(i -> i % 2 == 0).toArray());    break;
             case YEAR:              result = Range.of(1950, 2030).map(Year::of);                                                    break;
             case DATE:              result = Range.of(0, 20000).map(i -> new Date(System.currentTimeMillis() + i * 10000));         break;
             case LOCAL_DATE:        result = Range.of(LocalDate.now(), LocalDate.now().plusDays(10000), Period.ofDays(2));          break;

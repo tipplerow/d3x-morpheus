@@ -40,8 +40,8 @@ public class CombineTests {
 
         Range<Integer> rows1 = Range.of(0, 10);
         Range<Integer> rows2 = Range.of(5, 20);
-        Array<String> columns1 = Array.of("A", "B", "C");
-        Array<String> columns2 = Array.of("A", "B", "C", "D", "E");
+        Array<String> columns1 = Array.ofObjects("A", "B", "C");
+        Array<String> columns2 = Array.ofObjects("A", "B", "C", "D", "E");
 
         DataFrame<Integer,String> frame1 = DataFrame.ofDoubles(rows1, columns1, v -> Math.random());
         DataFrame<Integer,String> frame2 = DataFrame.ofDoubles(rows2, columns2, v -> Math.random());
@@ -82,8 +82,8 @@ public class CombineTests {
 
         Range<Integer> rows1 = Range.of(0, 10);
         Range<Integer> rows2 = Range.of(5, 20);
-        Array<String> columns1 = Array.of("A", "B", "C");
-        Array<String> columns2 = Array.of("A", "B", "C", "D", "E");
+        Array<String> columns1 = Array.ofObjects("A", "B", "C");
+        Array<String> columns2 = Array.ofObjects("A", "B", "C", "D", "E");
 
         DataFrame<Integer,String> frame1 = DataFrame.ofDoubles(rows1, columns1, v -> Math.random());
         DataFrame<Integer,String> frame2 = DataFrame.ofDoubles(rows2, columns2, v -> Math.random());
@@ -109,14 +109,14 @@ public class CombineTests {
 
         DataFrameCursor<Integer,String> cursor = frame3.cursor();
         IntStream.range(0, 5).forEach(rowIndex -> {
-            Array.of("D", "E").forEach(colKey -> {
+            Array.ofObjects("D", "E").forEach(colKey -> {
                 final double value = cursor.getDouble();
                 Assert.assertTrue(cursor.atKeys(rowIndex, colKey).isNull());
             });
         });
 
         IntStream.range(5, frame3.rowCount()).forEach(rowIndex -> {
-            Array.of("D", "E").forEach(colKey -> {
+            Array.ofObjects("D", "E").forEach(colKey -> {
                 final double expected = frame2.col(colKey).getDoubleAt(rowIndex-5);
                 final double actual = cursor.atKeys(rowIndex, colKey).getDouble();
                 Assert.assertEquals(actual, expected);
@@ -129,8 +129,8 @@ public class CombineTests {
     public void testCombineFirst() {
         Range<Integer> rows1 = Range.of(0, 10);
         Range<Integer> rows2 = Range.of(5, 20);
-        Array<String> columns1 = Array.of("A", "B", "C");
-        Array<String> columns2 = Array.of("A", "B", "C", "D", "E");
+        Array<String> columns1 = Array.ofObjects("A", "B", "C");
+        Array<String> columns2 = Array.ofObjects("A", "B", "C", "D", "E");
 
         DataFrame<Integer,String> frame1 = DataFrame.ofDoubles(rows1, columns1, v -> Math.random());
         DataFrame<Integer,String> frame2 = DataFrame.ofDoubles(rows2, columns2, v -> Math.random());
@@ -157,7 +157,7 @@ public class CombineTests {
 
         DataFrameCursor<Integer,String> cursor = frame3.cursor();
         IntStream.range(0, 5).forEach(rowIndex -> {
-            Array.of("D", "E").forEach(colKey -> {
+            Array.ofObjects("D", "E").forEach(colKey -> {
                 Assert.assertTrue(cursor.atKeys(rowIndex, colKey).isNull());
             });
         });
@@ -171,8 +171,8 @@ public class CombineTests {
         }
 
         IntStream.range(5, frame3.rowCount()).forEach(rowIndex -> {
-            Array.of("D", "E").forEach(colKey -> {
-                final double expected = frame2.cursor().atRow(rowIndex-5).atColKey(colKey).getDouble();
+            Array.ofObjects("D", "E").forEach(colKey -> {
+                final double expected = frame2.cursor().toRowAt(rowIndex-5).toCol(colKey).getDouble();
                 final double actual = cursor.atKeys(rowIndex, colKey).getDouble();
                 Assert.assertEquals(actual, expected);
             });

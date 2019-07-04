@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2014-2017 Xavier Witdouck
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,6 +30,7 @@ import com.d3x.morpheus.array.ArrayType;
 import com.d3x.morpheus.index.Index;
 import com.d3x.morpheus.range.Range;
 import com.d3x.morpheus.util.Predicates;
+import com.d3x.morpheus.util.text.parser.Parser;
 import org.testng.annotations.Test;
 
 /**
@@ -75,10 +76,10 @@ public class TestDataFrames {
      * @throws java.io.IOException  if there is an IO exception
      */
     public static DataFrame<LocalDate,String> getQuotes(String ticker) throws IOException {
-        return DataFrame.read().csv(options -> {
-            options.setResource("/quotes/" + ticker.toLowerCase() + ".csv");
-            options.setRowKeyParser(LocalDate.class, values -> LocalDate.parse(values[0]));
-            options.setColNamePredicate(Predicates.in("Open", "High", "Low", "Close", "Volume", "Adj Close"));
+        return DataFrame.read().<LocalDate>csv("/quotes/" + ticker.toLowerCase() + ".csv").read(options -> {
+            options.setRowKeyColumnName("Date");
+            options.getFormats().setParser("Date", Parser.ofLocalDate("yyyy-MM-dd"));
+            options.setColNamePredicate(Predicates.in("Date", "Open", "High", "Low", "Close", "Volume", "Adj Close"));
         });
     }
 
@@ -137,25 +138,12 @@ public class TestDataFrames {
 
     @Test(enabled = false)
     public void test() {
-        createMixedRandomFrame(Integer.class, 1000).write().csv(options -> {
-            options.setFile(new File("frame-with-int-index.csv"));
-        });
-        createMixedRandomFrame(String.class, 1000).write().csv(options -> {
-            options.setFile(new File("frame-with-string-index.csv"));
-        });
-        createMixedRandomFrame(LocalDate.class, 1000).write().csv(options -> {
-            options.setFile(new File("frame-with-local-date-index.csv"));
-        });
-        createMixedRandomFrame(LocalTime.class, 1000).write().csv(options -> {
-            options.setFile(new File("frame-with-local-time-index.csv"));
-        });
-        createMixedRandomFrame(LocalDateTime.class, 1000).write().csv(options -> {
-            options.setFile(new File("frame-with-local-date-time-index.csv"));
-        });
-        createMixedRandomFrame(ZonedDateTime.class, 1000).write().csv(options -> {
-            options.setFile(new File("frame-with-zoned-date-time-index.csv"));
-        });
-
+        createMixedRandomFrame(Integer.class, 1000).write().csv(new File("frame-with-int-index.csv")).apply();
+        createMixedRandomFrame(String.class, 1000).write().csv(new File("frame-with-string-index.csv")).apply();
+        createMixedRandomFrame(LocalDate.class, 1000).write().csv(new File("frame-with-local-date-index.csv")).apply();
+        createMixedRandomFrame(LocalTime.class, 1000).write().csv(new File("frame-with-local-time-index.csv")).apply();
+        createMixedRandomFrame(LocalDateTime.class, 1000).write().csv(new File("frame-with-local-date-time-index.csv")).apply();
+        createMixedRandomFrame(ZonedDateTime.class, 1000).write().csv(new File("frame-with-zoned-date-time-index.csv")).apply();
     }
 
 
@@ -164,7 +152,7 @@ public class TestDataFrames {
         if (type == Integer.class) {
             return Range.of(0, count).map(v -> (T)v);
         } else if (type == Long.class) {
-            return Range.of(0, count).map(v -> (T)new Long(v.longValue()));
+            return Range.of(0, count).map(v -> (T)Long.valueOf(v.longValue()));
         } else if (type == String.class) {
             return Range.of(0, count).map(v -> (T)("R" + v));
         } else if (type == LocalDate.class) {

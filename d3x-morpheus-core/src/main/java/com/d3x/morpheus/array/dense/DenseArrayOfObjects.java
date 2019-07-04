@@ -115,9 +115,19 @@ class DenseArrayOfObjects<T> extends ArrayBase<T> {
 
     @Override()
     public final Array<T> copy(int[] indexes) {
-        final DenseArrayOfObjects<T> clone = new DenseArrayOfObjects<>(type(), indexes.length, defaultValue);
+        var clone = new DenseArrayOfObjects<T>(type(), indexes.length, defaultValue);
         for (int i = 0; i < indexes.length; ++i) {
             clone.values[i] = this.values[indexes[i]];
+        }
+        return clone;
+    }
+
+
+    @Override
+    public Array<T> copy(Array<Integer> indexes) {
+        var clone = new DenseArrayOfObjects<T>(type(), indexes.length(), defaultValue);
+        for (int i = 0; i < indexes.length(); ++i) {
+            clone.values[i] = this.values[indexes.getInt(i)];
         }
         return clone;
     }

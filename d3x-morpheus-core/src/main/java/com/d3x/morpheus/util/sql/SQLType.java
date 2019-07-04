@@ -135,7 +135,11 @@ public enum SQLType {
                 case Types.TIME:        return SQLType.TIME;
                 case Types.TIMESTAMP:   return SQLType.DATETIME;
                 default:
-                    throw new RuntimeException("Unsupported data type for " + typeName + ", sqlType: " + sqlCode);
+                    switch (typeName) {
+                        case "TEXT":        return SQLType.VARCHAR;
+                        case "MEDIUMTEXT":  return SQLType.VARCHAR;
+                        default: throw new RuntimeException("Unsupported data type for " + typeName + ", sqlType: " + sqlCode);
+                    }
             }
         }
     }

@@ -134,9 +134,19 @@ class DenseArrayWithIntCoding<T> extends ArrayBase<T> implements WithIntCoding<T
 
     @Override()
     public final Array<T> copy(int[] indexes) {
-        final DenseArrayWithIntCoding<T> clone = new DenseArrayWithIntCoding<>(indexes.length, defaultValue, coding);
+        var clone = new DenseArrayWithIntCoding<T>(indexes.length, defaultValue, coding);
         for (int i = 0; i < indexes.length; ++i) {
             clone.codes[i] = this.codes[indexes[i]];
+        }
+        return clone;
+    }
+
+
+    @Override
+    public Array<T> copy(Array<Integer> indexes) {
+        var clone = new DenseArrayWithIntCoding<T>(indexes.length(), defaultValue, coding);
+        for (int i = 0; i < indexes.length(); ++i) {
+            clone.codes[i] = this.codes[indexes.getInt(i)];
         }
         return clone;
     }

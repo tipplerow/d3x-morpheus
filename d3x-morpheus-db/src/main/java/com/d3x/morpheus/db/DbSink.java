@@ -15,18 +15,13 @@
  */
 package com.d3x.morpheus.db;
 
-import java.io.File;
+import javax.sql.DataSource;
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.Date;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.Statement;
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -45,6 +40,7 @@ import com.d3x.morpheus.frame.DataFrameValue;
 import com.d3x.morpheus.util.Collect;
 import com.d3x.morpheus.util.IO;
 import com.d3x.morpheus.util.Initialiser;
+import com.d3x.morpheus.util.Try;
 import com.d3x.morpheus.util.functions.Function1;
 import com.d3x.morpheus.util.sql.SQLPlatform;
 import com.d3x.morpheus.util.sql.SQLType;
@@ -56,6 +52,7 @@ import com.d3x.morpheus.util.sql.SQLType;
  *
  * @author  Xavier Witdouck
  */
+@lombok.AllArgsConstructor()
 public class DbSink {
 
     private static final Map<Class<?>,SQLType> sqlTypeMap = new HashMap<>();
@@ -80,24 +77,27 @@ public class DbSink {
         sqlTypeMap.put(java.sql.Timestamp.class, SQLType.DATETIME);
     }
 
+
+    @lombok.NonNull
+    private Connection connection;
+
     /**
      * Constructor
+     * @param dataSource    the data source to get connection
      */
-    public DbSink() {
-        super();
+    public DbSink(DataSource dataSource) {
+        this.connection = Try.call(dataSource::getConnection);
     }
-
 
 
     public <R,C> void write(DataFrame<R,C> frame, Consumer<DbSinkOptions<R,C>> configurator) {
         Objects.requireNonNull(frame, "DataFrame cannot be null");
         Objects.requireNonNull(configurator, "The options consumer cannot be null");
-        final DbSinkOptions<R,C> options = Initialiser.apply(new DbSinkOptions<>(), configurator);
-        Connection conn = options.getConnection();
+        var options = Initialiser.apply(new DbSinkOptions<>(), configurator);
         try {
-            if (!options.getPlatform().isPresent()) {
-                final String driverName = conn.getMetaData().getDriverName();
-                final SQLPlatform platform = SQLPlatform.getPlatform(driverName);
+            if (options.getPlatform() == null) {
+                var driverName = connection.getMetaData().getDriverName();
+                var platform = SQLPlatform.getPlatform(driverName);
                 options.setPlatform(platform);
             }
             this.createTable(frame, options);
@@ -105,7 +105,7 @@ public class DbSink {
         } catch (Exception ex) {
             throw new DataFrameException("Failed to write DataFrame to database table " + options.getTableName(), ex);
         } finally {
-            IO.close(conn);
+            IO.close(connection);
         }
     }
 
@@ -117,17 +117,16 @@ public class DbSink {
      * @throws DataFrameException   if this operation fails
      */
     private <R,C> void createTable(DataFrame<R,C> frame, DbSinkOptions<R,C> options) {
-        final Connection conn = options.getConnection();
-        final String tableName = options.getTableName();
-        try (Statement stmt = conn.createStatement()) {
-            final DatabaseMetaData metaData = conn.getMetaData();
-            final ResultSet tables = metaData.getTables(null, null, tableName, null);
+        var tableName = options.getTableName();
+        try (Statement stmt = connection.createStatement()) {
+            var metaData = connection.getMetaData();
+            var tables = metaData.getTables(null, null, tableName, null);
             if (tables.next()) {
                 System.out.println("The table named " + tableName + " already exists");
             } else {
-                final String ddl = getCreateTableSql(frame, options);
+                var ddl = getCreateTableSql(frame, options);
                 System.out.println("Executing DDL:\n " + ddl);
-                stmt.executeUpdate(ddl);
+                stmt.execute(ddl);
             }
         } catch (Exception ex) {
             throw new DataFrameException("Failed to create table named " + tableName + " in database", ex);
@@ -142,15 +141,15 @@ public class DbSink {
      * @throws DataFrameException   if this operation fails
      */
     private <R,C> void insertData(DataFrame<R,C> frame, DbSinkOptions<R,C> options) {
-        final List<ColumnAdapter> columnList = getColumnAdapters(frame, options);
-        final String insertSql = getInsertSql(columnList, options);
+        var columnList = getColumnAdapters(frame, options);
+        var insertSql = getInsertSql(columnList, options);
         System.out.println("Insert SQL: " + insertSql);
-        try (PreparedStatement stmt = options.getConnection().prepareStatement(insertSql)) {
+        try (PreparedStatement stmt = connection.prepareStatement(insertSql)) {
             int rowCount = 0;
-            for (DataFrameRow<R,C> row : frame.rows()) {
+            for (var row : frame.rows()) {
                 for (int i=0; i<columnList.size(); ++i) {
-                    final ColumnAdapter adapter = columnList.get(i);
-                    final int stmtIndex = i+1;
+                    var adapter = columnList.get(i);
+                    var stmtIndex = i+1;
                     adapter.apply(stmt, stmtIndex, row);
                 }
                 stmt.addBatch();
@@ -177,12 +176,12 @@ public class DbSink {
      * @param options       the DB sink options
      * @return              the sql insert statement
      */
-    private <R,C> String getInsertSql(List<ColumnAdapter> columnList, DbSinkOptions<R,C> options) {
-        final String tableName = options.getTableName();
-        final List<String> colNames = columnList.stream().map(c -> c.colName).collect(Collectors.toList());
-        final List<String> params = IntStream.range(0, colNames.size()).mapToObj(i -> "?").collect(Collectors.toList());
-        final String paramsString = String.join(",", params);
-        final String columnsString = String.join(",", colNames);
+    private <R,C> String getInsertSql(List<ColumnAdapter<R,C>> columnList, DbSinkOptions<R,C> options) {
+        var tableName = options.getTableName();
+        var colNames = columnList.stream().map(c -> c.colName).collect(Collectors.toList());
+        var params = IntStream.range(0, colNames.size()).mapToObj(i -> "?").collect(Collectors.toList());
+        var paramsString = String.join(",", params);
+        var columnsString = String.join(",", colNames);
         return String.format("INSERT INTO %s (%s) VALUES (%s)", tableName, columnsString, paramsString);
     }
 
@@ -193,29 +192,31 @@ public class DbSink {
      * @return          the apply of column type info
      */
     @SuppressWarnings("unchecked")
-    private <R,C> List<ColumnAdapter> getColumnAdapters(DataFrame<R,C> frame, DbSinkOptions<R,C> options) {
-        final Connection conn = options.getConnection();
-        final String tableName = options.getTableName();
-        final SQLPlatform platform = options.getPlatform().orElseThrow(() -> new IllegalStateException("No SQL platform specified in options"));
-        final Map<C,String> columnMap1 = frame.cols().keys().collect(Collectors.toMap(c -> c, c -> options.getColumnNames().apply(c)));
-        final Map<String,C> columnMap2 = Collect.reverse(columnMap1);
-        try (Statement stmt = conn.createStatement()) {
-            final String sql = String.format("select * from %s where 1=2", tableName);
-            final List<ColumnAdapter> columnList = new ArrayList<>();
-            final ResultSetMetaData metaData = stmt.executeQuery(sql).getMetaData();
-            final SQLType.TypeResolver typeResolver = SQLType.getTypeResolver(platform);
+    private <R,C> List<ColumnAdapter<R,C>> getColumnAdapters(DataFrame<R,C> frame, DbSinkOptions<R,C> options) {
+        var tableName = options.getTableName();
+        var platform = options.getPlatform();
+        var columnMap1 = frame.cols().keys().collect(Collectors.toMap(c -> c, c -> options.getColumnNames().apply(c).toLowerCase()));
+        var columnMap2 = Collect.reverse(columnMap1);
+        try (Statement stmt = connection.createStatement()) {
+            var sql = String.format("SELECT * FROM %s WHERE 1=2", tableName);
+            var columnList = new ArrayList<ColumnAdapter<R,C>>();
+            var metaData = stmt.executeQuery(sql).getMetaData();
+            var typeResolver = SQLType.getTypeResolver(platform);
             for (int i=0; i<metaData.getColumnCount(); ++i) {
-                final String sqlColName = metaData.getColumnName(i+1);
-                final int sqlTypeCode = metaData.getColumnType(i+1);
-                final String sqlTypeName = metaData.getColumnTypeName(i+1);
-                final SQLType sqlType = typeResolver.getType(sqlTypeCode, sqlTypeName);
-                if (options.getRowKeyColumn().map(name -> name.equals(sqlColName)).orElse(false)) {
+                var sqlColName = metaData.getColumnName(i+1).toLowerCase();
+                var sqlTypeCode = metaData.getColumnType(i+1);
+                var sqlTypeName = metaData.getColumnTypeName(i+1);
+                var sqlType = typeResolver.getType(sqlTypeCode, sqlTypeName);
+                if (Optional.ofNullable(options.getRowKeyColumn()).map(name -> name.equalsIgnoreCase(sqlColName)).orElse(false)) {
                     columnList.add(new RowKeyAdapter(sqlColName, sqlType, options));
-                } else if (options.getAutoIncrementColumnName().map(name -> !name.equalsIgnoreCase(sqlColName)).orElse(true)) {
-                    final C colKey = columnMap2.get(sqlColName);
-                    final Class<?> dataType = frame.cols().type(colKey);
-                    final DataFrameCursor<R,C> cursor = frame.cursor().atColKey(colKey);
-                    final Function1<DataFrameValue<R,C>,?> mapper = options.getColumnMappings().getMapper(dataType);
+                } else if (Optional.ofNullable(options.getAutoIncrementColumnName()).map(name -> !name.equalsIgnoreCase(sqlColName)).orElse(true)) {
+                    var colKey = columnMap2.get(sqlColName);
+                    if (colKey == null) {
+                        throw new DataFrameException("No match for sql column name: " + sqlColName);
+                    }
+                    var dataType = frame.cols().type(colKey);
+                    var cursor = frame.cursor().toCol(colKey);
+                    var mapper = options.getColumnMappings().getMapper(dataType);
                     columnList.add(new ValueAdapter(sqlColName, sqlType, cursor, mapper));
                 }
             }
@@ -232,18 +233,17 @@ public class DbSink {
      * @return          the create table statement
      */
     private <R,C> String getCreateTableSql(DataFrame<R,C> frame, DbSinkOptions<R,C> options) {
-        final SQLPlatform platform = options.getPlatform().orElseThrow(() -> new IllegalStateException("No SQL platform configured on options"));
-        final StringBuilder ddl = new StringBuilder();
+        var platform = options.getPlatform();
+        var ddl = new StringBuilder();
         ddl.append("CREATE TABLE ");
-        ddl.append("\"");
         ddl.append(options.getTableName());
-        ddl.append("\" (\n");
+        ddl.append(" (\n");
 
-        options.getAutoIncrementColumnName().ifPresent(colName -> {
+        var autoIncrement = Optional.ofNullable(options.getAutoIncrementColumnName());
+        autoIncrement.ifPresent(colName -> {
             ddl.append("    ");
-            ddl.append("\"");
             ddl.append(colName);
-            ddl.append("\" INTEGER");
+            ddl.append(" INTEGER");
             switch (platform) {
                 case SQLITE:    ddl.append(" PRIMARY KEY");  break;
                 case H2:        ddl.append(" AUTO_INCREMENT PRIMARY KEY");  break;
@@ -256,30 +256,29 @@ public class DbSink {
             ddl.append(frame.cols().count() > 0 ? ",\n" : "");
         });
 
-        options.getRowKeyColumn().ifPresent(colName -> {
-            final Class<?> dataType = frame.rows().keyType();
-            final Class<?> sqlType = options.getColumnMappings().getSqlType(dataType);
-            final String typeInfo = getSqlTypeString(sqlType);
+        var rowKeyColumn = Optional.ofNullable(options.getRowKeyColumn());
+        rowKeyColumn.ifPresent(colName -> {
+            var dataType = frame.rows().keyType();
+            var sqlType = options.getColumnMappings().getSqlType(dataType);
+            var typeInfo = getSqlTypeString(sqlType);
             ddl.append("    ");
-            ddl.append("\"");
             ddl.append(colName);
-            ddl.append("\" ").append(typeInfo);
+            ddl.append(" ").append(typeInfo);
             ddl.append(" NOT NULL");
-            ddl.append(options.getAutoIncrementColumnName().isPresent() ? " PRIMARY KEY" : "");
+            ddl.append(autoIncrement.isPresent() ? " PRIMARY KEY" : "");
             ddl.append(frame.cols().count() > 0 ? ",\n" : "");
         });
 
         frame.cols().forEach(column -> {
-            final C key = column.key();
-            final String colName = options.getColumnNames().apply(key);
-            final boolean hasNull = column.hasNulls();
-            final Class<?> dataType = frame.cols().type(key);
-            final Class<?> sqlType = options.getColumnMappings().getSqlType(dataType);
-            final String typeInfo = getSqlTypeString(sqlType);
+            var key = column.key();
+            var colName = options.getColumnNames().apply(key);
+            var hasNull = column.hasNulls();
+            var dataType = frame.cols().type(key);
+            var sqlType = options.getColumnMappings().getSqlType(dataType);
+            var typeInfo = getSqlTypeString(sqlType);
             ddl.append("    ");
-            ddl.append("\"");
             ddl.append(colName);
-            ddl.append("\" ").append(typeInfo);
+            ddl.append(" ").append(typeInfo);
             ddl.append(hasNull ? " NULL" : " NOT NULL");
             ddl.append(",\n");
         });
@@ -295,7 +294,7 @@ public class DbSink {
      * @return          the type string
      */
     private String getSqlTypeString(Class<?> sqlClass) {
-        final SQLType sqlType = sqlTypeMap.get(sqlClass);
+        var sqlType = sqlTypeMap.get(sqlClass);
         if (sqlType == null) {
             throw new IllegalArgumentException("The SQL class is not a supported JDBC type: " + sqlClass);
         } else {
@@ -370,8 +369,8 @@ public class DbSink {
          */
         RowKeyAdapter(String colName, SQLType colType, DbSinkOptions<R,C> options) {
             super(colName, colType);
-            this.rowKeyMapper = options.getRowKeyMapper().orElseThrow(() -> new IllegalStateException("No mapper specified for row key mapping: " + colName));
-            this.rowKeyClass = options.getRowKeySqlClass().orElseThrow(() -> new IllegalStateException("No SQL type specified for row key mapping: " + colName));
+            this.rowKeyMapper = options.getRowKeyMapper();
+            this.rowKeyClass = options.getRowKeySqlClass();
             this.rowKeyType = Optional.ofNullable(sqlTypeMap.get(rowKeyClass)).orElseThrow(() ->
                 new IllegalArgumentException("The specified type is not a supported JDBC type: " + rowKeyClass)
             );
@@ -428,7 +427,7 @@ public class DbSink {
         @Override()
         void apply(PreparedStatement stmt, int stmtIndex, DataFrameRow<R,C> row) {
             try {
-                this.cursor.atRow(row.ordinal());
+                this.cursor.toRowAt(row.ordinal());
                 if (cursor.isNull()) {
                     stmt.setNull(stmtIndex, colType.getTypeCode());
                 } else {
@@ -454,55 +453,5 @@ public class DbSink {
                 throw new DataFrameException("Failed to apply value to SQL statement at " + coordinates, ex);
             }
         }
-    }
-
-
-    public static void main(String[] args) throws Exception {
-        File file = new File("/Users/witdxav/Dropbox/d3x/barra/mappings/GEMLT_Asset_Identity.20180918");
-        DataFrame<Integer,String> frame = DataFrame.read().csv(options -> {
-            options.setFile(file);
-            options.setDelimiter('|');
-            options.setHeader(true);
-            options.setColumnType("StartDate", LocalDate.class);
-            options.setColumnType("EndDate", LocalDate.class);
-            options.getFormats().setDateFormat("StartDate", "yyyyMMdd");
-            options.getFormats().setDateFormat("EndDate", "yyyyMMdd");
-        });
-
-        frame.out().print();
-
-        writeInfo(frame);
-    }
-
-    private static void writeInfo(DataFrame<Integer,String> frame) throws Exception {
-        DbSink sink = new DbSink();
-        String url = "jdbc:mysql://localhost:3306/barra_db";
-        String user = "root";
-        String password = "JusWjxbCV9xi6fFy+j}wtv7FKzULeR";
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        Connection conn = DriverManager.getConnection(url, user, password);
-        sink.write(frame, options -> {
-            options.setAutoIncrementColumnName("row_id");
-            options.setPlatform(SQLPlatform.MYSQL);
-            options.setConnection(conn);
-            options.setBatchSize(10000);
-            options.setTableName("gemlt_asset_info");
-            options.setColumnNames(colName -> {
-                switch (colName) {
-                    case "Barrid":          return "barra_id";
-                    case "Name":            return "name";
-                    case "Instrument":      return "instrument";
-                    case "IssuerID":        return "issuer_id";
-                    case "ISOCountryCode":  return "iso_country_code";
-                    case "ISOCurrencyCode": return "iso_currency_code";
-                    case "RootID":          return "root_id";
-                    case "AssetIDType":     return "asset_id_type";
-                    case "AssetID":         return "asset_id";
-                    case "StartDate":       return "start_date";
-                    case "EndDate":         return "end_date";
-                    default:    throw new IllegalArgumentException("Unexpected column: " + colName);
-                }
-            });
-        });
     }
 }

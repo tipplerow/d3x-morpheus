@@ -132,7 +132,6 @@ public class Resource {
                 if (file.exists()) {
                     return Resource.of(file);
                 } else {
-                    System.out.println("Looking for classpath resource: " + resource);
                     final URL url = Resource.class.getResource(resource);
                     if (url == null) {
                         throw new RuntimeException("Unable to locate a resource for " + resource);

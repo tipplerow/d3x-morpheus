@@ -56,7 +56,7 @@ public interface Statistic1 extends Statistic {
         stat.reset();
         for (int i=0; i<length; ++i) {
             final int index = offset + i;
-            final double value = sample.getDouble(index);
+            final double value = sample.getDoubleAt(index);
             stat.add(value);
         }
         return stat.getValue();

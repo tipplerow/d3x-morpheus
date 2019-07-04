@@ -141,18 +141,37 @@ class MappedArrayOfBooleans extends ArrayBase<Boolean> {
     @Override()
     public final Array<Boolean> copy(int[] indexes) {
         try {
-            final File newFile = MappedArrayConstructor.randomFile(true);
-            final short defaultShort = defaultValue ? (short)1 : (short)0;
-            final MappedArrayOfBooleans copy = new MappedArrayOfBooleans(indexes.length, defaultValue, newFile);
+            var newFile = MappedArrayConstructor.randomFile(true);
+            var defaultShort = defaultValue ? (short)1 : (short)0;
+            var copy = new MappedArrayOfBooleans(indexes.length, defaultValue, newFile);
             for (int i=0; i<indexes.length; ++i) {
-                final short value = buffer.get(indexes[i]);
+                var value = buffer.get(indexes[i]);
                 if (value != defaultShort) {
                     copy.buffer.put(i, value);
                 }
             }
             return copy;
         } catch (Exception ex) {
-            throw new ArrayException("Failed top copy subset of Array", ex);
+            throw new ArrayException("Failed to copy subset of Array", ex);
+        }
+    }
+
+
+    @Override
+    public Array<Boolean> copy(Array<Integer> indexes) {
+        try {
+            var newFile = MappedArrayConstructor.randomFile(true);
+            var defaultShort = defaultValue ? (short)1 : (short)0;
+            var copy = new MappedArrayOfBooleans(indexes.length(), defaultValue, newFile);
+            for (int i=0; i<indexes.length(); ++i) {
+                var value = buffer.get(indexes.getInt(i));
+                if (value != defaultShort) {
+                    copy.buffer.put(i, value);
+                }
+            }
+            return copy;
+        } catch (Exception ex) {
+            throw new ArrayException("Failed to copy subset of Array", ex);
         }
     }
 

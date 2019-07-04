@@ -51,6 +51,23 @@ public interface JsonSource<R,C> {
 
 
     /**
+     * Returns a json source for the style specified
+     * @param style the json style
+     * @param <R>   the row key type
+     * @param <C>   the column key type
+     * @return      the newly created source
+     */
+    static <R,C> JsonSource<R,C> create(JsonStyle style) {
+        switch (style) {
+            case DEFAULT:   return new JsonSourceDefault<>();
+            case COLUMNS:   return new JsonSourceColumns<>();
+            case SPLIT:     return new JsonSourceSplit<>();
+            default:        throw new IllegalArgumentException("Unsupported style specified: " + style);
+        }
+    }
+
+
+    /**
      * Returns a DataFrame loaded from JSON in the resource specified
      * @param style the JSON style
      * @param file  the resource to load from
@@ -59,8 +76,8 @@ public interface JsonSource<R,C> {
      */
     default DataFrame<R,C> read(JsonStyle style, File file) throws DataFrameException {
         return read(options -> {
-            options.setFile(file);
-            options.setStyle(style);
+            options.resource(Resource.of(file));
+            options.style(style);
         });
     }
 
@@ -74,8 +91,8 @@ public interface JsonSource<R,C> {
      */
     default DataFrame<R,C> read(JsonStyle style, URL url) throws DataFrameException {
         return read(options -> {
-            options.setURL(url);
-            options.setStyle(style);
+            options.resource(Resource.of(url));
+            options.style(style);
         });
     }
 
@@ -89,8 +106,8 @@ public interface JsonSource<R,C> {
      */
     default DataFrame<R,C> read(JsonStyle style, InputStream is) throws DataFrameException {
         return read(options -> {
-            options.setInputStream(is);
-            options.setStyle(style);
+            options.resource(Resource.of(is));
+            options.style(style);
         });
     }
 
@@ -104,8 +121,8 @@ public interface JsonSource<R,C> {
      */
     default DataFrame<R,C> read(JsonStyle style, String resource) throws DataFrameException {
         return read(options -> {
-            options.setResource(Resource.of(resource));
-            options.setStyle(style);
+            options.resource(Resource.of(resource));
+            options.style(style);
         });
     }
 
@@ -116,10 +133,8 @@ public interface JsonSource<R,C> {
      * @return          the loaded DataFrame
      * @throws DataFrameException   if frame fails to load from json
      */
-    default DataFrame<R,C> read(Consumer<Options<R,C>> consumer) {
-        Options<R,C> options = new Options<>();
-        consumer.accept(options);
-        return read(options);
+    default DataFrame<R,C> read(Consumer<Options.OptionsBuilder<R,C>> consumer) {
+        return read(Options.create(consumer));
     }
 
 
@@ -139,16 +154,24 @@ public interface JsonSource<R,C> {
      * @param <C>   the column key type
      */
     @lombok.Data()
+    @lombok.Builder()
+    @lombok.ToString()
+    @lombok.NoArgsConstructor()
+    @lombok.AllArgsConstructor()
     class Options<R,C> {
 
         /** The Json style for resource */
-        private JsonStyle style;
+        @lombok.NonNull @lombok.Builder.Default
+        private JsonStyle style = JsonStyle.DEFAULT;
         /** The resource to load frame from */
+        @lombok.NonNull
         private Resource resource;
         /** The formats used to parse JSON values */
-        private Formats formats;
+        @lombok.NonNull @lombok.Builder.Default
+        private Formats formats = new Formats();
         /** The character encoding for content */
-        private Charset charset;
+        @lombok.NonNull @lombok.Builder.Default
+        private Charset charset = StandardCharsets.UTF_8;
         /** The row key parser */
         private Parser<R> rowKeyParser;
         /** The col key parser */
@@ -158,37 +181,18 @@ public interface JsonSource<R,C> {
         /** The optional column predicate to filter columns */
         private Predicate<C> colPredicate;
 
-        /**
-         * Constructor
-         */
-        public Options() {
-            this.formats = new Formats();
-            this.charset = StandardCharsets.UTF_8;
-        }
 
         /**
-         * Sets the input file for these options
-         * @param file  the input file
+         * Returns new options initialized by consumer
+         * @param consumer  the consumer reference
+         * @return          the new options
          */
-        public void setFile(File file) {
-            this.resource = Resource.of(file);
+        public static <R,C> Options<R,C> create(Consumer<Options.OptionsBuilder<R,C>> consumer) {
+            var builder = Options.<R,C>builder();
+            consumer.accept(builder);
+            return builder.build();
         }
 
-        /**
-         * Sets the input URL for these options
-         * @param url   the input url
-         */
-        public void setURL(URL url) {
-            this.resource = Resource.of(url);
-        }
-
-        /**
-         * Applies to resource to load CSV content from
-         * @param inputStream   the input stream to load from
-         */
-        public void setInputStream(InputStream inputStream) {
-            this.resource = Resource.of(inputStream);
-        }
     }
 
 
@@ -200,12 +204,7 @@ public interface JsonSource<R,C> {
     class Standard<R,C> implements JsonSource<R,C> {
         @Override
         public DataFrame<R, C> read(Options<R,C> options) throws DataFrameException {
-            switch (options.getStyle()) {
-                case DEFAULT:   return new JsonSourceDefault<R,C>().read(options);
-                case COLUMNS:   return new JsonSourceDefault<R,C>().read(options);
-                case SPLIT:     return new JsonSourceDefault<R,C>().read(options);
-                default:        throw new IllegalArgumentException("Unsupported style specified: " + options.getStyle());
-            }
+            return JsonSource.<R,C>create(options.getStyle()).read(options);
         }
     }
 

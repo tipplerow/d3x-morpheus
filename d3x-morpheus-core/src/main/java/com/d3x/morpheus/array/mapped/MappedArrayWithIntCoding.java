@@ -155,11 +155,29 @@ class MappedArrayWithIntCoding<T> extends ArrayBase<T> implements WithIntCoding<
     @Override()
     public final Array<T> copy(int[] indexes) {
         try {
-            final File newFile = MappedArrayConstructor.randomFile(true);
-            final MappedArrayWithIntCoding<T> copy = new MappedArrayWithIntCoding<>(indexes.length, defaultValue, coding, newFile);
+            var newFile = MappedArrayConstructor.randomFile(true);
+            var copy = new MappedArrayWithIntCoding<T>(indexes.length, defaultValue, coding, newFile);
             for (int i=0; i<indexes.length; ++i) {
-                final int value = buffer.get(indexes[i]);
-                if (Integer.compare(value, defaultCode) != 0) {
+                var value = buffer.get(indexes[i]);
+                if (value != defaultCode) {
+                    copy.buffer.put(i, value);
+                }
+            }
+            return copy;
+        } catch (Exception ex) {
+            throw new ArrayException("Failed top copy subset of Array", ex);
+        }
+    }
+
+
+    @Override
+    public Array<T> copy(Array<Integer> indexes) {
+        try {
+            var newFile = MappedArrayConstructor.randomFile(true);
+            var copy = new MappedArrayWithIntCoding<T>(indexes.length(), defaultValue, coding, newFile);
+            for (int i=0; i<indexes.length(); ++i) {
+                var value = buffer.get(indexes.getInt(i));
+                if (value != defaultCode) {
                     copy.buffer.put(i, value);
                 }
             }

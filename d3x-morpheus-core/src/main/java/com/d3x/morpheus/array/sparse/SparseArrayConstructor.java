@@ -66,30 +66,36 @@ public class SparseArrayConstructor implements ArrayFactory.Constructor {
 
 
     @Override
-    @SuppressWarnings("unchecked")
     public <T> Array<T> apply(Class<T> type, int length, T defaultValue, String path) {
+        return apply(type, length, 0.2d, defaultValue);
+    }
+
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T> Array<T> apply(Class<T> type, int length, double fillPct, T defaultValue) {
         if (type.isEnum()) {
             final IntCoding<T> enumCoding = (IntCoding<T>)IntCoding.ofEnum((Class<Enum>)type);
-            return new SparseArrayWithIntCoding<>(length, defaultValue, enumCoding);
+            return new SparseArrayWithIntCoding<>(length, fillPct, defaultValue, enumCoding);
         } else {
             switch (ArrayType.of(type)) {
                 case BOOLEAN:           return ArrayFactory.dense().apply(type, length, defaultValue, null);
-                case INTEGER:           return (Array<T>)new SparseArrayOfInts(length, (Integer)defaultValue);
-                case LONG:              return (Array<T>)new SparseArrayOfLongs(length, (Long)defaultValue);
-                case DOUBLE:            return (Array<T>)new SparseArrayOfDoubles(length, (Double)defaultValue);
-                case OBJECT:            return (Array<T>)new SparseArrayOfObjects(type, length, defaultValue);
-                case STRING:            return (Array<T>)new SparseArrayOfObjects(type, length, defaultValue);
-                case LOCAL_DATE:        return (Array<T>)new SparseArrayWithLongCoding<>(length, (LocalDate)defaultValue, localDateCoding);
-                case LOCAL_TIME:        return (Array<T>)new SparseArrayWithLongCoding<>(length, (LocalTime)defaultValue, localTimeCoding);
-                case LOCAL_DATETIME:    return (Array<T>)new SparseArrayWithLongCoding<>(length, (LocalDateTime)defaultValue, localDateTimeCoding);
-                case YEAR:              return (Array<T>)new SparseArrayWithIntCoding<>(length, (Year)defaultValue, yearCoding);
-                case ZONE_ID:           return (Array<T>)new SparseArrayWithIntCoding<>(length, (ZoneId)defaultValue, zoneIdCoding);
-                case TIME_ZONE:         return (Array<T>)new SparseArrayWithIntCoding<>(length, (TimeZone)defaultValue, timeZoneCoding);
-                case DATE:              return (Array<T>)new SparseArrayWithLongCoding<>(length, (Date)defaultValue, dateCoding);
-                case INSTANT:           return (Array<T>)new SparseArrayWithLongCoding<>(length, (Instant)defaultValue, instantCoding);
-                case CURRENCY:          return (Array<T>)new SparseArrayWithIntCoding<>(length, (Currency)defaultValue, currencyCoding);
-                case ZONED_DATETIME:    return (Array<T>)new SparseArrayOfZonedDateTimes(length, (ZonedDateTime) defaultValue);
-                default:                return (Array<T>)new SparseArrayOfObjects(type, length, defaultValue);
+                case INTEGER:           return (Array<T>)new SparseArrayOfInts(length, fillPct, (Integer)defaultValue);
+                case LONG:              return (Array<T>)new SparseArrayOfLongs(length, fillPct, (Long)defaultValue);
+                case DOUBLE:            return (Array<T>)new SparseArrayOfDoubles(length, fillPct, (Double)defaultValue);
+                case OBJECT:            return (Array<T>)new SparseArrayOfObjects(type, length, fillPct, defaultValue);
+                case STRING:            return (Array<T>)new SparseArrayOfObjects(type, length, fillPct, defaultValue);
+                case LOCAL_DATE:        return (Array<T>)new SparseArrayWithLongCoding<>(length, fillPct, (LocalDate)defaultValue, localDateCoding);
+                case LOCAL_TIME:        return (Array<T>)new SparseArrayWithLongCoding<>(length, fillPct, (LocalTime)defaultValue, localTimeCoding);
+                case LOCAL_DATETIME:    return (Array<T>)new SparseArrayWithLongCoding<>(length, fillPct, (LocalDateTime)defaultValue, localDateTimeCoding);
+                case YEAR:              return (Array<T>)new SparseArrayWithIntCoding<>(length, fillPct, (Year)defaultValue, yearCoding);
+                case ZONE_ID:           return (Array<T>)new SparseArrayWithIntCoding<>(length, fillPct, (ZoneId)defaultValue, zoneIdCoding);
+                case TIME_ZONE:         return (Array<T>)new SparseArrayWithIntCoding<>(length, fillPct, (TimeZone)defaultValue, timeZoneCoding);
+                case DATE:              return (Array<T>)new SparseArrayWithLongCoding<>(length, fillPct, (Date)defaultValue, dateCoding);
+                case INSTANT:           return (Array<T>)new SparseArrayWithLongCoding<>(length, fillPct, (Instant)defaultValue, instantCoding);
+                case CURRENCY:          return (Array<T>)new SparseArrayWithIntCoding<>(length, fillPct, (Currency)defaultValue, currencyCoding);
+                case ZONED_DATETIME:    return (Array<T>)new SparseArrayOfZonedDateTimes(length, fillPct, (ZonedDateTime) defaultValue);
+                default:                return (Array<T>)new SparseArrayOfObjects(type, length, fillPct, defaultValue);
             }
         }
     }

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2014-2017 Xavier Witdouck
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,16 +15,12 @@
  */
 package com.d3x.morpheus.reference;
 
-import java.io.IOException;
-
+import com.d3x.morpheus.frame.DataFrame;
+import com.d3x.morpheus.frame.DataFrameAsserts;
+import com.d3x.morpheus.util.text.parser.Parser;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-
-import com.d3x.morpheus.frame.DataFrame;
-import com.d3x.morpheus.frame.DataFrameAsserts;
-import com.d3x.morpheus.frame.DataFrameColumns;
-import com.d3x.morpheus.frame.DataFrameRows;
 
 /**
  * Unit tests of covariance estimator in both the row and column dimensions of a DataFrame
@@ -40,70 +36,67 @@ public class CovarianceTests {
         return new Object[][] { {false}, {true} };
     }
 
-    private DataFrame<Integer,String> loadSourceData() throws IOException {
-        return DataFrame.read().csv("/stats-cov/source-data.csv");
+    private DataFrame<Integer,String> loadSourceData() {
+        return DataFrame.read().csv("/stats-cov/source-data.csv").read();
     }
 
-    private DataFrame<Integer,Integer> loadExpectedRowCov() throws IOException {
-        return DataFrame.read().<Integer>csv(options -> {
-            options.setResource("/stats-cov/row-cov.csv");
+    private DataFrame<Integer,Integer> loadExpectedRowCov() {
+        return DataFrame.read().<Integer>csv("/stats-cov/row-cov.csv").read(options -> {
             options.setMaxColumns(2000);
-            options.setExcludeColumns("Index");
-            options.setRowKeyParser(Integer.class, values -> Integer.parseInt(values[0]));
+            options.setRowKeyColumnName("Index");
+            options.setParser("Index", Parser.ofInteger());
         }).cols().mapKeys(k -> Integer.parseInt(k.key()));
     }
 
-    private DataFrame<String,String> loadExpectedColumnCov() throws IOException {
-        return DataFrame.read().csv(options -> {
-            options.setResource("/stats-cov/col-cov.csv");
-            options.setExcludeColumns("Index");
+    private DataFrame<String,String> loadExpectedColumnCov() {
+        return DataFrame.read().<String>csv("/stats-cov/col-cov.csv").read(options -> {
+            options.setRowKeyColumnName("Index");
             options.setMaxColumns(2000);
-            options.setRowKeyParser(String.class, values -> values[0]);
         });
     }
 
 
     @Test(dataProvider="style")
-    public void covarianceOfRows(boolean parallel) throws IOException {
-        final DataFrame<Integer,String> source = loadSourceData();
-        final DataFrameRows<Integer,String> rows = parallel ? source.rows().parallel() : source.rows().sequential();
-        final DataFrame<Integer,Integer> covActual = rows.stats().covariance();
-        final DataFrame<Integer,Integer> covExpected = loadExpectedRowCov();
+    public void covarianceOfRows(boolean parallel) {
+        var source = loadSourceData();
+        var rows = parallel ? source.rows().parallel() : source.rows().sequential();
+        var covActual = rows.stats().covariance();
+        var covExpected = loadExpectedRowCov();
         DataFrameAsserts.assertEqualsByIndex(covExpected, covActual);
         covExpected.cols().keys().forEach(key1 -> covExpected.cols().keys().forEach(key2 -> {
-            final double expected = covExpected.getDouble(key1, key2);
-            final double actual = source.rows().stats().covariance(key1, key2);
+            var expected = covExpected.getDouble(key1, key2);
+            var actual = source.rows().stats().covariance(key1, key2);
             Assert.assertEquals(actual, expected, 0.0000001, "Covariance match for " + key1 + ", " + key2);
         }));
     }
 
 
     @Test(dataProvider="style")
-    public void covarianceOfColumns(boolean parallel) throws IOException {
-        final DataFrame<Integer,String> source = loadSourceData();
-        final DataFrameColumns<Integer,String> columns = parallel ? source.cols().parallel() : source.cols().sequential();
-        final DataFrame<String,String> covActual = columns.stats().covariance();
-        final DataFrame<String,String> covExpected = loadExpectedColumnCov();
+    public void covarianceOfColumns(boolean parallel) {
+        var source = loadSourceData();
+        var columns = parallel ? source.cols().parallel() : source.cols().sequential();
+        var covActual = columns.stats().covariance();
+        var covExpected = loadExpectedColumnCov();
         DataFrameAsserts.assertEqualsByIndex(covExpected, covActual);
         covExpected.cols().keys().forEach(key1 -> covExpected.cols().keys().forEach(key2 -> {
-            final double expected = covExpected.getDouble(key1, key2);
-            final double actual = source.cols().stats().covariance(key1, key2);
+            var expected = covExpected.getDouble(key1, key2);
+            var actual = source.cols().stats().covariance(key1, key2);
             Assert.assertEquals(actual, expected, 0.0000001, "Covariance match for " + key1 + ", " + key2);
         }));
     }
 
 
     @Test(dataProvider = "style")
-    public void testCovarianceWithNonNumericColumns(boolean parallel) throws IOException {
-        final DataFrame<Integer,String> source = loadSourceData();
-        final DataFrame<Integer,String> input = source.cols().add("NonNumeric", String.class, v -> "Value:" + v.rowOrdinal());
-        final DataFrameColumns<Integer,String> columns = parallel ? input.cols().parallel() : input.cols().sequential();
-        final DataFrame<String,String> covActual = columns.stats().covariance();
-        final DataFrame<String,String> covExpected = loadExpectedColumnCov();
+    public void testCovarianceWithNonNumericColumns(boolean parallel) {
+        var source = loadSourceData();
+        var input = source.cols().add("NonNumeric", String.class, v -> "Value:" + v.rowOrdinal());
+        var columns = parallel ? input.cols().parallel() : input.cols().sequential();
+        var covActual = columns.stats().covariance();
+        var covExpected = loadExpectedColumnCov();
         DataFrameAsserts.assertEqualsByIndex(covExpected, covActual);
         covExpected.cols().keys().forEach(key1 -> covExpected.cols().keys().forEach(key2 -> {
-            final double expected = covExpected.getDouble(key1, key2);
-            final double actual = source.cols().stats().covariance(key1, key2);
+            var expected = covExpected.getDouble(key1, key2);
+            var actual = source.cols().stats().covariance(key1, key2);
             Assert.assertEquals(actual, expected, 0.0000001, "Covariance match for " + key1 + ", " + key2);
         }));
     }

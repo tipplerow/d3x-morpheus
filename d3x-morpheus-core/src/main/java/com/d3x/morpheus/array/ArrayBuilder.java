@@ -21,7 +21,7 @@ import com.d3x.morpheus.util.Asserts;
 /**
  * A class designed to build an array incrementally, without necessarily knowing the type upfront, or the final length.
  *
- * @param <T>   the array element typeCode
+ * @param <T>   the array element dataType
  *
  * <p><strong>This is open source software released under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 License</a></strong></p>
  *
@@ -29,34 +29,34 @@ import com.d3x.morpheus.util.Asserts;
  */
 public class ArrayBuilder<T> {
 
-    private int length;
+    private int capacity;
     private int index = 0;
     private Class<T> type;
     private Array<T> array;
-    private ArrayType typeCode;
+    private ArrayType dataType;
     private boolean checkType;
 
     /**
      * Constructor
-     * @param initialLength the initial length for array to build
-     * @param type  the optional array element typeCode if known (null allowed)
+     * @param capacity      the initial capacity for this builder
+     * @param type          the optional array element dataType if known (null allowed)
      * @param defaultValue  the default value for the array (null allowed, even for primitive types)
      * @param loadFactor    the array load factor which must be > 0 and <= 1 (1 implies dense array, < 1 implies spare array)
      */
     @SuppressWarnings("unchecked")
-    private ArrayBuilder(int initialLength, Class<T> type, T defaultValue, float loadFactor) {
+    private ArrayBuilder(int capacity, Class<T> type, T defaultValue, float loadFactor) {
         Asserts.check(loadFactor > 0f, "The load factor mus be > 0 and <= 1");
         Asserts.check(loadFactor <= 1f, "The load factor mus be > 0 and <= 1");
-        this.length = initialLength > 0 ? initialLength : 10;
+        this.capacity = capacity > 0 ? capacity : 10;
         if (type != null) {
             this.type = type;
-            this.typeCode = ArrayType.of(type);
-            this.array = Array.of(type, length, defaultValue, loadFactor);
+            this.dataType = ArrayType.of(type);
+            this.array = Array.of(type, this.capacity, defaultValue, loadFactor);
             this.checkType = false;
         } else if (defaultValue != null) {
             this.type = (Class<T>)defaultValue.getClass();
-            this.typeCode = ArrayType.of(this.type);
-            this.array = Array.of(this.type, length, defaultValue, loadFactor);
+            this.dataType = ArrayType.of(this.type);
+            this.array = Array.of(this.type, this.capacity, defaultValue, loadFactor);
             this.checkType = false;
         }
     }
@@ -64,7 +64,7 @@ public class ArrayBuilder<T> {
     /**
      * Returns a newly created builder for a dense arrays with initial length
      * @param initialLength     the initial capacity for builder
-     * @param <T>               the array element typeCode
+     * @param <T>               the array element dataType
      * @return                  the newly created builder
      */
     public static <T> ArrayBuilder<T> of(int initialLength) {
@@ -74,8 +74,8 @@ public class ArrayBuilder<T> {
     /**
      * Returns a newly created builder for a dense arrays based on the arguments provided
      * @param initialLength     the initial capacity for builder
-     * @param type              the typeCode for array elements
-     * @param <T>               the array element typeCode
+     * @param type              the dataType for array elements
+     * @param <T>               the array element dataType
      * @return                  the newly created builder
      */
     public static <T> ArrayBuilder<T> of(int initialLength, Class<T> type) {
@@ -85,9 +85,9 @@ public class ArrayBuilder<T> {
     /**
      * Returns a newly created builder for a dense arrays based on the arguments provided
      * @param initialLength     the initial capacity for builder
-     * @param type              the typeCode for array elements
+     * @param type              the dataType for array elements
      * @param defaultValue      the default value for the array (null allowed, even for primitive types)
-     * @param <T>               the array element typeCode
+     * @param <T>               the array element dataType
      * @return                  the newly created builder
      */
     public static <T> ArrayBuilder<T> of(int initialLength, Class<T> type, T defaultValue) {
@@ -97,14 +97,23 @@ public class ArrayBuilder<T> {
     /**
      * Returns a newly created builder for a dense arrays based on the arguments provided
      * @param initialLength     the initial capacity for builder
-     * @param type              the typeCode for array elements
+     * @param type              the dataType for array elements
      * @param defaultValue      the default value for the array (null allowed, even for primitive types)
      * @param loadFactor        the array load factor which must be > 0 and <= 1 (1 implies dense array, < 1 implies spare array)
-     * @param <T>               the array element typeCode
+     * @param <T>               the array element dataType
      * @return                  the newly created builder
      */
     public static <T> ArrayBuilder<T> of(int initialLength, Class<T> type, T defaultValue, float loadFactor) {
         return new ArrayBuilder<>(initialLength, type, defaultValue, loadFactor);
+    }
+
+
+    /**
+     * Returns the data type for this builder
+     * @return      the data type for builder
+     */
+    public ArrayType getDataType() {
+        return dataType != null ? dataType : ArrayType.OBJECT;
     }
 
     /**
@@ -205,53 +214,53 @@ public class ArrayBuilder<T> {
     }
 
     /**
-     * Checks that the specified data typeCode is compatible with the current array we are building
-     * @param dataType  the element data typeCode being added
+     * Checks that the specified data dataType is compatible with the current array we are building
+     * @param type  the element data dataType being added
      */
     @SuppressWarnings("unchecked")
-    private void checkType(Class<T> dataType) {
+    private void checkType(Class<T> type) {
         if (array == null) {
-            this.type = dataType;
-            this.typeCode = ArrayType.of(dataType);
-            this.array = Array.of(dataType, length);
-            this.checkType = typeCode != ArrayType.OBJECT;
-            this.length = array.length();
-        } else if (checkType && !isMatch(dataType)) {
-            final Array<T> newArray = Array.ofObjects(array.length());
+            this.type = type;
+            this.dataType = ArrayType.of(type);
+            this.array = Array.of(type, capacity);
+            this.checkType = this.dataType != ArrayType.OBJECT;
+            this.capacity = array.length();
+        } else if (checkType && !isMatch(type)) {
+            var newArray = Array.<T>ofObjects(array.length());
             for (int i=0; i<array.length(); ++i) newArray.setValue(i, array.getValue(i));
             this.array = newArray;
             this.type = (Class<T>)Object.class;
-            this.typeCode = ArrayType.OBJECT;
-            this.length = array.length();
+            this.dataType = ArrayType.OBJECT;
+            this.capacity = array.length();
         }
     }
 
     /**
-     * Returns the current size for this builder
-     * @return      the current size for builder
+     * Returns the current length for this builder
+     * @return      the current length for builder
      */
-    public int size() {
+    public int length() {
         return index;
     }
 
     /**
-     * Returns true if the data typeCode is a match for the current array typeCode
-     * @param dataType  the data typeCode class
+     * Returns true if the data dataType is a match for the current array dataType
+     * @param type  the data dataType class
      * @return          true if match
      */
-    private boolean isMatch(Class<T> dataType) {
-        return dataType == type || type.isAssignableFrom(dataType);
+    private boolean isMatch(Class<T> type) {
+        return type == this.type || this.type.isAssignableFrom(type);
     }
 
     /**
      * Checks to see if the current length supports adding another value, expanding if necessary
      */
     private void checkLength() {
-        if (index >= length) {
-            int newLength = length + (length >> 1);
+        if (index >= capacity) {
+            int newLength = capacity + (capacity >> 1);
             if (newLength < index + 1) newLength = index + 1;
             this.array.expand(newLength);
-            this.length = array.length();
+            this.capacity = array.length();
         }
     }
 

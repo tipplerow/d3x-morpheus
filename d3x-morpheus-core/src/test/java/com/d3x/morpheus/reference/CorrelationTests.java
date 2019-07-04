@@ -19,8 +19,7 @@ import java.io.IOException;
 
 import com.d3x.morpheus.frame.DataFrame;
 import com.d3x.morpheus.frame.DataFrameAsserts;
-import com.d3x.morpheus.frame.DataFrameColumns;
-import com.d3x.morpheus.frame.DataFrameRows;
+import com.d3x.morpheus.util.text.parser.Parser;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -40,38 +39,39 @@ public class CorrelationTests {
     }
 
     private DataFrame<Integer,String> loadSourceData() throws IOException {
-        return DataFrame.read().csv("/stats-correl/source-data.csv");
+        return DataFrame.read().csv("/stats-correl/source-data.csv").read();
     }
 
     private DataFrame<Integer,Integer> loadExpectedRowCorr() throws IOException {
-        return DataFrame.read().<Integer>csv(options -> {
-            options.setResource("/stats-correl/row-correl.csv");
-            options.setExcludeColumns("Index");
+        return DataFrame.read().<Integer>csv("/stats-correl/row-correl.csv").read(options -> {
+            options.setRowKeyColumnName("Index");
             options.setMaxColumns(2000);
-            options.setRowKeyParser(Integer.class, values -> Integer.parseInt(values[0]));
+            options.setParser("Index", Parser.ofInteger());
         }).cols().mapKeys(col -> Integer.parseInt(col.key()));
     }
 
     private DataFrame<String,String> loadExpectedColumnCorr() throws IOException {
-        return DataFrame.read().csv(options -> {
-            options.setResource("/stats-correl/col-correl.csv");
-            options.setExcludeColumns("Index");
+        return DataFrame.read().<String>csv("/stats-correl/col-correl.csv").read(options -> {
+            options.setRowKeyColumnName("Index");
             options.setMaxColumns(2000);
-            options.setRowKeyParser(String.class, values -> values[0]);
         });
     }
 
 
     @Test(dataProvider="style")
     public void correlationOfRows(boolean parallel) throws IOException {
-        final DataFrame<Integer,String> source = loadSourceData();
-        final DataFrameRows<Integer,String> rows = parallel ? source.rows().parallel() : source.rows().sequential();
-        final DataFrame<Integer,Integer> corrActual = rows.stats().correlation();
-        final DataFrame<Integer,Integer> corrExpected = loadExpectedRowCorr();
+        var source = loadSourceData();
+        var rows = parallel ? source.rows().parallel() : source.rows().sequential();
+        var corrActual = rows.stats().correlation();
+        var corrExpected = loadExpectedRowCorr();
+
+        corrActual.out().print();
+        corrExpected.out().print();
+
         DataFrameAsserts.assertEqualsByIndex(corrExpected, corrActual);
         corrExpected.cols().keys().forEach(key1 -> corrExpected.cols().keys().forEach(key2 -> {
-            final double expected = corrExpected.getDouble(key1, key2);
-            final double actual = source.rows().stats().correlation(key1, key2);
+            var expected = corrExpected.getDouble(key1, key2);
+            var actual = source.rows().stats().correlation(key1, key2);
             Assert.assertEquals(actual, expected, 0.0000001, "Correlation match for " + key1 + ", " + key2);
         }));
     }
@@ -79,14 +79,14 @@ public class CorrelationTests {
 
     @Test(dataProvider="style")
     public void correlationOfColumns(boolean parallel) throws IOException {
-        final DataFrame<Integer,String> source = loadSourceData();
-        final DataFrameColumns<Integer,String> columns = parallel ? source.cols().parallel() : source.cols().sequential();
-        final DataFrame<String,String> corrActual = columns.stats().correlation();
-        final DataFrame<String,String> corrExpected = loadExpectedColumnCorr();
+        var source = loadSourceData();
+        var columns = parallel ? source.cols().parallel() : source.cols().sequential();
+        var corrActual = columns.stats().correlation();
+        var corrExpected = loadExpectedColumnCorr();
         DataFrameAsserts.assertEqualsByIndex(corrExpected, corrActual);
         corrExpected.cols().keys().forEach(key1 -> corrExpected.cols().keys().forEach(key2 -> {
-            final double expected = corrExpected.getDouble(key1, key2);
-            final double actual = source.cols().stats().correlation(key1, key2);
+            var expected = corrExpected.getDouble(key1, key2);
+            var actual = source.cols().stats().correlation(key1, key2);
             Assert.assertEquals(actual, expected, 0.0000001, "Correlation match for " + key1 + ", " + key2);
         }));
     }
@@ -94,15 +94,15 @@ public class CorrelationTests {
 
     @Test(dataProvider = "style")
     public void testCorrelationWithNonNumericColumns(boolean parallel) throws IOException {
-        final DataFrame<Integer,String> source = loadSourceData();
-        final DataFrame<Integer,String> input = source.cols().add("NonNumeric", String.class, v -> "Value:" + v.rowOrdinal());
-        final DataFrameColumns<Integer,String> columns = parallel ? input.cols().parallel() : input.cols().sequential();
-        final DataFrame<String,String> corrActual = columns.stats().correlation();
-        final DataFrame<String,String> corrExpected = loadExpectedColumnCorr();
+        var source = loadSourceData();
+        var input = source.cols().add("NonNumeric", String.class, v -> "Value:" + v.rowOrdinal());
+        var columns = parallel ? input.cols().parallel() : input.cols().sequential();
+        var corrActual = columns.stats().correlation();
+        var corrExpected = loadExpectedColumnCorr();
         DataFrameAsserts.assertEqualsByIndex(corrExpected, corrActual);
         corrExpected.cols().keys().forEach(key1 -> corrExpected.cols().keys().forEach(key2 -> {
-            final double expected = corrExpected.getDouble(key1, key2);
-            final double actual = source.cols().stats().correlation(key1, key2);
+            var expected = corrExpected.getDouble(key1, key2);
+            var actual = source.cols().stats().correlation(key1, key2);
             Assert.assertEquals(actual, expected, 0.0000001, "Correlation match for " + key1 + ", " + key2);
         }));
     }

@@ -176,13 +176,33 @@ class MappedArrayOfZonedDateTimes extends ArrayBase<ZonedDateTime> {
     @Override()
     public final Array<ZonedDateTime> copy(int[] indexes) {
         try {
-            final File newFile = MappedArrayConstructor.randomFile(true);
-            final MappedArrayOfZonedDateTimes copy = new MappedArrayOfZonedDateTimes(indexes.length, defaultValue, newFile);
+            var newFile = MappedArrayConstructor.randomFile(true);
+            var copy = new MappedArrayOfZonedDateTimes(indexes.length, defaultValue, newFile);
             for (int i=0; i<indexes.length; ++i) {
-                final int toIndex = i * BYTE_COUNT;
-                final int fromIndex = indexes[i] * BYTE_COUNT;
-                final long epochMillis = byteBuffer.getLong(fromIndex);
-                final short zoneId = byteBuffer.getShort(fromIndex + 8);
+                var toIndex = i * BYTE_COUNT;
+                var fromIndex = indexes[i] * BYTE_COUNT;
+                var epochMillis = byteBuffer.getLong(fromIndex);
+                var zoneId = byteBuffer.getShort(fromIndex + 8);
+                copy.byteBuffer.putLong(toIndex, epochMillis);
+                copy.byteBuffer.putShort(toIndex + 8, zoneId);
+            }
+            return copy;
+        } catch (Exception ex) {
+            throw new ArrayException("Failed to copy Array: " + this, ex);
+        }
+    }
+
+
+    @Override
+    public Array<ZonedDateTime> copy(Array<Integer> indexes) {
+        try {
+            var newFile = MappedArrayConstructor.randomFile(true);
+            var copy = new MappedArrayOfZonedDateTimes(indexes.length(), defaultValue, newFile);
+            for (int i=0; i<indexes.length(); ++i) {
+                var toIndex = i * BYTE_COUNT;
+                var fromIndex = indexes.getInt(i) * BYTE_COUNT;
+                var epochMillis = byteBuffer.getLong(fromIndex);
+                var zoneId = byteBuffer.getShort(fromIndex + 8);
                 copy.byteBuffer.putLong(toIndex, epochMillis);
                 copy.byteBuffer.putShort(toIndex + 8, zoneId);
             }

@@ -19,14 +19,6 @@ import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.testng.Assert;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
-
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
-
-import com.d3x.morpheus.TestSuite;
 import com.d3x.morpheus.frame.DataFrame;
 import com.d3x.morpheus.frame.DataFrameColumn;
 import com.d3x.morpheus.frame.DataFrameColumns;
@@ -34,7 +26,12 @@ import com.d3x.morpheus.frame.DataFrameRow;
 import com.d3x.morpheus.frame.DataFrameRows;
 import com.d3x.morpheus.frame.DataFrameValue;
 import com.d3x.morpheus.range.Range;
-import com.d3x.morpheus.util.Tuple;
+import org.testng.Assert;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
+
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 /**
  * Unit tests for the DataFrame min() / max() functions.
@@ -296,38 +293,6 @@ public class MinMaxTests {
         System.out.println("Min diff for " + column.key() + " for row " + column.ordinal());
         assertEquals(actualMin, expectedMin.getAsDouble(), 0.0001);
     }
-
-
-    @Test()
-    public void testPopulation() {
-
-        //Load ONS population dataset
-        final DataFrame<Tuple,String> frame = TestSuite.getPopulationDataset();
-
-        //Find row with largest difference between the male/female percentages per year & borough
-        final Optional<DataFrameRow<Tuple,String>> rowMatch = frame.rows().max((row1, row2) -> {
-            final double row1Total = row1.getDouble("All Persons");
-            final double row2Total = row2.getDouble("All Persons");
-            final double row1Diff = row1.getDouble("All Males") - row1.getDouble("All Females");
-            final double row2Diff = row2.getDouble("All Males") - row2.getDouble("All Females");
-            return Double.compare(Math.abs(row1Diff / row1Total), Math.abs(row2Diff / row2Total));
-        });
-
-        //Check the data matches expected results
-        assertTrue(rowMatch.isPresent());
-        rowMatch.ifPresent(maxRow -> {
-            final double total = maxRow.getDouble("All Persons");
-            final double percentMales = (maxRow.getDouble("All Males") / total) * 100;
-            final double percentFemales = (maxRow.getDouble("All Females") / total) * 100d;
-            assertEquals(maxRow.key().<Integer>item(0).intValue(), 2011);
-            assertEquals(maxRow.key().<String>item(1), "City of London");
-            System.out.println("Max Male/Female difference is for " + maxRow.key());
-            System.out.println("Male Percent: " + percentMales + "%");
-            System.out.println("Female Percent: " + percentFemales + "%");
-        });
-    }
-
-
 
 
 }

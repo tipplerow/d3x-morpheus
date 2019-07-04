@@ -198,10 +198,10 @@ public class XDataFrameFactory extends DataFrameFactory {
                     final R key = rowKeyFunction.apply(resultSet);
                     frame.rows().add(key);
                     final int rowOrdinal = frame.rowCount()-1;
-                    cursor.atRow(rowOrdinal);
+                    cursor.toRowAt(rowOrdinal);
                     for (int i=1; i<=columnCount; ++i) {
                         final int colOrdinal = i-1;
-                        cursor.atCol(colOrdinal);
+                        cursor.toColAt(colOrdinal);
                         switch (metaData.getColumnType(i)) {
                             case Types.BIT:         cursor.setBoolean(resultSet.getBoolean(i));  break;
                             case Types.NVARCHAR:    cursor.setValue(resultSet.getString(i));     break;

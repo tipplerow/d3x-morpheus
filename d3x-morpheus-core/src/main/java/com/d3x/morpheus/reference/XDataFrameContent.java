@@ -278,6 +278,23 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
 
 
     /**
+     * Returns true if the value is null at the coordinates specified
+     * @param rowCoord  the row coordinate
+     * @param colCoord  the column coordinate
+     * @return          true if value is null
+     */
+    final boolean isNullAt(int rowCoord, int colCoord) {
+        if (columnStore) {
+            var colArray = data.get(colCoord);
+            return colArray.isNull(rowCoord);
+        } else {
+            var rowArray = data.get(rowCoord);
+            return rowArray.isNull(colCoord);
+        }
+    }
+
+
+    /**
      * Returns the array type for the vector implied by the row key specified
      * @param rowKey    the row key
      * @return          the array type for row key
@@ -301,8 +318,12 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
         if (!isColumnStore()) {
             return typeInfo();
         } else {
-            final int colIndex = colKeys.getCoordinate(colKey);
-            return data.get(colIndex).type();
+            var colIndex = colKeys.getCoordinate(colKey);
+            if (colIndex < 0) {
+                throw new DataFrameException("No match for col key: " + colKey);
+            } else {
+                return data.get(colIndex).type();
+            }
         }
     }
 
@@ -322,6 +343,28 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
             final int index = rowKeys.getCoordinate((R)key);
             return (Array<T>)data.get(index);
         }
+    }
+
+
+    /**
+     * Returns a shallow copy of this content with the row key index replaced
+     * @param rowKeys   the replacement row key index
+     * @param <X>       the replacement key type
+     * @return          the shallow copy of content
+     */
+    final <X> XDataFrameContent<X,C> withRowKeys(Index<X> rowKeys) {
+        return new XDataFrameContent<>(rowKeys, colKeys, columnStore, data);
+    }
+
+
+    /**
+     * Returns a shallow copy of this content with the column key index replaced
+     * @param colKeys   the replacement column key index
+     * @param <Y>       the replacement key type
+     * @return          the shallow copy of content
+     */
+    final <Y> XDataFrameContent<R,Y> withColKeys(Index<Y> colKeys) {
+        return new XDataFrameContent<>(rowKeys, colKeys, columnStore, data);
     }
 
 
@@ -461,7 +504,7 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
                     final Array<?> targetValues = Array.of(Boolean.class, array.length());
                     final Cursor cursor = new Cursor().init(frame, rowKeys.isEmpty() ? -1 : 0, colOrdinal);
                     for (int i = 0; i < rowCount; ++i) {
-                        cursor.atRow(i);
+                        cursor.toRowAt(i);
                         final boolean value = mapper.applyAsBoolean(cursor);
                         targetValues.setBoolean(cursor.rowIndex, value);
                     }
@@ -495,7 +538,7 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
                     final Array<?> targetValues = Array.of(Integer.class, array.length());
                     final Cursor cursor = new Cursor().init(frame, rowKeys.isEmpty() ? -1 : 0, colOrdinal);
                     for (int i = 0; i < rowCount; ++i) {
-                        cursor.atRow(i);
+                        cursor.toRowAt(i);
                         final int value = mapper.applyAsInt(cursor);
                         targetValues.setInt(cursor.rowIndex, value);
                     }
@@ -529,7 +572,7 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
                     final Array<?> targetValues = Array.of(Long.class, array.length());
                     final Cursor cursor = new Cursor().init(frame, rowKeys.isEmpty() ? -1 : 0, colOrdinal);
                     for (int i = 0; i < rowCount; ++i) {
-                        cursor.atRow(i);
+                        cursor.toRowAt(i);
                         final long value = mapper.applyAsLong(cursor);
                         targetValues.setLong(cursor.rowIndex, value);
                     }
@@ -563,7 +606,7 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
                     final Array<?> targetValues = Array.of(Double.class, array.length());
                     final Cursor cursor = new Cursor().init(frame, rowKeys.isEmpty() ? -1 : 0, colOrdinal);
                     for (int i = 0; i < rowCount; ++i) {
-                        cursor.atRow(i);
+                        cursor.toRowAt(i);
                         final double value = mapper.applyAsDouble(cursor);
                         targetValues.setDouble(cursor.rowIndex, value);
                     }
@@ -585,7 +628,7 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
     @SuppressWarnings("unchecked")
     final <T> XDataFrameContent<R,C> mapToObjects(XDataFrame<R,C> frame, C colKey, Class<T> type, Function<DataFrameValue<R,C>,T> mapper) {
         if (!isColumnStore()) {
-            throw new DataFrameException("Cannot apply columns of a transposed DataFrame");
+            throw new DataFrameException("Cannot map columns of a transposed DataFrame, call copy() first");
         } else {
             final int rowCount = rowKeys.size();
             final boolean parallel  = frame.isParallel();
@@ -598,7 +641,7 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
                     final Array<T> targetValues = Array.of(type, array.length());
                     final Cursor cursor = new Cursor().init(frame, rowKeys.isEmpty() ? -1 : 0, colOrdinal);
                     for (int i = 0; i < rowCount; ++i) {
-                        cursor.atRow(i);
+                        cursor.toRowAt(i);
                         final T value = mapper.apply(cursor);
                         targetValues.setValue(cursor.rowIndex, value);
                     }
@@ -615,19 +658,7 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
      * @param newColKeys   the optionally filtered column keys
      */
     final XDataFrameContent<R,C> filter(Index<R> newRowKeys, Index<C> newColKeys) {
-        if (newColKeys.size() == this.colKeys.size()) {
-            return new XDataFrameContent<>(newRowKeys, newColKeys, columnStore, data);
-        } else if (columnStore) {
-            final IntStream indexes = newColKeys.keys().mapToInt(k -> this.colKeys.getCoordinate(k));
-            final Index<C> colAxis = Index.of(newColKeys.toArray());
-            final List<Array<?>> newData = indexes.mapToObj(data::get).collect(Collectors.toList());
-            return new XDataFrameContent<>(newRowKeys, colAxis, columnStore, newData);
-        } else {
-            final IntStream indexes = newRowKeys.keys().mapToInt(k -> this.rowKeys.getCoordinate(k));
-            final Index<C> colAxis = Index.of(newColKeys.toArray());
-            final List<Array<?>> newData = indexes.mapToObj(data::get).collect(Collectors.toList());
-            return new XDataFrameContent<>(newRowKeys, colAxis, columnStore, newData);
-        }
+        return new XDataFrameContent<>(newRowKeys, newColKeys, columnStore, data);
     }
 
 
@@ -638,10 +669,10 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
      * @return              the newly created comparator
      */
     final XDataFrameComparator createRowComparator(List<C> colKeys, int multiplier) {
-        final XDataFrameComparator[] comparators = new XDataFrameComparator[colKeys.size()];
+        var comparators = new XDataFrameComparator[colKeys.size()];
         for (int i=0; i<colKeys.size(); ++i) {
-            final C colKey = colKeys.get(i);
-            final Array<?> array = getColArray(colKey);
+            var colKey = colKeys.get(i);
+            var array = getColArray(colKey);
             comparators[i] = XDataFrameComparator.create(array, multiplier);
         }
         return XDataFrameComparator.create(comparators).withIndex(rowKeys);
@@ -655,10 +686,10 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
      * @return              the newly created comparator
      */
     final XDataFrameComparator createColComparator(List<R> rowKeys, int multiplier) {
-        final XDataFrameComparator[] comparators = new XDataFrameComparator[rowKeys.size()];
+        var comparators = new XDataFrameComparator[rowKeys.size()];
         for (int i=0; i<rowKeys.size(); ++i) {
-            final R rowKey = rowKeys.get(i);
-            final Array<?> array = getRowArray(rowKey);
+            var rowKey = rowKeys.get(i);
+            var array = getRowArray(rowKey);
             comparators[i] = XDataFrameComparator.create(array, multiplier);
         }
         return XDataFrameComparator.create(comparators).withIndex(colKeys);
@@ -671,9 +702,9 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
      * @return          the array of row data
      */
     private Array<?> getRowArray(R rowKey) {
-        final Class<?> type = rowType(rowKey);
-        final Array<?> array = Array.of(type, colKeys.size());
-        final int rowIndex = rowKeys.getCoordinate(rowKey);
+        var type = rowType(rowKey);
+        var array = Array.of(type, colKeys.size());
+        var rowIndex = rowKeys.getCoordinate(rowKey);
         switch (ArrayType.of(type)) {
             case BOOLEAN:           return array.applyBooleans(v -> booleanAt(rowIndex, colCoordinateAt(v.index())));
             case INTEGER:           return array.applyInts(v -> intAt(rowIndex, colCoordinateAt(v.index())));
@@ -695,9 +726,9 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
      * @return          the array of column data
      */
     private Array<?> getColArray(C colKey) {
-        final Class<?> type = colType(colKey);
-        final Array<?> array = Array.of(type, rowKeys.size());
-        final int colIndex = colKeys.getCoordinate(colKey);
+        var type = colType(colKey);
+        var array = Array.of(type, rowKeys.size());
+        var colIndex = colKeys.getCoordinate(colKey);
         switch (ArrayType.of(type)) {
             case BOOLEAN:           return array.applyBooleans(v -> booleanAt(rowCoordinateAt(v.index()), colIndex));
             case INTEGER:           return array.applyInts(v -> intAt(rowCoordinateAt(v.index()), colIndex));
@@ -736,7 +767,7 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
             final Class<?> dataType = colType(colKey);
             final ArrayType type = ArrayType.of(dataType);
             final int colIndex = colKeys.getCoordinate(colKey);
-            final Array<Object> array = Array.<Object>of(dataType, rowCount);
+            final Array<Object> array = Array.of((Class<Object>)dataType, rowCount);
             newContent.addColumn(colKey, array);
             if (type.isBoolean()) {
                 for (int i=0; i<rowCount; ++i) {
@@ -791,15 +822,15 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
                 return new XDataFrameContent<>(newRowAxis, newColAxis, columnStore, newData);
             } else if (colKeys().isFilter()) {
                 final Array<C> colKeys = this.colKeys.toArray();
-                final Index<R> newRowAxis = rowKeys.copy();
+                final Index<R> newRowAxis = rowKeys.copy(true);
                 final Index<C> newColAxis = Index.of(colKeys);
                 final List<Array<?>> newData = this.colKeys.keys().map(c -> getArray(c).copy()).collect(Collectors.toList());
                 return new XDataFrameContent<>(newRowAxis, newColAxis, columnStore, newData);
             } else {
                 final XDataFrameContent<R,C> clone = (XDataFrameContent<R,C>)super.clone();
                 clone.data = this.data.stream().map(Array::copy).collect(Collectors.toList());
-                clone.rowKeys = this.rowKeys.copy();
-                clone.colKeys = this.colKeys.copy();
+                clone.rowKeys = this.rowKeys.copy(true);
+                clone.colKeys = this.colKeys.copy(true);
                 return clone;
             }
         } catch (CloneNotSupportedException ex) {
@@ -1106,8 +1137,8 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
          */
         private Cursor init(XDataFrame<R,C> frame, int rowOrdinal, int colOrdinal) {
             this.frame = frame;
-            if (rowOrdinal >= 0) atRow(rowOrdinal);
-            if (colOrdinal >= 0) atCol(colOrdinal);
+            if (rowOrdinal >= 0) toRowAt(rowOrdinal);
+            if (colOrdinal >= 0) toColAt(colOrdinal);
             return this;
         }
 
@@ -1366,7 +1397,7 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
         }
 
         @Override
-        public final DataFrameCursor<R,C> atRow(int ordinal) {
+        public final DataFrameCursor<R,C> toRowAt(int ordinal) {
             try {
                 this.rowIndex = rowKeys.getCoordinateAt(ordinal);
                 this.array = columnStore ? array : data.get(rowIndex);
@@ -1378,7 +1409,7 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
         }
 
         @Override
-        public final DataFrameCursor<R,C> atCol(int ordinal) {
+        public final DataFrameCursor<R,C> toColAt(int ordinal) {
             try {
                 this.colIndex = colKeys.getCoordinateAt(ordinal);
                 this.array = columnStore ? data.get(colIndex) : array;
@@ -1395,10 +1426,10 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
         }
 
         @Override
-        public final DataFrameCursor<R,C> atRowKey(R key) {
+        public final DataFrameCursor<R,C> toRow(R key) {
             try {
                 final int ordinal = rowKeys.getOrdinal(key);
-                return atRow(ordinal);
+                return toRowAt(ordinal);
             } catch (DataFrameException ex) {
                 throw ex;
             } catch (Throwable t) {
@@ -1407,10 +1438,10 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
         }
 
         @Override
-        public final DataFrameCursor<R,C> atColKey(C key) {
+        public final DataFrameCursor<R,C> toCol(C key) {
             try {
                 final int ordinal = colKeys.getOrdinal(key);
-                return atCol(ordinal);
+                return toColAt(ordinal);
             } catch (DataFrameException ex) {
                 throw ex;
             } catch (Throwable t) {
@@ -1420,12 +1451,12 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
 
         @Override
         public final DataFrameCursor<R,C> atKeys(R rowKey, C colKey) {
-            return atRowKey(rowKey).atColKey(colKey);
+            return toRow(rowKey).toCol(colKey);
         }
 
         @Override
         public final DataFrameCursor<R,C> at(int rowOrdinal, int colOrdinal) {
-            return atRow(rowOrdinal).atCol(colOrdinal);
+            return toRowAt(rowOrdinal).toColAt(colOrdinal);
         }
 
         @Override

@@ -41,7 +41,7 @@ class IndexOfLongs extends IndexBase<Long> {
      */
     IndexOfLongs(int initialSize) {
         super(Array.of(Long.class, initialSize));
-        this.indexMap = new TLongIntHashMap(initialSize, 0.75f, -1, -1);
+        this.indexMap = new TLongIntHashMap(initialSize, DEFAULT_LOAD_FACTOR, -1, -1);
     }
 
     /**
@@ -50,7 +50,7 @@ class IndexOfLongs extends IndexBase<Long> {
      */
     IndexOfLongs(Iterable<Long> iterable) {
         super(iterable);
-        this.indexMap = new TLongIntHashMap(keyArray().length(), 0.75f, -1, -1);
+        this.indexMap = new TLongIntHashMap(keyArray().length(), DEFAULT_LOAD_FACTOR, -1, -1);
         this.keyArray().sequential().forEachValue(v -> {
             final int index = v.index();
             final long key = v.getLong();
@@ -68,7 +68,7 @@ class IndexOfLongs extends IndexBase<Long> {
      */
     private IndexOfLongs(Iterable<Long> iterable, IndexOfLongs parent) {
         super(iterable, parent);
-        this.indexMap = new TLongIntHashMap(keyArray().length(), 0.75f, -1, -1);
+        this.indexMap = new TLongIntHashMap(keyArray().length(), DEFAULT_LOAD_FACTOR, -1, -1);
         this.keyArray().sequential().forEachValue(v -> {
             final long key = v.getLong();
             final int index = parent.indexMap.get(key);
@@ -140,10 +140,10 @@ class IndexOfLongs extends IndexBase<Long> {
     }
 
     @Override
-    public final Index<Long> copy() {
+    public final Index<Long> copy(boolean deep) {
         try {
-            final IndexOfLongs clone = (IndexOfLongs)super.copy();
-            clone.indexMap = new TLongIntHashMap(indexMap);
+            final IndexOfLongs clone = (IndexOfLongs)super.copy(deep);
+            if (deep) clone.indexMap = new TLongIntHashMap(indexMap);
             return clone;
         } catch (Exception ex) {
             throw new IndexException("Failed to clone index", ex);

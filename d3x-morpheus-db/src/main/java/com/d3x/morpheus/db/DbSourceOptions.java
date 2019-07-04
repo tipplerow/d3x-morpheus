@@ -19,17 +19,21 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import javax.sql.DataSource;
 
 import com.d3x.morpheus.frame.DataFrameException;
+import com.d3x.morpheus.util.Try;
 import com.d3x.morpheus.util.sql.SQLExtractor;
 
 /**
@@ -41,44 +45,32 @@ import com.d3x.morpheus.util.sql.SQLExtractor;
  *
  * @author  Xavier Witdouck
  */
+@lombok.Data()
 public class DbSourceOptions<R> {
-
-    /**
-     * Interface to the row key resolver
-     * @param <X>   the key type
-     */
-    public interface KeyResolver<X> {
-
-        /**
-         * Returns the key extracted from result set
-         * @param rs    the result set
-         * @return      the key from result set
-         * @throws SQLException if fails to extract key
-         */
-        X apply(ResultSet rs) throws SQLException;
-    }
-
 
     private String sql;
     private int rowCapacity;
     private int fetchSize;
-    private Connection connection;
-    private Object[] parameters;
+    private List<Object> parameters;
     private boolean autoCommit = true;
     private boolean readOnly = false;
     private Set<String> excludeColumnSet;
-    private KeyResolver<R> rowKeyResolver;
+    private Function<ResultSet,R> rowKeyMapper;
+    private Function<String,String> colKeyMapper;
     private Map<String,SQLExtractor> extractorMap;
 
     /**
      * Constructor
      */
     @SuppressWarnings("unchecked")
-    public DbSourceOptions() {
+    DbSourceOptions() {
         this.rowCapacity = 1000;
+        this.fetchSize = 1000;
+        this.parameters = new ArrayList<>();
         this.excludeColumnSet = new HashSet<>();
         this.extractorMap = new HashMap<>();
-        this.rowKeyResolver = (ResultSet rs) -> {
+        this.colKeyMapper = v -> v;
+        this.rowKeyMapper = (ResultSet rs) -> {
             try {
                 return (R)rs.getObject(1);
             } catch (SQLException ex) {
@@ -87,137 +79,6 @@ public class DbSourceOptions<R> {
         };
     }
 
-    public void validate() {
-        Objects.requireNonNull(sql, "The SQL statement cannot be null");
-        Objects.requireNonNull(connection, "The JDBC connection cannot be null");
-    }
-
-    /**
-     * Sets the SQL query for this request
-     * @param sql   the sql for this request
-     * @return      this request
-     */
-    public DbSourceOptions<R> withSql(String sql) {
-        Objects.requireNonNull(sql, "The sql cannot be null");
-        this.sql = sql;
-        return this;
-    }
-
-    /**
-     * Sets the parameters for the SQL expression
-     * @param parameters  the SQL parameters
-     * @return      this request
-     */
-    public DbSourceOptions<R> withParameters(Object...parameters) {
-        Objects.requireNonNull(parameters, "The sql parameters cannot be null, empty array is fine");
-        this.parameters = parameters;
-        return this;
-    }
-
-    /**
-     * Sets the JDBC connection for this request
-     * @param connection    the connection for this request
-     * @return              this request
-     */
-    public DbSourceOptions<R> withConnection(Connection connection) {
-        Objects.requireNonNull(connection, "The SQL connection cannot be null");
-        this.connection = connection;
-        return this;
-    }
-
-    /**
-     * Sets the JDBC connection for this request
-     * @param dataSource    the DataSource the grab a connection from
-     * @return              this request
-     */
-    public DbSourceOptions<R> withConnection(DataSource dataSource) {
-        Objects.requireNonNull(dataSource, "The SQL data source cannot be null");
-        try {
-            this.connection = dataSource.getConnection();
-            return this;
-        } catch (SQLException ex) {
-            throw new RuntimeException("Failed to access a DB connection from DataSource", ex);
-        }
-    }
-
-    /**
-     * Sets the JDBC connection URL and optional credentials
-     * This method should ideally only be used for testing, a connection pool is preferable for production
-     * @param url       the JDBC connection url
-     * @param username  the JDBC connection username, can be null
-     * @param password  the JDBC connection password, can be null
-     * @return          this request
-     */
-    public DbSourceOptions<R> withConnection(String url, String username, String password) {
-        try {
-            Objects.requireNonNull(url, "The JDBC URL cannnot be null");
-            this.connection = DriverManager.getConnection(url, username, password);
-            return this;
-        } catch (SQLException ex) {
-            throw new DataFrameException("Failed to create connection for URL:" + url, ex);
-        }
-    }
-
-    /**
-     * Sets the names of columns not to include in the resulting DataFrame
-     * @param columns   the columns to exlcude from DataFrame
-     * @return          this request
-     */
-    public DbSourceOptions<R> withExcludeColumns(String... columns) {
-        this.excludeColumnSet.addAll(Arrays.asList(columns));
-        return this;
-    }
-
-    /**
-     * Sets the row key function for this request
-     * @param rowKeyFunction    the row key function
-     * @return                  this request
-     */
-    public DbSourceOptions<R> withRowKeyFunction(KeyResolver<R> rowKeyFunction) {
-        Objects.requireNonNull(rowKeyFunction, "The row key function cannot be null");
-        this.rowKeyResolver = rowKeyFunction;
-        return this;
-    }
-
-    /**
-     * Sets the initial row capacity to size the DataFrame
-     * @param rowCapacity   the initial roe capacity
-     * @return  this request
-     */
-    public DbSourceOptions<R> withRowCapacity(int rowCapacity) {
-        this.rowCapacity = rowCapacity;
-        return this;
-    }
-
-    /**
-     * Sets the fetch size for the statement when executing queries
-     * @param fetchSize the fetch size
-     * @return          these options
-     */
-    public DbSourceOptions<R> withFetchSize(int fetchSize) {
-        this.fetchSize = fetchSize;
-        return this;
-    }
-
-    /**
-     * Sets the connection auto commit state
-     * @param autoCommit    true to enable auto commit
-     * @return              these options
-     */
-    public DbSourceOptions<R> withAutoCommit(boolean autoCommit) {
-        this.autoCommit = autoCommit;
-        return this;
-    }
-
-    /**
-     * Sets the connection read only setting
-     * @param readOnly  true for read only
-     * @return          these options
-     */
-    public DbSourceOptions<R> withReadOnly(boolean readOnly) {
-        this.readOnly = readOnly;
-        return this;
-    }
 
     /**
      * Sets the extractor to use for the column name
@@ -232,84 +93,9 @@ public class DbSourceOptions<R> {
         return this;
     }
 
-    /**
-     * Returns the SQL query for this request
-     * @return  the sql query
-     */
-    public String getSql() {
-        return sql;
-    }
 
-    /**
-     * Returns the parameters for this request
-     * @return  the parameters for request
-     */
-    Optional<Object[]> getParameters() {
-        return Optional.ofNullable(parameters);
-    }
-
-    /**
-     * Returns the connection for this request
-     * @return  the connection for this request
-     */
-    Connection getConnection() {
-        return connection;
-    }
-
-    /**
-     * Returns the initial row capacity to size the resulting DataFrame
-     * @return  the row capacity
-     */
-    int getRowCapacity() {
-        return rowCapacity;
-    }
-
-    /**
-     * Returns the connection auto commit preference
-     * @return  true for auto commit
-     */
-    boolean isAutoCommit() {
-        return autoCommit;
-    }
-
-    /**
-     * Returns the connection read only setting
-     * @return  true for read only
-     */
-    boolean isReadOnly() {
-        return readOnly;
-    }
-
-    /**
-     * Returns the set of columns to exclude
-     * @return  the set of columns to exclude
-     */
-    Set<String> getExcludeColumnSet() {
-        return excludeColumnSet;
-    }
-
-    /**
-     * Returns the statement fetch size for queries
-     * @return      the statement fetch size
-     */
-    Optional<Integer> getFetchSize() {
-        return fetchSize <= 0 ? Optional.empty() : Optional.of(fetchSize);
-    }
-
-    /**
-     * Returns the row key generating function for this request
-     * @return  the row query generating function
-     */
-    KeyResolver<R> getRowKeyResolver() {
-        return rowKeyResolver;
-    }
-
-    /**
-     * Returns the apply of extractors for this request
-     * @return  the apply of extractors
-     */
-    Map<String,SQLExtractor> getExtractors() {
-        return Collections.unmodifiableMap(extractorMap);
+    SQLExtractor getExtractor(String colName, SQLExtractor fallback) {
+        return extractorMap.getOrDefault(colName, fallback);
     }
 
 }

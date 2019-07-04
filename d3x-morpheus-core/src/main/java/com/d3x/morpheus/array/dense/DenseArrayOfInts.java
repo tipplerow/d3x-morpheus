@@ -115,9 +115,19 @@ class DenseArrayOfInts extends ArrayBase<Integer> {
 
     @Override()
     public final Array<Integer> copy(int[] indexes) {
-        final DenseArrayOfInts clone = new DenseArrayOfInts(indexes.length, defaultValue);
+        var clone = new DenseArrayOfInts(indexes.length, defaultValue);
         for (int i = 0; i < indexes.length; ++i) {
             clone.values[i] = this.values[indexes[i]];
+        }
+        return clone;
+    }
+
+
+    @Override
+    public Array<Integer> copy(Array<Integer> indexes) {
+        var clone = new DenseArrayOfInts(indexes.length(), defaultValue);
+        for (int i = 0; i < indexes.length(); ++i) {
+            clone.values[i] = this.values[indexes.getInt(i)];
         }
         return clone;
     }

@@ -133,9 +133,19 @@ class DenseArrayWithLongCoding<T> extends ArrayBase<T> implements WithLongCoding
 
     @Override()
     public final Array<T> copy(int[] indexes) {
-        final DenseArrayWithLongCoding<T> clone = new DenseArrayWithLongCoding<>(indexes.length, defaultValue, coding);
+        var clone = new DenseArrayWithLongCoding<T>(indexes.length, defaultValue, coding);
         for (int i = 0; i < indexes.length; ++i) {
             clone.codes[i] = this.codes[indexes[i]];
+        }
+        return clone;
+    }
+
+
+    @Override
+    public Array<T> copy(Array<Integer> indexes) {
+        var clone = new DenseArrayWithLongCoding<T>(indexes.length(), defaultValue, coding);
+        for (int i = 0; i < indexes.length(); ++i) {
+            clone.codes[i] = this.codes[indexes.getInt(i)];
         }
         return clone;
     }

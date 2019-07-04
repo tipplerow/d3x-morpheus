@@ -45,7 +45,7 @@ public class DimensionTests {
     private final LocalDate start = LocalDate.of(2007, 1, 3);
     private final LocalDate end = start.plusDays(20);
     private final Index<LocalDate> rowKeys = Range.of(start, end).toIndex(LocalDate.class);
-    private final Index<String> colKeys = Index.of("C1", "C2", "C3", "C4", "C5");
+    private final Index<String> colKeys = Index.ofObjects("C1", "C2", "C3", "C4", "C5");
     private final DataFrame<LocalDate,String> frame = DataFrame.ofDoubles(rowKeys, colKeys);
 
 

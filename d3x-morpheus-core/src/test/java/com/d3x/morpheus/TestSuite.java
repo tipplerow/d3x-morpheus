@@ -16,6 +16,7 @@
 package com.d3x.morpheus;
 
 import java.io.File;
+import java.net.URL;
 
 import com.d3x.morpheus.frame.DataFrame;
 import com.d3x.morpheus.util.Tuple;
@@ -51,24 +52,6 @@ public class TestSuite {
      */
     public static File getOutputFile(String testName, String fileName) {
         return new File(getOutputDir(testName), fileName);
-    }
-
-
-    /**
-     * Returns the UK ONS population dataset
-     * @return  the UK ONS population dataset
-     */
-    public static DataFrame<Tuple,String> getPopulationDataset() {
-        return DataFrame.read().csv(options -> {
-            options.setResource("http://tinyurl.com/ons-population-year");
-            options.setRowKeyParser(Tuple.class, row -> Tuple.of(Integer.parseInt(row[1]), row[2]));
-            options.setExcludeColumns("Code");
-            options.getFormats().setNullValues("-");
-            options.getFormats().copyParser(Double.class, "All Males");
-            options.getFormats().copyParser(Double.class, "All Females");
-            options.getFormats().copyParser(Double.class, "All Persons");
-            options.getFormats().copyParser(Double.class, "[MF]\\s+\\d+");
-        });
     }
 
 }

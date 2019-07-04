@@ -51,13 +51,14 @@ class SparseArrayOfLongs extends ArrayBase<Long> {
     /**
      * Constructor
      * @param length    the length for this array
+     * @param fillPct   the fill percent for array (0.2 implies 20% filled)
      * @param defaultValue  the default value for array
      */
-    SparseArrayOfLongs(int length, Long defaultValue) {
+    SparseArrayOfLongs(int length, double fillPct, Long defaultValue) {
         super(Long.class, ArrayStyle.SPARSE, false);
         this.length = length;
         this.defaultValue = defaultValue != null ? defaultValue : 0L;
-        this.values = new TIntLongHashMap((int)Math.max(length * 0.5, 10d), 0.8f, -1, this.defaultValue);
+        this.values = new TIntLongHashMap((int)Math.max(length * fillPct, 10d), 0.85f, -1, this.defaultValue);
     }
 
     /**
@@ -118,7 +119,8 @@ class SparseArrayOfLongs extends ArrayBase<Long> {
 
     @Override()
     public final Array<Long> copy(int[] indexes) {
-        final SparseArrayOfLongs clone = new SparseArrayOfLongs(indexes.length, defaultValue);
+        var fillPct = (double)values.size() / length();
+        var clone = new SparseArrayOfLongs(indexes.length, fillPct, defaultValue);
         for (int i = 0; i < indexes.length; ++i) {
             final long value = getLong(indexes[i]);
             clone.setLong(i, value);
@@ -127,10 +129,23 @@ class SparseArrayOfLongs extends ArrayBase<Long> {
     }
 
 
+    @Override
+    public Array<Long> copy(Array<Integer> indexes) {
+        var fillPct = (double)values.size() / length();
+        var clone = new SparseArrayOfLongs(indexes.length(), fillPct, defaultValue);
+        for (int i = 0; i < indexes.length(); ++i) {
+            final long value = getLong(indexes.getInt(i));
+            clone.setLong(i, value);
+        }
+        return clone;
+    }
+
+
     @Override()
     public final Array<Long> copy(int start, int end) {
-        final int length = end - start;
-        final SparseArrayOfLongs clone = new SparseArrayOfLongs(length, defaultValue);
+        var length = end - start;
+        var fillPct = (double)values.size() / length();
+        var clone = new SparseArrayOfLongs(length, fillPct, defaultValue);
         for (int i=0; i<length; ++i) {
             final long value = getLong(start+i);
             if (value != defaultValue) {

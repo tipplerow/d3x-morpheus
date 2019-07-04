@@ -296,12 +296,12 @@ class XDataFrameAxisStats<K,R,C,X,Y> extends XDataFrameStatsBase<X,Y> implements
             final int threshold = isParallel() ? DataFrameOptions.getRowSplitThreshold(frame) : Integer.MAX_VALUE;
             if (count <= threshold) {
                 final int length = frame.cols().count();
-                final DataFrameCursor<R,StatType> cursor = target.cursor().atCol(0);
+                final DataFrameCursor<R,StatType> cursor = target.cursor().toColAt(0);
                 final XDataFrameRow<R,C> row = new XDataFrameRow<>(frame, false);
                 for (int rowOrdinal = from; rowOrdinal <= to; ++rowOrdinal) {
                     final R rowKey = target.rows().key(rowOrdinal);
                     final double statValue = row.moveTo(rowKey).compute(statistic, 0, length);
-                    cursor.atRow(rowOrdinal).setDouble(statValue);
+                    cursor.toRowAt(rowOrdinal).setDouble(statValue);
                 }
             } else {
                 final int splitCount = (to - from) / 2;
@@ -345,12 +345,12 @@ class XDataFrameAxisStats<K,R,C,X,Y> extends XDataFrameStatsBase<X,Y> implements
             final int threshold = isParallel() ? DataFrameOptions.getColumnSplitThreshold(frame) : Integer.MAX_VALUE;
             if (count <= threshold) {
                 final int length = frame.rowCount();
-                final DataFrameCursor<C,StatType> cursor = target.cursor().atCol(0);
+                final DataFrameCursor<C,StatType> cursor = target.cursor().toColAt(0);
                 final XDataFrameColumn<R,C> column = new XDataFrameColumn<>(frame, false);
                 for (int colOrdinal = from; colOrdinal <= to; ++colOrdinal) {
                     final C colKey = target.rows().key(colOrdinal);
                     final double statValue = column.moveTo(colKey).compute(statistic, 0, length);
-                    cursor.atRow(colOrdinal).setDouble(statValue);
+                    cursor.toRowAt(colOrdinal).setDouble(statValue);
                 }
             } else {
                 final int splitCount = (to - from) / 2;
@@ -404,10 +404,10 @@ class XDataFrameAxisStats<K,R,C,X,Y> extends XDataFrameStatsBase<X,Y> implements
                     final DataFrameCursor<R,C> target = result.cursor().at(0, colOrdinal);
                     if (rowCount > 0) target.setDouble(source.getDouble());
                     for (int rowOrdinal=1; rowOrdinal<rowCount; ++rowOrdinal) {
-                        final double rawValue = source.atRow(rowOrdinal).getDouble();
-                        final double emaPrior = target.atRow(rowOrdinal-1).getDouble();
+                        final double rawValue = source.toRowAt(rowOrdinal).getDouble();
+                        final double emaPrior = target.toRowAt(rowOrdinal-1).getDouble();
                         final double emaValue = rawValue * alpha + (1d - alpha) * emaPrior;
-                        target.atRow(rowOrdinal).setDouble(emaValue);
+                        target.toRowAt(rowOrdinal).setDouble(emaValue);
                     }
                 }
             } else {
@@ -458,10 +458,10 @@ class XDataFrameAxisStats<K,R,C,X,Y> extends XDataFrameStatsBase<X,Y> implements
                 final XDataFrameRow<R,C> row1 = new XDataFrameRow<>(frame, false);
                 final XDataFrameRow<R,C> row2 = new XDataFrameRow<>(frame, false);
                 for (int rowIndex1 = from; rowIndex1 <= to; ++rowIndex1) {
-                    cursor.atRow(rowIndex1);
+                    cursor.toRowAt(rowIndex1);
                     row1.moveTo((R)result.rows().key(rowIndex1));
                     for (int rowIndex2 = 0; rowIndex2 < rowCount; ++rowIndex2) {
-                        cursor.atCol(rowIndex2);
+                        cursor.toColAt(rowIndex2);
                         row2.moveTo((R)result.rows().key(rowIndex2));
                         if (row1.isNumeric() && row2.isNumeric()) {
                             this.statistic.reset();
@@ -522,10 +522,10 @@ class XDataFrameAxisStats<K,R,C,X,Y> extends XDataFrameStatsBase<X,Y> implements
                 final XDataFrameColumn<R,C> column1 = new XDataFrameColumn<>(frame, false);
                 final XDataFrameColumn<R,C> column2 = new XDataFrameColumn<>(frame, false);
                 for (int colIndex1 = from; colIndex1 <= to; ++colIndex1) {
-                    cursor.atRow(colIndex1);
+                    cursor.toRowAt(colIndex1);
                     column1.moveTo((C)result.cols().key(colIndex1));
                     for (int colIndex2 = 0; colIndex2 < colCount; ++ colIndex2) {
-                        cursor.atCol(colIndex2);
+                        cursor.toColAt(colIndex2);
                         column2.moveTo((C)result.cols().key(colIndex2));
                         if (column1.isNumeric() && column2.isNumeric()) {
                             this.statistic.reset();

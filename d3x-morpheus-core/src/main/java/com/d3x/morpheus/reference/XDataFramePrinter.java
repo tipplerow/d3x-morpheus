@@ -120,7 +120,7 @@ class XDataFramePrinter {
         final String[][] data = new String[rowCount][colCount];
         final DataFrameCursor<?,?> cursor = frame.cursor().at(0, 0);
         for (int i=0; i<rowCount; ++i) {
-            cursor.atRow(i);
+            cursor.toRowAt(i);
             for (int j=0; j<=frame.colCount(); ++j) {
                 try {
                     if (j == 0) {
@@ -128,7 +128,7 @@ class XDataFramePrinter {
                         final String rowText = rowKeyPrinter.apply(rowKey);
                         data[i][j] = rowText;
                     } else {
-                        cursor.atCol(j-1);
+                        cursor.toColAt(j-1);
                         final Printer<Object> printer = printers.get(j -1);
                         final Object value = cursor.getValue();
                         final String text =  printer.apply(value);

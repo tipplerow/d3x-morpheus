@@ -115,9 +115,19 @@ class DenseArrayOfBooleans extends ArrayBase<Boolean> {
 
     @Override()
     public final Array<Boolean> copy(int[] indexes) {
-        final DenseArrayOfBooleans clone = new DenseArrayOfBooleans(indexes.length, defaultValue);
+        var clone = new DenseArrayOfBooleans(indexes.length, defaultValue);
         for (int i = 0; i < indexes.length; ++i) {
             clone.values[i] = this.values[indexes[i]];
+        }
+        return clone;
+    }
+
+
+    @Override
+    public Array<Boolean> copy(Array<Integer> indexes) {
+        var clone = new DenseArrayOfBooleans(indexes.length(), defaultValue);
+        for (int i = 0; i < indexes.length(); ++i) {
+            clone.values[i] = this.values[indexes.getInt(i)];
         }
         return clone;
     }

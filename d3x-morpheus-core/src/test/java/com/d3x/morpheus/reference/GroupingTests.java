@@ -48,10 +48,9 @@ public class GroupingTests {
 
 
     private DataFrame<String,String> frame() {
-        return DataFrame.read().csv(options -> {
-            options.setResource("/csv/etf.csv");
+        return DataFrame.read().<String>csv("/csv/etf.csv").read(options -> {
             options.setHeader(true);
-            options.setRowKeyParser(String.class, values -> values[0]);
+            options.setRowKeyColumnName("Ticker");
         });
     }
 

@@ -51,7 +51,7 @@ public interface MemoryEstimator {
                 final Method method = clazz.getDeclaredMethod("hasInstrumentation");
                 final boolean instrumentation = (Boolean) method.invoke(clazz);
                 if (instrumentation) {
-                    this.meter = clazz.newInstance();
+                    this.meter = clazz.getDeclaredConstructor().newInstance();
                     this.measureDeep = clazz.getDeclaredMethod("measureDeep", Object.class);
                 }
             } catch (ClassNotFoundException ex) {

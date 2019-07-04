@@ -110,7 +110,7 @@ public class SelectTests {
 
     @Test(dataProvider="frameTypes")
     public void testSelectColumns(Class type) {
-        final Index<String> colKeys = Index.of("C2", "C5", "C19", "C27");
+        final Index<String> colKeys = Index.ofObjects("C2", "C5", "C19", "C27");
         final DataFrame<ZonedDateTime,String> frame = TestDataFrames.random(type, rows, columns);
         final DataFrame<ZonedDateTime,String> slice = frame.cols().select(column -> colKeys.contains(column.key()));
         final DataFrame<ZonedDateTime,String> expected = TestDataFrames.random(type, rows, colKeys);

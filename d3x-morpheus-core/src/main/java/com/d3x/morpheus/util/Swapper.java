@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2010-2014 Sebastiano Vigna
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +16,7 @@
 package com.d3x.morpheus.util;
 
 /**
- * An interface to an ordered collection that can swap elements whose position is specified by integers
+ * An interface that exposes a function to swap elements in an ordered collection.
  */
 public interface Swapper {
 

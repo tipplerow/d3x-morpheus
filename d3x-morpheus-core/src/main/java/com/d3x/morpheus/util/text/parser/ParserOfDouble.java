@@ -38,7 +38,7 @@ class ParserOfDouble extends Parser<Double> {
 
     private Function<String,Number> handler;
 
-    /**
+    /*
      * Static initializer
      */
     static {

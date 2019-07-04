@@ -72,6 +72,12 @@ public interface DataFramePCA<R,C> {
     interface Model<R,C> {
 
         /**
+         * Returns the scores for this PCA model based on all components
+         * @return   the resulting scores
+         */
+        DataFrame<R,Integer> getScores();
+
+        /**
          * Returns an mx1 DataFrame of Eigen Values ordered from largest to smallest
          * @return  the mx1 DataFrame of sorted Eigen Values
          */
@@ -82,12 +88,6 @@ public interface DataFramePCA<R,C> {
          * @return  the DataFrame of Eigenvectors arranged in columns and ordered as per the Eigenvalues.
          */
         DataFrame<Integer,Integer> getEigenVectors();
-
-        /**
-         * Returns the scores for this PCA model based on all components
-         * @return   the resulting scores
-         */
-        DataFrame<R,Integer> getScores();
 
         /**
          * Returns the original data projected back to the original basis using the specified number of components

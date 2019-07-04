@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import com.d3x.morpheus.array.Array;
 import com.d3x.morpheus.frame.DataFrame;
@@ -144,7 +145,7 @@ public class PerfStat implements java.io.Serializable {
      * @return  the GC time stats for this performance monitor
      */
     public DataFrame<String,String> getGcStats() {
-        final Array<String> categories = Array.of("Min", "Max", "Mean", "Median", "Stdev");
+        final Array<String> categories = Array.of(Stream.of("Min", "Max", "Mean", "Median", "Stdev"));
         return DataFrame.ofDoubles(categories, Collections.singleton(label)).applyDoubles(v -> {
             switch (v.rowOrdinal()) {
                 case 0:  return getGcTime(StatType.MIN);
@@ -162,7 +163,7 @@ public class PerfStat implements java.io.Serializable {
      * @return  the call time stats for this performance monitor
      */
     public DataFrame<String,String> getRunStats() {
-        final Array<String> categories = Array.of("Min", "Max", "Mean", "Median", "Stdev");
+        final Array<String> categories = Array.of(Stream.of("Min", "Max", "Mean", "Median", "Stdev"));
         return DataFrame.ofDoubles(categories, Collections.singleton(label)).applyDoubles(v -> {
             switch (v.rowOrdinal()) {
                 case 0:  return getCallTime(StatType.MIN);
@@ -182,7 +183,7 @@ public class PerfStat implements java.io.Serializable {
      * @return  the call time stats for this performance monitor
      */
     public DataFrame<String,String> getTimeStats(boolean includeGC) {
-        final Array<String> categories = Array.of("Min", "Max", "Mean", "Median", "Stdev");
+        final Array<String> categories = Array.of(Stream.of("Min", "Max", "Mean", "Median", "Stdev"));
         return DataFrame.ofDoubles(categories, Collections.singleton(label)).applyDoubles(v -> {
             switch (v.rowOrdinal()) {
                 case 0:  return getCallTime(StatType.MIN) + (includeGC ? getGcTime(StatType.MIN) : 0);
@@ -201,7 +202,7 @@ public class PerfStat implements java.io.Serializable {
      * @return  the used memory stats for this performance monitor
      */
     public DataFrame<String,String> getUsedMemStats() {
-        final Array<String> categories = Array.of("Min", "Max", "Mean", "Median", "Stdev");
+        final Array<String> categories = Array.of(Stream.of("Min", "Max", "Mean", "Median", "Stdev"));
         return DataFrame.ofDoubles(categories, Collections.singleton(label)).applyDoubles(v -> {
             switch (v.rowOrdinal()) {
                 case 0:  return getUsedMemory(StatType.MIN);
@@ -219,7 +220,7 @@ public class PerfStat implements java.io.Serializable {
      */
     private void reset(int count) {
         this.count = 0;
-        Array<String> colKeys = Array.of(label + " (call)", label + " (gc)",  label + " (total)");
+        Array<String> colKeys = Array.of(Stream.of(label + " (call)", label + " (gc)",  label + " (total)"));
         this.frame = DataFrame.ofDoubles(Range.of(0, count).map(String::valueOf), colKeys);
         this.gcTimeStats = StatsCollector.of(new Min(), new Max(), new Mean(), new Median(), new StdDev(true));
         this.callTimeStats = StatsCollector.of(new Min(), new Max(), new Mean(), new Median(), new StdDev(true));
@@ -227,7 +228,7 @@ public class PerfStat implements java.io.Serializable {
     }
 
     public DataFrame<String,String> getFrame() {
-        return DataFrame.ofDoubles(Array.of("call", "gc"), label).applyDoubles(v -> {
+        return DataFrame.ofDoubles(Array.of(Stream.of("call", "gc")), label).applyDoubles(v -> {
             switch (v.rowOrdinal()) {
                 case 0: return callTimeStats.getValue(StatType.MEAN);
                 case 1: return gcTimeStats.getValue(StatType.MEAN);

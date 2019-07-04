@@ -370,8 +370,8 @@ public class MultiCharts {
 
     private Chart<PiePlot<String,String>> piePlot1() {
         DataFrame<String,String> frame = DataFrame.ofDoubles(
-            Array.of("AUS", "GBR", "USA", "DEU", "ITA", "ESP", "ZAF"),
-            Array.of("Random"),
+            Array.ofObjects("AUS", "GBR", "USA", "DEU", "ITA", "ESP", "ZAF"),
+            Array.ofObjects("Random"),
             value -> Math.random() * 10d
         );
         return Chart.create().withPiePlot(frame, false, chart -> {
@@ -385,8 +385,8 @@ public class MultiCharts {
 
     private Chart<PiePlot<String,String>> piePlot2() {
         DataFrame<String, String> frame = DataFrame.ofDoubles(
-            Array.of("AUS", "GBR", "USA", "DEU", "ITA", "ESP", "ZAF"),
-            Array.of("Random"),
+            Array.ofObjects("AUS", "GBR", "USA", "DEU", "ITA", "ESP", "ZAF"),
+            Array.ofObjects("Random"),
             value -> Math.random() * 10d
         );
         return Chart.create().withPiePlot(frame, false, chart -> {
@@ -401,8 +401,8 @@ public class MultiCharts {
 
     private Chart<PiePlot<String,String>> piePlot3() {
         DataFrame<String, String> frame = DataFrame.ofDoubles(
-            Array.of("AUS", "GBR", "USA", "DEU", "ITA", "ESP", "ZAF"),
-            Array.of("Random"),
+            Array.ofObjects("AUS", "GBR", "USA", "DEU", "ITA", "ESP", "ZAF"),
+            Array.ofObjects("Random"),
             value -> Math.random() * 10d
         );
         return Chart.create().withPiePlot(frame, true, chart -> {
@@ -417,8 +417,8 @@ public class MultiCharts {
 
     private Chart<PiePlot<String,String>> piePlot4() {
         DataFrame<String, String> frame = DataFrame.ofDoubles(
-            Array.of("AUS", "GBR", "USA", "DEU", "ITA", "ESP", "ZAF"),
-            Array.of("Random"),
+            Array.ofObjects("AUS", "GBR", "USA", "DEU", "ITA", "ESP", "ZAF"),
+            Array.ofObjects("Random"),
             value -> Math.random() * 10d
         );
         return Chart.create().withPiePlot(frame, false, chart -> {

@@ -16,7 +16,6 @@
 package com.d3x.morpheus.reference;
 
 import java.util.Comparator;
-import java.util.stream.IntStream;
 
 import com.d3x.morpheus.array.Array;
 import com.d3x.morpheus.frame.DataFrameColumn;
@@ -117,8 +116,8 @@ abstract class XDataFrameComparator implements IntComparator {
 
     @Override
     public int compare(int ordinal1, int ordinal2) {
-        final int index1 = index.getCoordinateAt(ordinal1);
-        final int index2 = index.getCoordinateAt(ordinal2);
+        var index1 = index.getCoordinateAt(ordinal1);
+        var index2 = index.getCoordinateAt(ordinal2);
         return compareValues(index1, index2);
     }
 
@@ -195,8 +194,8 @@ abstract class XDataFrameComparator implements IntComparator {
         return new XDataFrameComparator() {
             @Override
             final int compareValues(int index1, int index2) {
-                final double v1 = array.getDouble(index1);
-                final double v2 = array.getDouble(index2);
+                var v1 = array.getDouble(index1);
+                var v2 = array.getDouble(index2);
                 return multiplier * Double.compare(v1, v2);
             }
         };
@@ -387,29 +386,4 @@ abstract class XDataFrameComparator implements IntComparator {
             }
         }
     }
-
-
-
-    public static void main(String[] args) {
-        final int size = 5000000;
-        IntStream.range(0, 5).forEach(k -> {
-            final Array<Double> values = Array.of(Double.class, size).applyDoubles(v -> Math.random());
-            final Index<Double> index = Index.of(values);
-            final XDataFrameComparator comparator = XDataFrameComparator.create(values, 1).withIndex(index);
-            final long t1 = System.currentTimeMillis();
-            index.sort(true, comparator);
-            final long t2 = System.currentTimeMillis();
-            System.out.println("Sorted array in " + (t2-t1) + " millis");
-            for (int i=1; i<index.size(); ++i) {
-                final double v1 = index.getKey(i-1);
-                final double v2 = index.getKey(i);
-                final int comp = Double.compare(v1, v2);
-                if (comp > 0) {
-                    throw new RuntimeException("The indexes are not sorted for the array");
-                }
-            }
-        });
-    }
-
-
 }

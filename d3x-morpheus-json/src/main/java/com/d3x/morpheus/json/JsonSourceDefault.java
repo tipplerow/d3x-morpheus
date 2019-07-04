@@ -15,22 +15,25 @@
  */
 package com.d3x.morpheus.json;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
+import java.time.LocalDate;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import com.d3x.morpheus.array.Array;
-import com.d3x.morpheus.array.ArrayBuilder;
 import com.d3x.morpheus.array.ArrayType;
 import com.d3x.morpheus.frame.DataFrame;
 import com.d3x.morpheus.frame.DataFrameException;
-import com.d3x.morpheus.util.Asserts;
+import com.d3x.morpheus.index.Index;
+import com.d3x.morpheus.range.Range;
 import com.d3x.morpheus.util.IO;
-import com.d3x.morpheus.util.text.Formats;
-import com.d3x.morpheus.util.text.parser.Parser;
+import com.d3x.morpheus.util.Resource;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 
@@ -41,231 +44,164 @@ import com.google.gson.stream.JsonToken;
  *
  * @author Xavier Witdouck
  */
-class JsonSourceDefault<R,C> implements JsonSource<R,C> {
-
-    private JsonReader reader;
-    private List<Array<?>> dataList;
-    private ArrayBuilder<R> rowKeyBuilder;
-    private ArrayBuilder<C> colKeyBuilder;
-    private JsonSource.Options<R,C> options;
+public class JsonSourceDefault<R,C> implements JsonSource<R,C> {
 
 
     @Override
-    public synchronized DataFrame<R,C> read(Options<R,C> options) throws DataFrameException {
+    public DataFrame<R,C> read(Options<R,C> options) throws DataFrameException {
+        var is = options.getResource().toInputStream();
+        var reader = new JsonReader(new InputStreamReader(new BufferedInputStream(is)));
         try {
-            this.options = options;
-            this.reader = new JsonReader(new InputStreamReader(options.getResource().toInputStream()));
-            this.reader.beginObject();
-            if (reader.hasNext()) {
-                final String rootName = reader.nextName();
-                if (!rootName.equalsIgnoreCase("DataFrame")) {
-                    throw new DataFrameException("Unsupported JSON format for DataFrame");
-                } else {
-                    reader.beginObject();
-                    int rowCount = -1;
-                    int colCount = -1;
-                    while (reader.hasNext()) {
-                        final String name = reader.nextName();
-                        if (name.equalsIgnoreCase("rowCount")) {
-                            rowCount = reader.nextInt();
-                        } else if (name.equalsIgnoreCase("colCount")) {
-                            colCount = reader.nextInt();
-                        } else if (name.equalsIgnoreCase("rowKeys")) {
-                            readRowKeys(rowCount);
-                        } else if (name.equalsIgnoreCase("columns")) {
-                            readColumns(rowCount, colCount);
-                        }
-                    }
-                }
-            }
-            reader.endObject();
-            return createFrame();
-        } catch (DataFrameException ex) {
-            throw ex;
-        } catch (Exception ex) {
-            throw new DataFrameException("Failed to load DataFrame for request: " + options, ex);
+            return read(reader, options);
         } finally {
             IO.close(reader);
         }
     }
 
-
     /**
-     * Returns a newly created DataFrame from the contents that has been read from JSON
-     * @return      the newly created DataFrame
-     */
-    private DataFrame<R,C> createFrame() {
-        final Array<R> rowKeys = rowKeyBuilder.toArray();
-        final Array<C> colKeys = colKeyBuilder.toArray();
-        final Class<C> colType = colKeys.type();
-        return DataFrame.of(rowKeys, colType, columns -> {
-            for (int i=0; i<colKeys.length(); ++i) {
-                final C colKey = colKeys.getValue(i);
-                final Array<?> array = dataList.get(i);
-                columns.add(colKey, array);
-            }
-        });
-    }
-
-
-    /**
-     * Reads row keys from the stream
-     * @param rowCount  the row count for frame
+     * Returns a DataFrame loaded from the Json reader
+     * @param reader        the Json stream reader
+     * @param options       the options for parsing
+     * @return              the resulting DataFrame
+     * @throws DataFrameException   if fails to parse json into DataFrame
      */
     @SuppressWarnings("unchecked")
-    private void readRowKeys(int rowCount) {
+    public DataFrame<R,C> read(JsonReader reader, Options<R,C> options) throws DataFrameException {
         try {
-            this.reader.beginObject();
-            this.rowKeyBuilder = ArrayBuilder.of(rowCount);
-            final Formats formats = options.getFormats();
-            Parser<R> parser = formats.getParserOrFail(Object.class);
-            final Map<String,Class<?>> typeMap = getTypeMap(formats);
-            while (reader.hasNext()) {
-                final String name = reader.nextName();
-                if (name.equalsIgnoreCase("type")) {
-                    final String typeName = reader.nextString();
-                    final Class<?> dataType = typeMap.get(typeName);
-                    if (dataType == null) throw new IllegalArgumentException("No Formats parser exists for type name: " + typeName);
-                    parser = formats.getParserOrFail(typeName, dataType);
-                } else if (name.equalsIgnoreCase("values")) {
-                    reader.beginArray();
-                    while (reader.hasNext()) {
-                        final String value = reader.nextString();
-                        final R key = parser.apply(value);
-                        rowKeyBuilder.add(key);
-                    }
-                    reader.endArray();
-                }
-            }
-            reader.endObject();
-        } catch (DataFrameException ex) {
-            throw ex;
-        } catch (Exception ex) {
-            throw new DataFrameException("Failed to read row keys for DataFrame", ex);
-        }
-    }
-
-
-    /**
-     * Reads the column data from JSON and returs a apply of column data by key
-     * @param rowCount      the row count
-     * @param colCount      the column count
-     */
-    @SuppressWarnings("unchecked")
-    private void readColumns(int rowCount, int colCount) {
-        try {
-            reader.beginArray();
-            dataList = new ArrayList<>(colCount);
-            colKeyBuilder = ArrayBuilder.of(colCount);
-            final Formats formats = options.getFormats();
-            final Map<String,Class<?>> typeMap = getTypeMap(formats);
-            while (reader.hasNext()) {
+            var token = reader.peek();
+            if (token == JsonToken.NULL) {
+                reader.nextNull();
+                return null;
+            } else {
                 reader.beginObject();
-                String key = null;
-                String keyTypeName;
-                ArrayType dataType = null;
-                Class<?> dataClass = null;
-                Function<String,?> parser = formats.getParserOrFail(Object.class);
-                ArrayBuilder<Object> dataBuilder = null;
-                while (reader.hasNext()) {
-                    final String name = reader.nextName();
-                    if (name.equalsIgnoreCase("key")) {
-                        key = reader.nextString();
-                    } else if (name.equalsIgnoreCase("keyType")) {
-                        keyTypeName = reader.nextString();
-                        final Class<?> keyType = typeMap.get(keyTypeName);
-                        final C colKey = (C)formats.getParserOrFail(keyType).apply(key);
-                        colKeyBuilder.add(colKey);
-                    } else if (name.equalsIgnoreCase("dataType")) {
-                        final String dataTypeName = reader.nextString();
-                        dataClass = typeMap.get(dataTypeName);
-                        parser = formats.getParserOrFail(dataTypeName, dataClass);
-                        if (parser == null) throw new RuntimeException("No parser configured in formats for type named: " + dataTypeName);
-                        dataType = ArrayType.of(dataClass);
-                    } else if (name.equalsIgnoreCase("defaultValue")) {
-                        Asserts.notNull(dataType, "The data type for column has not been resolved: " + key);
-                        final JsonToken token = reader.peek();
-                        if (token == JsonToken.NULL) {
-                            reader.nextNull();
-                            dataBuilder = ArrayBuilder.of(rowCount, (Class<Object>)dataClass, null);
-                        } else if (token == JsonToken.BOOLEAN) {
-                            final boolean nullValue = reader.nextBoolean();
-                            dataBuilder = ArrayBuilder.of(rowCount, (Class<Object>)dataClass, nullValue);
-                        } else if (token == JsonToken.NUMBER) {
-                            final String nullString = reader.nextString();
-                            dataBuilder = ArrayBuilder.of(rowCount, (Class<Object>)dataClass, parser.apply(nullString));
-                        } else if (token == JsonToken.STRING) {
-                            final String nullString = String.valueOf(reader.nextDouble());
-                            dataBuilder = ArrayBuilder.of(rowCount, (Class<Object>)dataClass, parser.apply(nullString));
-                        } else {
-                            throw new IllegalStateException("Unexpected JsonToken: " + token);
+                token = reader.peek();
+                var rowCount = 10;
+                var colCount = 10;
+                DataFrame<R,C> result = null;
+                var rowType = (Class<R>)Object.class;
+                var colType = (Class<C>)Object.class;
+                var formats = options.getFormats();
+                while (token != JsonToken.END_OBJECT) {
+                    var name = reader.nextName();
+                    if (name.equalsIgnoreCase("rowCount")) {
+                        rowCount = reader.nextInt();
+                        token = reader.peek();
+                    } else if (name.equalsIgnoreCase("colCount")) {
+                        colCount = reader.nextInt();
+                        token = reader.peek();
+                    } else if (name.equalsIgnoreCase("rowType")) {
+                        rowType = JsonSink.getDataType(reader.nextString());
+                        token = reader.peek();
+                    } else if (name.equalsIgnoreCase("colType")) {
+                        colType = JsonSink.getDataType(reader.nextString());
+                        token = reader.peek();
+                    } else if (name.equalsIgnoreCase("columns")) {
+                        var rows = Index.of(rowType, rowCount);
+                        var cols = Index.of(colType, colCount);
+                        result = DataFrame.ofObjects(rows, cols);
+                        var columns = (JsonArray)new Gson().fromJson(reader, JsonArray.class);
+                        for (int i=0; i<columns.size(); ++i) {
+                            var object = columns.get(i).getAsJsonObject();
+                            var key = formats.<C>parse(colType, object.get("key").getAsString());
+                            var dataType = JsonSink.getDataType(object.get("dataType").getAsString());
+                            var array = Array.of(dataType, rowCount);
+                            result.cols().add(key, array);
                         }
-                    } else if (name.equalsIgnoreCase("values")) {
-                        Asserts.notNull(dataType, "The data type for column has not been resolved: " + key);
-                        Asserts.notNull(dataBuilder, "");
-                        reader.beginArray();
-                        if (dataType.isBoolean()) {
-                            while (reader.hasNext()) {
-                                final boolean isNull = reader.peek() == JsonToken.NULL;
-                                final boolean rawValue = !isNull && reader.nextBoolean();
-                                dataBuilder.addBoolean(rawValue);
-                            }
-                        } else if (dataType.isInteger()) {
-                            while (reader.hasNext()) {
-                                final boolean isNull = reader.peek() == JsonToken.NULL;
-                                final int rawValue = isNull ? 0 : reader.nextInt();
-                                dataBuilder.addInt(rawValue);
-                            }
-                        } else if (dataType.isLong()) {
-                            while (reader.hasNext()) {
-                                final boolean isNull = reader.peek() == JsonToken.NULL;
-                                final long rawValue = isNull ? 0L : reader.nextLong();
-                                dataBuilder.addLong(rawValue);
-                            }
-                        } else if (dataType.isDouble()) {
-                            while (reader.hasNext()) {
-                                final boolean isNull = reader.peek() == JsonToken.NULL;
-                                final double rawValue = isNull ? Double.NaN : reader.nextDouble();
-                                dataBuilder.addDouble(rawValue);
-                            }
-                        } else {
-                            while (reader.hasNext()) {
-                                final boolean isNull = reader.peek() == JsonToken.NULL;
-                                final String rawValue = isNull ? null : reader.nextString();
-                                final Object value = parser.apply(rawValue);
-                                dataBuilder.add(value);
-                            }
-                        }
-                        final Array<?> array = dataBuilder.toArray();
-                        dataList.add(array);
-                        reader.endArray();
+                        token = reader.peek();
+                    } else if (name.equalsIgnoreCase("data")) {
+                        readData(result, reader, options);
+                        token = reader.peek();
                     }
                 }
                 reader.endObject();
+                return result;
             }
-            reader.endArray();
-        } catch (DataFrameException ex) {
-            throw ex;
-        } catch (Exception ex) {
-            throw new DataFrameException("Failed to read columns for DataFrame", ex);
+        } catch (IOException ex) {
+            throw new DataFrameException("Failed to deserialzie DataFrame from json", ex);
         }
     }
 
 
     /**
-     * Returns the type apply from the formats
-     * @param formats   the formats
-     * @return          the type apply
+     * Reads data from the json stream into the data frame
+     * @param frame     the frame to populate with data
+     * @param reader    the json stream reader
+     * @param options   the json source options
      */
-    private Map<String,Class<?>> getTypeMap(Formats formats) {
-        final Map<String,Class<?>> typeMap = new HashMap<>();
-        formats.getParserKeys().forEach(key -> {
-            if (key instanceof Class) {
-                final Class<?> type = (Class<?>)key;
-                final String name = type.getSimpleName();
-                typeMap.put(name, type);
+    private void readData(DataFrame<R,C> frame, JsonReader reader, Options options) throws IOException {
+        var token = reader.peek();
+        if (token == JsonToken.NULL) {
+            reader.nextNull();
+        } else {
+            reader.beginObject();
+            token = reader.peek();
+            var formats = options.getFormats();
+            var rowKeyType = frame.rows().keyType();
+            var typeMap = frame.cols().keys().collect(Collectors.toMap(v -> v, v -> frame.cols().type(v)));
+            while (token != JsonToken.END_OBJECT) {
+                var rowLabel = reader.nextName();
+                var rowKey = formats.<R>parse(rowKeyType, rowLabel);
+                var rowIndex = frame.rows().add(rowKey);
+                reader.beginObject();
+                token = reader.peek();
+                while (token != JsonToken.END_OBJECT) {
+                    var colLabel = reader.nextName();
+                    var colIndex = Integer.parseInt(colLabel.replace("#", ""));
+                    var colKey = frame.cols().key(colIndex);
+                    var dataType = typeMap.get(colKey);
+                    var typeCode = ArrayType.of(dataType);
+                    token = reader.peek();
+                    if (token == JsonToken.NULL) {
+                        reader.nextNull();
+                        frame.setValueAt(rowIndex, colIndex, null);
+                        token = reader.peek();
+                    } else if (token == JsonToken.BOOLEAN) {
+                        var value = reader.nextBoolean();
+                        frame.setBooleanAt(rowIndex, colIndex, value);
+                        token = reader.peek();
+                    } else if (token == JsonToken.STRING) {
+                        var text = reader.nextString();
+                        var parser = formats.getParserOrFail(colKey, dataType);
+                        var value = parser.apply(text);
+                        frame.setValueAt(rowIndex, colIndex, value);
+                        token = reader.peek();
+                    } else if (typeCode == ArrayType.DOUBLE) {
+                        var value = reader.nextDouble();
+                        frame.setDoubleAt(rowIndex, colIndex, value);
+                        token = reader.peek();
+                    } else if (typeCode == ArrayType.LONG) {
+                        var value = reader.nextLong();
+                        frame.setLongAt(rowIndex, colIndex, value);
+                        token = reader.peek();
+                    } else {
+                        var value = reader.nextInt();
+                        frame.setIntAt(rowIndex, colIndex, value);
+                        token = reader.peek();
+                    }
+                }
+                reader.endObject();
+                token = reader.peek();
             }
-        });
-        return typeMap;
+            reader.endObject();
+        }
     }
+
+
+    public static void main(String[] args) {
+        var range = Range.of(LocalDate.parse("2019-05-01"), LocalDate.parse("2019-05-10"));
+        var columns = IntStream.range(0, 10).mapToObj(i -> "Column-" + i).collect(Collectors.toList());
+        var frame = DataFrame.ofDoubles(range, columns, v -> Math.random());
+        var sink = new JsonSinkDefault<LocalDate,String>();
+        var os = new ByteArrayOutputStream(1024 * 10);
+        sink.write(frame, JsonSink.Options.create(v -> {
+            v.resource(Resource.of(os));
+            v.pretty(true);
+        }));
+        IO.println(new String(os.toByteArray()));
+        var source = new JsonSourceDefault<LocalDate,String>();
+        var result = source.read(o -> o.resource(Resource.of(new ByteArrayInputStream(os.toByteArray()))));
+        IO.println(result);
+    }
+
+
 }

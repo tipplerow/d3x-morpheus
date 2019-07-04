@@ -33,8 +33,8 @@ import static org.testng.AssertJUnit.assertEquals;
  */
 public class StatsTest1 {
 
-    private static Index<String> rows = Index.of("R1", "R2", "R3", "R4");
-    private static Index<String> columns = Index.of("C1", "C2", "C3", "C4", "C5", "C6");
+    private static Index<String> rows = Index.ofObjects("R1", "R2", "R3", "R4");
+    private static Index<String> columns = Index.ofObjects("C1", "C2", "C3", "C4", "C5", "C6");
     private static double[][] values = new double[][] {
         {  1.22d,  4.43d,     7.42d,  4.34d,    78.3d,  3003.49d},
         {  2.22d,  5.46d,  -103.67d,  3.45d,  -273.4d,  232.456d},

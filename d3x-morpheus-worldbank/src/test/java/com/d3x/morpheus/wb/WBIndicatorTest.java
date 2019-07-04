@@ -55,12 +55,8 @@ public class WBIndicatorTest {
 
     @Test()
     public void testC02() {
-        final DataFrame<LocalDate,String> expected = DataFrame.read().csv(options -> {
-            options.setResource("/indicators/EN.ATM.CO2E.PC.csv");
-
-
-            options.setRowKeyParser(LocalDate.class, values -> LocalDate.parse(values[0]));
-            options.setExcludeColumnIndexes(0);
+        var expected = DataFrame.read().<LocalDate>csv("/indicators/EN.ATM.CO2E.PC.csv").read(options -> {
+            options.setRowKeyColumnIndex(0);
         });
         final DataFrame<LocalDate,String> actual = source.read(options -> {
             options.setBatchSize(1000);
@@ -79,9 +75,7 @@ public class WBIndicatorTest {
 
     @Test(enabled = false)
     public void testAll() {
-        final DataFrame<Integer,String> frame = DataFrame.read().csv(options -> {
-            options.setResource("/Users/witdxav/Dropbox/data/world-bank/WDI/WDIData.csv");
-        });
+        var frame = DataFrame.read().csv("/Users/witdxav/Dropbox/data/world-bank/WDI/WDIData.csv").read();
         frame.out().print();
 
         final Set<String> indicatorSet = new HashSet<>();

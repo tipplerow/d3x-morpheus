@@ -91,6 +91,11 @@ class ArrayReadOnly<T> extends ArrayBase<T> {
     }
 
     @Override
+    public Array<T> copy(Array<Integer> indexes) {
+        return source.copy(indexes).readOnly();
+    }
+
+    @Override
     public final Array<T> copy(int start, int end) {
         return source.copy(start, end).readOnly();
     }

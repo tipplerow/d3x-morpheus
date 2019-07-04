@@ -41,22 +41,18 @@ public class ExpWeightedTests {
 
     @Test(dataProvider="style")
     public void testExpWeightedMovingAverage(boolean parallel) {
-        final DataFrame<LocalDate,String> expected = DataFrame.read().csv(options -> {
-            options.setResource("/ewmw/spy-ewma.csv");
-            options.setExcludeColumns("Date");
-            options.setRowKeyParser(LocalDate.class, values -> LocalDate.parse(values[0]));
+        var expected = DataFrame.read().<LocalDate>csv("/ewmw/spy-ewma.csv").read(options -> {
+            options.setRowKeyColumnName("Date");
         });
-        final DataFrame<LocalDate,String> actual = DataFrame.read().csv(options -> {
-            options.setResource("/ewmw/spy.csv");
-            options.setExcludeColumns("Date");
+        var actual = DataFrame.read().<LocalDate>csv("/ewmw/spy.csv").read(options -> {
+            options.setRowKeyColumnName("Date");
             options.getFormats().copyParser(Double.class, "Volume");
-            options.setRowKeyParser(LocalDate.class, values -> LocalDate.parse(values[0]));
         });
         if (parallel) {
-            final DataFrame<LocalDate,String> ewma = actual.cols().parallel().stats().ewma(20);
+            var ewma = actual.cols().parallel().stats().ewma(20);
             DataFrameAsserts.assertEqualsByIndex(ewma, expected);
         } else {
-            final DataFrame<LocalDate,String> ewma = actual.cols().sequential().stats().ewma(20);
+            var ewma = actual.cols().sequential().stats().ewma(20);
             DataFrameAsserts.assertEqualsByIndex(ewma, expected);
         }
     }

@@ -65,7 +65,7 @@ public class TupleTests {
         assertEquals(value1.hashCode(), value2.hashCode(), "Hashcode matches");
         assertTrue(value1 == value1.filter(0, value1.size()));
         assertTrue(value1.equals(value2));
-        assertEquals(value1.item(0), new Integer(1));
+        assertEquals(value1.item(0), Integer.valueOf(1));
         assertEquals(value1.item(1), "Two");
         assertEquals(value1.item(2), "Three");
         assertEquals(value1.item(3), 5d);
@@ -77,7 +77,7 @@ public class TupleTests {
         Tuple value2 = value1.filter(0, 2);
         assertTrue(value1 == value2);
         assertEquals(value2.size(), 2);
-        assertEquals(value2.item(0), new Integer(1));
+        assertEquals(value2.item(0), Integer.valueOf(1));
         assertEquals(value2.item(1), "Two");
     }
 

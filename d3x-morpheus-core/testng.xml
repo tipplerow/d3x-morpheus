@@ -25,7 +25,7 @@
 
     <test name="DataFrame IO Tests">
         <packages>
-            <package name="com.d3x.morpheus.io.*"/>
+            <package name="com.d3x.morpheus.json.*"/>
         </packages>
         <classes>
             <class name="com.d3x.morpheus.reference.SerializationTests"/>
@@ -36,6 +36,13 @@
     <test name="DataFrame Util Tests">
         <packages>
             <package name="com.d3x.morpheus.util.*"/>
+        </packages>
+    </test>
+
+
+    <test name="DataSeries Tests">
+        <packages>
+            <package name="com.d3x.morpheus.series.*"/>
         </packages>
     </test>
 

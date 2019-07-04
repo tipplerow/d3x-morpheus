@@ -114,9 +114,19 @@ class DenseArrayOfDoubles extends ArrayBase<Double> {
 
     @Override()
     public final Array<Double> copy(int[] indexes) {
-        final DenseArrayOfDoubles clone = new DenseArrayOfDoubles(indexes.length, defaultValue);
+        var clone = new DenseArrayOfDoubles(indexes.length, defaultValue);
         for (int i = 0; i < indexes.length; ++i) {
             clone.values[i] = this.values[indexes[i]];
+        }
+        return clone;
+    }
+
+
+    @Override
+    public Array<Double> copy(Array<Integer> indexes) {
+        var clone = new DenseArrayOfDoubles(indexes.length(), defaultValue);
+        for (int i = 0; i < indexes.length(); ++i) {
+            clone.values[i] = this.values[indexes.getInt(i)];
         }
         return clone;
     }
@@ -155,11 +165,11 @@ class DenseArrayOfDoubles extends ArrayBase<Double> {
 
     @Override
     public final Array<Double> filter(Predicate<ArrayValue<Double>> predicate) {
-        final ArrayCursor<Double> cursor = cursor();
-        final ArrayBuilder<Double> builder = ArrayBuilder.of(length(), type());
+        var cursor = cursor();
+        var builder = ArrayBuilder.of(length(), type());
         for (int i=0; i<values.length; ++i) {
             cursor.moveTo(i);
-            final boolean match = predicate.test(cursor);
+            var match = predicate.test(cursor);
             if (match) {
                 builder.addDouble(cursor.getDouble());
             }

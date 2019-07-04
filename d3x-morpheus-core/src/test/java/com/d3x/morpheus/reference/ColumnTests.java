@@ -455,14 +455,14 @@ public class ColumnTests {
 
     @Test(dataProvider="args1")
     public void testColumnMapping2(Class type) {
-        final Index<String> rowKeys = Index.of("a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k");
+        final Index<String> rowKeys = Index.ofObjects("a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k");
         final DataFrame<String,String> source = TestDataFrames.random(type, rowKeys, rowKeys);
         final DataFrame<String,String> target = TestDataFrames.random(type, rowKeys, rowKeys);
         final DataFrameCursor<String,String> cursor = source.cursor();
         if (type == boolean.class) {
             target.cols().keys().forEach(colKey -> {
                 target.col(colKey).applyBooleans(v -> {
-                    return cursor.atRow(v.rowOrdinal()).atColKey(colKey).getBoolean();
+                    return cursor.toRowAt(v.rowOrdinal()).toCol(colKey).getBoolean();
                 });
             });
             DataFrameAsserts.assertEqualsByIndex(source, target);
@@ -578,7 +578,7 @@ public class ColumnTests {
         final LocalDate start = LocalDate.now().minusYears(10);
         final LocalDate end = start.plusDays(5000);
         final Index<LocalDate> rowKeys = Range.of(start, end).toIndex(LocalDate.class);
-        final Index<String> colKeys = Index.of("A", "B", "C", "D", "E", "F", "G", "H");
+        final Index<String> colKeys = Index.ofObjects("A", "B", "C", "D", "E", "F", "G", "H");
         final DataFrame<LocalDate,String> frame = DataFrame.of(rowKeys, colKeys, Double.class);
         frame.applyDoubles(v -> Math.random() * 100);
         frame.cols().stream().forEach(column -> {
@@ -603,7 +603,7 @@ public class ColumnTests {
         final LocalDate start = LocalDate.now().minusYears(10);
         final LocalDate end = start.plusDays(5000);
         final Index<LocalDate> rowKeys = Range.of(start, end).toIndex(LocalDate.class);
-        final Index<String> colKeys = Index.of("A", "B", "C", "D", "E", "F", "G", "H");
+        final Index<String> colKeys = Index.ofObjects("A", "B", "C", "D", "E", "F", "G", "H");
         final DataFrame<LocalDate,String> frame = DataFrame.of(rowKeys, colKeys, Double.class);
         frame.applyDoubles(v -> Math.random() * 100);
         final Iterator<DataFrameColumn<LocalDate,String>> iterator = frame.cols().iterator();

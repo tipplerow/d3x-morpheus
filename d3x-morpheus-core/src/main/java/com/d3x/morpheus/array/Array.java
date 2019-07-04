@@ -31,7 +31,9 @@ import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
 import java.util.function.ToIntFunction;
 import java.util.function.ToLongFunction;
+import java.util.stream.Stream;
 
+import com.d3x.morpheus.util.IntComparator;
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.commons.math3.distribution.RealDistribution;
 
@@ -127,6 +129,13 @@ public interface Array<T> extends Iterable<T>, Serializable, Cloneable {
      * @return          the deep copy of a subset of this array
      */
     Array<T> copy(int[] indexes);
+
+    /**
+     * Returns a deep copy of this array including only the values at the indexes specified
+     * @param indexes   the indexes of values to include in the copy
+     * @return          the deep copy of a subset of this array
+     */
+    Array<T> copy(Array<Integer> indexes);
 
     /**
      * Returns a deep copy of a subset of this array including only the values in the range
@@ -293,6 +302,13 @@ public interface Array<T> extends Iterable<T>, Serializable, Cloneable {
     Array<T> sort(boolean ascending);
 
     /**
+     * Sorts all elements in this array according to the int comparator
+     * @param comparator    the custom comparator to sort array
+     * @return              the sorted Array reference
+     */
+    Array<T> sort(IntComparator comparator);
+
+    /**
      * Sorts a subset of elements in this array based on the range specified in either ascending or descending order
      * @param start         the start index for range, inclusive
      * @param end           the end index for range, exclusive
@@ -309,6 +325,7 @@ public interface Array<T> extends Iterable<T>, Serializable, Cloneable {
      * @return              the sorted Array reference
      */
     Array<T> sort(int start, int end, Comparator<ArrayValue<T>> comparator);
+
 
     /**
      * Returns a newly created array including values that pass the predicate
@@ -645,22 +662,13 @@ public interface Array<T> extends Iterable<T>, Serializable, Cloneable {
         return ArrayFactory.mapped().apply(type, length, defaultValue, path);
     }
 
-    /**
-     * Returns a newly created dense Array that wraps the object array specified
-     * @param values    the values to wrap
-     * @return          the newly created Array
-     */
-    @SuppressWarnings("unchecked")
-    static <V> Array<V> of(V... values) {
-        return ArrayFactory.create(values);
-    }
 
     /**
      * Returns a newly created dense Array that wraps the boolean array specified
      * @param values    the values to wrap
      * @return          the newly created Array
      */
-    static Array<Boolean> of(boolean[] values) {
+    static Array<Boolean> of(boolean... values) {
         return ArrayFactory.create(values);
     }
 
@@ -669,7 +677,7 @@ public interface Array<T> extends Iterable<T>, Serializable, Cloneable {
      * @param values    the values to wrap
      * @return          the newly created Array
      */
-    static Array<Integer> of(int[] values) {
+    static Array<Integer> of(int... values) {
         return ArrayFactory.create(values);
     }
 
@@ -678,7 +686,7 @@ public interface Array<T> extends Iterable<T>, Serializable, Cloneable {
      * @param values    the values to wrap
      * @return          the newly created Array
      */
-    static Array<Long> of(long[] values) {
+    static Array<Long> of(long... values) {
         return ArrayFactory.create(values);
     }
 
@@ -687,8 +695,30 @@ public interface Array<T> extends Iterable<T>, Serializable, Cloneable {
      * @param values    the values to wrap
      * @return          the newly created Array
      */
-    static Array<Double> of(double[] values) {
+    static Array<Double> of(double... values) {
         return ArrayFactory.create(values);
+    }
+
+    /**
+     * Returns a newly created dense Array that wraps the object array specified
+     * @param values    the values to wrap
+     * @return          the newly created Array
+     */
+    static <V> Array<V> ofObjects(V... values) {
+        return ArrayFactory.create(values);
+    }
+
+
+    /**
+     * Returns a newly created array from the stream of values
+     * @param values    the values for stream
+     * @param <V>       the stream type
+     * @return          the newly created values
+     */
+    static <V> Array<V> of(Stream<V> values) {
+        var builder = ArrayBuilder.<V>of(100);
+        values.forEach(builder::add);
+        return builder.toArray();
     }
 
     /**
@@ -712,6 +742,7 @@ public interface Array<T> extends Iterable<T>, Serializable, Cloneable {
         return Array.of(type, length, defaultValue, 1F);
     }
 
+
     /**
      * Returns a newly created dense Array based on the arguments specified
      * @param type          the data type for Array
@@ -730,13 +761,13 @@ public interface Array<T> extends Iterable<T>, Serializable, Cloneable {
 
     /**
      * Returns a newly created Array based on the arguments specified
-     * @param type          the data type for Array
-     * @param length        the initial length for array
-     * @param loadFactor    the load factor between 0..1 (1 for dense array, < 1 for sparse array)
-     * @return              the newly created array
+     * @param type      the data type for Array
+     * @param length    the initial length for array
+     * @param fillPct   the fill percentage between 0..1 (1 for dense array, < 1 for sparse array)
+     * @return          the newly created array
      */
-    static <V> Array<V> of(Class<V> type, int length, float loadFactor) {
-        return Array.of(type, length, ArrayType.defaultValue(type), loadFactor);
+    static <V> Array<V> of(Class<V> type, int length, double fillPct) {
+        return Array.of(type, length, ArrayType.defaultValue(type), fillPct);
     }
 
     /**
@@ -744,12 +775,12 @@ public interface Array<T> extends Iterable<T>, Serializable, Cloneable {
      * @param type          the data type for Array
      * @param length        the initial length for array
      * @param defaultValue  the default value for the array
-     * @param loadFactor    the load factor between 0..1 (1 for dense array, < 1 for sparse array)
+     * @param fillPct       the fill percentage between 0..1 (1 for dense array, < 1 for sparse array)
      * @return              the newly created array
      */
-    static <V> Array<V> of(Class<V> type, int length, V defaultValue, float loadFactor) {
-        if (loadFactor < 1f) {
-            return ArrayFactory.sparse().apply(type, length, defaultValue);
+    static <V> Array<V> of(Class<V> type, int length, V defaultValue, double fillPct) {
+        if (fillPct < 1f) {
+            return ArrayFactory.sparse().apply(type, length, fillPct, defaultValue);
         } else {
             return ArrayFactory.dense().apply(type, length, defaultValue);
         }
@@ -779,24 +810,24 @@ public interface Array<T> extends Iterable<T>, Serializable, Cloneable {
     /**
      * Returns a newly created Array of objects of length specified
      * @param length        the initial length for array
-     * @param loadFactor    the load factor between 0..1 (1 for dense array, < 1 for sparse array)
+     * @param fillPct    the load factor between 0..1 (1 for dense array, < 1 for sparse array)
      * @return              the newly created array
      */
     @SuppressWarnings("unchecked")
-    static <V> Array<V> ofObjects(int length, float loadFactor) {
-        return of((Class<V>)Object.class, length, loadFactor);
+    static <V> Array<V> ofObjects(int length, double fillPct) {
+        return of((Class<V>)Object.class, length, fillPct);
     }
 
     /**
      * Returns a newly created Array of objects of length specified
      * @param length        the initial length for array
      * @param defaultValue  the default value for the array
-     * @param loadFactor    the load factor between 0..1 (1 for dense array, < 1 for sparse array)
+     * @param fillPct    the load factor between 0..1 (1 for dense array, < 1 for sparse array)
      * @return              the newly created array
      */
     @SuppressWarnings("unchecked")
-    static <V> Array<V> ofObjects(int length, V defaultValue, float loadFactor) {
-        return of((Class<V>)Object.class, length, defaultValue, loadFactor);
+    static <V> Array<V> ofObjects(int length, V defaultValue, double fillPct) {
+        return Array.<V>of((Class<V>)Object.class, length, defaultValue, fillPct);
     }
 
 
@@ -867,9 +898,9 @@ public interface Array<T> extends Iterable<T>, Serializable, Cloneable {
         } else {
             final T defaultValue = source.defaultValue();
             final int count = source.count(v -> v.isEqualTo(defaultValue));
-            final float loadFactor = (float)(Math.abs(count - source.length())) / (float)source.length();
-            final float loadFactorAdjusted = Math.min(0.99F, loadFactor);
-            final Array<T> result = Array.of(source.type(), source.length(), defaultValue, loadFactorAdjusted);
+            final double fillPct = (float)(Math.abs(count - source.length())) / (double)source.length();
+            final double fillPctAdjusted = Math.min(0.99F, fillPct);
+            final Array<T> result = Array.of(source.type(), source.length(), defaultValue, fillPctAdjusted);
             switch (source.typeCode()) {
                 case BOOLEAN:           result.applyBooleans(v -> source.getBoolean(v.index()));    break;
                 case INTEGER:           result.applyInts(v -> source.getInt(v.index()));            break;

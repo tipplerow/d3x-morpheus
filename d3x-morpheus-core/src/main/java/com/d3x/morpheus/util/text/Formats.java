@@ -73,14 +73,14 @@ public class Formats {
      * NOTE THAT THE ORDER IN WHICH THESE ARE REGISTERED MATTERS SOMEWHAT (MORE SPECIFIC TO LESS SPECIFIC)
      */
     private void registerParsers() {
+        this.setParser(double.class, Parser.ofDouble("0.0000####;-0.0000####", 1).withNullChecker(nullCheck));
+        this.setParser(Double.class, Parser.ofDouble("0.0000####;-0.0000####", 1).withNullChecker(nullCheck));
         this.setParser(boolean.class, Parser.ofBoolean().withNullChecker(nullCheck));
         this.setParser(Boolean.class, Parser.ofBoolean().withNullChecker(nullCheck));
         this.setParser(int.class, Parser.ofInteger().withNullChecker(nullCheck));
         this.setParser(Integer.class, Parser.ofInteger().withNullChecker(nullCheck));
         this.setParser(long.class, Parser.ofLong().withNullChecker(nullCheck));
         this.setParser(Long.class, Parser.ofLong().withNullChecker(nullCheck));
-        this.setParser(double.class, Parser.ofDouble("0.0000####;-0.0000####", 1).withNullChecker(nullCheck));
-        this.setParser(Double.class, Parser.ofDouble("0.0000####;-0.0000####", 1).withNullChecker(nullCheck));
         this.setParser(BigDecimal.class, Parser.ofBigDecimal().withNullChecker(nullCheck));
         this.setParser(LocalDate.class, Parser.ofLocalDate(DateTimeFormatter.ISO_LOCAL_DATE).withNullChecker(nullCheck));
         this.setParser(LocalTime.class, Parser.ofLocalTime(DateTimeFormatter.ISO_LOCAL_TIME).withNullChecker(nullCheck));
@@ -361,14 +361,33 @@ public class Formats {
      * @return          the formatted string
      */
     @SuppressWarnings("unchecked")
-    public <T> String format(T value) {
+    public final <T> String format(T value) {
         if (value == null) {
             return "null";
         } else {
-            final Class<T> type = (Class<T>)value.getClass();
-            return getPrinterOrFail(type, null).apply(value);
+            var type = (Class<T>)value.getClass();
+            var printer = getPrinterOrFail(type, Object.class);
+            return printer.apply(value);
         }
     }
+
+
+    /**
+     * Parses text into some object representation using the parser registered against the key provided
+     * @param key       the parser key to use
+     * @param text      the text to parse
+     * @param <T>       the data type
+     * @return          the resulting value
+     */
+    public final <T> T parse(Object key, String text) {
+        if (text == null) {
+            return null;
+        } else {
+            var parser = this.<T>getParserOrFail(key);
+            return parser.apply(text);
+        }
+    }
+
 
     /**
      * Returns a Printer for the key specified
@@ -499,25 +518,14 @@ public class Formats {
      * @return          the Parser that can parse all values
      */
     @SuppressWarnings("unchecked")
-    public Optional<Parser<?>> findParser(String... values) {
-        return findParser(Arrays.asList(values));
-    }
-
-    /**
-     * Finds a Parser that can parse all the values in the collection
-     * @param values    the values to attempt to parse
-     * @return          the Parser that can parse all values
-     */
-    @SuppressWarnings("unchecked")
     public Optional<Parser<?>> findParser(Collection<String> values) {
-        Objects.requireNonNull(values, "The values to parse cannot be null");
-        final List<String> nonNullValues = values.stream().filter(v -> !nullCheck.applyAsBoolean(v)).collect(Collectors.toList());
+        var nonNullValues = values.stream().filter(v -> !nullCheck.applyAsBoolean(v)).collect(Collectors.toList());
         if (nonNullValues.size() == 0) {
             return Optional.empty();
         } else {
-            for (Map.Entry<Object,Parser<?>> entry : parserMap.entrySet()) {
-                final Parser<?> parser = entry.getValue();
-                final boolean allMatch = nonNullValues.stream().allMatch(parser::isSupported);
+            for (var entry : parserMap.entrySet()) {
+                var parser = entry.getValue();
+                var allMatch = nonNullValues.stream().allMatch(parser::isSupported);
                 if (allMatch && !parser.getType().equals(Object.class)) {
                     return Optional.of(parser.optimize(nonNullValues.iterator().next()));
                 }

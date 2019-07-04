@@ -41,7 +41,7 @@ class IndexOfDoubles extends IndexBase<Double> {
      */
     IndexOfDoubles(int initialSize) {
         super(Array.of(Double.class, initialSize));
-        this.indexMap = new TDoubleIntHashMap(initialSize, 0.75f, -1, -1);
+        this.indexMap = new TDoubleIntHashMap(initialSize, DEFAULT_LOAD_FACTOR, -1, -1);
     }
 
     /**
@@ -50,7 +50,7 @@ class IndexOfDoubles extends IndexBase<Double> {
      */
     IndexOfDoubles(Iterable<Double> iterable) {
         super(iterable);
-        this.indexMap = new TDoubleIntHashMap(keyArray().length(), 0.75f, -1, -1);
+        this.indexMap = new TDoubleIntHashMap(keyArray().length(), DEFAULT_LOAD_FACTOR, -1, -1);
         this.keyArray().sequential().forEachValue(v -> {
             final int index = v.index();
             final double key = v.getDouble();
@@ -68,7 +68,7 @@ class IndexOfDoubles extends IndexBase<Double> {
      */
     private IndexOfDoubles(Iterable<Double> iterable, IndexOfDoubles parent) {
         super(iterable, parent);
-        this.indexMap = new TDoubleIntHashMap(keyArray().length(), 0.75f, -1, -1);
+        this.indexMap = new TDoubleIntHashMap(keyArray().length(), DEFAULT_LOAD_FACTOR, -1, -1);
         this.keyArray().sequential().forEachValue(v -> {
             final double key = v.getDouble();
             final int index = parent.indexMap.get(key);
@@ -140,10 +140,10 @@ class IndexOfDoubles extends IndexBase<Double> {
     }
 
     @Override
-    public final Index<Double> copy() {
+    public final Index<Double> copy(boolean deep) {
         try {
-            final IndexOfDoubles clone = (IndexOfDoubles)super.copy();
-            clone.indexMap = new TDoubleIntHashMap(indexMap);
+            var clone = (IndexOfDoubles)super.copy(deep);
+            if (deep) clone.indexMap = new TDoubleIntHashMap(indexMap);
             return clone;
         } catch (Exception ex) {
             throw new IndexException("Failed to clone index", ex);

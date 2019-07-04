@@ -166,12 +166,10 @@ public class QuandlSource {
             for (int i=0; i<maxPages; ++i) {
                 final URL url = createUrl("/api/v3/databases.csv", "page=" + i + "&per_page=" + pageSize);
                 System.out.println("Calling: " + url);
-                final DataFrame<Integer,String> frame = DataFrame.read().csv(options -> {
-                    options.setURL(url);
-                    options.setExcludeColumns("id");
+                var frame = DataFrame.read().<Integer>csv(url).read(options -> {
+                    options.setRowKeyColumnName("id");
                     options.setColumnType("datasets_count", Long.class);
                     options.setColumnType("downloads", Long.class);
-                    options.setRowKeyParser(Integer.class, v -> Integer.parseInt(v[0]));
                 });
                 if (frame.rowCount() == 0) break;
                 frameList.add(frame);
@@ -310,17 +308,16 @@ public class QuandlSource {
      * @return          the resulting DataFrame
      */
     public DataFrame<LocalDate,String> getTimeSeries(Consumer<TimeSeriesOptions> consumer) {
-        final TimeSeriesOptions options = initOptions(TimeSeriesOptions.class, consumer);
+        var options = initOptions(TimeSeriesOptions.class, consumer);
         try {
-            final String database = options.getDatabase();
-            final String dataset = options.getDataset();
-            final String queryString = options.toQueryString();
+            var database = options.getDatabase();
+            var dataset = options.getDataset();
+            var queryString = options.toQueryString();
             final URL url = createUrl("/api/v3/datasets/" + database + "/" + dataset + ".csv", queryString);
             IO.println(url);
-            return DataFrame.read().csv(csvOptions -> {
-                csvOptions.setURL(url);
+            return DataFrame.read().<LocalDate>csv(url).read(csvOptions -> {
                 csvOptions.setColIndexPredicate(index -> index != 0);
-                csvOptions.setRowKeyParser(LocalDate.class, v -> LocalDate.parse(v[0]));
+                csvOptions.setRowKeyColumnIndex(0);
             });
         } catch (Exception ex) {
             throw new QuandlException("Failed to load time-series from Quandl: " + options, ex);
@@ -345,14 +342,14 @@ public class QuandlSource {
             final String urlPath = "/api/v3/datatables/" + database + "/" + dataset + ".csv";
             final URL url = createUrl(urlPath, queryString);
             response = doGet(url.toString(), null);
-            final DataFrame<Integer,String> frame = DataFrame.read().csv(response.getEntity().getContent());
+            final DataFrame<Integer,String> frame = DataFrame.read().csv(response.getEntity().getContent()).read();
             Header cursorId = response.getFirstHeader("Cursor_ID");
             while (cursorId != null) {
                 final String nextQuery = queryString + "&qopts.cursor_id=" + cursorId.getValue();
                 final URL nextUrl = createUrl(urlPath, nextQuery);
                 IO.close(response);
                 response = doGet(nextUrl.toString(), null);
-                final DataFrame<Integer,String> nextPage = DataFrame.read().csv(response.getEntity().getContent());
+                final DataFrame<Integer,String> nextPage = DataFrame.read().csv(response.getEntity().getContent()).read();
                 final DataFrame<Integer,String> nextFrame = nextPage.rows().mapKeys(row -> frame.rowCount() + row.ordinal());
                 cursorId = response.getFirstHeader("Cursor_ID");
                 frame.rows().addAll(nextFrame);
