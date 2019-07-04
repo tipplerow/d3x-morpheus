@@ -15,6 +15,7 @@
  */
 package com.d3x.morpheus.index;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -22,12 +23,10 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import com.d3x.core.util.StopWatch;
 import com.d3x.morpheus.array.Array;
 import com.d3x.morpheus.array.ArrayBuilder;
 import com.d3x.morpheus.array.ArrayValue;
 import com.d3x.morpheus.range.Range;
-import com.d3x.morpheus.util.IO;
 import com.d3x.morpheus.util.IntComparator;
 import com.d3x.morpheus.util.SortAlgorithm;
 import com.d3x.morpheus.util.Swapper;
@@ -39,7 +38,7 @@ import com.d3x.morpheus.util.Swapper;
  *
  * @author  Xavier Witdouck
  */
-abstract class IndexBase<K> implements Index<K> {
+abstract class IndexBase<K> implements Index<K>, Swapper {
 
     static final float DEFAULT_LOAD_FACTOR = 0.85f;
 
@@ -47,8 +46,8 @@ abstract class IndexBase<K> implements Index<K> {
 
     private Array<K> keys;
     private Index<K> parent;
-    private Array<Integer> indexes;
-    private Array<Integer> ordinals;
+    private int[] indexes;
+    private int[] ordinals;
 
     /**
      *
@@ -67,14 +66,13 @@ abstract class IndexBase<K> implements Index<K> {
         this.keys = createArray(iterable);
         this.parent = parent;
         if (parent != null) {
-            final float loadFactor = (float)keys.length() / (float)parent.size();
-            this.indexes = Array.of(Integer.class, keys.length());
-            this.ordinals = Array.of(Integer.class, parent.size(), loadFactor);
+            this.indexes = new int[keys.length()];
+            this.ordinals = new int[parent.size()];
             for (int ordinal = 0; ordinal < keys.length(); ++ordinal) {
                 final K key = keys.getValue(ordinal);
                 final int index = parent.getCoordinate(key);
-                this.indexes.setInt(ordinal, index);
-                this.ordinals.setInt(index, ordinal);
+                this.indexes[ordinal] = index;
+                this.ordinals[index] = ordinal;
             }
         }
     }
@@ -169,7 +167,7 @@ abstract class IndexBase<K> implements Index<K> {
 
     @Override()
     public final IntStream indexes() {
-        return indexes != null ? indexes.stream().ints() : IntStream.range(0, size());
+        return indexes != null ? IntStream.of(indexes) : IntStream.range(0, size());
     }
 
     @Override()
@@ -218,7 +216,7 @@ abstract class IndexBase<K> implements Index<K> {
         if (ordinals == null) {
             return coordinate;
         } else {
-            return ordinals.getInt(coordinate);
+            return ordinals[coordinate];
         }
     }
 
@@ -231,7 +229,7 @@ abstract class IndexBase<K> implements Index<K> {
         } else if (indexes == null) {
             return ordinal;
         } else {
-            return indexes.getInt(ordinal);
+            return indexes[ordinal];
         }
     }
 
@@ -269,10 +267,9 @@ abstract class IndexBase<K> implements Index<K> {
     public void sort(boolean parallel, boolean ascending) {
         try {
             var multiplier = ascending ? 1 : -1;
-            this.indexes = indexes != null ? indexes : Range.of(0, size()).toArray();
+            this.indexes = indexes != null ? indexes : IntStream.range(0, size()).toArray();
             IntComparator comparator = (i, j) -> multiplier * keys.compare(i, j);
-            Swapper swapper = (i, j) ->  { keys.swap(i, j); indexes.swap(i, j); };
-            SortAlgorithm.getDefault(parallel).sort(0, size(), comparator, swapper);
+            SortAlgorithm.getDefault(parallel).sort(0, size(), comparator, this);
         } catch (Exception ex) {
             throw new IndexException("Failed to sort Index", ex);
         }
@@ -287,13 +284,12 @@ abstract class IndexBase<K> implements Index<K> {
                 this.indexes = null;
                 this.ordinals = null;
             } else {
-                this.indexes = indexes != null ? indexes : Range.of(0, size()).toArray();
-                Swapper swapper = (i, j) ->  { keys.swap(i, j); indexes.swap(i, j); };
-                SortAlgorithm.getDefault(parallel).sort(0, size(), comparator, swapper);
-                this.ordinals = ordinals != null ? ordinals : Array.of(Integer.class, indexes.length());
-                for (int i = 0; i < indexes.length(); ++i) {
-                    var index = indexes.getInt(i);
-                    this.ordinals.setInt(index, i);
+                this.indexes = indexes != null ? indexes : IntStream.range(0, size()).toArray();
+                SortAlgorithm.getDefault(parallel).sort(0, size(), comparator, this);
+                this.ordinals = ordinals != null ? ordinals : new int[indexes.length];
+                for (int i = 0; i < indexes.length; ++i) {
+                    var index = indexes[i];
+                    this.ordinals[index] = i;
                 }
             }
         } catch (Exception ex) {
@@ -303,14 +299,23 @@ abstract class IndexBase<K> implements Index<K> {
 
 
     @Override
+    public final void swap(int i, int j) {
+        this.keys.swap(i, j);
+        var i1 = indexes[i];
+        var i2 = indexes[j];
+        this.indexes[j] = i1;
+        this.indexes[i] = i2;
+    }
+
+    @Override
     @SuppressWarnings("unchecked")
     public Index<K> copy(boolean deep) {
         try {
             var clone = (IndexBase<K>)super.clone();
             clone.keys = keys.copy();
             clone.parent = parent;
-            clone.indexes = indexes != null ? indexes.copy() : null;
-            clone.ordinals = ordinals != null ? ordinals.copy() : null;
+            clone.indexes = indexes != null ? Arrays.copyOf(indexes, indexes.length) : null;
+            clone.ordinals = ordinals != null ? Arrays.copyOf(ordinals, ordinals.length) : null;
             return clone;
         } catch (Exception ex) {
             throw new IndexException("Failed to create copy of Index", ex);

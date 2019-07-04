@@ -165,11 +165,11 @@ class DenseArrayOfDoubles extends ArrayBase<Double> {
 
     @Override
     public final Array<Double> filter(Predicate<ArrayValue<Double>> predicate) {
-        final ArrayCursor<Double> cursor = cursor();
-        final ArrayBuilder<Double> builder = ArrayBuilder.of(length(), type());
+        var cursor = cursor();
+        var builder = ArrayBuilder.of(length(), type());
         for (int i=0; i<values.length; ++i) {
             cursor.moveTo(i);
-            final boolean match = predicate.test(cursor);
+            var match = predicate.test(cursor);
             if (match) {
                 builder.addDouble(cursor.getDouble());
             }

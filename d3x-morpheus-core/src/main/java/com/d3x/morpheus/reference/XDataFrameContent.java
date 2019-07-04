@@ -669,10 +669,10 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
      * @return              the newly created comparator
      */
     final XDataFrameComparator createRowComparator(List<C> colKeys, int multiplier) {
-        final XDataFrameComparator[] comparators = new XDataFrameComparator[colKeys.size()];
+        var comparators = new XDataFrameComparator[colKeys.size()];
         for (int i=0; i<colKeys.size(); ++i) {
-            final C colKey = colKeys.get(i);
-            final Array<?> array = getColArray(colKey);
+            var colKey = colKeys.get(i);
+            var array = getColArray(colKey);
             comparators[i] = XDataFrameComparator.create(array, multiplier);
         }
         return XDataFrameComparator.create(comparators).withIndex(rowKeys);
@@ -686,10 +686,10 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
      * @return              the newly created comparator
      */
     final XDataFrameComparator createColComparator(List<R> rowKeys, int multiplier) {
-        final XDataFrameComparator[] comparators = new XDataFrameComparator[rowKeys.size()];
+        var comparators = new XDataFrameComparator[rowKeys.size()];
         for (int i=0; i<rowKeys.size(); ++i) {
-            final R rowKey = rowKeys.get(i);
-            final Array<?> array = getRowArray(rowKey);
+            var rowKey = rowKeys.get(i);
+            var array = getRowArray(rowKey);
             comparators[i] = XDataFrameComparator.create(array, multiplier);
         }
         return XDataFrameComparator.create(comparators).withIndex(colKeys);
@@ -702,9 +702,9 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
      * @return          the array of row data
      */
     private Array<?> getRowArray(R rowKey) {
-        final Class<?> type = rowType(rowKey);
-        final Array<?> array = Array.of(type, colKeys.size());
-        final int rowIndex = rowKeys.getCoordinate(rowKey);
+        var type = rowType(rowKey);
+        var array = Array.of(type, colKeys.size());
+        var rowIndex = rowKeys.getCoordinate(rowKey);
         switch (ArrayType.of(type)) {
             case BOOLEAN:           return array.applyBooleans(v -> booleanAt(rowIndex, colCoordinateAt(v.index())));
             case INTEGER:           return array.applyInts(v -> intAt(rowIndex, colCoordinateAt(v.index())));
@@ -726,9 +726,9 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
      * @return          the array of column data
      */
     private Array<?> getColArray(C colKey) {
-        final Class<?> type = colType(colKey);
-        final Array<?> array = Array.of(type, rowKeys.size());
-        final int colIndex = colKeys.getCoordinate(colKey);
+        var type = colType(colKey);
+        var array = Array.of(type, rowKeys.size());
+        var colIndex = colKeys.getCoordinate(colKey);
         switch (ArrayType.of(type)) {
             case BOOLEAN:           return array.applyBooleans(v -> booleanAt(rowCoordinateAt(v.index()), colIndex));
             case INTEGER:           return array.applyInts(v -> intAt(rowCoordinateAt(v.index()), colIndex));

@@ -16,7 +16,6 @@
 package com.d3x.morpheus.series;
 
 import java.lang.reflect.ParameterizedType;
-import java.util.Comparator;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
@@ -89,7 +88,7 @@ public class DoubleSeries<K> extends DataSeries<K,Double> implements Sample {
      * @return      the value or null
      */
     public final double getDouble(K key) {
-        var coord = index.getCoordinate(key);
+        var coord = keys.getCoordinate(key);
         return coord >= 0 ? values.getDouble(coord) : Double.NaN;
     }
 
@@ -100,7 +99,7 @@ public class DoubleSeries<K> extends DataSeries<K,Double> implements Sample {
      * @return      the value or null
      */
     public final double getDoubleAt(int index) {
-        var coord = this.index.getCoordinateAt(index);
+        var coord = this.keys.getCoordinateAt(index);
         return coord >= 0 ? values.getDouble(coord) : Double.NaN;
     }
 
@@ -112,7 +111,7 @@ public class DoubleSeries<K> extends DataSeries<K,Double> implements Sample {
      * @return      the value or null
      */
     public final double getDoubleOrElse(K key, double fallback) {
-        var coord = index.getCoordinate(key);
+        var coord = keys.getCoordinate(key);
         return coord >= 0 ? values.getDouble(coord) : fallback;
     }
 
@@ -124,7 +123,7 @@ public class DoubleSeries<K> extends DataSeries<K,Double> implements Sample {
      * @return          the value or null
      */
     public final double getDoubleAtOrElse(int index, double fallback) {
-        var coord = this.index.getCoordinateAt(index);
+        var coord = this.keys.getCoordinateAt(index);
         return coord >= 0 ? values.getDouble(coord) : fallback;
     }
 
@@ -138,57 +137,35 @@ public class DoubleSeries<K> extends DataSeries<K,Double> implements Sample {
     }
 
 
-    /**
-     * Returns a mapping of this series with the keys mapped
-     * @param mapper    the key mapper
-     * @param <T>       the type for mapper
-     * @return          the mapped series
-     */
+    @Override
+    public DoubleSeries<K> parallel() {
+        return (DoubleSeries<K>)super.parallel();
+    }
+
+
+    @Override
+    public DoubleSeries<K> sequential() {
+        return (DoubleSeries<K>)super.sequential();
+    }
+
+
+    @Override
+    public DoubleSeries<K> copy() {
+        return (DoubleSeries<K>)super.copy();
+    }
+
+
+    @Override
     public <T> DoubleSeries<T> mapKeys(Function<K,T> mapper) {
         return new DoubleSeries<>(super.mapKeys(mapper));
     }
 
 
-    /**
-     * Returns a filtered copy of this series
-     * @param predicate the predicate to select items
-     * @return          the filtered series
-     */
+    @Override
     public DoubleSeries<K> filter(Predicate<Entry<K,Double>> predicate) {
         return new DoubleSeries<>(super.filter(predicate));
     }
 
-
-    /**
-     * Returns a shallow copy of this series sorted according to comparator
-     * @param comparator    the comparator to apply sorting to entries
-     * @return              the shallow copy sorted series
-     */
-    public DoubleSeries<K> sort(Comparator<Entry<K,Double>> comparator) {
-        return new DoubleSeries<>(super.sort(false, comparator));
-    }
-
-
-    /**
-     * Returns a shallow copy of this series sorted according to comparator
-     * @param parallel      true to apply parallel sorting algo
-     * @param comparator    the comparator to apply sorting to entries
-     * @return              the shallow copy sorted series
-     */
-    public DoubleSeries<K> sort(boolean parallel, Comparator<Entry<K,Double>> comparator) {
-        return new DoubleSeries<>(super.sort(parallel, comparator));
-    }
-
-
-    @Override
-    Entry<K,Double> createEntry() {
-        return new Entry<>(this) {
-            @Override
-            public final double getDouble() {
-                return getDoubleAt(ordinal());
-            }
-        };
-    }
 
 
     @Override
@@ -247,14 +224,29 @@ public class DoubleSeries<K> extends DataSeries<K,Double> implements Sample {
 
 
     public static void main(String[] args) {
-        var size = 1000000;
+        var size = 10000000;
         var builder = DoubleSeries.<Integer>builder().capacity(size);
         IntStream.range(0, size).forEach(i -> builder.addDouble(i, Math.random() * 100d));
         var series = builder.build();
-        for (int i=0; i<10; ++i) {
-            var time = StopWatch.time(() -> series.sort(true, Comparator.comparingDouble(Entry::getDouble)));
-            //var time = StopWatch.time(() -> series.values.sort(true));
-            IO.println("Sorted " + size + " entries in " + time.getMillis() + " millis");
+
+        for (int i=0; i<20; ++i) {
+
+            var input1 = series.values.copy();
+            var time1 = StopWatch.time(() -> input1.parallel().sort((i1, i2) -> {
+                var d1 = input1.getDouble(i1);
+                var d2 = input1.getDouble(i2);
+                return Double.compare(d1, d2);
+            }));
+            IO.println("Array Sort " + size + " entries in " + time1.getMillis() + " millis");
+
+            var input2 = series.copy();
+            var time2 = StopWatch.time(() -> input2.parallel().sort((i1, i2) -> {
+                var d1 = input2.getDoubleAt(i1);
+                var d2 = input2.getDoubleAt(i2);
+                return Double.compare(d1, d2);
+            }));
+            IO.println("Series Sort " + size + " entries in " + time2 + " millis");
+
         }
     }
 

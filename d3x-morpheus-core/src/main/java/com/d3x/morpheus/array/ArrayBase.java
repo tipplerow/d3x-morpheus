@@ -502,6 +502,12 @@ public abstract class ArrayBase<T> implements Array<T> {
 
 
     @Override
+    public Array<T> sort(IntComparator comparator) {
+        return doSort(0, length(), comparator);
+    }
+
+
+    @Override
     public Array<T> sort(int start, int end, boolean ascending) {
         return sort(start, end, ascending ? 1 : -1);
     }

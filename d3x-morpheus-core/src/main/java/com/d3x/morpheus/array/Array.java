@@ -33,6 +33,7 @@ import java.util.function.ToIntFunction;
 import java.util.function.ToLongFunction;
 import java.util.stream.Stream;
 
+import com.d3x.morpheus.util.IntComparator;
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.commons.math3.distribution.RealDistribution;
 
@@ -301,6 +302,13 @@ public interface Array<T> extends Iterable<T>, Serializable, Cloneable {
     Array<T> sort(boolean ascending);
 
     /**
+     * Sorts all elements in this array according to the int comparator
+     * @param comparator    the custom comparator to sort array
+     * @return              the sorted Array reference
+     */
+    Array<T> sort(IntComparator comparator);
+
+    /**
      * Sorts a subset of elements in this array based on the range specified in either ascending or descending order
      * @param start         the start index for range, inclusive
      * @param end           the end index for range, exclusive
@@ -317,6 +325,7 @@ public interface Array<T> extends Iterable<T>, Serializable, Cloneable {
      * @return              the sorted Array reference
      */
     Array<T> sort(int start, int end, Comparator<ArrayValue<T>> comparator);
+
 
     /**
      * Returns a newly created array including values that pass the predicate

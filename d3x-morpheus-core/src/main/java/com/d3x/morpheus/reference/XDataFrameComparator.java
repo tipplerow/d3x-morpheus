@@ -116,8 +116,8 @@ abstract class XDataFrameComparator implements IntComparator {
 
     @Override
     public int compare(int ordinal1, int ordinal2) {
-        final int index1 = index.getCoordinateAt(ordinal1);
-        final int index2 = index.getCoordinateAt(ordinal2);
+        var index1 = index.getCoordinateAt(ordinal1);
+        var index2 = index.getCoordinateAt(ordinal2);
         return compareValues(index1, index2);
     }
 
@@ -194,8 +194,8 @@ abstract class XDataFrameComparator implements IntComparator {
         return new XDataFrameComparator() {
             @Override
             final int compareValues(int index1, int index2) {
-                final double v1 = array.getDouble(index1);
-                final double v2 = array.getDouble(index2);
+                var v1 = array.getDouble(index1);
+                var v2 = array.getDouble(index2);
                 return multiplier * Double.compare(v1, v2);
             }
         };

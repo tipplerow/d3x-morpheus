@@ -115,22 +115,23 @@ public class DataSeriesTests {
     public void sortAscending() {
         var path = "/csv/aapl.csv";
         var series = DataSeries.<LocalDate,Double>csv(path).read("Date", "Adj Close").toDoubles();
-        var result = series.sort((e1, e2) -> {
-            var v1 = e1.getDouble();
-            var v2 = e2.getDouble();
+        var sorted = series.copy();
+        sorted.sort((i1, i2) -> {
+            var v1 = sorted.getDoubleAt(i1);
+            var v2 = sorted.getDoubleAt(i2);
             return Double.compare(v1, v2);
         });
-        Assert.assertTrue(result.size() > 0);
-        Assert.assertEquals(result.size(),  series.size());
-        Assert.assertNotEquals(result.firstKey(), series.firstKey());
-        Assert.assertEquals(result.lastKey(), series.lastKey());
+        Assert.assertTrue(sorted.size() > 0);
+        Assert.assertEquals(sorted.size(),  series.size());
+        Assert.assertNotEquals(sorted.firstKey(), series.firstKey());
+        Assert.assertEquals(sorted.lastKey(), series.lastKey());
         Assert.assertEquals(series.firstKey().orNull(), LocalDate.parse("1980-12-12"));
         Assert.assertEquals(series.lastKey().orNull(), LocalDate.parse("2014-08-29"));
-        Assert.assertEquals(result.firstKey().orNull(), LocalDate.parse("1982-07-08"));
-        Assert.assertEquals(result.lastKey().orNull(), LocalDate.parse("2014-08-29"));
-        for (int i=1; i<result.size(); ++i) {
-            var v1 = result.getDoubleAt(i-1);
-            var v2 = result.getDoubleAt(i);
+        Assert.assertEquals(sorted.firstKey().orNull(), LocalDate.parse("1982-07-08"));
+        Assert.assertEquals(sorted.lastKey().orNull(), LocalDate.parse("2014-08-29"));
+        for (int i=1; i<sorted.size(); ++i) {
+            var v1 = sorted.getDoubleAt(i-1);
+            var v2 = sorted.getDoubleAt(i);
             if (v1 > v2) {
                 throw new RuntimeException("Series not sorted at " + i);
             }

@@ -19,7 +19,6 @@ import java.io.File;
 import java.io.InputStream;
 import java.lang.reflect.ParameterizedType;
 import java.net.URL;
-import java.util.Comparator;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -31,6 +30,7 @@ import com.d3x.morpheus.array.Array;
 import com.d3x.morpheus.array.ArrayBuilder;
 import com.d3x.morpheus.array.ArrayType;
 import com.d3x.morpheus.index.Index;
+import com.d3x.morpheus.util.IntComparator;
 import com.d3x.morpheus.util.Resource;
 
 /**
@@ -42,23 +42,24 @@ import com.d3x.morpheus.util.Resource;
  *
  * @author  Xavier Witdouck
  */
-public class DataSeries<K,V> {
+public class DataSeries<K,V> implements Cloneable {
 
-    protected Index<K> index;
+    protected Index<K> keys;
     protected Array<V> values;
+    private boolean parallel;
 
     /**
      * Constructor
-     * @param index     the index with keys for series
+     * @param keys     the index with keys for series
      * @param values    the array with values for series
      */
     DataSeries(
-        @lombok.NonNull Index<K> index,
+        @lombok.NonNull Index<K> keys,
         @lombok.NonNull Array<V> values) {
-        if (index.size() != values.length()) {
+        if (keys.size() != values.length()) {
             throw new IllegalArgumentException("Key and value array must have the same length");
         } else {
-            this.index = index;
+            this.keys = keys;
             this.values = values;
         }
     }
@@ -68,7 +69,7 @@ public class DataSeries<K,V> {
      * @param source    the source to copy
      */
     DataSeries(@lombok.NonNull DataSeries<K,V> source) {
-        this.index = source.index;
+        this.keys = source.keys;
         this.values = source.values;
     }
 
@@ -151,7 +152,7 @@ public class DataSeries<K,V> {
      * @return  the key class for series
      */
     public final Class<K> keyClass() {
-        return index.type();
+        return keys.type();
     }
 
 
@@ -160,7 +161,7 @@ public class DataSeries<K,V> {
      * @return  the key data type
      */
     public final ArrayType keyType() {
-        return ArrayType.of(index.type());
+        return ArrayType.of(keys.type());
     }
 
 
@@ -196,7 +197,7 @@ public class DataSeries<K,V> {
      * @return   the stream of keys
      */
     public final Stream<K> getKeys() {
-        return index.keys();
+        return keys.keys();
     }
 
 
@@ -206,7 +207,7 @@ public class DataSeries<K,V> {
      * @return          the key at location
      */
     public final K getKey(int ordinal) {
-        return index.getKey(ordinal);
+        return keys.getKey(ordinal);
     }
 
 
@@ -215,7 +216,7 @@ public class DataSeries<K,V> {
      * @return  the first key
      */
     public final Option<K> firstKey() {
-        return Option.of(index.first().orElse(null));
+        return Option.of(keys.first().orElse(null));
     }
 
 
@@ -224,7 +225,7 @@ public class DataSeries<K,V> {
      * @return  the last key
      */
     public final Option<K> lastKey() {
-        return Option.of(index.last().orElse(null));
+        return Option.of(keys.last().orElse(null));
     }
 
 
@@ -234,7 +235,7 @@ public class DataSeries<K,V> {
      * @return      the value or null
      */
     public final V getValue(K key) {
-        var coord = index.getCoordinate(key);
+        var coord = keys.getCoordinate(key);
         return coord >= 0 ? values.getValue(coord) : null;
     }
 
@@ -246,7 +247,7 @@ public class DataSeries<K,V> {
      * @return      the value or null
      */
     public final V getValueOrElse(K key, V fallback) {
-        var coord = index.getCoordinate(key);
+        var coord = keys.getCoordinate(key);
         return coord >= 0 ? values.getValue(coord) : fallback;
     }
 
@@ -257,7 +258,7 @@ public class DataSeries<K,V> {
      * @return      the value or null
      */
     public final V getValueAt(int index) {
-        var coord = this.index.getCoordinateAt(index);
+        var coord = this.keys.getCoordinateAt(index);
         return values.getValue(coord);
     }
 
@@ -269,7 +270,7 @@ public class DataSeries<K,V> {
      * @return          the value or null
      */
     public final V getValueAtOrElse(int index, V fallback) {
-        var coord = this.index.getCoordinateAt(index);
+        var coord = this.keys.getCoordinateAt(index);
         var value = values.getValue(coord);
         return value != null ? value : fallback;
     }
@@ -283,37 +284,17 @@ public class DataSeries<K,V> {
         var size = this.size();
         var value = createEntry();
         for (int i=0; i<size; ++i) {
-            consumer.accept(value.locate(i));
+            consumer.accept(value.at(i));
         }
     }
 
 
     /**
-     * Returns a shallow copy of this series sorted according to comparator
+     * Sorts this series according to the comparator provided
      * @param comparator    the comparator to apply sorting to entries
-     * @return              the shallow copy sorted series
      */
-    public DataSeries<K,V> sort(Comparator<Entry<K,V>> comparator) {
-        return sort(false, comparator);
-    }
-
-
-    /**
-     * Returns a shallow copy of this series sorted according to comparator
-     * @param parallel      true to apply parallel sorting algo
-     * @param comparator    the comparator to apply sorting to entries
-     * @return              the shallow copy sorted series
-     */
-    public DataSeries<K,V> sort(boolean parallel, Comparator<Entry<K,V>> comparator) {
-        var clone = (DataSeries<K,V>)new DataSeries<>(index.copy(false), values);
-        var entry1 = clone.createEntry();
-        var entry2 = clone.createEntry();
-        clone.index.sort(parallel, (i1, i2) -> {
-            entry1.locate(i1);
-            entry2.locate(i2);
-            return comparator.compare(entry1, entry2);
-        });
-        return clone;
+    public void sort(IntComparator comparator) {
+        this.keys.sort(parallel, comparator);
     }
 
 
@@ -324,7 +305,7 @@ public class DataSeries<K,V> {
      * @return          the mapped series
      */
     public <T> DataSeries<T,V> mapKeys(Function<K,T> mapper) {
-        var result = index.map((key, index) -> mapper.apply(key));
+        var result = keys.map((key, index) -> mapper.apply(key));
         return new DataSeries<>(result, values);
     }
 
@@ -336,18 +317,75 @@ public class DataSeries<K,V> {
      */
     public DataSeries<K,V> filter(Predicate<Entry<K,V>> predicate) {
         var size = this.size();
-        var keys = ArrayBuilder.of(size, index.type());
+        var keys = ArrayBuilder.of(size, this.keys.type());
         var indexes = ArrayBuilder.of(size, Integer.class);
         this.forEach(entry -> {
             if (predicate.test(entry)) {
                 var key = entry.key();
-                indexes.addInt(index.getCoordinate(key));
+                indexes.addInt(this.keys.getCoordinate(key));
                 keys.add(key);
             }
         });
         var newIndex = Index.of(keys.toArray());
         var newValues = values.copy(indexes.toArray());
         return new DataSeries<>(newIndex, newValues);
+    }
+
+
+    /**
+     * Returns a parallel version of this series
+     * @return      the parallel version of series
+     */
+    @SuppressWarnings("unchecked")
+    public DataSeries<K,V> parallel() {
+        try {
+            if (parallel) {
+                return this;
+            } else {
+                var clone = (DataSeries<K,V>)super.clone();
+                clone.parallel = true;
+                return clone;
+            }
+        } catch (CloneNotSupportedException ex) {
+            throw new RuntimeException(ex.getMessage(), ex);
+        }
+    }
+
+
+    /**
+     * Returns a sequential version of this series
+     * @return      the sequential version of series
+     */
+    @SuppressWarnings("unchecked")
+    public DataSeries<K,V> sequential() {
+        try {
+            if (!parallel) {
+                return this;
+            } else {
+                var clone = (DataSeries<K,V>)super.clone();
+                clone.parallel = false;
+                return clone;
+            }
+        } catch (CloneNotSupportedException ex) {
+            throw new RuntimeException(ex.getMessage(), ex);
+        }
+    }
+
+
+    /**
+     * Returns a deep copy of this series
+     * @return  a deep copy of series
+     */
+    @SuppressWarnings("unchecked")
+    public DataSeries<K,V> copy() {
+        try {
+            var clone = (DataSeries<K,V>)super.clone();
+            clone.keys = keys.copy(true);
+            clone.values = values.copy();
+            return clone;
+        } catch (CloneNotSupportedException ex) {
+            throw new RuntimeException(ex.getMessage(), ex);
+        }
     }
 
 
@@ -363,9 +401,9 @@ public class DataSeries<K,V> {
 
     /**
      * Returns a newly created entry
-     * @return  the newly created entry
+     * @return          the newly created entry
      */
-    Entry<K,V> createEntry() {
+    private Entry<K,V> createEntry() {
         return new Entry<>(this);
     }
 
@@ -378,14 +416,15 @@ public class DataSeries<K,V> {
     /**
      * A class used to represent an entry in a data series by exposing the key, ordinal and value
      */
-    static class Entry<K,V> {
+    static final class Entry<K,V> implements Cloneable {
 
         private int ordinal;
+        private int coordinate;
         private DataSeries<K,V> series;
 
         /**
          * Constructor
-         * @param series    the series to wrap
+         * @param series    the series to operate on
          */
         Entry(DataSeries<K,V> series) {
             this.series = series;
@@ -396,9 +435,19 @@ public class DataSeries<K,V> {
          * @param ordinal   the new ordinal location
          * @return          this entry
          */
-        private Entry<K,V> locate(int ordinal) {
+        private Entry<K,V> at(int ordinal) {
             this.ordinal = ordinal;
+            this.coordinate = series.keys.getCoordinateAt(ordinal);
             return this;
+        }
+
+        @SuppressWarnings("unchecked")
+        public Entry<K,V> copy() {
+            try {
+                return (Entry<K,V>) super.clone();
+            } catch (CloneNotSupportedException ex) {
+                throw new RuntimeException(ex.getMessage(), ex);
+            }
         }
 
         /**
@@ -421,36 +470,32 @@ public class DataSeries<K,V> {
          * Returns the value for this entry as a boolean
          * @return  the value as a boolean
          */
-        public boolean getBoolean() {
-            var value = series.getValueAt(ordinal);
-            return value != null ? (Boolean)value : false;
+        public final boolean getBoolean() {
+            return series.values.getBoolean(coordinate);
         }
 
         /**
          * Returns the value for this entry as an int
          * @return  the value as an int
          */
-        public int getInt() {
-            var value = series.getValueAt(ordinal);
-            return value != null ? ((Number)value).intValue() : 0;
+        public final int getInt() {
+            return series.values.getInt(coordinate);
         }
 
         /**
          * Returns the value for this entry as a long
          * @return  the value as a long
          */
-        public long getLong() {
-            var value = series.getValueAt(ordinal);
-            return value != null ? ((Number)value).longValue() : 0L;
+        public final long getLong() {
+            return series.values.getLong(coordinate);
         }
 
         /**
          * Returns the value for this entry as a double
          * @return      the value as a double
          */
-        public double getDouble() {
-            var value = series.getValueAt(ordinal);
-            return value != null ? ((Number)value).doubleValue() : Double.NaN;
+        public final double getDouble() {
+            return series.values.getDouble(coordinate);
         }
 
         /**
@@ -458,7 +503,7 @@ public class DataSeries<K,V> {
          * @return  the value as an object
          */
         public final V getValue() {
-            return series.getValueAt(ordinal);
+            return series.values.getValue(coordinate);
         }
     }
 
