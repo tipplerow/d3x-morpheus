@@ -204,17 +204,16 @@ abstract class XDataFrameVector<X,Y,R,C,Z> implements DataFrameVector<X,Y,R,C,Z>
     @Override
     public final DataFrame<Double,String> hist(int binCount) {
         Asserts.check(binCount > 0, "The bin count must be > 0");
-        final double minValue = stats().min();
-        final double maxValue = stats().max();
-        final double stepSize = (maxValue - minValue) / binCount;
-        final Range<Double> rowKeys = Range.of(minValue, maxValue + stepSize, stepSize);
-        final DataFrame<Double,String> hist = DataFrame.ofInts(rowKeys, "Count");
-        final DataFrameCursor<Double,String> cursor = hist.cursor().toColAt(0);
+        var minValue = stats().min();
+        var maxValue = stats().max();
+        var stepSize = (maxValue - minValue) / binCount;
+        var rowKeys = Range.of(minValue, maxValue + stepSize, stepSize);
+        var hist = DataFrame.ofInts(rowKeys, "Count");
+        var cursor = hist.cursor().toColAt(0);
         this.forEachValue(v -> {
-            final double value = v.getDouble();
+            var value = v.getDouble();
             hist.rows().lowerKey(value).ifPresent(lowerKey -> {
-                final int rowOrdinal = hist.rows().ordinal(lowerKey);
-                final int count = cursor.toRowAt(rowOrdinal).getInt();
+                var count = cursor.toRow(lowerKey).getInt();
                 cursor.setInt(count + 1);
             });
         });

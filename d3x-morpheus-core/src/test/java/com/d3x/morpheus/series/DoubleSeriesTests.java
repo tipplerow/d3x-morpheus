@@ -17,11 +17,13 @@ package com.d3x.morpheus.series;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.util.function.IntFunction;
+import java.util.stream.IntStream;
 
 import com.d3x.core.json.JsonEngine;
-import com.d3x.morpheus.array.ArrayType;
 import com.d3x.morpheus.util.IO;
 import org.testng.Assert;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
@@ -29,26 +31,40 @@ import org.testng.annotations.Test;
  *
  * @author Xavier Witdouck
  */
-public class DataSeriesTests {
+public class DoubleSeriesTests {
 
     private JsonEngine jsonEngine = DataSeriesJson.registerDefaults(new JsonEngine());
+
+
+    private IntFunction ofIntFunction(IntFunction function) {
+        return function;
+    }
+
+
+    @DataProvider(name="types")
+    public Object[][] types() {
+        var now = LocalDate.now();
+        return new Object[][] {
+            { Integer.class, ofIntFunction(i -> i) },
+            { LocalDate.class, ofIntFunction(now::plusDays)},
+            { String.class, ofIntFunction(i -> "X" + i) }
+        };
+    }
 
 
     @Test()
     public void csvRead() {
         var path = "/csv/aapl.csv";
-        var series = DataSeries.<LocalDate,Double>csv(path).read("Date", "Adj Close").toDoubles();
+        var series = DoubleSeries.<LocalDate>csv(path).read("Date", "Adj Close");
         Assert.assertEquals(series.valueClass(), Double.class);
-        Assert.assertEquals(series.valueType(), ArrayType.DOUBLE);
         Assert.assertEquals(series.keyClass(), LocalDate.class);
-        Assert.assertEquals(series.keyType(), ArrayType.LOCAL_DATE);
         Assert.assertEquals(series.size(), 8503);
         Assert.assertEquals(series.firstKey().orNull(), LocalDate.parse("1980-12-12"));
         Assert.assertEquals(series.lastKey().orNull(), LocalDate.parse("2014-08-29"));
         Assert.assertEquals(series.getDouble(LocalDate.parse("1980-12-12")), 0.44203d, 0.000001d);
         Assert.assertEquals(series.getDouble(LocalDate.parse("2014-08-29")), 101.65627d, 0.000001d);
-        Assert.assertEquals(series.toDoubles().stats().min(), 0.16913d, 0.000001d);
-        Assert.assertEquals(series.toDoubles().stats().max(), 101.65627d, 0.000001d);
+        Assert.assertEquals(series.stats().min(), 0.16913d, 0.000001d);
+        Assert.assertEquals(series.stats().max(), 101.65627d, 0.000001d);
     }
 
 
@@ -56,16 +72,15 @@ public class DataSeriesTests {
     @SuppressWarnings("unchecked")
     public void jsonIO() {
         var path = "/csv/aapl.csv";
-        var series = DataSeries.<LocalDate,Double>csv(path).read("Date", "Adj Close").toDoubles();
-        var jsonIO = jsonEngine.io(DoubleSeries.typeOf(LocalDate.class));
+        var series = DoubleSeries.<LocalDate>csv(path).read("Date", "Adj Close");
+        var jsonIO = jsonEngine.io(DoubleSeries.ofType(LocalDate.class));
         var jsonString = jsonIO.toString(series);
-        var result = ((DataSeries<LocalDate,Double>)jsonIO.fromString(jsonString)).toDoubles();
+        IO.println(jsonString);
+        var result = ((DoubleSeries<LocalDate>)jsonIO.fromString(jsonString));
         Assert.assertEquals(result.size(), series.size());
         Assert.assertEquals(result.valueClass(), series.valueClass());
-        Assert.assertEquals(result.valueType(), series.valueType());
         Assert.assertEquals(result.keyClass(), series.keyClass());
-        Assert.assertEquals(result.keyType(), series.keyType());
-        series.getKeys().forEach(key -> {
+        series.keys().forEach(key -> {
             var v1 = series.getDouble(key);
             var v2 = result.getDouble(key);
             Assert.assertEquals(v2, v1, 0.000001d);
@@ -76,35 +91,30 @@ public class DataSeriesTests {
     @Test()
     public void mapKeys() {
         var path = "/csv/aapl.csv";
-        var series = DataSeries.<LocalDate,Double>csv(path).read("Date", "Adj Close").toDoubles();
-        var result = series.mapKeys(v -> v.minusDays(1)).toDoubles();
+        var series = DoubleSeries.<LocalDate>csv(path).read("Date", "Adj Close");
+        var result = series.mapKeys(LocalDate.class, v -> v.minusDays(1));
         Assert.assertEquals(result.size(), series.size());
         Assert.assertEquals(result.valueClass(), series.valueClass());
-        Assert.assertEquals(result.valueType(), series.valueType());
         Assert.assertEquals(result.keyClass(), series.keyClass());
-        Assert.assertEquals(result.keyType(), series.keyType());
-        series.forEach(v -> {
-            var ordinal = v.ordinal();
-            var mapped = result.getKey(ordinal);
-            var expected = v.key().minusDays(1);
+        for (int i=0; i<series.size(); ++i) {
+            var mapped = result.getKey(i);
+            var expected = series.getKey(i).minusDays(1);
             Assert.assertEquals(mapped, expected);
-            Assert.assertEquals(result.getDoubleAt(ordinal), v.getDouble(), 0.000001d);
-        });
+            Assert.assertEquals(result.getDoubleAt(i), series.getDoubleAt(i), 0.000001d);
+        }
     }
 
 
     @Test()
     public void filterKeys() {
         var path = "/csv/aapl.csv";
-        var series = DataSeries.<LocalDate,Double>csv(path).read("Date", "Adj Close").toDoubles();
-        var result1 = series.filter(v -> v.key().getDayOfWeek() == DayOfWeek.MONDAY).toDoubles();
+        var series = DoubleSeries.<LocalDate>csv(path).read("Date", "Adj Close");
+        var result1 = series.filter(v -> v.getDayOfWeek() == DayOfWeek.MONDAY);
         Assert.assertTrue(result1.size() > 0);
         Assert.assertTrue(result1.size() < series.size());
         Assert.assertEquals(result1.valueClass(), series.valueClass());
-        Assert.assertEquals(result1.valueType(), series.valueType());
         Assert.assertEquals(result1.keyClass(), series.keyClass());
-        Assert.assertEquals(result1.keyType(), series.keyType());
-        result1.getKeys().forEach(key -> {
+        result1.keys().forEach(key -> {
             Assert.assertEquals(key.getDayOfWeek(), DayOfWeek.MONDAY);
             Assert.assertEquals(result1.getDouble(key), series.getDouble(key));
         });
@@ -112,9 +122,9 @@ public class DataSeriesTests {
 
 
     @Test()
-    public void sortAscending() {
+    public void sorting1() {
         var path = "/csv/aapl.csv";
-        var series = DataSeries.<LocalDate,Double>csv(path).read("Date", "Adj Close").toDoubles();
+        var series = DoubleSeries.<LocalDate>csv(path).read("Date", "Adj Close");
         var sorted = series.copy();
         sorted.sort((i1, i2) -> {
             var v1 = sorted.getDoubleAt(i1);
@@ -129,24 +139,37 @@ public class DataSeriesTests {
         Assert.assertEquals(series.lastKey().orNull(), LocalDate.parse("2014-08-29"));
         Assert.assertEquals(sorted.firstKey().orNull(), LocalDate.parse("1982-07-08"));
         Assert.assertEquals(sorted.lastKey().orNull(), LocalDate.parse("2014-08-29"));
-        for (int i=1; i<sorted.size(); ++i) {
-            var v1 = sorted.getDoubleAt(i-1);
-            var v2 = sorted.getDoubleAt(i);
-            if (v1 > v2) {
-                throw new RuntimeException("Series not sorted at " + i);
-            }
-        }
+        DoubleSeries.assertAscending(sorted);
     }
 
+
+    @Test(dataProvider="types")
+    public <K> void sorting(Class<K> keyType, IntFunction<K> keyGen) {
+        var builder = DoubleSeries.builder(keyType).capacity(100);
+        IntStream.range(0, 1000).forEach(i -> builder.putDouble(keyGen.apply(i), Math.random() * 100d));
+        var series = builder.build();
+        var sorted = series.copy();
+        sorted.sort((i1, i2) -> {
+            var v1 = sorted.getDoubleAt(i1);
+            var v2 = sorted.getDoubleAt(i2);
+            return Double.compare(v1, v2);
+        });
+        Assert.assertTrue(sorted.size() > 0);
+        Assert.assertEquals(sorted.size(), series.size());
+        Assert.assertNotEquals(sorted.firstKey(), series.firstKey());
+        Assert.assertNotEquals(sorted.lastKey(), series.lastKey());
+        DoubleSeries.assertAscending(sorted);
+    }
+
+
+    /*
     @Test()
     @SuppressWarnings("unchecked")
     public void strings() {
-        var series = DataSeries.<Integer,String>builder(String.class).addValue(1, "Hello").addValue(2, "World").build();
+        var series = DataSeries.builder(Integer.class, String.class).putValue(1, "Hello").putValue(2, "World").build();
         Assert.assertTrue(series.size() > 0);
         Assert.assertEquals(series.valueClass(), String.class);
-        Assert.assertEquals(series.valueType(), ArrayType.STRING);
         Assert.assertEquals(series.keyClass(), Integer.class);
-        Assert.assertEquals(series.keyType(), ArrayType.INTEGER);
         var jsonIO = jsonEngine.io(series.type());
         var jsonString = jsonIO.toString(series);
         IO.println(jsonString);
@@ -162,5 +185,7 @@ public class DataSeriesTests {
             Assert.assertEquals(v2, v1);
         });
     }
+
+    */
 
 }

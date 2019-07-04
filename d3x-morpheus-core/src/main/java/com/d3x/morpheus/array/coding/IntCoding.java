@@ -19,14 +19,16 @@ import java.time.Year;
 import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.Currency;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.TimeZone;
 import java.util.stream.IntStream;
 
-import gnu.trove.map.TObjectIntMap;
-import gnu.trove.map.hash.TObjectIntHashMap;
-
+import com.d3x.core.util.Option;
 import com.d3x.morpheus.util.IntComparator;
 import com.d3x.morpheus.util.SortAlgorithm;
+import gnu.trove.map.TObjectIntMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
 
 /**
  * An interface that exposes a coding between object values and corresponding int code
@@ -92,6 +94,90 @@ public interface IntCoding<T> extends Coding<T> {
      */
     static <T extends Enum> IntCoding<T> ofEnum(Class<T> type) {
         return new OfEnum<>(type);
+    }
+
+
+    /**
+     * Manages IntCoding support
+     */
+    class Support {
+
+        private static Map<Class<?>,IntCoding<?>> codingMap = new HashMap<>();
+
+        /*
+         * Static initializer
+         */
+        static {
+            Support.register(Integer.class, new OfInt());
+            Support.register(Year.class, new OfYear());
+            Support.register(ZoneId.class, new OfZoneId());
+            Support.register(TimeZone.class, new OfTimeZone());
+            Support.register(Currency.class, new OfCurrency());
+        }
+
+
+        /**
+         * Returns true if int coding is supported for type
+         * @param type  the data type
+         * @return      true if supported
+         */
+        public static boolean includes(Class<?> type) {
+            return type.isEnum() || codingMap.containsKey(type);
+        }
+
+
+        /**
+         * Registers a coding definition for the type
+         * @param type      the coding type
+         * @param coding    the coding instance
+         * @param <T>       the type
+         */
+        public static <T> void register(Class<T> type, IntCoding<T> coding) {
+            codingMap.put(type, coding);
+        }
+
+
+        /**
+         * Returns the int coding for type if available
+         * @param type  the data type
+         * @param <T>   the coding type
+         * @return      the coding option
+         */
+        @SuppressWarnings("unchecked")
+        public static <T> Option<IntCoding<T>> getCoding(Class<T> type) {
+            if (type.isEnum()) {
+                var enumType = (Class<Enum>)type;
+                return Option.of((IntCoding<T>)new OfEnum<>(enumType));
+            } else {
+                return Option.of((IntCoding<T>)codingMap.get(type));
+            }
+        }
+    }
+
+
+    /**
+     * An identity coding for Long
+     */
+    class OfInt extends BaseCoding<Integer> implements IntCoding<Integer> {
+
+        private static final long serialVersionUID = 1L;
+
+        /**
+         * Constructor
+         */
+        OfInt() {
+            super(Integer.class);
+        }
+
+        @Override
+        public final int getCode(Integer value) {
+            return value == null ? Integer.MIN_VALUE : value;
+        }
+
+        @Override
+        public final Integer getValue(int code) {
+            return code == Integer.MIN_VALUE ? null : code;
+        }
     }
 
 

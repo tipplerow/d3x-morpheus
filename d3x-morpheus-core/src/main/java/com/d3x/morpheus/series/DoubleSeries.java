@@ -15,239 +15,347 @@
  */
 package com.d3x.morpheus.series;
 
+import java.io.BufferedOutputStream;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.lang.reflect.ParameterizedType;
+import java.net.URL;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.IntStream;
+import java.util.stream.DoubleStream;
+import java.util.stream.Stream;
 
 import com.d3x.core.util.Generic;
-import com.d3x.core.util.StopWatch;
-import com.d3x.morpheus.array.Array;
-import com.d3x.morpheus.array.ArrayBuilder;
-import com.d3x.morpheus.index.Index;
-import com.d3x.morpheus.stats.Sample;
+import com.d3x.core.util.IO;
+import com.d3x.morpheus.frame.DataFrame;
 import com.d3x.morpheus.stats.Stats;
-import com.d3x.morpheus.util.IO;
+import com.d3x.morpheus.util.AssertException;
+import com.d3x.morpheus.util.IntComparator;
+import com.d3x.morpheus.util.Resource;
 
 /**
- * A type specific series for optimized to hold primitive double values
- *
- * @param <K> the key type
+ * An interface to an immutable series of doubles stored against a unique key
  *
  * <p>This is open source software released under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 License</a></p>
  *
- * @author  Xavier Witdouck
+ * @author Xavier Witdouck
  */
-public class DoubleSeries<K> extends DataSeries<K,Double> implements Sample {
+public interface DoubleSeries<K> extends DataSeries<K,Double> {
 
     /**
-     * Constructor
-     * @param keys      the array of keys
-     * @param values    the array of values
+     * Returns the value for key, NaN if no match
+     * @param key   the entry key
+     * @return      the value for key, NaN if no match
      */
-    private DoubleSeries(
-        @lombok.NonNull Index<K> keys,
-        @lombok.NonNull Array<Double> values) {
-        super(keys, values);
+    double getDouble(K key);
+
+
+    @Override
+    default Double getValue(K key) {
+        return getDouble(key);
+    }
+
+    @Override
+    default Double getValueAt(int index) {
+        return getDoubleAt(index);
+    }
+
+    @Override
+    default Class<Double> valueClass() {
+        return Double.class;
+    }
+
+    /**
+     * Returns a sequential version of this series
+     * @return      the sequential series
+     */
+    default DoubleSeries<K> sequential() {
+        return this;
+    }
+
+    /**
+     * Returns a parallel version of this series, if supported
+     * @return      the parallel series, if supported
+     */
+    default DoubleSeries<K> parallel() {
+        return this;
+    }
+
+    /**
+     * Returns the value for the index specified
+     * @param index     the index to access
+     * @return          the value at index
+     */
+    default double getDoubleAt(int index) {
+        return getDouble(getKey(index));
+    }
+
+    /**
+     * Returns the stream of doubles for this series
+     * @return      the stream of doubles
+     */
+    default DoubleStream toDoubles() {
+        return keys().mapToDouble(this::getDouble);
+    }
+
+    /**
+     * Returns the stats interface to this series
+     * @return  the stats interface to series
+     */
+    default Stats<Double> stats() {
+        return Stats.of(this::toDoubles);
+    }
+
+    /**
+     * Returns the value for asset, zero if no match for asset
+     * @param key   the item identifier
+     * @return      the value for item, zero if no match
+     */
+    default double getDoubleOrZero(K key) {
+        var value = getDouble(key);
+        return Double.isNaN(value) ? 0d : value;
     }
 
 
     /**
-     * Copy constructor
-     * @param source    the source to copy
+     * Returns a deep copy of this series
+     * @return  a deep copy of series
      */
-    DoubleSeries(DataSeries<K,Double> source) {
-        super(source);
+    @SuppressWarnings("unchecked")
+    default DoubleSeries<K> copy() {
+        if (isEmpty()) {
+            var keyClass = keyClass();
+            return DoubleSeries.empty(keyClass);
+        } else {
+            var keyType = (Class<K>)getKey(0).getClass();
+            var builder = DoubleSeries.builder(keyType).capacity(size());
+            this.forEach(builder::putValue);
+            return builder.build();
+        }
     }
 
 
     /**
-     * Returns a newly created builder for this class
-     * @param <K>   the key type
-     * @return      the new builder
+     * Iterates over all entries in this map
+     * @param consumer  the consumer to accept entries
      */
-    public static <K> Builder<K> builder() {
-        return new Builder<>();
+    default void forEach(BiConsumer<K> consumer) {
+        keys().forEach(key -> {
+            var value = getDouble(key);
+            consumer.accept(key, value);
+        });
     }
 
 
     /**
-     * Returns a parameterized type of this class with key type
-     * @param keyType   the key type for series
-     * @param <K>       key type
-     * @return          newly created parameterized type
+     * Returns a mapping of this data into a new keys
+     * @param type      the target key type
+     * @param mapper    the mapper to apply
+     * @return          the mapped vector
      */
-    public static <K> ParameterizedType typeOf(Class<K> keyType) {
+    default <V> DoubleSeries<V> mapKeys(Class<V> type, Function<K,V> mapper) {
+        var length = this.size();
+        var builder = DoubleSeries.builder(type).capacity(length);
+        this.keys().forEach(key -> {
+            var value = getDouble(key);
+            var targetId = mapper.apply(key);
+            builder.putValue(targetId, value);
+        });
+        return builder.build();
+    }
+
+
+    /**
+     * Returns a filtered version of this series
+     * @param predicate the predicate to filter series
+     * @return          the filtered series
+     */
+    default DoubleSeries<K> filter(Predicate<K> predicate) {
+        var length = this.size();
+        var keyType = this.keyClass();
+        var builder = DoubleSeries.builder(keyType).capacity(length);
+        this.keys().filter(predicate).forEach(key -> {
+            var value = getDouble(key);
+            builder.putDouble(key, value);
+        });
+        return builder.build();
+    }
+
+
+    /**
+     * Writes these asset values to a CSV file
+     * @param file  the file to write to
+     * @throws IOException  if there is an I/O exception
+     */
+    default void writeCsv(File file) throws IOException {
+        this.writeCsv(IO.toFile(file));
+    }
+
+
+    /**
+     * Writes these asset values to a CSV output stream
+     * @param os        the output stream to write to
+     * @throws IOException  if there is an I/O exception
+     */
+    default void writeCsv(OutputStream os) throws IOException {
+        BufferedWriter writer = null;
+        try {
+            var keys = keys().iterator();
+            writer = new BufferedWriter(new OutputStreamWriter(new BufferedOutputStream(os)));
+            writer.write("Key,Value");
+            while (keys.hasNext()) {
+                var key = keys.next();
+                var value = getDouble(key);
+                writer.newLine();
+                writer.write(String.format("%s,%s", key, value));
+            }
+        } finally {
+            IO.close(writer);
+        }
+    }
+
+
+    /**
+     * Returns a new DoubleSeries Builder for key type
+     * @param keyType   the key type
+     * @return          the builder
+     */
+    static <K> DoubleSeriesBuilder<K> builder(Class<K> keyType) {
+        return DoubleSeriesBuilder.builder(keyType);
+    }
+
+    /**
+     * Returns a parameterized type to represent double map with key type
+     * @param keyType   the parameterized type for double map
+     * @return          the parameterized type
+     */
+    static ParameterizedType ofType(Class<?> keyType) {
         return Generic.of(DoubleSeries.class, keyType, Double.class);
     }
 
+    /**
+     * Returns a CSV data series read adapter for resource
+     * @param file  the resource to read from
+     * @param <K>   the key type for series
+     * @return      the CSV read adapter
+     */
+    static <K> DataSeriesCsv<K,Double,DoubleSeries<K>> csv(File file) {
+        return new DataSeriesCsv<>(Resource.of(file));
+    }
 
     /**
-     * Returns the value for key
-     * @param key   the key item
-     * @return      the value or null
+     * Returns a CSV data series read adapter for resource
+     * @param url   the resource to read from
+     * @param <K>   the key type for series
+     * @return      the CSV read adapter
      */
-    public final double getDouble(K key) {
-        var coord = keys.getCoordinate(key);
-        return coord >= 0 ? values.getDouble(coord) : Double.NaN;
+    static <K> DataSeriesCsv<K,Double,DoubleSeries<K>> csv(URL url) {
+        return new DataSeriesCsv<>(Resource.of(url));
     }
-
 
     /**
-     * Returns the value at the index
-     * @param index the index location
-     * @return      the value or null
+     * Returns a CSV data series read adapter for resource
+     * @param path  the resource to read from
+     * @param <K>   the key type for series
+     * @return      the CSV read adapter
      */
-    public final double getDoubleAt(int index) {
-        var coord = this.keys.getCoordinateAt(index);
-        return coord >= 0 ? values.getDouble(coord) : Double.NaN;
+    static <K> DataSeriesCsv<K,Double,DoubleSeries<K>> csv(String path) {
+        return new DataSeriesCsv<>(Resource.of(path));
     }
-
 
     /**
-     * Returns the value for key
-     * @param key   the key item
-     * @param fallback  the fallback value if no match for key
-     * @return      the value or null
+     * Returns a CSV data series read adapter for resource
+     * @param is    the resource to read from
+     * @param <K>   the key type for series
+     * @return      the CSV read adapter
      */
-    public final double getDoubleOrElse(K key, double fallback) {
-        var coord = keys.getCoordinate(key);
-        return coord >= 0 ? values.getDouble(coord) : fallback;
+    static <K> DataSeriesCsv<K,Double,DoubleSeries<K>> csv(InputStream is) {
+        return new DataSeriesCsv<>(Resource.of(is));
     }
-
 
     /**
-     * Returns the value for key
-     * @param index     the index location
-     * @param fallback  the fallback value if no match for key
-     * @return          the value or null
+     * Returns series from the column values in a DataFrame
+     * @param frame     the DataFrame to extract values from
+     * @param colKey    the column key to extract
+     * @return          the the does series
      */
-    public final double getDoubleAtOrElse(int index, double fallback) {
-        var coord = this.keys.getCoordinateAt(index);
-        return coord >= 0 ? values.getDouble(coord) : fallback;
+    static <R,C> DoubleSeries<R> from(DataFrame<R,C> frame, C colKey) {
+        var keyType = frame.rows().keyType();
+        var result = DoubleSeries.builder(keyType);
+        var col = frame.cols().ordinal(colKey);
+        frame.rows().forEach(row -> {
+            var key = row.key();
+            var value = row.getDoubleAt(col);
+            if (!Double.isNaN(value)) {
+                result.putValue(key, value);
+            }
+        });
+        return result.build();
     }
-
-
-    /**
-     * Returns the stats interface for this series
-     * @return  the stats interface for series
-     */
-    public Stats<Double> stats() {
-        return Stats.of(this);
-    }
-
-
-    @Override
-    public DoubleSeries<K> parallel() {
-        return (DoubleSeries<K>)super.parallel();
-    }
-
-
-    @Override
-    public DoubleSeries<K> sequential() {
-        return (DoubleSeries<K>)super.sequential();
-    }
-
-
-    @Override
-    public DoubleSeries<K> copy() {
-        return (DoubleSeries<K>)super.copy();
-    }
-
-
-    @Override
-    public <T> DoubleSeries<T> mapKeys(Function<K,T> mapper) {
-        return new DoubleSeries<>(super.mapKeys(mapper));
-    }
-
-
-    @Override
-    public DoubleSeries<K> filter(Predicate<Entry<K,Double>> predicate) {
-        return new DoubleSeries<>(super.filter(predicate));
-    }
-
-
-
-    @Override
-    public String toString() {
-        return "DoubleSeries type: " + valueType() + ", size: " + size() + ", first: " + firstKey().orNull() + ", last: " + lastKey().orNull();
-    }
-
 
 
     /**
-     * An incremental builder for DataSeries
-     * @param <K>   the key type
+     * Returns an empty dataset of asset values
+     * @param keyType   the key type
+     * @return      the empty dataset
      */
-    public static class Builder<K> {
+    static <K> DoubleSeries<K> empty(Class<K> keyType) {
+        return new DoubleSeries<>() {
+            @Override
+            public int size() {
+                return 0;
+            }
+            @Override
+            public K getKey(int index) {
+                return null;
+            }
+            @Override
+            public Class<K> keyClass() {
+                return keyType;
+            }
+            @Override
+            public Stream<K> keys() {
+                return Stream.empty();
+            }
+            @Override
+            public double getDouble(K key) {
+                return Double.NaN;
+            }
+            @Override
+            public void sort(IntComparator comparator) {
 
-        protected ArrayBuilder<K> keys;
-        protected ArrayBuilder<Double> values;
+            }
+        };
+    }
 
-        /**
-         * Sets the initial capacity for this builder
-         * @param capacity  the initial capacity
-         * @return          this builder
-         */
-        public Builder<K> capacity(int capacity) {
-            if (keys != null) {
-                return this;
-            } else {
-                this.keys = ArrayBuilder.of(capacity);
-                this.values = ArrayBuilder.of(capacity, Double.class);
-                return this;
+
+    /**
+     * Asserts that the series is sorted in ascending order
+     * @param series    the series to check sort order
+     * @throws AssertException if series not sorted
+     */
+    static void assertAscending(DoubleSeries<?> series) {
+        for (int i=1; i<series.size(); ++i) {
+            var v1 = series.getDoubleAt(i-1);
+            var v2 = series.getDoubleAt(i);
+            if (v1 > v2) {
+                throw new AssertException("Series not sorted at " + i);
             }
         }
-
-        /**
-         * Returns a new series created from the state of this builder
-         * @return      the newly created series
-         */
-        public DoubleSeries<K> build() {
-            this.capacity(10);
-            return new DoubleSeries<>(Index.of(keys.toArray()), values.toArray());
-        }
-
-        /**
-         * Adds a double to this series builder
-         * @param key       the key for entry
-         * @param value     the value for entry
-         * @return          this builder
-         */
-        public Builder<K> addDouble(@lombok.NonNull K key, double value) {
-            this.capacity(100);
-            this.keys.add(key);
-            this.values.addDouble(value);
-            return this;
-        }
     }
 
 
-    public static void main(String[] args) {
-        var size = 10000000;
-        var builder = DoubleSeries.<Integer>builder().capacity(size);
-        IntStream.range(0, size).forEach(i -> builder.addDouble(i, Math.random() * 100d));
-        var series = builder.build();
+    /**
+     * A consumer for entries of a DoubleSeries
+     * @param <K>   the key type
+     */
+    interface BiConsumer<K> {
 
-        for (int i=0; i<20; ++i) {
-
-            var input1 = series.values.copy();
-            var time1 = StopWatch.time(() -> input1.parallel().sort((i1, i2) -> {
-                var d1 = input1.getDouble(i1);
-                var d2 = input1.getDouble(i2);
-                return Double.compare(d1, d2);
-            }));
-            IO.println("Array Sort " + size + " entries in " + time1.getMillis() + " millis");
-
-            var input2 = series.copy();
-            var time2 = StopWatch.time(() -> input2.parallel().sort((i1, i2) -> {
-                var d1 = input2.getDoubleAt(i1);
-                var d2 = input2.getDoubleAt(i2);
-                return Double.compare(d1, d2);
-            }));
-            IO.println("Series Sort " + size + " entries in " + time2 + " millis");
-
-        }
+        void accept(K key, double value);
     }
 
 

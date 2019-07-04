@@ -23,6 +23,10 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import com.d3x.core.util.Option;
 
 /**
  * An interface that exposes a coding between object values and corresponding long code
@@ -95,6 +99,86 @@ public interface LongCoding<T> extends Coding<T> {
      */
     static LongCoding<ZonedDateTime> ofZonedDateTime() {
         return new LongCoding.OfZonedDateTime();
+    }
+
+
+    /**
+     * Manages LongCoding support
+     */
+    class Support {
+
+        private static Map<Class<?>,LongCoding<?>> codingMap = new HashMap<>();
+
+        /*
+         * Static initializer
+         */
+        static {
+            Support.register(Long.class, new OfLong());
+            Support.register(Date.class, new OfDate());
+            Support.register(Instant.class, new OfInstant());
+            Support.register(LocalDate.class, new OfLocalDate());
+            Support.register(LocalDateTime.class, new OfLocalDateTime());
+            Support.register(LocalTime.class, new OfLocalTime());
+        }
+
+
+        /**
+         * Returns true if long coding is supported for type
+         * @param type  the data type
+         * @return      true if supported
+         */
+        public static boolean includes(Class<?> type) {
+            return codingMap.containsKey(type);
+        }
+
+
+        /**
+         * Registers a coding definition for the type
+         * @param type      the coding type
+         * @param coding    the coding instance
+         * @param <T>       the type
+         */
+        public static <T> void register(Class<T> type, LongCoding<T> coding) {
+            codingMap.put(type, coding);
+        }
+
+
+        /**
+         * Returns the long coding for type if available
+         * @param type  the data type
+         * @param <T>   the coding type
+         * @return      the coding option
+         */
+        @SuppressWarnings("unchecked")
+        public static <T> Option<LongCoding<T>> getCoding(Class<T> type) {
+            return Option.of((LongCoding<T>)codingMap.get(type));
+        }
+    }
+
+
+    /**
+     * An identity coding for Long
+     */
+    class OfLong extends BaseCoding<Long> implements LongCoding<Long> {
+
+        private static final long serialVersionUID = 1L;
+
+        /**
+         * Constructor
+         */
+        OfLong() {
+            super(Long.class);
+        }
+
+        @Override
+        public final long getCode(Long value) {
+            return value == null ? Long.MIN_VALUE : value;
+        }
+
+        @Override
+        public final Long getValue(long code) {
+            return code == Long.MIN_VALUE ? null : code;
+        }
     }
 
 

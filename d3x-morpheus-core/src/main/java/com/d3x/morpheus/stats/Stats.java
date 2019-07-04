@@ -15,6 +15,10 @@
  */
 package com.d3x.morpheus.stats;
 
+import java.util.function.Supplier;
+import java.util.function.ToDoubleFunction;
+import java.util.stream.DoubleStream;
+
 /**
  * An interface to an object that provides summary statistics on itself.
  *
@@ -157,97 +161,118 @@ public interface Stats<T> {
      * @return          the summary stats
      */
     static Stats<Double> of(Sample sample) {
-        return new Stats<>() {
-
-            /**
-             * Returns the summary statistic for the sample
-             * @param statistic     the statistic definition
-             * @return              the resulting value
-             */
-            private double compute(Statistic1 statistic) {
-                var size = sample.size();
-                for (int i=0; i<size; ++i) {
-                    var value = sample.getDoubleAt(i);
-                    if (!Double.isNaN(value)) {
-                        statistic.add(value);
-                    }
+        return new Basic(stat -> {
+            var size = sample.size();
+            for (int i=0; i<size; ++i) {
+                var value = sample.getDoubleAt(i);
+                if (!Double.isNaN(value)) {
+                    stat.add(value);
                 }
-                return statistic.getValue();
             }
+            return stat.getValue();
+        });
+    }
 
-            @Override
-            public Double count() {
-                return compute(new Count());
-            }
-            @Override
-            public Double min() {
-                return compute(new Min());
-            }
-            @Override
-            public Double max() {
-                return compute(new Max());
-            }
-            @Override
-            public Double mean() {
-                return compute(new Mean());
-            }
-            @Override
-            public Double median() {
-                return compute(new Median());
-            }
-            @Override
-            public Double mad() {
-                return compute(new MeanAbsDev());
-            }
-            @Override
-            public Double stdDev() {
-                return compute(new StdDev(true));
-            }
-            @Override
-            public Double sem() {
-                return compute(new StdErrorMean());
-            }
-            @Override
-            public Double sum() {
-                return compute(new Sum());
-            }
-            @Override
-            public Double sumLogs() {
-                return compute(new SumLogs());
-            }
-            @Override
-            public Double sumSquares() {
-                return compute(new SumSquares());
-            }
-            @Override
-            public Double variance() {
-                return compute(new Variance(true));
-            }
-            @Override
-            public Double kurtosis() {
-                return compute(new Kurtosis());
-            }
-            @Override
-            public Double skew() {
-                return compute(new Skew());
-            }
-            @Override
-            public Double geoMean() {
-                return compute(new GeoMean());
-            }
-            @Override
-            public Double product() {
-                return compute(new Product());
-            }
-            @Override
-            public Double autocorr(int lag) {
-                return compute(new AutoCorrelation(lag));
-            }
-            @Override
-            public Double percentile(double nth) {
-                return compute(new Percentile(nth));
-            }
-        };
-    };
+
+    /**
+     * Returns summary stats for a supplier of double streams
+     * @param supplier  the stream supplier
+     * @return          the summary stats
+     */
+    static Stats<Double> of(Supplier<DoubleStream> supplier) {
+        return new Basic(stat -> {
+            var doubles = supplier.get();
+            doubles.forEach(v -> {
+                if (!Double.isNaN(v)) {
+                    stat.add(v);
+                }
+            });
+            return stat.getValue();
+        });
+    }
+
+
+    /**
+     * A convenience interface for Stats implementations
+     */
+    @lombok.AllArgsConstructor()
+    class Basic implements Stats<Double> {
+
+        @lombok.NonNull
+        private ToDoubleFunction<Statistic1> compute;
+
+        @Override
+        public Double count() {
+            return compute.applyAsDouble(new Count());
+        }
+        @Override
+        public Double min() {
+            return compute.applyAsDouble(new Min());
+        }
+        @Override
+        public Double max() {
+            return compute.applyAsDouble(new Max());
+        }
+        @Override
+        public Double mean() {
+            return compute.applyAsDouble(new Mean());
+        }
+        @Override
+        public Double median() {
+            return compute.applyAsDouble(new Median());
+        }
+        @Override
+        public Double mad() {
+            return compute.applyAsDouble(new MeanAbsDev());
+        }
+        @Override
+        public Double stdDev() {
+            return compute.applyAsDouble(new StdDev(true));
+        }
+        @Override
+        public Double sem() {
+            return compute.applyAsDouble(new StdErrorMean());
+        }
+        @Override
+        public Double sum() {
+            return compute.applyAsDouble(new Sum());
+        }
+        @Override
+        public Double sumLogs() {
+            return compute.applyAsDouble(new SumLogs());
+        }
+        @Override
+        public Double sumSquares() {
+            return compute.applyAsDouble(new SumSquares());
+        }
+        @Override
+        public Double variance() {
+            return compute.applyAsDouble(new Variance(true));
+        }
+        @Override
+        public Double kurtosis() {
+            return compute.applyAsDouble(new Kurtosis());
+        }
+        @Override
+        public Double skew() {
+            return compute.applyAsDouble(new Skew());
+        }
+        @Override
+        public Double geoMean() {
+            return compute.applyAsDouble(new GeoMean());
+        }
+        @Override
+        public Double product() {
+            return compute.applyAsDouble(new Product());
+        }
+        @Override
+        public Double autocorr(int lag) {
+            return compute.applyAsDouble(new AutoCorrelation(lag));
+        }
+        @Override
+        public Double percentile(double nth) {
+            return compute.applyAsDouble(new Percentile(nth));
+        }
+    }
 
 }
