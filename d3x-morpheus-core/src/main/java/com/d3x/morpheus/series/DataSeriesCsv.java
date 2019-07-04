@@ -27,11 +27,13 @@ import com.d3x.morpheus.util.text.Formats;
 /**
  * A component used to read a CSV resource into a Morpheus DataSeries
  *
+ * <p>This is open source software released under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 License</a></p>
+ *
  * @param <K>   the key type
  * @param <V>   the value type
  */
 @lombok.AllArgsConstructor()
-public class DataSeriesCsv<K,V> {
+public class DataSeriesCsv<K,V,D extends DataSeries<K,V>> {
 
     @lombok.NonNull
     private Resource resource;
@@ -41,7 +43,7 @@ public class DataSeriesCsv<K,V> {
      * Returns a data series parsed from a CSV resource selecting first two columns
      * @return      the data series result
      */
-    public DataSeries<K,V> read() {
+    public D read() {
         return read(o -> {
             o.setKeyColIndex(0);
             o.setValColIndex(1);
@@ -55,7 +57,7 @@ public class DataSeriesCsv<K,V> {
      * @param valColIndex   the column index for series values
      * @return      the data series result
      */
-    public DataSeries<K,V> read(int keyColIndex, int valColIndex) {
+    public D read(int keyColIndex, int valColIndex) {
         return read(o -> {
             o.setKeyColIndex(keyColIndex);
             o.setValColIndex(valColIndex);
@@ -69,7 +71,7 @@ public class DataSeriesCsv<K,V> {
      * @param valColName   the column name for series values
      * @return      the data series result
      */
-    public DataSeries<K,V> read(String keyColName, String valColName) {
+    public D read(String keyColName, String valColName) {
         return read(o -> {
             o.setKeyColName(keyColName);
             o.setValColName(valColName);
@@ -82,7 +84,7 @@ public class DataSeriesCsv<K,V> {
      * @param configurator  the options configurator function
      * @return              the data series result
      */
-    public DataSeries<K,V> read(Consumer<Options> configurator) {
+    public D read(Consumer<Options> configurator) {
         var options = new Options();
         configurator.accept(options);
         return from(DataFrame.read().<Integer>csv(resource.toInputStream()).read(o -> {
@@ -100,15 +102,43 @@ public class DataSeriesCsv<K,V> {
      * @return          the resulting series
      */
     @SuppressWarnings("unchecked")
-    private DataSeries<K,V> from(DataFrame<Integer,?> frame) {
-        var builder = new DataSeries.Builder<K,V>();
+    private D from(DataFrame<Integer,?> frame) {
+        var keyType = (Class<K>)frame.colAt(0).typeInfo();
+        var valueType = (Class<V>)frame.colAt(1).typeInfo();
+        var builder = DataSeriesBuilder.builder(keyType, valueType);
         builder.capacity(frame.rowCount());
-        frame.rows().forEach(row -> {
-            var key = (K)row.getValueAt(0);
-            var value = row.getDoubleAt(1);
-            builder.addDouble(key, value);
-        });
-        return builder.build();
+        if (valueType.equals(Boolean.class)) {
+            frame.rows().forEach(row -> {
+                var key = (K)row.getValueAt(0);
+                var value = row.getBooleanAt(1);
+                builder.putBoolean(key, value);
+            });
+        } else if (valueType.equals(Integer.class)) {
+            frame.rows().forEach(row -> {
+                var key = (K)row.getValueAt(0);
+                var value = row.getIntAt(1);
+                builder.putInt(key, value);
+            });
+        } else if (valueType.equals(Long.class)) {
+            frame.rows().forEach(row -> {
+                var key = (K)row.getValueAt(0);
+                var value = row.getLongAt(1);
+                builder.putLong(key, value);
+            });
+        } else if (valueType.equals(Double.class)) {
+            frame.rows().forEach(row -> {
+                var key = (K)row.getValueAt(0);
+                var value = row.getDoubleAt(1);
+                builder.putDouble(key, value);
+            });
+        } else {
+            frame.rows().forEach(row -> {
+                var key = (K)row.getValueAt(0);
+                var value = (V)row.getValueAt(1);
+                builder.putValue(key, value);
+            });
+        }
+        return (D)builder.build();
     }
 
 

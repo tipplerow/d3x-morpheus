@@ -58,8 +58,8 @@ public class SortingPerf {
     @Test(enabled = false)
     public void seriesSeq() {
         var size = 10000000;
-        var builder = DoubleSeries.<Integer>builder().capacity(size);
-        IntStream.range(0, size).forEach(i -> builder.addDouble(i, Math.random() * 100d));
+        var builder = DoubleSeries.builder(Integer.class).capacity(size);
+        IntStream.range(0, size).forEach(i -> builder.putDouble(i, Math.random() * 100d));
         var series = builder.build();
         for (int i=0; i<10; ++i) {
             var input = series.copy();
@@ -76,12 +76,12 @@ public class SortingPerf {
     @Test(enabled = false)
     public void seriesPar() {
         var size = 10000000;
-        var builder = DoubleSeries.<Integer>builder().capacity(size);
-        IntStream.range(0, size).forEach(i -> builder.addDouble(i, Math.random() * 100d));
-        var series = builder.build();
+        var builder = DoubleSeries.builder(Integer.class).capacity(size);
+        IntStream.range(0, size).forEach(i -> builder.putDouble(i, Math.random() * 100d));
+        var series = builder.build().parallel();
         for (int i=0; i<10; ++i) {
             var input = series.copy();
-            var time2 = StopWatch.time(() -> input.parallel().sort((i1, i2) -> {
+            var time2 = StopWatch.time(() -> input.sort((i1, i2) -> {
                 var d1 = input.getDoubleAt(i1);
                 var d2 = input.getDoubleAt(i2);
                 return Double.compare(d1, d2);
