@@ -39,11 +39,11 @@ public class CorrelationTests {
     }
 
     private DataFrame<Integer,String> loadSourceData() throws IOException {
-        return DataFrame.read().csv("/stats-correl/source-data.csv").read();
+        return DataFrame.read("/stats-correl/source-data.csv").csv();
     }
 
     private DataFrame<Integer,Integer> loadExpectedRowCorr() throws IOException {
-        return DataFrame.read().<Integer>csv("/stats-correl/row-correl.csv").read(options -> {
+        return DataFrame.read("/stats-correl/row-correl.csv").csv(Integer.class, options -> {
             options.setRowKeyColumnName("Index");
             options.setMaxColumns(2000);
             options.setParser("Index", Parser.ofInteger());
@@ -51,7 +51,7 @@ public class CorrelationTests {
     }
 
     private DataFrame<String,String> loadExpectedColumnCorr() throws IOException {
-        return DataFrame.read().<String>csv("/stats-correl/col-correl.csv").read(options -> {
+        return DataFrame.read("/stats-correl/col-correl.csv").csv(String.class, options -> {
             options.setRowKeyColumnName("Index");
             options.setMaxColumns(2000);
         });

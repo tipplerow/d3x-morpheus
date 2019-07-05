@@ -54,7 +54,7 @@ public class WorldBank {
      */
     private static DataFrame<String,String> createDataset() {
         final Array<String> years = Array.ofObjects("1980", "1985", "1990", "1995", "2000", "2005", "2010");
-        var frame = DataFrame.read().<String>csv("/worldbank/gdp_per_capita.csv").read(options -> {
+        var frame = DataFrame.read("/worldbank/gdp_per_capita.csv").csv(String.class, options -> {
             options.setRowKeyColumnName("Country");
         });
         return frame.cols().select(years).rows().select(Array.ofObjects(

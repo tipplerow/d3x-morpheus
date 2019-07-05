@@ -61,13 +61,13 @@ public class PCATests {
             final DataFrame<Integer,String> actualEigenValues = model.getEigenValues().cols().mapKeys(c -> c.key().toString());
             Assert.assertEquals(actualEigenValues.colCount(), 3);
             Assert.assertEquals(actualEigenValues.rowCount(), 360);
-            DataFrameAsserts.assertEqualsByIndex(actualEigenValues, DataFrame.read().csv(file1).read());
+            DataFrameAsserts.assertEqualsByIndex(actualEigenValues, DataFrame.read(file1).csv());
 
             //Check eigenvectors matched previously recorded data
             final DataFrame<Integer,String> actualEigenVectors = model.getEigenVectors().cols().mapKeys(c -> String.valueOf(c.key()));
             Assert.assertEquals(actualEigenVectors.colCount(), 360);
             Assert.assertEquals(actualEigenVectors.rowCount(), 360);
-            DataFrameAsserts.assertEqualsByIndex(actualEigenVectors, DataFrame.read().csv(file2).read());
+            DataFrameAsserts.assertEqualsByIndex(actualEigenVectors, DataFrame.read(file2).csv());
 
             IntStream.of(30, 50, 100).forEach(nComps -> {
 
@@ -77,13 +77,13 @@ public class PCATests {
                 final DataFrame<Integer,String> actualScores = model.getScores(nComps).cols().mapKeys(c -> String.valueOf(c.key()));
                 Assert.assertEquals(actualScores.rowCount(), 504);
                 Assert.assertEquals(actualScores.colCount(), nComps);
-                DataFrameAsserts.assertEqualsByIndex(actualScores, DataFrame.read().csv(scoreFile).read());
+                DataFrameAsserts.assertEqualsByIndex(actualScores, DataFrame.read(scoreFile).csv());
 
 
                 final DataFrame<Integer,String> actualProjection = model.getProjection(nComps).cols().mapKeys(c -> String.valueOf(c.key()));
                 Assert.assertEquals(actualProjection.rowCount(), 504);
                 Assert.assertEquals(actualProjection.colCount(), 360);
-                DataFrameAsserts.assertEqualsByIndex(actualProjection, DataFrame.read().csv(projectionFile).read());
+                DataFrameAsserts.assertEqualsByIndex(actualProjection, DataFrame.read(projectionFile).csv());
 
             });
             return Optional.empty();
@@ -109,13 +109,13 @@ public class PCATests {
             final DataFrame<Integer,String> actualEigenValues = model.getEigenValues().cols().mapKeys(c -> c.key().toString());
             Assert.assertEquals(actualEigenValues.colCount(), 3);
             Assert.assertEquals(actualEigenValues.rowCount(), 360);
-            DataFrameAsserts.assertEqualsByIndex(actualEigenValues, DataFrame.read().csv(file1).read());
+            DataFrameAsserts.assertEqualsByIndex(actualEigenValues, DataFrame.read(file1).csv());
 
             //Check eigenvectors matched previously recorded data
             final DataFrame<Integer,String> actualEigenVectors = model.getEigenVectors().cols().mapKeys(c -> String.valueOf(c.key()));
             Assert.assertEquals(actualEigenVectors.colCount(), 360);
             Assert.assertEquals(actualEigenVectors.rowCount(), 360);
-            DataFrameAsserts.assertEqualsByIndex(actualEigenVectors, DataFrame.read().csv(file2).read());
+            DataFrameAsserts.assertEqualsByIndex(actualEigenVectors, DataFrame.read(file2).csv());
 
             IntStream.of(30, 50, 100).forEach(nComps -> {
 
@@ -125,12 +125,12 @@ public class PCATests {
                 final DataFrame<Integer,String> actualScores = model.getScores(nComps).cols().mapKeys(c -> String.valueOf(c.key()));
                 Assert.assertEquals(actualScores.rowCount(), 504);
                 Assert.assertEquals(actualScores.colCount(), nComps);
-                DataFrameAsserts.assertEqualsByIndex(actualScores, DataFrame.read().csv(scoreFile).read());
+                DataFrameAsserts.assertEqualsByIndex(actualScores, DataFrame.read(scoreFile).csv());
 
                 final DataFrame<Integer,String> actualProjection = model.getProjection(nComps).cols().mapKeys(c -> String.valueOf(c.key()));
                 Assert.assertEquals(actualProjection.rowCount(), 504);
                 Assert.assertEquals(actualProjection.colCount(), 360);
-                DataFrameAsserts.assertEqualsByIndex(actualProjection, DataFrame.read().csv(projectionFile).read());
+                DataFrameAsserts.assertEqualsByIndex(actualProjection, DataFrame.read(projectionFile).csv());
             });
             return Optional.empty();
         });
@@ -155,13 +155,13 @@ public class PCATests {
             final DataFrame<Integer,String> actualEigenValues = model.getEigenValues().cols().mapKeys(c -> c.key().toString());
             Assert.assertEquals(actualEigenValues.colCount(), 3);
             Assert.assertEquals(actualEigenValues.rowCount(), 360);
-            DataFrameAsserts.assertEqualsByIndex(actualEigenValues, DataFrame.read().csv(file1).read());
+            DataFrameAsserts.assertEqualsByIndex(actualEigenValues, DataFrame.read(file1).csv());
 
             //Check eigenvectors matched previously recorded data
             final DataFrame<Integer,String> actualEigenVectors = model.getEigenVectors().cols().mapKeys(c -> String.valueOf(c.key()));
             Assert.assertEquals(actualEigenVectors.colCount(), 360);
             Assert.assertEquals(actualEigenVectors.rowCount(), 360);
-            DataFrameAsserts.assertEqualsByIndex(actualEigenVectors, DataFrame.read().csv(file2).read());
+            DataFrameAsserts.assertEqualsByIndex(actualEigenVectors, DataFrame.read(file2).csv());
 
             IntStream.of(30, 50, 100).forEach(nComps -> {
 
@@ -171,12 +171,12 @@ public class PCATests {
                 final DataFrame<Integer,String> actualScores = model.getScores(nComps).cols().mapKeys(c -> String.valueOf(c.key()));
                 Assert.assertEquals(actualScores.rowCount(), 504);
                 Assert.assertEquals(actualScores.colCount(), nComps);
-                DataFrameAsserts.assertEqualsByIndex(actualScores, DataFrame.read().csv(scoreFile).read());
+                DataFrameAsserts.assertEqualsByIndex(actualScores, DataFrame.read(scoreFile).csv());
 
                 final DataFrame<Integer,String> actualProjection = model.getProjection(nComps).cols().mapKeys(c -> String.valueOf(c.key()));
                 Assert.assertEquals(actualProjection.rowCount(), 504);
                 Assert.assertEquals(actualProjection.colCount(), 360);
-                DataFrameAsserts.assertEqualsByIndex(actualProjection, DataFrame.read().csv(projectionFile).read());
+                DataFrameAsserts.assertEqualsByIndex(actualProjection, DataFrame.read(projectionFile).csv());
             });
             return Optional.empty();
         });

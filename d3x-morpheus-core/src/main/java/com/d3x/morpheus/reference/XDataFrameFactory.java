@@ -42,6 +42,7 @@ import com.d3x.morpheus.frame.DataFrameHeader;
 import com.d3x.morpheus.frame.DataFrameRead;
 import com.d3x.morpheus.index.Index;
 import com.d3x.morpheus.range.Range;
+import com.d3x.morpheus.util.Resource;
 
 /**
  * The reference implementation of the DataFrameFactory interface.
@@ -52,11 +53,10 @@ import com.d3x.morpheus.range.Range;
  */
 public class XDataFrameFactory extends DataFrameFactory {
 
-    private DataFrameRead read = new XDataFrameRead();
 
     @Override
-    public DataFrameRead read() {
-        return read;
+    public DataFrameRead read(Resource resource) {
+        return new XDataFrameRead(resource);
     }
 
 

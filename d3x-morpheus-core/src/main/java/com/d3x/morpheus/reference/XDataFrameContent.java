@@ -1217,7 +1217,7 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
                     return array.isNull(colIndex);
                 }
             } catch (Exception ex) {
-                throw new DataFrameException("DataFrame read error at (" + rowKey() + ", " + colKey() + "): " + ex.getMessage(), ex);
+                throw new DataFrameException("DataFrame csv error at (" + rowKey() + ", " + colKey() + "): " + ex.getMessage(), ex);
             }
         }
 
@@ -1273,7 +1273,7 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
                     return array.getBoolean(colIndex);
                 }
             } catch (Throwable t) {
-                throw new DataFrameException("DataFrame read error at (" + rowKey() + ", " + colKey() + "): ", t);
+                throw new DataFrameException("DataFrame csv error at (" + rowKey() + ", " + colKey() + "): ", t);
             }
         }
 
@@ -1286,7 +1286,7 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
                     return array.getInt(colIndex);
                 }
             } catch (Throwable t) {
-                throw new DataFrameException("DataFrame read error at (" + rowKey() + ", " + colKey() + "): ", t);
+                throw new DataFrameException("DataFrame csv error at (" + rowKey() + ", " + colKey() + "): ", t);
             }
         }
 
@@ -1299,7 +1299,7 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
                     return array.getLong(colIndex);
                 }
             } catch (Throwable t) {
-                throw new DataFrameException("DataFrame read error at (" + rowKey() + ", " + colKey() + "): ", t);
+                throw new DataFrameException("DataFrame csv error at (" + rowKey() + ", " + colKey() + "): ", t);
             }
         }
 
@@ -1312,7 +1312,7 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
                     return array.getDouble(colIndex);
                 }
             } catch (Throwable t) {
-                throw new DataFrameException("DataFrame read error at (" + rowKey() + ", " + colKey() + "): ", t);
+                throw new DataFrameException("DataFrame csv error at (" + rowKey() + ", " + colKey() + "): ", t);
             }
         }
 
@@ -1326,7 +1326,7 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
                     return (V)array.getValue(colIndex);
                 }
             } catch (Throwable t) {
-                throw new DataFrameException("DataFrame read error at (" + rowKey() + ", " + colKey() + "): ", t);
+                throw new DataFrameException("DataFrame csv error at (" + rowKey() + ", " + colKey() + "): ", t);
             }
         }
 

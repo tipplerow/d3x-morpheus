@@ -25,7 +25,6 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 import com.d3x.morpheus.frame.DataFrame;
-import com.d3x.morpheus.frame.DataFrameException;
 import com.d3x.morpheus.util.Predicates;
 import com.d3x.morpheus.util.functions.ObjectIntBiFunction;
 import com.d3x.morpheus.util.text.Formats;
@@ -34,27 +33,25 @@ import com.d3x.morpheus.util.text.parser.Parser;
 /**
  * Interface to a component that can read CSV contents into a Morpheus DataFrame
  *
- * @param <R>   the row key type
- *
  * <p><strong>This is open source software released under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 License</a></strong></p>
  *
  * @author  Xavier Witdouck
  */
-public interface CsvSource<R> {
+public interface CsvSource {
 
     /**
-     * Reads the CSV resource into a DataFrame using sequence of integers for row keys
+     * Loads underlying resource into a DataFrame with sequence of integers for row keys
      * @return      the data frame result containing CSV data
-     * @throws DataFrameException   if fails to parse resource
      */
-    DataFrame<Integer,String> read() throws DataFrameException;
+    DataFrame<Integer,String> read();
 
     /**
-     * Reads the CSV resource into a DataFrame with options provided by caller
+     * Loads underlying resource into a DataFrame with using a configured column for row keys
+     * @param rowType       the row type
+     * @param configurator  the options configurator
      * @return      the data frame result containing CSV data
-     * @throws DataFrameException   if fails to parse resource
      */
-    DataFrame<R,String> read(Consumer<Options> configurator) throws DataFrameException;
+    <R> DataFrame<R,String> read(Class<R> rowType, Consumer<Options> configurator);
 
 
     /**
@@ -146,7 +143,6 @@ public interface CsvSource<R> {
             this.setColIndexPredicate(Predicates.in(columns).negate());
         }
 
-
         /**
          * Sets a parser for one or more columns
          * @param colNameRegex  the column name regular expression
@@ -155,7 +151,6 @@ public interface CsvSource<R> {
         public void setParser(String colNameRegex, Parser<?> parser) {
             this.formats.setParser(colNameRegex, parser);
         }
-
 
         /**
          * Sets a parser for one or more columns
@@ -221,8 +216,5 @@ public interface CsvSource<R> {
                 return colIndexPredicate == null && colNamePredicate == null;
             }
         }
-
     }
-
-
 }

@@ -40,40 +40,40 @@ public class StatsRollingTests {
 
 
     private DataFrame<Integer,String> loadSourceData() throws IOException {
-        return DataFrame.read().csv("/stats-rolling/source-data.csv").read();
+        return DataFrame.read("/stats-rolling/source-data.csv").csv();
     }
 
 
     private DataFrame<Integer,String> loadExpectedRowStats(StatType stat) throws IOException {
         switch (stat) {
-            case MIN:           return DataFrame.read().csv("/stats-rolling/row-min.csv").read();
-            case MAX:           return DataFrame.read().csv("/stats-rolling/row-max.csv").read();
-            case SUM:           return DataFrame.read().csv("/stats-rolling/row-sum.csv").read();
-            case MEAN:          return DataFrame.read().csv("/stats-rolling/row-mean.csv").read();
-            case COUNT:         return DataFrame.read().csv("/stats-rolling/row-count.csv").read();
-            case SKEWNESS:      return DataFrame.read().csv("/stats-rolling/row-skew.csv").read();
-            case KURTOSIS:      return DataFrame.read().csv("/stats-rolling/row-kurt.csv").read();
-            case VARIANCE:      return DataFrame.read().csv("/stats-rolling/row-var.csv").read();
-            case STD_DEV:       return DataFrame.read().csv("/stats-rolling/row-std.csv").read();
-            case MEDIAN:        return DataFrame.read().csv("/stats-rolling/row-median.csv").read();
-            case PERCENTILE:    return DataFrame.read().csv("/stats-rolling/row-percentile-80th.csv").read();
+            case MIN:           return DataFrame.read("/stats-rolling/row-min.csv").csv();
+            case MAX:           return DataFrame.read("/stats-rolling/row-max.csv").csv();
+            case SUM:           return DataFrame.read("/stats-rolling/row-sum.csv").csv();
+            case MEAN:          return DataFrame.read("/stats-rolling/row-mean.csv").csv();
+            case COUNT:         return DataFrame.read("/stats-rolling/row-count.csv").csv();
+            case SKEWNESS:      return DataFrame.read("/stats-rolling/row-skew.csv").csv();
+            case KURTOSIS:      return DataFrame.read("/stats-rolling/row-kurt.csv").csv();
+            case VARIANCE:      return DataFrame.read("/stats-rolling/row-var.csv").csv();
+            case STD_DEV:       return DataFrame.read("/stats-rolling/row-std.csv").csv();
+            case MEDIAN:        return DataFrame.read("/stats-rolling/row-median.csv").csv();
+            case PERCENTILE:    return DataFrame.read("/stats-rolling/row-percentile-80th.csv").csv();
             default:    throw new IllegalArgumentException("Unexpected stat type: " + stat);
         }
     }
 
     private DataFrame<Integer,String> loadExpectedColStats(StatType stat) throws IOException {
         switch (stat) {
-            case MIN:           return DataFrame.read().csv("/stats-rolling/column-min.csv").read();
-            case MAX:           return DataFrame.read().csv("/stats-rolling/column-max.csv").read();
-            case SUM:           return DataFrame.read().csv("/stats-rolling/column-sum.csv").read();
-            case MEAN:          return DataFrame.read().csv("/stats-rolling/column-mean.csv").read();
-            case COUNT:         return DataFrame.read().csv("/stats-rolling/column-count.csv").read();
-            case SKEWNESS:      return DataFrame.read().csv("/stats-rolling/column-skew.csv").read();
-            case KURTOSIS:      return DataFrame.read().csv("/stats-rolling/column-kurt.csv").read();
-            case VARIANCE:      return DataFrame.read().csv("/stats-rolling/column-var.csv").read();
-            case STD_DEV:       return DataFrame.read().csv("/stats-rolling/column-std.csv").read();
-            case MEDIAN:        return DataFrame.read().csv("/stats-rolling/column-median.csv").read();
-            case PERCENTILE:    return DataFrame.read().csv("/stats-rolling/column-percentile-80th.csv").read();
+            case MIN:           return DataFrame.read("/stats-rolling/column-min.csv").csv();
+            case MAX:           return DataFrame.read("/stats-rolling/column-max.csv").csv();
+            case SUM:           return DataFrame.read("/stats-rolling/column-sum.csv").csv();
+            case MEAN:          return DataFrame.read("/stats-rolling/column-mean.csv").csv();
+            case COUNT:         return DataFrame.read("/stats-rolling/column-count.csv").csv();
+            case SKEWNESS:      return DataFrame.read("/stats-rolling/column-skew.csv").csv();
+            case KURTOSIS:      return DataFrame.read("/stats-rolling/column-kurt.csv").csv();
+            case VARIANCE:      return DataFrame.read("/stats-rolling/column-var.csv").csv();
+            case STD_DEV:       return DataFrame.read("/stats-rolling/column-std.csv").csv();
+            case MEDIAN:        return DataFrame.read("/stats-rolling/column-median.csv").csv();
+            case PERCENTILE:    return DataFrame.read("/stats-rolling/column-percentile-80th.csv").csv();
             default:    throw new IllegalArgumentException("Unexpected stat type: " + stat);
         }
     }

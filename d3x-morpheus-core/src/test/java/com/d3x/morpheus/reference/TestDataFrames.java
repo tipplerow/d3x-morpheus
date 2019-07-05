@@ -76,7 +76,8 @@ public class TestDataFrames {
      * @throws java.io.IOException  if there is an IO exception
      */
     public static DataFrame<LocalDate,String> getQuotes(String ticker) throws IOException {
-        return DataFrame.read().<LocalDate>csv("/quotes/" + ticker.toLowerCase() + ".csv").read(options -> {
+        var path = String.format("/quotes/%s.csv", ticker.toLowerCase());
+        return DataFrame.read(path).csv(LocalDate.class, options -> {
             options.setRowKeyColumnName("Date");
             options.getFormats().setParser("Date", Parser.ofLocalDate("yyyy-MM-dd"));
             options.setColNamePredicate(Predicates.in("Date", "Open", "High", "Low", "Close", "Volume", "Adj Close"));

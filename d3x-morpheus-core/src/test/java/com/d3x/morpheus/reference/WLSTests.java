@@ -41,13 +41,13 @@ public class WLSTests {
 
     @DataProvider(name = "data1")
     public Object[][] testData1() {
-        return wrap(DataFrame.read().csv("/csv/supervisor.csv").read());
+        return wrap(DataFrame.read("/csv/supervisor.csv").csv());
     }
 
 
     @DataProvider(name = "data2")
     public Object[][] testData2() {
-        return wrap(DataFrame.read().csv("/csv/wls-2.csv").read(options -> {
+        return wrap(DataFrame.read("/csv/wls-2.csv").csv(Integer.class, options -> {
             options.setRowKeyColumnName("DataFrame");
         }));
     }

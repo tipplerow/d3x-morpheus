@@ -37,11 +37,11 @@ public class CovarianceTests {
     }
 
     private DataFrame<Integer,String> loadSourceData() {
-        return DataFrame.read().csv("/stats-cov/source-data.csv").read();
+        return DataFrame.read("/stats-cov/source-data.csv").csv();
     }
 
     private DataFrame<Integer,Integer> loadExpectedRowCov() {
-        return DataFrame.read().<Integer>csv("/stats-cov/row-cov.csv").read(options -> {
+        return DataFrame.read("/stats-cov/row-cov.csv").csv(Integer.class, options -> {
             options.setMaxColumns(2000);
             options.setRowKeyColumnName("Index");
             options.setParser("Index", Parser.ofInteger());
@@ -49,7 +49,7 @@ public class CovarianceTests {
     }
 
     private DataFrame<String,String> loadExpectedColumnCov() {
-        return DataFrame.read().<String>csv("/stats-cov/col-cov.csv").read(options -> {
+        return DataFrame.read("/stats-cov/col-cov.csv").csv(String.class, options -> {
             options.setRowKeyColumnName("Index");
             options.setMaxColumns(2000);
         });

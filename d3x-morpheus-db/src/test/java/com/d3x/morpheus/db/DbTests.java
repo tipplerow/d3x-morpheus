@@ -215,7 +215,7 @@ public class DbTests {
     @Test(dataProvider = "databases")
     public void testEtfWrite(String dbName) {
         var source = dataSourceMap.get(dbName);
-        var frame = DataFrame.read().<String>csv("/csv/etf.csv").read(options -> {
+        var frame = DataFrame.read("/csv/etf.csv").csv(String.class, options -> {
             options.setRowKeyColumnName("Ticker");
             options.setColumnType("Geography", String.class);
         });
@@ -234,7 +234,7 @@ public class DbTests {
     @Test(dataProvider = "databases")
     public void testWriteProcessLog(String dbName) {
         var path = "/csv/process.csv";
-        var frame = DataFrame.read().<Integer>csv(path).read(options -> {
+        var frame = DataFrame.read(path).csv(Integer.class, options -> {
             options.setRowKeyColumnName("ProcessId");
             options.setCharset(StandardCharsets.UTF_16);
             options.setColumnType("ExecutionState", String.class);

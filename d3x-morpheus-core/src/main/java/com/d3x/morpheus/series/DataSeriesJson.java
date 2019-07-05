@@ -17,7 +17,6 @@ package com.d3x.morpheus.series;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import com.d3x.core.json.JsonAdapter;
 import com.d3x.core.json.JsonEngine;
@@ -46,22 +45,39 @@ public class DataSeriesJson<K,V,S extends DataSeries<K,V>> implements JsonAdapte
 
 
     /**
+     * Returns a newly created data series json IO adapter
+     * @param keyType   the key type
+     * @param encode    the key encoder
+     * @param decode    the key decoder
+     * @return          the IO adapter
+     */
+    public static <K,V> JsonAdapter<DataSeries<K,V>> of(
+        @lombok.NonNull Class<K> keyType,
+        @lombok.NonNull Class<V> valueType,
+        @lombok.NonNull Function<K, String> encode,
+        @lombok.NonNull Function<String, K> decode) {
+        return new DataSeriesJson<>(DataSeries.ofType(keyType, valueType), encode, decode);
+    }
+
+    /**
      * Registers all default json serializers for data series
      * @param engine    the engine to register adapters against
      * @return          the same as arg
      */
     public static JsonEngine registerDefaults(JsonEngine engine) {
         var formats = new Formats();
-        var types = formats.getParserKeys().stream().filter(v -> v instanceof Class).map(Class.class::cast).collect(Collectors.toList());
-        types.forEach(keyType -> {
-            var parser = formats.getParser(keyType);
-            var printer = formats.getPrinter(keyType);
-            if (parser != null && printer != null) {
-                engine.register(new DataSeriesJson<>(DoubleSeries.ofType((Class<?>)keyType), printer, parser));
-                types.forEach(valueType -> {
-                    var paramType = DataSeries.ofType((Class<?>)keyType, (Class<?>)valueType);
-                    engine.register(new DataSeriesJson<>(paramType, printer, parser));
-                });
+        var keys = formats.getParserKeys();
+        keys.forEach(key -> {
+            if (key instanceof Class) {
+                var dataType = (Class<?>)key;
+                var parser = formats.getParser(dataType);
+                var printer = formats.getPrinter(dataType);
+                if (parser != null && printer != null) {
+                    keys.forEach(valueType -> {
+                        var paramType = DataSeries.ofType((Class<?>)key, (Class<?>)valueType);
+                        engine.register(new DataSeriesJson<>(paramType, printer, parser));
+                    });
+                }
             }
         });
         return engine;

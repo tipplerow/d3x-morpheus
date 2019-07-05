@@ -74,7 +74,7 @@ public class DbSourceOptions<R> {
             try {
                 return (R)rs.getObject(1);
             } catch (SQLException ex) {
-                throw new RuntimeException("Failed to read row key from SQL ResultSet", ex);
+                throw new RuntimeException("Failed to csv row key from SQL ResultSet", ex);
             }
         };
     }

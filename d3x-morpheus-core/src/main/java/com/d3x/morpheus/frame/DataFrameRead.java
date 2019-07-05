@@ -15,9 +15,7 @@
  */
 package com.d3x.morpheus.frame;
 
-import java.io.File;
-import java.io.InputStream;
-import java.net.URL;
+import java.util.function.Consumer;
 
 import com.d3x.morpheus.csv.CsvSource;
 
@@ -31,35 +29,19 @@ import com.d3x.morpheus.csv.CsvSource;
 public interface DataFrameRead {
 
     /**
-     * Reads a DataFrame from a CSV file
-     * @param file      the input file
-     * @param <R>       the row key type
-     * @return          the resulting DataFrame
+     * Loads underlying resource into a DataFrame with sequence of integers for row keys
+     * @return      the data frame result containing CSV data
+     * @throws DataFrameException   if fails to parse resource
      */
-    <R> CsvSource<R> csv(File file);
+    DataFrame<Integer,String> csv();
 
     /**
-     * Reads a DataFrame from a CSV file
-     * @param url       the input url
-     * @param <R>       the row key type
-     * @return          the resulting DataFrame
+     * Loads underlying resource into a DataFrame with using a configured column for row keys
+     * @param rowType       the row type
+     * @param configurator  the options configurator
+     * @return      the data frame result containing CSV data
      */
-    <R> CsvSource<R> csv(URL url);
+    <R> DataFrame<R,String> csv(Class<R> rowType, Consumer<CsvSource.Options> configurator);
 
-    /**
-     * Reads a DataFrame from a CSV file
-     * @param is        the input stream to read from
-     * @param <R>       the row key type
-     * @return          the resulting DataFrame
-     */
-    <R> CsvSource<R> csv(InputStream is);
-
-    /**
-     * Reads a DataFrame from a CSV resource
-     * @param resource      a file name or URL
-     * @param <R>           the row key type
-     * @return              the resulting DataFrame
-     */
-    <R> CsvSource<R> csv(String resource);
 
 }

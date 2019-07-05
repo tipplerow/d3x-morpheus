@@ -104,7 +104,7 @@ public class CsvTests {
     private <T> void readAndValidate(DataFrame<T,String> original, Class<T> rowType, File file) {
         var formats = new Formats();
         var parser = formats.<T>getParserOrFail(rowType);
-        var result = DataFrame.read().<T>csv(file).read(options -> {
+        var result = DataFrame.read(file).csv(rowType, options -> {
             options.setFormats(formats);
             options.setRowKeyColumnName("DataFrame");
             options.getFormats().setParser("DataFrame", parser);
@@ -123,7 +123,7 @@ public class CsvTests {
 
     @Test()
     public void testBasicRead() {
-        var frame = DataFrame.read().<Integer>csv("/csv/aapl.csv").read(options -> {
+        var frame = DataFrame.read("/csv/aapl.csv").csv(Integer.class, options -> {
             options.getFormats().setParser("Volume", Long.class);
         });
         assertTrue(frame.rows().count() > 0, "There is at least one row");
@@ -176,7 +176,7 @@ public class CsvTests {
 
     @Test()
     public void testRowKeyParser() {
-        var frame = DataFrame.read().<LocalDate>csv("/csv/aapl.csv").read(options -> {
+        var frame = DataFrame.read("/csv/aapl.csv").csv(LocalDate.class, options -> {
             options.setRowKeyColumnName("Date");
             options.getFormats().copyParser(Long.class, "Volume");
         });
@@ -229,7 +229,7 @@ public class CsvTests {
 
     @Test()
     public void testRowPredicate() {
-        var frame = DataFrame.read().<Integer>csv("/csv/aapl.csv").read(options -> {
+        var frame = DataFrame.read("/csv/aapl.csv").csv(Integer.class, options -> {
             options.setRowPredicate(values -> values[0].startsWith("2012"));
             options.getFormats().copyParser(Long.class, "Volume");
         });
@@ -271,11 +271,11 @@ public class CsvTests {
     @Test()
     public void testColumnPredicate() {
         final String[] columns = {"Date", "Close", "Volume"};
-        var frame = DataFrame.read().<Integer>csv("/csv/aapl.csv").read(options -> {
+        var frame = DataFrame.read("/csv/aapl.csv").csv(Integer.class, options -> {
             options.setIncludeColumns(columns);
             options.getFormats().setParser("Volume", Long.class);
         });
-        var expected = DataFrame.read().<Integer>csv("/csv/aapl.csv").read(options -> {
+        var expected = DataFrame.read("/csv/aapl.csv").csv(Integer.class, options -> {
             options.getFormats().setParser("Volume", Long.class);
         });
         assertEquals(frame.rowCount(), 8503);
@@ -298,12 +298,12 @@ public class CsvTests {
     @Test()
     public void testRowAndColumnPredicate() {
         final String[] columns = {"Date", "Close", "Volume"};
-        var frame = DataFrame.read().<Integer>csv("/csv/aapl.csv").read(options -> {
+        var frame = DataFrame.read("/csv/aapl.csv").csv(Integer.class, options -> {
             options.setRowPredicate(values -> values[0].startsWith("2012"));
             options.setColNamePredicate(Predicates.in(columns));
             options.getFormats().copyParser(Long.class, "Volume");
         });
-        var expected = DataFrame.read().<LocalDate>csv("/csv/aapl.csv").read(options -> {
+        var expected = DataFrame.read("/csv/aapl.csv").csv(LocalDate.class, options -> {
             options.setRowKeyColumnName("Date");
             options.getFormats().copyParser(Long.class, "Volume");
         });
@@ -330,12 +330,12 @@ public class CsvTests {
     @Test()
     public void testWriteFollowedByRead() {
         final File file = new File(tmpDir, "aapl.csv");
-        var frame1 = DataFrame.read().<Integer>csv("/csv/aapl.csv").read(options -> {
+        var frame1 = DataFrame.read("/csv/aapl.csv").csv(Integer.class, options -> {
             options.setRowKeyColumnName("Date");
             options.getFormats().setParser("Volume", Long.class);
         });
         frame1.write().csv(file).apply();
-        var frame2 = DataFrame.read().<Integer>csv(file).read(options -> {
+        var frame2 = DataFrame.read(file).csv(Integer.class, options -> {
             options.setRowKeyColumnName("DataFrame");
             options.getFormats().setParser("Volume", Long.class);
         });
@@ -345,7 +345,7 @@ public class CsvTests {
 
     @Test()
     public void testCustomParsers() {
-        var frame = DataFrame.read().<Integer>csv("/csv/aapl.csv").read(options -> {
+        var frame = DataFrame.read("/csv/aapl.csv").csv(Integer.class, options -> {
             options.setRowKeyColumnName("Date");
             options.getFormats().copyParser(Double.class, "Volume");
             options.getFormats().copyParser(BigDecimal.class, "Close");
@@ -365,7 +365,7 @@ public class CsvTests {
     @Test()
     public void testWindowsTasks() {
         final String[] columns = {"Image Name", "PID", "Session Name", "Session#", "Mem Usage", "Status", "User Name", "CPU Time", "Window Title"};
-        var frame = DataFrame.read().<Integer>csv("/csv/tasks.csv").read(options -> {
+        var frame = DataFrame.read("/csv/tasks.csv").csv(Integer.class, options -> {
             options.setColNamePredicate(Predicates.in(columns));
             options.setRowKeyColumnName("PID");
         });
@@ -379,12 +379,12 @@ public class CsvTests {
     public void testWindowsTasksColumnInclude() {
         final String[] columns1 = {"Image Name", "Session Name", "Session#", "Mem Usage", "Status", "User Name", "CPU Time", "Window Title", "PID"};
         final String[] columns2 = {"Image Name", "Mem Usage", "User Name", "CPU Time", "PID"};
-        var frame1 = DataFrame.read().<Integer>csv("/csv/tasks.csv").read(options -> {
+        var frame1 = DataFrame.read("/csv/tasks.csv").csv(Integer.class, options -> {
             options.setRowKeyColumnName("PID");
             options.setParser("PID", Parser.ofInteger());
             options.setColNamePredicate(Predicates.in(columns1));
         });
-        var frame2 = DataFrame.read().<Integer>csv("/csv/tasks.csv").read(options -> {
+        var frame2 = DataFrame.read("/csv/tasks.csv").csv(Integer.class, options -> {
             options.setRowKeyColumnName("PID");
             options.setParser("PID", Parser.ofInteger());
             options.setColNamePredicate(Predicates.in(columns2));
@@ -402,7 +402,7 @@ public class CsvTests {
 
     @Test()
     public void testCustomCharset() {
-        var frame = DataFrame.read().csv("/csv/process.csv").read(options -> {
+        var frame = DataFrame.read("/csv/process.csv").csv(Integer.class, options -> {
             options.setCharset(StandardCharsets.UTF_16);
             options.setRowKeyColumnName("ProcessId");
             options.getFormats().copyParser(Long.class, "KernelModeTime");
@@ -414,7 +414,7 @@ public class CsvTests {
 
     @Test()
     public void testMultipleColumnPredicates() {
-        var frame = DataFrame.read().<LocalDate>csv("/csv/aapl.csv").read(options -> {
+        var frame = DataFrame.read("/csv/aapl.csv").csv(LocalDate.class, options -> {
             options.setExcludeColumns("Open");
             options.setRowKeyColumnName("Date");
             options.getFormats().copyParser(Long.class, "Volume");
@@ -459,7 +459,7 @@ public class CsvTests {
 
     @Test()
     public void testIncludeColumnIndexes() {
-        var frame = DataFrame.read().<LocalDate>csv("/csv/aapl.csv").read(options -> {
+        var frame = DataFrame.read("/csv/aapl.csv").csv(LocalDate.class, options -> {
             options.setRowKeyColumnName("Date");
             options.setIncludeColumnIndexes(0, 2, 3, 4, 5, 6);
             options.getFormats().copyParser(Long.class, "Volume");

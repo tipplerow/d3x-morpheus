@@ -41,10 +41,10 @@ public class ExpWeightedTests {
 
     @Test(dataProvider="style")
     public void testExpWeightedMovingAverage(boolean parallel) {
-        var expected = DataFrame.read().<LocalDate>csv("/ewmw/spy-ewma.csv").read(options -> {
+        var expected = DataFrame.read("/ewmw/spy-ewma.csv").csv(LocalDate.class, options -> {
             options.setRowKeyColumnName("Date");
         });
-        var actual = DataFrame.read().<LocalDate>csv("/ewmw/spy.csv").read(options -> {
+        var actual = DataFrame.read("/ewmw/spy.csv").csv(LocalDate.class, options -> {
             options.setRowKeyColumnName("Date");
             options.getFormats().copyParser(Double.class, "Volume");
         });

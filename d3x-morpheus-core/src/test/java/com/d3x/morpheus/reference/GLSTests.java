@@ -42,7 +42,7 @@ public class GLSTests {
      * @return  longley dataset
      */
     private DataFrame<Year,String> longley() {
-        return DataFrame.read().<Year>csv("/csv/longley-2.csv").read(options -> {
+        return DataFrame.read("/csv/longley-2.csv").csv(Year.class, options -> {
             options.setHeader(true);
             options.setRowKeyColumnName("Obs");
             options.getFormats().setParser("Obs", Parser.forObject(Year.class, v -> Year.of(Integer.parseInt(v))));

@@ -16,7 +16,6 @@
 package com.d3x.morpheus.csv;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -49,14 +48,12 @@ import com.univocity.parsers.csv.CsvParserSettings;
 /**
  * A DataFrameSource designed to load DataFrames from a CSV resource based on the CSV request descriptor.
  *
- * @param <R>   the row key type
- *
  * <p><strong>This is open source software released under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 License</a></strong></p>
  *
  * @author  Xavier Witdouck
  */
 @lombok.AllArgsConstructor()
-public class CsvSourceDefault<R> implements CsvSource<R> {
+public class CsvSourceDefault implements CsvSource {
 
     @lombok.NonNull
     private Resource resource;
@@ -65,18 +62,20 @@ public class CsvSourceDefault<R> implements CsvSource<R> {
     @Override
     @SuppressWarnings("unchecked")
     public DataFrame<Integer,String> read() throws DataFrameException {
-        return (DataFrame<Integer,String>)read(o -> o.setHeader(true));
+        return read(Integer.class, o -> {
+            o.setHeader(true);
+        });
     }
 
     @Override
-    public DataFrame<R,String> read(Consumer<Options> configurator) throws DataFrameException {
+    public <R> DataFrame<R,String> read(Class<R> rowType, Consumer<Options> configurator) throws DataFrameException {
         try {
             var options = new Options();
             configurator.accept(options);
             switch (resource.getType()) {
-                case FILE:          return parse(options, new FileInputStream(resource.asFile()));
-                case URL:           return parse(options, resource.asURL());
-                case INPUT_STREAM:  return parse(options, resource.asInputStream());
+                case FILE:          return parse(rowType, options, resource.toInputStream());
+                case URL:           return parse(rowType, options, resource.asURL());
+                case INPUT_STREAM:  return parse(rowType, options, resource.toInputStream());
                 default:    throw new DataFrameException("Unsupported resource specified in CSVRequest: " + resource);
             }
         } catch (DataFrameException ex) {
@@ -93,16 +92,16 @@ public class CsvSourceDefault<R> implements CsvSource<R> {
      * @return      the DataFrame parsed from url
      * @throws IOException      if there stream read error
      */
-    private DataFrame<R,String> parse(Options options, URL url) throws IOException {
+    private <R> DataFrame<R,String> parse(Class<R> rowType, Options options, URL url) throws IOException {
         Objects.requireNonNull(url, "The URL cannot be null");
         if (!url.getProtocol().startsWith("http")) {
-            return parse(options, url.openStream());
+            return parse(rowType, options, url.openStream());
         } else {
             return HttpClient.getDefault().<DataFrame<R,String>>doGet(httpRequest -> {
                 httpRequest.setUrl(url);
                 httpRequest.setResponseHandler(response -> {
                     try (InputStream stream = response.getStream()) {
-                        final DataFrame<R,String> frame = parse(options, stream);
+                        final DataFrame<R,String> frame = parse(rowType, options, stream);
                         return Optional.ofNullable(frame);
                     } catch (IOException ex) {
                         throw new RuntimeException("Failed to load DataFrame from csv: " + url, ex);
@@ -115,13 +114,15 @@ public class CsvSourceDefault<R> implements CsvSource<R> {
 
     /**
      * Returns a DataFrame parsed from the stream specified stream
+     * @param rowType   the row type
+     * @param options   the CSV options
      * @param stream    the stream to parse
      * @return          the DataFrame parsed from stream
      * @throws IOException      if there stream read error
      */
-    private DataFrame<R,String> parse(Options options, InputStream stream) throws IOException {
+    private <R> DataFrame<R,String> parse(Class<R> rowType, Options options, InputStream stream) throws IOException {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(stream, options.getCharset()))) {
-            var handler = new CsvProcessor(options);
+            var handler = new CsvProcessor<R>(options);
             var settings = new CsvParserSettings();
             settings.getFormat().setDelimiter(options.getDelimiter());
             settings.setHeaderExtractionEnabled(options.isHeader());
@@ -147,7 +148,7 @@ public class CsvSourceDefault<R> implements CsvSource<R> {
     /**
      * A RowProcessor that receives callbacks and incrementally builds the DataFrame.
      */
-    private class CsvProcessor implements RowProcessor {
+    private class CsvProcessor<R> implements RowProcessor {
 
         @lombok.Getter
         private int rowCounter;
@@ -363,7 +364,7 @@ public class CsvSourceDefault<R> implements CsvSource<R> {
 
     public static void main(String[] args) {
         var path = "/Users/witdxav/temp/opt-models/bf5489bf-18be-4442-8c49-d659207ceeee-data/opt-data.csv";
-        var frame = DataFrame.read().csv(path).read(options -> {
+        var frame = DataFrame.read(path).csv(String.class, options -> {
             options.setHeader(true);
             options.setReadBatchSize(1000);
             options.setRowKeyColumnName("symbol");
