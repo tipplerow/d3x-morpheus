@@ -221,7 +221,7 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
             final XDataFrame<R,C> newFrame = new XDataFrame<>(content, parallel);
             this.cols().sequential().forEach(column -> {
                 final C colKey = column.key();
-                final Class<?> colClass = column.typeInfo();
+                final Class<?> colClass = column.dataClass();
                 final ArrayType arrayType = ArrayType.of(colClass);
                 final DataFrameColumn<R,C> newColumn = newFrame.cols().add(colKey, colClass);
                 switch (arrayType) {
@@ -284,7 +284,7 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
 
     @Override
     public final DataFrameValue<R,C> get(R rowKey, C colKey) {
-        return data.cursor(this).atKeys(rowKey, colKey);
+        return data.cursor(this).locate(rowKey, colKey);
     }
 
 
@@ -296,7 +296,7 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
 
     @Override
     public final DataFrameRow<R,C> row(R rowKey) {
-        final int ordinal = rowKeys().getOrdinal(rowKey);
+        var ordinal = rowKeys().getOrdinal(rowKey);
         if (ordinal >= 0) {
             return new XDataFrameRow<>(this, parallel, ordinal);
         } else {
@@ -307,17 +307,17 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
 
     @Override
     public final DataFrameRow<R,C> rowAt(int rowOrdinal) {
-        try {
+        if (rowOrdinal < 0 || rowOrdinal >= rowCount()) {
+            throw new DataFrameException("Row ordinal out of bounds");
+        } else {
             return new XDataFrameRow<>(this, parallel, rowOrdinal);
-        } catch (Throwable t) {
-            throw new DataFrameException("Failed to locate row for " + rowOrdinal, t);
         }
     }
 
 
     @Override
     public final DataFrameColumn<R,C> col(C colKey) {
-        final int ordinal = colKeys().getOrdinal(colKey);
+        var ordinal = colKeys().getOrdinal(colKey);
         if (ordinal >= 0) {
             return new XDataFrameColumn<>(this, parallel, ordinal);
         } else {
@@ -327,18 +327,18 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
 
 
     @Override
-    public final DataFrameColumn<R,C> colAt(int colIOrdinal) {
-        try {
-            return new XDataFrameColumn<>(this, parallel, colIOrdinal);
-        } catch (Throwable t) {
-            throw new DataFrameException("Failed to locate column for " + colIOrdinal, t);
+    public final DataFrameColumn<R,C> colAt(int colOrdinal) {
+        if (colOrdinal < 0 || colOrdinal >= colCount()) {
+            throw new DataFrameException("Column ordinal out of bounds");
+        } else {
+            return new XDataFrameColumn<>(this, parallel, colOrdinal);
         }
     }
 
 
     @Override
     public int count(Predicate<DataFrameValue<R,C>> predicate) {
-        final AtomicInteger count = new AtomicInteger();
+        var count = new AtomicInteger();
         this.forEachValue(v -> {
             if (predicate.test(v)) {
                 count.incrementAndGet();
@@ -353,10 +353,10 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
         if (rowCount() == 0 || colCount() == 0) {
             return Optional.empty();
         } else if (rowCount() > colCount()) {
-            final MinMaxValueTask task = new MinMaxValueTask(0, rowCount(), true, predicate);
+            var task = new MinMaxValueTask(0, rowCount(), true, predicate);
             return isParallel() ? ForkJoinPool.commonPool().invoke(task) : task.compute();
         } else {
-            final MinMaxValueTask task = new MinMaxValueTask(0, colCount(), true, predicate);
+            var task = new MinMaxValueTask(0, colCount(), true, predicate);
             return isParallel() ? ForkJoinPool.commonPool().invoke(task) : task.compute();
         }
     }
@@ -367,10 +367,10 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
         if (rowCount() == 0 || colCount() == 0) {
             return Optional.empty();
         } else if (rowCount() > colCount()) {
-            final MinMaxValueTask task = new MinMaxValueTask(0, rowCount(), false, predicate);
+            var task = new MinMaxValueTask(0, rowCount(), false, predicate);
             return  isParallel() ? ForkJoinPool.commonPool().invoke(task) : task.compute();
         } else {
-            final MinMaxValueTask task = new MinMaxValueTask(0, colCount(), false, predicate);
+            var task = new MinMaxValueTask(0, colCount(), false, predicate);
             return isParallel() ? ForkJoinPool.commonPool().invoke(task) : task.compute();
         }
     }
@@ -381,10 +381,10 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
         if (rowCount() == 0 || colCount() == 0) {
             return Optional.empty();
         } else if (rowCount() > colCount()) {
-            final BoundsTask<V> task = new BoundsTask<>(0, rowCount(), predicate);
+            var task = new BoundsTask<V>(0, rowCount(), predicate);
             return isParallel() ? ForkJoinPool.commonPool().invoke(task) : task.compute();
         } else {
-            final BoundsTask<V> task = new BoundsTask<>(0, colCount(), predicate);
+            var task = new BoundsTask<V>(0, colCount(), predicate);
             return isParallel() ? ForkJoinPool.commonPool().invoke(task) : task.compute();
         }
     }
@@ -393,14 +393,14 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
     @Override()
     public final DataFrame<R,C> forEachValue(Consumer<DataFrameValue<R,C>> consumer) {
         if (parallel && colCount() > 0) {
-            final int toIndex = rowCount() * colCount() - 1;
-            final int threshold = (rowCount() * colCount()) / Runtime.getRuntime().availableProcessors();
-            final ForEachValue action = new ForEachValue(0, toIndex, threshold, consumer);
+            var toIndex = rowCount() * colCount() - 1;
+            var threshold = (rowCount() * colCount()) / Runtime.getRuntime().availableProcessors();
+            var action = new ForEachValue(0, toIndex, threshold, consumer);
             ForkJoinPool.commonPool().invoke(action);
         } else if (colCount() > 0) {
-            final int toIndex = rowCount() * colCount() - 1;
-            final int threshold = Integer.MAX_VALUE;
-            final ForEachValue action = new ForEachValue(0, toIndex, threshold, consumer);
+            var toIndex = rowCount() * colCount() - 1;
+            var threshold = Integer.MAX_VALUE;
+            var action = new ForEachValue(0, toIndex, threshold, consumer);
             action.compute();
         }
         return this;
@@ -410,14 +410,14 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
     @Override()
     public final DataFrame<R,C> applyBooleans(ToBooleanFunction<DataFrameValue<R,C>> mapper) {
         if (parallel && colCount() > 0) {
-            final int toIndex = rowCount() * colCount() - 1;
-            final int threshold = (rowCount() * colCount()) / Runtime.getRuntime().availableProcessors();
-            final ApplyBooleans action = new ApplyBooleans(0, toIndex, threshold, mapper);
+            var toIndex = rowCount() * colCount() - 1;
+            var threshold = (rowCount() * colCount()) / Runtime.getRuntime().availableProcessors();
+            var action = new ApplyBooleans(0, toIndex, threshold, mapper);
             ForkJoinPool.commonPool().invoke(action);
         } else if (colCount() > 0) {
-            final int toIndex = rowCount() * colCount() - 1;
-            final int threshold = Integer.MAX_VALUE;
-            final ApplyBooleans action = new ApplyBooleans(0, toIndex, threshold, mapper);
+            var toIndex = rowCount() * colCount() - 1;
+            var threshold = Integer.MAX_VALUE;
+            var action = new ApplyBooleans(0, toIndex, threshold, mapper);
             action.compute();
         }
         return this;
@@ -427,14 +427,14 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
     @Override()
     public final DataFrame<R,C> applyInts(ToIntFunction<DataFrameValue<R,C>> mapper) {
         if (parallel && colCount() > 0) {
-            final int toIndex = rowCount() * colCount() - 1;
-            final int threshold = (rowCount() * colCount()) / Runtime.getRuntime().availableProcessors();
-            final ApplyInts action = new ApplyInts(0, toIndex, threshold, mapper);
+            var toIndex = rowCount() * colCount() - 1;
+            var threshold = (rowCount() * colCount()) / Runtime.getRuntime().availableProcessors();
+            var action = new ApplyInts(0, toIndex, threshold, mapper);
             ForkJoinPool.commonPool().invoke(action);
         } else if (colCount() > 0) {
-            final int toIndex = rowCount() * colCount() - 1;
-            final int threshold = Integer.MAX_VALUE;
-            final ApplyInts action = new ApplyInts(0, toIndex, threshold, mapper);
+            var toIndex = rowCount() * colCount() - 1;
+            var threshold = Integer.MAX_VALUE;
+            var action = new ApplyInts(0, toIndex, threshold, mapper);
             action.compute();
         }
         return this;
@@ -444,14 +444,14 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
     @Override()
     public final DataFrame<R,C> applyLongs(ToLongFunction<DataFrameValue<R,C>> mapper) {
         if (parallel && colCount() > 0) {
-            final int toIndex = rowCount() * colCount() - 1;
-            final int threshold = (rowCount() * colCount()) / Runtime.getRuntime().availableProcessors();
-            final ApplyLongs action = new ApplyLongs(0, toIndex, threshold, mapper);
+            var toIndex = rowCount() * colCount() - 1;
+            var threshold = (rowCount() * colCount()) / Runtime.getRuntime().availableProcessors();
+            var action = new ApplyLongs(0, toIndex, threshold, mapper);
             ForkJoinPool.commonPool().invoke(action);
         } else if (colCount() > 0) {
-            final int toIndex = rowCount() * colCount() - 1;
-            final int threshold = Integer.MAX_VALUE;
-            final ApplyLongs action = new ApplyLongs(0, toIndex, threshold, mapper);
+            var toIndex = rowCount() * colCount() - 1;
+            var threshold = Integer.MAX_VALUE;
+            var action = new ApplyLongs(0, toIndex, threshold, mapper);
             action.compute();
         }
         return this;
@@ -461,14 +461,14 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
     @Override()
     public final DataFrame<R,C> applyDoubles(ToDoubleFunction<DataFrameValue<R,C>> mapper) {
         if (parallel && colCount() > 0) {
-            final int toIndex = rowCount() * colCount() - 1;
-            final int threshold = (rowCount() * colCount()) / Runtime.getRuntime().availableProcessors();
-            final ApplyDoubles action = new ApplyDoubles(0, toIndex, threshold, mapper);
+            var toIndex = rowCount() * colCount() - 1;
+            var threshold = (rowCount() * colCount()) / Runtime.getRuntime().availableProcessors();
+            var action = new ApplyDoubles(0, toIndex, threshold, mapper);
             ForkJoinPool.commonPool().invoke(action);
         } else if (colCount() > 0) {
-            final int toIndex = rowCount() * colCount() - 1;
-            final int threshold = Integer.MAX_VALUE;
-            final ApplyDoubles action = new ApplyDoubles(0, toIndex, threshold, mapper);
+            var toIndex = rowCount() * colCount() - 1;
+            var threshold = Integer.MAX_VALUE;
+            var action = new ApplyDoubles(0, toIndex, threshold, mapper);
             action.compute();
         }
         return this;
@@ -478,14 +478,14 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
     @Override()
     public final DataFrame<R,C> applyValues(Function<DataFrameValue<R,C>,?> mapper) {
         if (parallel && colCount() > 0) {
-            final int toIndex = rowCount() * colCount() - 1;
-            final int threshold = (rowCount() * colCount()) / Runtime.getRuntime().availableProcessors();
-            final ApplyValues action = new ApplyValues(0, toIndex, threshold, mapper);
+            var toIndex = rowCount() * colCount() - 1;
+            var threshold = (rowCount() * colCount()) / Runtime.getRuntime().availableProcessors();
+            var action = new ApplyValues(0, toIndex, threshold, mapper);
             ForkJoinPool.commonPool().invoke(action);
         } else if (colCount() > 0) {
-            final int toIndex = rowCount() * colCount() - 1;
-            final int threshold = Integer.MAX_VALUE;
-            final ApplyValues action = new ApplyValues(0, toIndex, threshold, mapper);
+            var toIndex = rowCount() * colCount() - 1;
+            var threshold = Integer.MAX_VALUE;
+            var action = new ApplyValues(0, toIndex, threshold, mapper);
             action.compute();
         }
         return this;
@@ -494,20 +494,20 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
 
     @Override()
     public DataFrame<R,C> sign() throws DataFrameException {
-        final int rowCount = rowCount();
-        final int colCount = colCount();
-        final Index<R> rowIndex = Index.of(rows().keyArray());
-        final Index<C> colIndex = Index.of(cols().keyArray());
-        final XDataFrame<R,C> result = (XDataFrame<R,C>)DataFrame.ofInts(rowIndex, colIndex);
-        final DataFrameCursor<R,C> cursor1 = this.cursor();
-        final DataFrameCursor<R,C> cursor2 = result.cursor();
+        var rowCount = rowCount();
+        var colCount = colCount();
+        var rowIndex = Index.of(rows().keyArray());
+        var colIndex = Index.of(cols().keyArray());
+        var result = (XDataFrame<R,C>)DataFrame.ofInts(rowIndex, colIndex);
+        var cursor1 = this.cursor();
+        var cursor2 = result.cursor();
         for (int i=0; i<rowCount; ++i) {
-            cursor1.toRowAt(i);
-            cursor2.toRowAt(i);
+            cursor1.rowAt(i);
+            cursor2.rowAt(i);
             for (int j=0; j<colCount; ++j) {
-                cursor1.toColAt(j);
-                cursor2.toColAt(j);
-                final double value = cursor1.getDouble();
+                cursor1.colAt(j);
+                cursor2.colAt(j);
+                var value = cursor1.getDouble();
                 cursor2.setInt(0);
                 if (value > 0d) {
                     cursor2.setInt(1);
@@ -685,23 +685,23 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
     @Override()
     public final DataFrame<R,C> update(DataFrame<R,C> update, boolean addRows, boolean addColumns) throws DataFrameException {
         try {
-            final XDataFrame<R,C> other = (XDataFrame<R,C>)update;
+            var other = (XDataFrame<R,C>)update;
             if (addRows) rows().addAll(update.rows().keyArray());
             if (addColumns) cols().addAll(update);
-            final Array<R> rowKeys = rowKeys().intersect(other.rowKeys());
-            final Array<C> colKeys = colKeys().intersect(other.colKeys());
-            final int[] sourceRows = other.rowKeys().ordinals(rowKeys).toArray();
-            final int[] sourceCols = other.colKeys().ordinals(colKeys).toArray();
-            final int[] targetRows = this.rowKeys().ordinals(rowKeys).toArray();
-            final int[] targetCols = this.colKeys().ordinals(colKeys).toArray();
-            final DataFrameCursor<R,C> sourceCursor = other.cursor();
-            final DataFrameCursor<R,C> targetCursor = this.cursor();
+            var rowKeys = rowKeys().intersect(other.rowKeys());
+            var colKeys = colKeys().intersect(other.colKeys());
+            var sourceRows = other.rowKeys().ordinals(rowKeys).toArray();
+            var sourceCols = other.colKeys().ordinals(colKeys).toArray();
+            var targetRows = this.rowKeys().ordinals(rowKeys).toArray();
+            var targetCols = this.colKeys().ordinals(colKeys).toArray();
+            var sourceCursor = other.cursor();
+            var targetCursor = this.cursor();
             for (int i=0; i<sourceRows.length; ++i) {
-                sourceCursor.toRowAt(sourceRows[i]);
-                targetCursor.toRowAt(targetRows[i]);
+                sourceCursor.rowAt(sourceRows[i]);
+                targetCursor.rowAt(targetRows[i]);
                 for (int j=0; j<sourceCols.length; ++j) {
-                    sourceCursor.toColAt(sourceCols[j]);
-                    targetCursor.toColAt(targetCols[j]);
+                    sourceCursor.colAt(sourceCols[j]);
+                    targetCursor.colAt(targetCols[j]);
                     final Object value = sourceCursor.getValue();
                     targetCursor.setValue(value);
                 }
@@ -715,8 +715,8 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
 
     @Override()
     public Iterator<DataFrameValue<R,C>> iterator() {
-        final DataFrameCursor<R,C> value = cursor();
-        return new Iterator<DataFrameValue<R,C>>() {
+        var value = cursor();
+        return new Iterator<>() {
             private int rowIndex = 0;
             private int colIndex = 0;
             @Override
@@ -738,8 +738,8 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
 
     @Override()
     public Iterator<DataFrameValue<R,C>> iterator(Predicate<DataFrameValue<R,C>> predicate) {
-        final DataFrameCursor<R,C> value = cursor();
-        return new Iterator<DataFrameValue<R,C>>() {
+        var value = cursor();
+        return new Iterator<>() {
             private int rowIndex = 0;
             private int colIndex = 0;
             @Override
@@ -773,75 +773,75 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
 
     @Override()
     public final DataFrame<R, C> head(int count) {
-        final IntStream indexes = IntStream.range(0, Math.min(count, rowCount()));
-        final Array<R> keys = indexes.mapToObj(i -> rows().key(i)).collect(ArrayUtils.toArray());
-        final Index<R> newRowAxis = rowKeys().filter(keys);
-        final Index<C> newColAxis = colKeys();
-        final XDataFrameContent<R,C> newContents = data.filter(newRowAxis, newColAxis);
+        var indexes = IntStream.range(0, Math.min(count, rowCount()));
+        var keys = indexes.mapToObj(i -> rows().key(i)).collect(ArrayUtils.toArray());
+        var newRowAxis = rowKeys().filter(keys);
+        var newColAxis = colKeys();
+        var newContents = data.filter(newRowAxis, newColAxis);
         return new XDataFrame<>(newContents, parallel);
     }
 
 
     @Override()
     public final DataFrame<R, C> tail(int count) {
-        final IntStream indexes = IntStream.range(Math.max(0, rowCount() - count), rowCount());
-        final Array<R> keys = indexes.mapToObj(i -> rows().key(i)).collect(ArrayUtils.toArray());
-        final Index<R> newRowAxis = rowKeys().filter(keys);
-        final Index<C> newColAxis = colKeys();
-        final XDataFrameContent<R,C> newContents = data.filter(newRowAxis, newColAxis);
+        var indexes = IntStream.range(Math.max(0, rowCount() - count), rowCount());
+        var keys = indexes.mapToObj(i -> rows().key(i)).collect(ArrayUtils.toArray());
+        var newRowAxis = rowKeys().filter(keys);
+        var newColAxis = colKeys();
+        var newContents = data.filter(newRowAxis, newColAxis);
         return new XDataFrame<>(newContents, parallel);
     }
 
 
     @Override()
     public final DataFrame<R,C> left(int count) {
-        final Array<C> colKeys = colKeys().toArray(0, Math.min(colCount(), count));
-        final Index<C> newColAxis = colKeys().filter(colKeys);
-        final XDataFrameContent<R,C> newContents = data.filter(rowKeys(), newColAxis);
+        var colKeys = colKeys().toArray(0, Math.min(colCount(), count));
+        var newColAxis = colKeys().filter(colKeys);
+        var newContents = data.filter(rowKeys(), newColAxis);
         return new XDataFrame<>(newContents, parallel);
     }
 
 
     @Override()
     public final DataFrame<R,C> right(int count) {
-        final Array<C> colKeys = colKeys().toArray(Math.max(0, colCount() - count), colCount());
-        final Index<C> newColAxis = colKeys().filter(colKeys);
-        final XDataFrameContent<R,C> newContents = data.filter(rowKeys(), newColAxis);
+        var colKeys = colKeys().toArray(Math.max(0, colCount() - count), colCount());
+        var newColAxis = colKeys().filter(colKeys);
+        var newContents = data.filter(rowKeys(), newColAxis);
         return new XDataFrame<>(newContents, parallel);
     }
 
 
     @Override()
     public final DataFrame<R,C> select(Iterable<R> rowKeys, Iterable<C> colKeys) {
-        final Index<R> newRowAxis = rowKeys().filter(rowKeys);
-        final Index<C> newColAxis = colKeys().filter(colKeys);
-        final XDataFrameContent<R,C> newContents = data.filter(newRowAxis, newColAxis);
+        var newRowAxis = rowKeys().filter(rowKeys);
+        var newColAxis = colKeys().filter(colKeys);
+        var newContents = data.filter(newRowAxis, newColAxis);
         return new XDataFrame<>(newContents, parallel);
     }
 
 
     @Override()
     public final DataFrame<R,C> select(Predicate<DataFrameRow<R,C>> rowPredicate, Predicate<DataFrameColumn<R,C>> colPredicate) {
-        final SelectRows selectRows = new SelectRows(0, rowCount()-1, rowPredicate);
-        final SelectColumns selectCols = new SelectColumns(0, colCount()-1, colPredicate);
-        final Array<R> rowKeys = isParallel() ? ForkJoinPool.commonPool().invoke(selectRows) : selectRows.compute();
-        final Array<C> colKeys = isParallel() ? ForkJoinPool.commonPool().invoke(selectCols) : selectCols.compute();
-        final Index<R> newRowAxis = rowKeys().filter(rowKeys);
-        final Index<C> newColAxis = colKeys().filter(colKeys);
-        final XDataFrameContent<R,C> newContents = data.filter(newRowAxis, newColAxis);
+        var selectRows = new SelectRows(0, rowCount()-1, rowPredicate);
+        var selectCols = new SelectColumns(0, colCount()-1, colPredicate);
+        var rowKeys = isParallel() ? ForkJoinPool.commonPool().invoke(selectRows) : selectRows.compute();
+        var colKeys = isParallel() ? ForkJoinPool.commonPool().invoke(selectCols) : selectCols.compute();
+        var newRowAxis = rowKeys().filter(rowKeys);
+        var newColAxis = colKeys().filter(colKeys);
+        var newContents = data.filter(newRowAxis, newColAxis);
         return new XDataFrame<>(newContents, parallel);
     }
 
 
     @Override
     public DataFrame<R, C> mapToBooleans(ToBooleanFunction<DataFrameValue<R, C>> mapper) {
-        final Array<R> rowKeys = rows().keyArray();
-        final Array<C> colKeys = cols().keyArray();
-        final DataFrame<R,C> result = DataFrame.ofBooleans(rowKeys, colKeys);
+        var rowKeys = rows().keyArray();
+        var colKeys = cols().keyArray();
+        var result = DataFrame.ofBooleans(rowKeys, colKeys);
         result.cols().forEach(writeColumn -> {
-            final C colKey = writeColumn.key();
+            var colKey = writeColumn.key();
             this.cols().forEachValue(colKey, v -> {
-                final boolean value = mapper.applyAsBoolean(v);
+                var value = mapper.applyAsBoolean(v);
                 writeColumn.setBooleanAt(v.rowOrdinal(), value);
             });
         });
@@ -851,13 +851,13 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
 
     @Override
     public DataFrame<R, C> mapToInts(ToIntFunction<DataFrameValue<R, C>> mapper) {
-        final Array<R> rowKeys = rows().keyArray();
-        final Array<C> colKeys = cols().keyArray();
-        final DataFrame<R,C> result = DataFrame.ofInts(rowKeys, colKeys);
+        var rowKeys = rows().keyArray();
+        var colKeys = cols().keyArray();
+        var result = DataFrame.ofInts(rowKeys, colKeys);
         result.cols().forEach(writeColumn -> {
-            final C colKey = writeColumn.key();
+            var colKey = writeColumn.key();
             this.cols().forEachValue(colKey, v -> {
-                final int value = mapper.applyAsInt(v);
+                var value = mapper.applyAsInt(v);
                 writeColumn.setIntAt(v.rowOrdinal(), value);
             });
         });
@@ -867,13 +867,13 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
 
     @Override
     public DataFrame<R, C> mapToLongs(ToLongFunction<DataFrameValue<R, C>> mapper) {
-        final Array<R> rowKeys = rows().keyArray();
-        final Array<C> colKeys = cols().keyArray();
-        final DataFrame<R,C> result = DataFrame.ofLongs(rowKeys, colKeys);
+        var rowKeys = rows().keyArray();
+        var colKeys = cols().keyArray();
+        var result = DataFrame.ofLongs(rowKeys, colKeys);
         result.cols().forEach(writeColumn -> {
-            final C colKey = writeColumn.key();
+            var colKey = writeColumn.key();
             this.cols().forEachValue(colKey, v -> {
-                final long value = mapper.applyAsLong(v);
+                var value = mapper.applyAsLong(v);
                 writeColumn.setLongAt(v.rowOrdinal(), value);
             });
         });
@@ -883,13 +883,13 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
 
     @Override()
     public final DataFrame<R,C> mapToDoubles(ToDoubleFunction<DataFrameValue<R,C>> mapper) {
-        final Array<R> rowKeys = rows().keyArray();
-        final Array<C> colKeys = cols().keyArray();
-        final DataFrame<R,C> result = DataFrame.ofDoubles(rowKeys, colKeys);
+        var rowKeys = rows().keyArray();
+        var colKeys = cols().keyArray();
+        var result = DataFrame.ofDoubles(rowKeys, colKeys);
         result.cols().forEach(writeColumn -> {
-            final C colKey = writeColumn.key();
+            var colKey = writeColumn.key();
             this.cols().forEachValue(colKey, v -> {
-                final double value = mapper.applyAsDouble(v);
+                var value = mapper.applyAsDouble(v);
                 writeColumn.setDoubleAt(v.rowOrdinal(), value);
             });
         });
@@ -899,14 +899,14 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
 
     @Override
     public <T> DataFrame<R,C> mapToObjects(Class<T> type, Function<DataFrameValue<R,C>,T> mapper) {
-        final Array<R> rowKeys = rows().keyArray();
-        final Array<C> colKeys = cols().keyArray();
-        final XDataFrameContent<R,C> content = new XDataFrameContent<>(rowKeys, colKeys, type);
-        final XDataFrame<R,C> result = new XDataFrame<>(content, parallel);
+        var rowKeys = rows().keyArray();
+        var colKeys = cols().keyArray();
+        var content = new XDataFrameContent<R,C>(rowKeys, colKeys, type);
+        var result = new XDataFrame<R,C>(content, parallel);
         result.cols().forEach(writeColumn -> {
-            final C colKey = writeColumn.key();
+            var colKey = writeColumn.key();
             this.cols().forEachValue(colKey, v -> {
-                final Object value = mapper.apply(v);
+                var value = mapper.apply(v);
                 writeColumn.setValueAt(v.rowOrdinal(), value);
             });
         });
@@ -946,141 +946,141 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
 
     @Override
     public final boolean getBoolean(R rowKey, C colKey) {
-        final int row = data.rowCoordinate(rowKey);
-        final int col = data.colCoordinate(colKey);
+        var row = data.rowCoordinate(rowKey);
+        var col = data.colCoordinate(colKey);
         return data.booleanAt(row, col);
     }
 
     @Override
     public final boolean getBooleanAt(int rowOrdinal, int colOrdinal) {
-        final int row = data.rowCoordinateAt(rowOrdinal);
-        final int col = data.colCoordinateAt(colOrdinal);
+        var row = data.rowCoordinateAt(rowOrdinal);
+        var col = data.colCoordinateAt(colOrdinal);
         return data.booleanAt(row, col);
     }
 
     @Override
     public final int getInt(R rowKey, C colKey) {
-        final int row = data.rowCoordinate(rowKey);
-        final int col = data.colCoordinate(colKey);
+        var row = data.rowCoordinate(rowKey);
+        var col = data.colCoordinate(colKey);
         return data.intAt(row, col);
     }
 
     @Override
     public final int getIntAt(int rowOrdinal, int colOrdinal) {
-        final int row = data.rowCoordinateAt(rowOrdinal);
-        final int col = data.colCoordinateAt(colOrdinal);
+        var row = data.rowCoordinateAt(rowOrdinal);
+        var col = data.colCoordinateAt(colOrdinal);
         return data.intAt(row, col);
     }
 
     @Override
     public final long getLong(R rowKey, C colKey) {
-        final int row = data.rowCoordinate(rowKey);
-        final int col = data.colCoordinate(colKey);
+        var row = data.rowCoordinate(rowKey);
+        var col = data.colCoordinate(colKey);
         return data.longAt(row, col);
     }
 
     @Override
     public final long getLongAt(int rowOrdinal, int colOrdinal) {
-        final int row = data.rowCoordinateAt(rowOrdinal);
-        final int col = data.colCoordinateAt(colOrdinal);
+        var row = data.rowCoordinateAt(rowOrdinal);
+        var col = data.colCoordinateAt(colOrdinal);
         return data.longAt(row, col);
     }
 
     @Override
     public final double getDouble(R rowKey, C colKey) {
-        final int row = data.rowCoordinate(rowKey);
-        final int col = data.colCoordinate(colKey);
+        var row = data.rowCoordinate(rowKey);
+        var col = data.colCoordinate(colKey);
         return data.doubleAt(row, col);
     }
 
     @Override
     public final double getDoubleAt(int rowOrdinal, int colOrdinal) {
-        final int row = data.rowCoordinateAt(rowOrdinal);
-        final int col = data.colCoordinateAt(colOrdinal);
+        var row = data.rowCoordinateAt(rowOrdinal);
+        var col = data.colCoordinateAt(colOrdinal);
         return data.doubleAt(row, col);
     }
 
     @Override
     public final <T> T getValue(R rowKey, C colKey) {
-        final int row = data.rowCoordinate(rowKey);
-        final int col = data.colCoordinate(colKey);
+        var row = data.rowCoordinate(rowKey);
+        var col = data.colCoordinate(colKey);
         return data.valueAt(row, col);
     }
 
     @Override
     public final <T> T getValueAt(int rowOrdinal, int colOrdinal) {
-        final int row = data.rowCoordinateAt(rowOrdinal);
-        final int col = data.colCoordinateAt(colOrdinal);
+        var row = data.rowCoordinateAt(rowOrdinal);
+        var col = data.colCoordinateAt(colOrdinal);
         return data.valueAt(row, col);
     }
 
     @Override
     public final boolean setBoolean(R rowKey, C colKey, boolean value) {
-        final int row = data.rowCoordinate(rowKey);
-        final int col = data.colCoordinate(colKey);
+        var row = data.rowCoordinate(rowKey);
+        var col = data.colCoordinate(colKey);
         return data.booleanAt(row, col, value);
     }
 
     @Override
     public final boolean setBooleanAt(int rowOrdinal, int colOrdinal, boolean value) {
-        final int row = data.rowCoordinateAt(rowOrdinal);
-        final int col = data.colCoordinateAt(colOrdinal);
+        var row = data.rowCoordinateAt(rowOrdinal);
+        var col = data.colCoordinateAt(colOrdinal);
         return data.booleanAt(row, col, value);
     }
 
     @Override
     public final int setInt(R rowKey, C colKey, int value) {
-        final int row = data.rowCoordinate(rowKey);
-        final int col = data.colCoordinate(colKey);
+        var row = data.rowCoordinate(rowKey);
+        var col = data.colCoordinate(colKey);
         return data.intAt(row, col, value);
     }
 
     @Override
     public final int setIntAt(int rowOrdinal, int colOrdinal, int value) {
-        final int row = data.rowCoordinateAt(rowOrdinal);
-        final int col = data.colCoordinateAt(colOrdinal);
+        var row = data.rowCoordinateAt(rowOrdinal);
+        var col = data.colCoordinateAt(colOrdinal);
         return data.intAt(row, col, value);
     }
 
     @Override
     public final long setLong(R rowKey, C colKey, long value) {
-        final int row = data.rowCoordinate(rowKey);
-        final int col = data.colCoordinate(colKey);
+        var row = data.rowCoordinate(rowKey);
+        var col = data.colCoordinate(colKey);
         return data.longAt(row, col, value);
     }
 
     @Override
     public final long setLongAt(int rowOrdinal, int colOrdinal, long value) {
-        final int row = data.rowCoordinateAt(rowOrdinal);
-        final int col = data.colCoordinateAt(colOrdinal);
+        var row = data.rowCoordinateAt(rowOrdinal);
+        var col = data.colCoordinateAt(colOrdinal);
         return data.longAt(row, col, value);
     }
 
     @Override
     public final double setDouble(R rowKey, C colKey, double value) {
-        final int row = data.rowCoordinate(rowKey);
-        final int col = data.colCoordinate(colKey);
+        var row = data.rowCoordinate(rowKey);
+        var col = data.colCoordinate(colKey);
         return data.doubleAt(row, col, value);
     }
 
     @Override
     public final double setDoubleAt(int rowOrdinal, int colOrdinal, double value) {
-        final int row = data.rowCoordinateAt(rowOrdinal);
-        final int col = data.colCoordinateAt(colOrdinal);
+        var row = data.rowCoordinateAt(rowOrdinal);
+        var col = data.colCoordinateAt(colOrdinal);
         return data.doubleAt(row, col, value);
     }
 
     @Override
     public final <T> T setValue(R rowKey, C colKey, T value) {
-        final int row = data.rowCoordinate(rowKey);
-        final int col = data.colCoordinate(colKey);
+        var row = data.rowCoordinate(rowKey);
+        var col = data.colCoordinate(colKey);
         return data.valueAt(row, col, value);
     }
 
     @Override
     public final <T> T setValueAt(int rowOrdinal, int colOrdinal, T value) {
-        final int row = data.rowCoordinateAt(rowOrdinal);
-        final int col = data.colCoordinateAt(colOrdinal);
+        var row = data.rowCoordinateAt(rowOrdinal);
+        var col = data.colCoordinateAt(colOrdinal);
         return data.valueAt(row, col, value);
     }
 
@@ -1090,8 +1090,8 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
         if (isEmpty()) {
             return Stream.empty();
         } else {
-            final int valueCount = rowCount() * colCount();
-            final int splitThreshold = Math.max(valueCount, valueCount / Runtime.getRuntime().availableProcessors());
+            var valueCount = rowCount() * colCount();
+            var splitThreshold = Math.max(valueCount, valueCount / Runtime.getRuntime().availableProcessors());
             return StreamSupport.stream(new DataFrameValueSpliterator<>(0, valueCount-1, rowCount(), splitThreshold), isParallel());
         }
     }
@@ -1103,34 +1103,34 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
         if (!(object instanceof DataFrame)) {
             return false;
         } else {
-            final int rowCount = rowCount();
-            final int colCount = colCount();
-            final DataFrame<R,C> other = (DataFrame<R,C>)object;
+            var rowCount = rowCount();
+            var colCount = colCount();
+            var other = (DataFrame<R,C>)object;
             if (other.rowCount() != rowCount || other.colCount() != colCount) {
                 return false;
             } else {
                 for (int i=0; i<rowCount; ++i) {
-                    final Object rowKey1 = rows().key(i);
-                    final Object rowKey2 = other.rows().key(i);
+                    var rowKey1 = rows().key(i);
+                    var rowKey2 = other.rows().key(i);
                     if (!rowKey1.equals(rowKey2)) {
                         return false;
                     }
                 }
                 for (int j=0; j<colCount; ++j) {
-                    final Object colKey1 = cols().key(j);
-                    final Object colKey2 = other.cols().key(j);
+                    var colKey1 = cols().key(j);
+                    var colKey2 = other.cols().key(j);
                     if (!colKey1.equals(colKey2)) {
                         return false;
                     }
                 }
-                final DataFrameCursor<R,C> left = this.cursor();
-                final DataFrameCursor<R,C> right = other.cursor();
+                var left = this.cursor();
+                var right = other.cursor();
                 for (int i=0; i<rowCount; ++i) {
-                    left.toRowAt(i);
-                    right.toRowAt(i);
+                    left.rowAt(i);
+                    right.rowAt(i);
                     for (int j=0; j<colCount; ++j) {
-                        left.toColAt(j);
-                        right.toColAt(j);
+                        left.colAt(j);
+                        right.colAt(j);
                         if (!left.isEqualTo(right.getValue())) {
                             return false;
                         }
@@ -1144,9 +1144,9 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
 
     @Override()
     public String toString() {
-        final int rowCount = rows.count();
-        final int colCount = cols.count();
-        final StringBuilder text = new StringBuilder();
+        var rowCount = rows.count();
+        var colCount = cols.count();
+        var text = new StringBuilder();
         text.append("DataFrame[").append(rowCount).append("x").append(colCount).append("]");
         if (rowCount > 0) {
             text.append(" rows=[");
@@ -1217,21 +1217,21 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
 
         @Override
         protected void compute() {
-            final int count = (to - from) + 1;
+            var count = (to - from) + 1;
             if (count > threshold) {
-                final int midPoint = from + ((to - from) / 2);
+                var midPoint = from + ((to - from) / 2);
                 invokeAll(
                     new ApplyBooleans(from, midPoint, threshold, mapper),
                     new ApplyBooleans(midPoint+1, to, threshold, mapper)
                 );
             } else {
-                final int rowCount = rowCount();
-                final DataFrameCursor<R,C> value = cursor();
+                var rowCount = rowCount();
+                var value = cursor();
                 for (int index=from; index<=to; ++index) {
-                    final int rowOrdinal = index % rowCount;
-                    final int colOrdinal = index / rowCount;
+                    var rowOrdinal = index % rowCount;
+                    var colOrdinal = index / rowCount;
                     value.at(rowOrdinal, colOrdinal);
-                    final boolean result = mapper.applyAsBoolean(value);
+                    var result = mapper.applyAsBoolean(value);
                     value.setBoolean(result);
                 }
             }
@@ -1265,21 +1265,21 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
 
         @Override
         protected void compute() {
-            final int count = (to - from) + 1;
+            var count = (to - from) + 1;
             if (count > threshold) {
-                final int midPoint = from + ((to - from) / 2);
+                var midPoint = from + ((to - from) / 2);
                 invokeAll(
                     new ApplyInts(from, midPoint, threshold, mapper),
                     new ApplyInts(midPoint+1, to, threshold, mapper)
                 );
             } else {
-                final int rowCount = rowCount();
-                final DataFrameCursor<R,C> value = cursor();
+                var rowCount = rowCount();
+                var value = cursor();
                 for (int index=from; index<=to; ++index) {
-                    final int rowOrdinal = index % rowCount;
-                    final int colOrdinal = index / rowCount;
+                    var rowOrdinal = index % rowCount;
+                    var colOrdinal = index / rowCount;
                     value.at(rowOrdinal, colOrdinal);
-                    final int result = mapper.applyAsInt(value);
+                    var result = mapper.applyAsInt(value);
                     value.setInt(result);
                 }
             }
@@ -1313,21 +1313,21 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
 
         @Override
         protected void compute() {
-            final int count = (to - from) + 1;
+            var count = (to - from) + 1;
             if (count > threshold) {
-                final int midPoint = from + ((to - from) / 2);
+                var midPoint = from + ((to - from) / 2);
                 invokeAll(
                     new ApplyLongs(from, midPoint, threshold, mapper),
                     new ApplyLongs(midPoint+1, to, threshold, mapper)
                 );
             } else {
-                final int rowCount = rowCount();
-                final DataFrameCursor<R,C> value = cursor();
+                var rowCount = rowCount();
+                var value = cursor();
                 for (int index=from; index<=to; ++index) {
-                    final int rowOrdinal = index % rowCount;
-                    final int colOrdinal = index / rowCount;
+                    var rowOrdinal = index % rowCount;
+                    var colOrdinal = index / rowCount;
                     value.at(rowOrdinal, colOrdinal);
-                    final long result = mapper.applyAsLong(value);
+                    var result = mapper.applyAsLong(value);
                     value.setLong(result);
                 }
             }
@@ -1361,21 +1361,21 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
 
         @Override
         protected void compute() {
-            final int count = (to - from) + 1;
+            var count = (to - from) + 1;
             if (count > threshold) {
-                final int midPoint = from + ((to - from) / 2);
+                var midPoint = from + ((to - from) / 2);
                 invokeAll(
                     new ApplyDoubles(from, midPoint, threshold, mapper),
                     new ApplyDoubles(midPoint+1, to, threshold, mapper)
                 );
             } else {
-                final int rowCount = rowCount();
-                final DataFrameCursor<R,C> value = cursor();
+                var rowCount = rowCount();
+                var value = cursor();
                 for (int index=from; index<=to; ++index) {
-                    final int rowOrdinal = index % rowCount;
-                    final int colOrdinal = index / rowCount;
+                    var rowOrdinal = index % rowCount;
+                    var colOrdinal = index / rowCount;
                     value.at(rowOrdinal, colOrdinal);
-                    final double result = mapper.applyAsDouble(value);
+                    var result = mapper.applyAsDouble(value);
                     value.setDouble(result);
                 }
             }
@@ -1409,21 +1409,21 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
 
         @Override
         protected void compute() {
-            final int count = (to - from) + 1;
+            var count = (to - from) + 1;
             if (count > threshold) {
-                final int midPoint = from + ((to - from) / 2);
+                var midPoint = from + ((to - from) / 2);
                 invokeAll(
                     new ApplyValues(from, midPoint, threshold, mapper),
                     new ApplyValues(midPoint+1, to, threshold, mapper)
                 );
             } else {
-                final int rowCount = rowCount();
-                final DataFrameCursor<R,C> value = cursor();
+                var rowCount = rowCount();
+                var value = cursor();
                 for (int index=from; index<=to; ++index) {
-                    final int rowOrdinal = index % rowCount;
-                    final int colOrdinal = index / rowCount;
+                    var rowOrdinal = index % rowCount;
+                    var colOrdinal = index / rowCount;
                     value.at(rowOrdinal, colOrdinal);
-                    final Object result = mapper.apply(value);
+                    var result = mapper.apply(value);
                     value.setValue(result);
                 }
             }
@@ -1457,19 +1457,19 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
 
         @Override
         protected void compute() {
-            final int count = (to - from) + 1;
+            var count = (to - from) + 1;
             if (count > threshold) {
-                final int midPoint = from + ((to - from) / 2);
+                var midPoint = from + ((to - from) / 2);
                 invokeAll(
                     new ForEachValue(from, midPoint, threshold, consumer),
                     new ForEachValue(midPoint+1, to, threshold, consumer)
                 );
             } else {
-                final int rowCount = rowCount();
-                final DataFrameCursor<R,C> cursor = cursor();
+                var rowCount = rowCount();
+                var cursor = cursor();
                 for (int index=from; index<=to; ++index) {
-                    final int rowOrdinal = index % rowCount;
-                    final int colOrdinal = index / rowCount;
+                    var rowOrdinal = index % rowCount;
+                    var colOrdinal = index / rowCount;
                     cursor.at(rowOrdinal, colOrdinal);
                     consumer.accept(cursor);
                 }
@@ -1516,8 +1516,8 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
         public boolean tryAdvance(Consumer<? super DataFrameValue<X,Y>> action) {
             Asserts.check(action != null, "The consumer action cannot be null");
             if (position <= end) {
-                final int rowOrdinal = position % rowCount;
-                final int colOrdinal = position / rowCount;
+                var rowOrdinal = position % rowCount;
+                var colOrdinal = position / rowCount;
                 this.value.at(rowOrdinal, colOrdinal);
                 this.position++;
                 action.accept(value);
@@ -1532,9 +1532,9 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
             if (estimateSize() < splitThreshold) {
                 return null;
             } else {
-                final int newStart = start;
-                final int halfSize = (end - start) / 2;
-                final int newEnd = newStart + halfSize;
+                var newStart = start;
+                var halfSize = (end - start) / 2;
+                var newEnd = newStart + halfSize;
                 this.start = newEnd + 1;
                 this.position = start;
                 return new DataFrameValueSpliterator<>(newStart, newEnd, rowCount, splitThreshold);
@@ -1586,16 +1586,16 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
 
         @Override
         protected Array<R> compute() {
-            final int count = to - from + 1;
+            var count = to - from + 1;
             final Class<R> keyType = rows().keyType();
             if (count > threshold) {
                 return split();
             } else {
-                final int rowCount = rowCount();
-                final XDataFrameRow<R,C> row = new XDataFrameRow<>(XDataFrame.this, false);
-                final ArrayBuilder<R> builder = ArrayBuilder.of(rowCount > 0 ? rowCount : 10, keyType);
+                var rowCount = rowCount();
+                var row = new XDataFrameRow<R,C>(XDataFrame.this, false);
+                var builder = ArrayBuilder.of(rowCount > 0 ? rowCount : 10, keyType);
                 for (int ordinal=from; ordinal<=to; ++ordinal) {
-                    row.moveTo(ordinal);
+                    row.atOrdinal(ordinal);
                     if (predicate.test(row)) {
                         builder.add(row.key());
                     }
@@ -1609,16 +1609,16 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
          * @return  the join results from the two sub-tasks
          */
         private Array<R> split() {
-            final int splitCount = (to - from) / 2;
-            final int midPoint = from + splitCount;
-            final SelectRows left  = new SelectRows(from, midPoint, predicate);
-            final SelectRows right = new SelectRows(midPoint + 1, to, predicate);
+            var splitCount = (to - from) / 2;
+            var midPoint = from + splitCount;
+            var left  = new SelectRows(from, midPoint, predicate);
+            var right = new SelectRows(midPoint + 1, to, predicate);
             left.fork();
-            final Array<R> rightAns = right.compute();
-            final Array<R> leftAns  = left.join();
-            final int size = Math.max(rightAns.length() + leftAns.length(), 10);
-            final Class<R> rowKeyType = rows().keyType();
-            final ArrayBuilder<R> builder = ArrayBuilder.of(size, rowKeyType);
+            var rightAns = right.compute();
+            var leftAns  = left.join();
+            var size = Math.max(rightAns.length() + leftAns.length(), 10);
+            var rowKeyType = rows().keyType();
+            var builder = ArrayBuilder.of(size, rowKeyType);
             builder.addAll(leftAns);
             builder.addAll(rightAns);
             return builder.toArray();
@@ -1654,16 +1654,16 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
 
         @Override
         protected Array<C> compute() {
-            final int count = to - from + 1;
-            final Class<C> keyType = cols().keyType();
+            var count = to - from + 1;
+            var keyType = cols().keyType();
             if (count > threshold) {
                 return split();
             } else {
-                final int colCount = colCount();
-                final XDataFrameColumn<R,C> column = new XDataFrameColumn<>(XDataFrame.this, false);
-                final ArrayBuilder<C> builder = ArrayBuilder.of(colCount > 0 ? colCount : 10, keyType);
+                var colCount = colCount();
+                var column = new XDataFrameColumn<R,C>(XDataFrame.this, false);
+                var builder = ArrayBuilder.of(colCount > 0 ? colCount : 10, keyType);
                 for (int ordinal=from; ordinal<=to; ++ordinal) {
-                    column.moveTo(ordinal);
+                    column.atOrdinal(ordinal);
                     if (predicate.test(column)) {
                         builder.add(column.key());
                     }
@@ -1677,15 +1677,15 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
          * @return  the join results from the two sub-tasks
          */
         private Array<C> split() {
-            final int splitCount = (to - from) / 2;
-            final int midPoint = from + splitCount;
-            final SelectColumns left  = new SelectColumns(from, midPoint, predicate);
-            final SelectColumns right = new SelectColumns(midPoint + 1, to, predicate);
+            var splitCount = (to - from) / 2;
+            var midPoint = from + splitCount;
+            var left  = new SelectColumns(from, midPoint, predicate);
+            var right = new SelectColumns(midPoint + 1, to, predicate);
             left.fork();
-            final Array<C> rightAns = right.compute();
-            final Array<C> leftAns  = left.join();
-            final int size = Math.max(rightAns.length() + leftAns.length(), 10);
-            final ArrayBuilder<C> builder = ArrayBuilder.of(size, cols().keyType());
+            var rightAns = right.compute();
+            var leftAns  = left.join();
+            var size = Math.max(rightAns.length() + leftAns.length(), 10);
+            var builder = ArrayBuilder.of(size, cols().keyType());
             builder.addAll(leftAns);
             builder.addAll(rightAns);
             return builder.toArray();
@@ -1728,13 +1728,13 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
                 return split();
             } else if (rowCount() > colCount()) {
                 return initial().map(result -> {
-                    DataFrameCursor<R,C> value = cursor();
-                    final int rowStart = result.rowOrdinal() - offset;
+                    var value = cursor();
+                    var rowStart = result.rowOrdinal() - offset;
                     for (int i=rowStart; i<length; ++i) {
-                        value.toRowAt(offset + i);
-                        final int colStart = i == rowStart ? result.colOrdinal() : 0;
+                        value.rowAt(offset + i);
+                        var colStart = i == rowStart ? result.colOrdinal() : 0;
                         for (int j=colStart; j<colCount(); ++j) {
-                            value.toColAt(j);
+                            value.colAt(j);
                             if (predicate.test(value)) {
                                 if (min && value.compareTo(result) < 0) {
                                     result.at(value.rowOrdinal(), value.colOrdinal());
@@ -1744,17 +1744,17 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
                             }
                         }
                     }
-                    return (DataFrameValue<R,C>)result;
+                    return result;
                 });
             } else {
                 return initial().map(result -> {
-                    DataFrameCursor<R,C> value = cursor();
-                    final int colStart = result.colOrdinal() - offset;
+                    var value = cursor();
+                    var colStart = result.colOrdinal() - offset;
                     for (int i=colStart; i<length; ++i) {
-                        value.toColAt(offset + i);
-                        final int rowStart = i == colStart ? result.rowOrdinal() : 0;
+                        value.colAt(offset + i);
+                        var rowStart = i == colStart ? result.rowOrdinal() : 0;
                         for (int j=rowStart; j<rowCount(); ++j) {
-                            value.toRowAt(j);
+                            value.rowAt(j);
                             if (predicate.test(value)) {
                                 if (min && value.compareTo(result) < 0) {
                                     result.at(value.rowOrdinal(), value.colOrdinal());
@@ -1764,7 +1764,7 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
                             }
                         }
                     }
-                    return (DataFrameValue<R,C>)result;
+                    return result;
                 });
             }
         }
@@ -1774,14 +1774,14 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
          * @return      the initial result cursor to track min value
          */
         private Optional<DataFrameCursor<R,C>> initial() {
-            DataFrameCursor<R,C> result = cursor();
+            var result = cursor();
             if (rowCount() > colCount()) {
                 result.at(offset, 0);
                 for (int i=0; i<length; ++i) {
                     if (predicate.test(result)) break;
-                    result.toRowAt(offset + i);
+                    result.rowAt(offset + i);
                     for (int j=0; j<colCount(); ++j) {
-                        result.toColAt(j);
+                        result.colAt(j);
                         if (predicate.test(result)) {
                             break;
                         }
@@ -1791,9 +1791,9 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
                 result.at(0, offset);
                 for (int i=0; i<length; ++i) {
                     if (predicate.test(result)) break;
-                    result.toColAt(offset + i);
+                    result.colAt(offset + i);
                     for (int j=0; j<rowCount(); ++j) {
-                        result.toRowAt(j);
+                        result.rowAt(j);
                         if (predicate.test(result)) {
                             break;
                         }
@@ -1812,17 +1812,17 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
          * @return      returns the min across the two split tasks
          */
         private Optional<DataFrameValue<R,C>> split() {
-            final int splitLength = length / 2;
-            final int midPoint = offset + splitLength;
-            final MinMaxValueTask leftTask = new MinMaxValueTask(offset, splitLength, min, predicate);
-            final MinMaxValueTask rightTask = new MinMaxValueTask(midPoint, length - splitLength, min, predicate);
+            var splitLength = length / 2;
+            var midPoint = offset + splitLength;
+            var leftTask = new MinMaxValueTask(offset, splitLength, min, predicate);
+            var rightTask = new MinMaxValueTask(midPoint, length - splitLength, min, predicate);
             leftTask.fork();
-            final Optional<DataFrameValue<R,C>> rightAns = rightTask.compute();
-            final Optional<DataFrameValue<R,C>> leftAns = leftTask.join();
+            var rightAns = rightTask.compute();
+            var leftAns = leftTask.join();
             if (leftAns.isPresent() && rightAns.isPresent()) {
-                final DataFrameValue<R,C> left = leftAns.get();
-                final DataFrameValue<R,C> right = rightAns.get();
-                final int result = left.compareTo(right);
+                var left = leftAns.get();
+                var right = rightAns.get();
+                var result = left.compareTo(right);
                 return min ? result < 0 ? leftAns : rightAns : result > 0 ? leftAns : rightAns;
             } else {
                 return leftAns.isPresent() ? leftAns : rightAns;
@@ -1865,15 +1865,15 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
                 return split();
             } else if (rowCount() > colCount()) {
                 return initial().map(initial -> {
-                    final DataFrameCursor<R,C> value = cursor();
-                    final DataFrameCursor<R,C> min = initial.copy();
-                    final DataFrameCursor<R,C> max = initial.copy();
-                    final int rowStart = initial.rowOrdinal() - offset;
+                    var value = cursor();
+                    var min = initial.copy();
+                    var max = initial.copy();
+                    var rowStart = initial.rowOrdinal() - offset;
                     for (int i=rowStart; i<length; ++i) {
-                        value.toRowAt(offset + i);
-                        final int colStart = i == rowStart ? initial.colOrdinal() : 0;
+                        value.rowAt(offset + i);
+                        var colStart = i == rowStart ? initial.colOrdinal() : 0;
                         for (int j=colStart; j<colCount(); ++j) {
-                            value.toColAt(j);
+                            value.colAt(j);
                             if (predicate.test(value)) {
                                 if (value.compareTo(min) < 0) {
                                     min.at(value.rowOrdinal(), value.colOrdinal());
@@ -1883,21 +1883,21 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
                             }
                         }
                     }
-                    final V lower = min.getValue();
-                    final V upper = max.getValue();
+                    var lower = min.<V>getValue();
+                    var upper = max.<V>getValue();
                     return Bounds.of(lower, upper);
                 });
             } else {
                 return initial().map(initial -> {
-                    final DataFrameCursor<R,C> value = cursor();
-                    final DataFrameCursor<R,C> min = initial.copy();
-                    final DataFrameCursor<R,C> max = initial.copy();
-                    final int colStart = initial.colOrdinal() - offset;
+                    var value = cursor();
+                    var min = initial.copy();
+                    var max = initial.copy();
+                    var colStart = initial.colOrdinal() - offset;
                     for (int i=colStart; i<length; ++i) {
-                        value.toColAt(offset + i);
-                        final int rowStart = i == colStart ? initial.rowOrdinal() : 0;
+                        value.colAt(offset + i);
+                        var rowStart = i == colStart ? initial.rowOrdinal() : 0;
                         for (int j=rowStart; j<rowCount(); ++j) {
-                            value.toRowAt(j);
+                            value.rowAt(j);
                             if (predicate.test(value)) {
                                 if (value.compareTo(min) < 0) {
                                     min.at(value.rowOrdinal(), value.colOrdinal());
@@ -1907,8 +1907,8 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
                             }
                         }
                     }
-                    final V lower = min.getValue();
-                    final V upper = max.getValue();
+                    var lower = min.<V>getValue();
+                    var upper = max.<V>getValue();
                     return Bounds.of(lower, upper);
                 });
             }
@@ -1919,14 +1919,14 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
          * @return      the initial result cursor to track min value
          */
         private Optional<DataFrameCursor<R,C>> initial() {
-            DataFrameCursor<R,C> result = cursor();
+            var result = cursor();
             if (rowCount() > colCount()) {
                 result.at(offset, 0);
                 for (int i=0; i<length; ++i) {
                     if (predicate.test(result)) break;
-                    result.toRowAt(offset + i);
+                    result.rowAt(offset + i);
                     for (int j=0; j<colCount(); ++j) {
-                        result.toColAt(j);
+                        result.colAt(j);
                         if (predicate.test(result)) {
                             break;
                         }
@@ -1936,9 +1936,9 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
                 result.at(0, offset);
                 for (int i=0; i<length; ++i) {
                     if (predicate.test(result)) break;
-                    result.toColAt(offset + i);
+                    result.colAt(offset + i);
                     for (int j=0; j<rowCount(); ++j) {
-                        result.toRowAt(j);
+                        result.rowAt(j);
                         if (predicate.test(result)) {
                             break;
                         }
@@ -1957,16 +1957,16 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
          * @return      returns the min across the two split tasks
          */
         private Optional<Bounds<V>> split() {
-            final int splitLength = length / 2;
-            final int midPoint = offset + splitLength;
-            final BoundsTask<V> leftTask = new BoundsTask<>(offset, splitLength, predicate);
-            final BoundsTask<V> rightTask = new BoundsTask<>(midPoint, length - splitLength, predicate);
+            var splitLength = length / 2;
+            var midPoint = offset + splitLength;
+            var leftTask = new BoundsTask<V>(offset, splitLength, predicate);
+            var rightTask = new BoundsTask<V>(midPoint, length - splitLength, predicate);
             leftTask.fork();
-            final Optional<Bounds<V>> rightAns = rightTask.compute();
-            final Optional<Bounds<V>> leftAns = leftTask.join();
+            var rightAns = rightTask.compute();
+            var leftAns = leftTask.join();
             if (leftAns.isPresent() && rightAns.isPresent()) {
-                final Bounds<V> left = leftAns.get();
-                final Bounds<V> right = rightAns.get();
+                var left = leftAns.get();
+                var right = rightAns.get();
                 return Optional.of(Bounds.ofAll(left, right));
             } else {
                 return leftAns.isPresent() ? leftAns : rightAns;

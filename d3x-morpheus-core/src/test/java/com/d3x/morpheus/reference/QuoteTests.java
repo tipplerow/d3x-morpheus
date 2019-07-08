@@ -82,7 +82,7 @@ public class QuoteTests {
 
     @Test()
     public void testStats() {
-        var frame = DataFrame.read().<LocalDate>csv("/quotes/quote.csv").read(options -> {
+        var frame = DataFrame.read("/quotes/quote.csv").csv(LocalDate.class, options -> {
             options.setRowKeyColumnName("Date");
         });
         frame.cols().keys().forEach(columnKey -> {
@@ -104,7 +104,7 @@ public class QuoteTests {
 
     @Test()
     public void testRowStats() {
-        var frame = DataFrame.read().<LocalDate>csv("/quotes/quote.csv").read(options -> {
+        var frame = DataFrame.read("/quotes/quote.csv").csv(LocalDate.class, options -> {
             options.setRowKeyColumnName("Date");
         });
         for (int i=0; i<10; ++i) {
@@ -127,7 +127,7 @@ public class QuoteTests {
 
     @Test()
     public void testColumnStats()  {
-        var frame = DataFrame.read().<LocalDate>csv("/quotes/quote.csv").read(options -> {
+        var frame = DataFrame.read("/quotes/quote.csv").csv(LocalDate.class, options -> {
             options.setRowKeyColumnName("Date");
         });
         PerfStat.timeInMicros("Column stats", 20, () -> {
@@ -145,7 +145,7 @@ public class QuoteTests {
     }
 
     public void testRowDemean() {
-        var frame = DataFrame.read().<LocalDate>csv("/quotes/quote.csv").read(options -> {
+        var frame = DataFrame.read("/quotes/quote.csv").csv(LocalDate.class, options -> {
             options.setRowKeyColumnName("Date");
         });
         PerfStat.timeInMillis("Row demean", 20, () -> {

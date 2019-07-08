@@ -167,9 +167,9 @@ abstract class XDataFrameLeastSquares<R,C> implements DataFrameLeastSquares<R,C>
         final int rowCount = frame.rows().count();
         final int colIndex = frame.cols().ordinal(regressand);
         final RealVector y = new ArrayRealVector(rowCount);
-        final DataFrameCursor<R,C> cursor = frame.cursor().toColAt(colIndex);
+        final DataFrameCursor<R,C> cursor = frame.cursor().colAt(colIndex);
         for (int i = 0; i < rowCount; ++i) {
-            cursor.toRowAt(i);
+            cursor.rowAt(i);
             final double value = cursor.getDouble();
             y.setEntry(i, value);
         }
@@ -185,14 +185,14 @@ abstract class XDataFrameLeastSquares<R,C> implements DataFrameLeastSquares<R,C>
         final int n = frame.rows().count();
         final int offset = hasIntercept() ? 1 : 0;
         final int p = hasIntercept() ? regressors.size() + 1 : regressors.size();
-        final int[] colIndexes = regressors.stream().mapToInt(k -> frame.cols().ordinal(k)).toArray();
+        var colIndexes = regressors.stream().mapToInt(k -> frame.cols().ordinal(k)).toArray();
         final RealMatrix x = new Array2DRowRealMatrix(n, p);
         final DataFrameCursor<R,C> cursor = frame.cursor();
         for (int i = 0; i < n; ++i) {
             x.setEntry(i, 0, 1d);
-            cursor.toRowAt(i);
+            cursor.rowAt(i);
             for (int j = offset; j < p; ++j) {
-                cursor.toColAt(colIndexes[j - offset]);
+                cursor.colAt(colIndexes[j - offset]);
                 final double value = cursor.getDouble();
                 x.setEntry(i, j, value);
             }
@@ -322,12 +322,12 @@ abstract class XDataFrameLeastSquares<R,C> implements DataFrameLeastSquares<R,C>
             if (hasIntercept()) {
                 final double interceptVariance = betaVar.getEntry(0);
                 final double interceptStdError = Math.sqrt(interceptVariance);
-                this.interceptCursor.toCol(Field.STD_ERROR).setDouble(interceptStdError);
+                this.interceptCursor.col(Field.STD_ERROR).setDouble(interceptStdError);
             }
             for (int i = 0; i < regressors.size(); i++) {
                 final double betaVar_i = betaVar.getEntry(i + offset);
                 final double betaStdError = Math.sqrt(betaVar_i);
-                this.betaCursor.toRowAt(i).toCol(Field.STD_ERROR).setDouble(betaStdError);
+                this.betaCursor.rowAt(i).col(Field.STD_ERROR).setDouble(betaStdError);
             }
         } catch (Exception ex) {
             throw new DataFrameException("Failed to calculate regression coefficient standard errors", ex);
@@ -343,28 +343,28 @@ abstract class XDataFrameLeastSquares<R,C> implements DataFrameLeastSquares<R,C>
             final double residualDF = frame.rows().count() - (regressors.size() + 1);
             final TDistribution distribution = new TDistribution(residualDF);
             final double interceptParam = betaVector.getEntry(0);
-            final double interceptStdError = interceptCursor.toCol(Field.STD_ERROR).getDouble();
+            final double interceptStdError = interceptCursor.col(Field.STD_ERROR).getDouble();
             final double interceptTStat = interceptParam / interceptStdError;
             final double interceptPValue = distribution.cumulativeProbability(-Math.abs(interceptTStat)) * 2d;
             final double interceptCI = interceptStdError * distribution.inverseCumulativeProbability(1d - alpha / 2d);
-            this.interceptCursor.toCol(Field.PARAMETER).setDouble(interceptParam);
-            this.interceptCursor.toCol(Field.T_STAT).setDouble(interceptTStat);
-            this.interceptCursor.toCol(Field.P_VALUE).setDouble(interceptPValue);
-            this.interceptCursor.toCol(Field.CI_LOWER).setDouble(interceptParam - interceptCI);
-            this.interceptCursor.toCol(Field.CI_UPPER).setDouble(interceptParam + interceptCI);
+            this.interceptCursor.col(Field.PARAMETER).setDouble(interceptParam);
+            this.interceptCursor.col(Field.T_STAT).setDouble(interceptTStat);
+            this.interceptCursor.col(Field.P_VALUE).setDouble(interceptPValue);
+            this.interceptCursor.col(Field.CI_LOWER).setDouble(interceptParam - interceptCI);
+            this.interceptCursor.col(Field.CI_UPPER).setDouble(interceptParam + interceptCI);
             final int offset = hasIntercept() ? 1 : 0;
             for (int i=0; i<regressors.size(); ++i) {
                 final C regressor = regressors.get(i);
                 final double betaParam = betaVector.getEntry(i + offset);
-                final double betaStdError = betaCursor.atKeys(regressor, Field.STD_ERROR).getDouble();
+                final double betaStdError = betaCursor.locate(regressor, Field.STD_ERROR).getDouble();
                 final double tStat = betaParam / betaStdError;
                 final double pValue = distribution.cumulativeProbability(-Math.abs(tStat)) * 2d;
                 final double betaCI = betaStdError * distribution.inverseCumulativeProbability(1d - alpha / 2d);
-                this.betaCursor.atKeys(regressor, Field.PARAMETER).setDouble(betaParam);
-                this.betaCursor.atKeys(regressor, Field.T_STAT).setDouble(tStat);
-                this.betaCursor.atKeys(regressor, Field.P_VALUE).setDouble(pValue);
-                this.betaCursor.atKeys(regressor, Field.CI_LOWER).setDouble(betaParam - betaCI);
-                this.betaCursor.atKeys(regressor, Field.CI_UPPER).setDouble(betaParam + betaCI);
+                this.betaCursor.locate(regressor, Field.PARAMETER).setDouble(betaParam);
+                this.betaCursor.locate(regressor, Field.T_STAT).setDouble(tStat);
+                this.betaCursor.locate(regressor, Field.P_VALUE).setDouble(pValue);
+                this.betaCursor.locate(regressor, Field.CI_LOWER).setDouble(betaParam - betaCI);
+                this.betaCursor.locate(regressor, Field.CI_UPPER).setDouble(betaParam + betaCI);
             }
         } catch (Exception ex) {
             throw new DataFrameException("Failed to compute regression coefficient t-stats and p-values", ex);
@@ -479,14 +479,14 @@ abstract class XDataFrameLeastSquares<R,C> implements DataFrameLeastSquares<R,C>
     @Override()
     public double getInterceptValue(Field field) {
         this.computeIf();
-        return interceptCursor.toCol(field).getDouble();
+        return interceptCursor.col(field).getDouble();
     }
 
 
     @Override
     public double getBetaValue(C regressor, Field field) {
         this.computeIf();
-        return betaCursor.atKeys(regressor, field).getDouble();
+        return betaCursor.locate(regressor, field).getDouble();
     }
 
 
@@ -523,7 +523,7 @@ abstract class XDataFrameLeastSquares<R,C> implements DataFrameLeastSquares<R,C>
                 double fitted = intercept;
                 for (int i=0; i<regressors.size(); ++i) {
                     final C regressor = regressors.get(i);
-                    final double x = cursor.atKeys(rowKey, regressor).getDouble();
+                    final double x = cursor.locate(rowKey, regressor).getDouble();
                     final double value = x * slopes[i];
                     fitted += value;
                 }
@@ -543,8 +543,8 @@ abstract class XDataFrameLeastSquares<R,C> implements DataFrameLeastSquares<R,C>
             double deltaSquared = 0d;
             final int n = residuals.rowCount();
             for (int i=1; i<n; ++i) {
-                final double error = residualCursor.toRowAt(i).getDouble();
-                final double errorPrevious = residualCursor.toRowAt(i-1).getDouble();
+                final double error = residualCursor.rowAt(i).getDouble();
+                final double errorPrevious = residualCursor.rowAt(i-1).getDouble();
                 etSquared += error * error;
                 deltaSquared += Math.pow(error - errorPrevious, 2);
             }
@@ -660,10 +660,10 @@ abstract class XDataFrameLeastSquares<R,C> implements DataFrameLeastSquares<R,C>
         return DataFrame.ofDoubles(rowKeys, fields, value -> {
             final Field field = value.colKey();
             if (value.rowKey().equals("Intercept")) {
-                return this.interceptCursor.toCol(field).getDouble();
+                return this.interceptCursor.col(field).getDouble();
             } else {
                 final C regressor = (C)value.rowKey();
-                return betaCursor.atKeys(regressor, field).getDouble();
+                return betaCursor.locate(regressor, field).getDouble();
             }
         });
     }

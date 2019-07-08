@@ -16,7 +16,7 @@
 package com.d3x.morpheus.frame;
 
 import java.io.File;
-import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
 
 import com.d3x.morpheus.csv.CsvSink;
@@ -33,28 +33,28 @@ public interface DataFrameWrite<R,C> {
     /**
      * Returns a CSV sink to write a DF to CSV
      * @param file      the input file
-     * @return          the resulting DataFrame
+     * @return              the CSV sink
      */
     CsvSink<R,C> csv(File file);
 
     /**
      * Returns a CSV sink to write a DF to CSV
      * @param url       the input url
-     * @return          the resulting DataFrame
+     * @return              the CSV sink
      */
     CsvSink<R,C> csv(URL url);
 
     /**
      * Returns a CSV sink to write a DF to CSV
-     * @param is        the input stream to read from
-     * @return          the resulting DataFrame
+     * @param os        the output stream to write to
+     * @return              the CSV sink
      */
-    CsvSink<R,C> csv(InputStream is);
+    CsvSink<R,C> csv(OutputStream os);
 
     /**
      * Returns a CSV sink to write a DF to CSV
      * @param resource      a file name or URL
-     * @return              the resulting DataFrame
+     * @return              the CSV sink
      */
     CsvSink<R,C> csv(String resource);
 

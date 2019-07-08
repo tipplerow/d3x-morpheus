@@ -42,6 +42,7 @@ import com.d3x.morpheus.frame.DataFrameHeader;
 import com.d3x.morpheus.frame.DataFrameRead;
 import com.d3x.morpheus.index.Index;
 import com.d3x.morpheus.range.Range;
+import com.d3x.morpheus.util.Resource;
 
 /**
  * The reference implementation of the DataFrameFactory interface.
@@ -52,11 +53,10 @@ import com.d3x.morpheus.range.Range;
  */
 public class XDataFrameFactory extends DataFrameFactory {
 
-    private DataFrameRead read = new XDataFrameRead();
 
     @Override
-    public DataFrameRead read() {
-        return read;
+    public DataFrameRead read(Resource resource) {
+        return new XDataFrameRead(resource);
     }
 
 
@@ -86,11 +86,11 @@ public class XDataFrameFactory extends DataFrameFactory {
                 result.rows().addAll(next);
                 result.cols().addAll(next);
                 next.cols().forEach(column -> {
-                    final ArrayType type = ArrayType.of(column.typeInfo());
+                    final ArrayType type = ArrayType.of(column.dataClass());
                     column.forEach(v -> {
                         final R rowKey = v.rowKey();
                         final C colKey = v.colKey();
-                        if (cursor.atKeys(rowKey, colKey).isNull()) {
+                        if (cursor.locate(rowKey, colKey).isNull()) {
                             switch (type) {
                                 case BOOLEAN:   cursor.setBoolean(v.getBoolean());  break;
                                 case INTEGER:   cursor.setInt(v.getInt());          break;
@@ -198,10 +198,10 @@ public class XDataFrameFactory extends DataFrameFactory {
                     final R key = rowKeyFunction.apply(resultSet);
                     frame.rows().add(key);
                     final int rowOrdinal = frame.rowCount()-1;
-                    cursor.toRowAt(rowOrdinal);
+                    cursor.rowAt(rowOrdinal);
                     for (int i=1; i<=columnCount; ++i) {
                         final int colOrdinal = i-1;
-                        cursor.toColAt(colOrdinal);
+                        cursor.colAt(colOrdinal);
                         switch (metaData.getColumnType(i)) {
                             case Types.BIT:         cursor.setBoolean(resultSet.getBoolean(i));  break;
                             case Types.NVARCHAR:    cursor.setValue(resultSet.getString(i));     break;

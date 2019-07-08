@@ -240,7 +240,7 @@ class SparseArrayOfZonedDateTimes extends ArrayBase<ZonedDateTime> {
     @Override
     public final Array<ZonedDateTime> filter(Predicate<ArrayValue<ZonedDateTime>> predicate) {
         int count = 0;
-        final int length = this.length();
+        var length = this.length();
         final ArrayCursor<ZonedDateTime> cursor = cursor();
         final Array<ZonedDateTime> matches = Array.of(type(), length, loadFactor());
         for (int i=0; i<length; ++i) {

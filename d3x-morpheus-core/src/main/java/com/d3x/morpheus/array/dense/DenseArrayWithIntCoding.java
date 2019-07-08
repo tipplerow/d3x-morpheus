@@ -154,7 +154,7 @@ class DenseArrayWithIntCoding<T> extends ArrayBase<T> implements WithIntCoding<T
 
     @Override()
     public final Array<T> copy(int start, int end) {
-        final int length = end - start;
+        var length = end - start;
         final DenseArrayWithIntCoding<T> clone = new DenseArrayWithIntCoding<>(length, defaultValue, coding);
         System.arraycopy(codes, start, clone.codes, 0, length);
         return clone;
@@ -175,8 +175,8 @@ class DenseArrayWithIntCoding<T> extends ArrayBase<T> implements WithIntCoding<T
 
     @Override
     public final Array<T> swap(int i, int j) {
-        final int v1 = codes[i];
-        final int v2 = codes[j];
+        var v1 = codes[i];
+        var v2 = codes[j];
         this.codes[i] = v2;
         this.codes[j] = v1;
         return this;
@@ -204,8 +204,8 @@ class DenseArrayWithIntCoding<T> extends ArrayBase<T> implements WithIntCoding<T
             throw new ArrayException("The from index array must have the same length as the to index array");
         } else {
             for (int i=0; i<fromIndexes.length; ++i) {
-                final int toIndex = toIndexes[i];
-                final int fromIndex = fromIndexes[i];
+                var toIndex = toIndexes[i];
+                var fromIndex = fromIndexes[i];
                 final T update = from.getValue(fromIndex);
                 this.setValue(toIndex, update);
             }
@@ -238,7 +238,7 @@ class DenseArrayWithIntCoding<T> extends ArrayBase<T> implements WithIntCoding<T
     @Override
     public final Array<T> expand(int newLength) {
         if (newLength > codes.length) {
-            final int[] newCodes = new int[newLength];
+            var newCodes = new int[newLength];
             System.arraycopy(codes, 0, newCodes, 0, codes.length);
             Arrays.fill(newCodes, codes.length, newCodes.length, defaultCode);
             this.codes = newCodes;
@@ -249,7 +249,7 @@ class DenseArrayWithIntCoding<T> extends ArrayBase<T> implements WithIntCoding<T
 
     @Override
     public Array<T> fill(T value, int start, int end) {
-        final int code = coding.getCode(value);
+        var code = coding.getCode(value);
         Arrays.fill(codes, start, end, code);
         return this;
     }
@@ -266,7 +266,7 @@ class DenseArrayWithIntCoding<T> extends ArrayBase<T> implements WithIntCoding<T
         if (value == null) {
             return isNull(index);
         } else {
-            final int code = coding.getCode(value);
+            var code = coding.getCode(value);
             return code == codes[index];
         }
     }
@@ -286,7 +286,7 @@ class DenseArrayWithIntCoding<T> extends ArrayBase<T> implements WithIntCoding<T
 
     @Override
     public int setInt(int index, int value) {
-        final int oldValue = getInt(index);
+        var oldValue = getInt(index);
         this.codes[index] = value;
         return oldValue;
     }
@@ -302,11 +302,11 @@ class DenseArrayWithIntCoding<T> extends ArrayBase<T> implements WithIntCoding<T
 
     @Override
     public Array<T> distinct(int limit) {
-        final int capacity = limit < Integer.MAX_VALUE ? limit : 100;
+        var capacity = limit < Integer.MAX_VALUE ? limit : 100;
         final TIntSet set = new TIntHashSet(capacity);
         final ArrayBuilder<T> builder = ArrayBuilder.of(capacity, type());
         for (int i=0; i<length(); ++i) {
-            final int code = getInt(i);
+            var code = getInt(i);
             if (set.add(code)) {
                 final T value = getValue(i);
                 builder.add(value);
@@ -348,7 +348,7 @@ class DenseArrayWithIntCoding<T> extends ArrayBase<T> implements WithIntCoding<T
     /** Custom serialization */
     private void readObject(ObjectInputStream is) throws IOException, ClassNotFoundException {
         this.coding = (IntCoding<T>)is.readObject();
-        final int length = is.readInt();
+        var length = is.readInt();
         this.codes = new int[length];
         for (int i=0; i<length; ++i) {
             codes[i] = is.readInt();

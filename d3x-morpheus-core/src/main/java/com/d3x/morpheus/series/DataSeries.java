@@ -68,6 +68,13 @@ public interface DataSeries<K,V> extends Cloneable {
     K getKey(int index);
 
     /**
+     * Returns true if the series contains key
+     * @param key   the key to match
+     * @return      true if series contains key
+     */
+    boolean contains(K key);
+
+    /**
      * Returns the value for the key
      * @param key   the key to match
      * @return      the value or null if no match
@@ -86,7 +93,9 @@ public interface DataSeries<K,V> extends Cloneable {
      * @param comparator    the comparator to apply
      * @throws UnsupportedOperationException    if not supported
      */
-    void sort(IntComparator comparator);
+    default void sort(IntComparator comparator) {
+        throw new UnsupportedOperationException("Sorting not supported by this series");
+    }
 
     /**
      * Returns true if this is a parallel series
@@ -155,8 +164,8 @@ public interface DataSeries<K,V> extends Cloneable {
      * @param <K>   the key type for series
      * @return      the CSV read adapter
      */
-    static <K,V> DataSeriesCsv<K,V,DataSeries<K,V>> csv(File file) {
-        return new DataSeriesCsv<>(Resource.of(file));
+    static <K,V> DataSeriesRead<K,V,DataSeries<K,V>> read(File file) {
+        return new DataSeriesRead<>(Resource.of(file));
     }
 
     /**
@@ -165,8 +174,8 @@ public interface DataSeries<K,V> extends Cloneable {
      * @param <K>   the key type for series
      * @return      the CSV read adapter
      */
-    static <K,V> DataSeriesCsv<K,V,DataSeries<K,V>> csv(URL url) {
-        return new DataSeriesCsv<>(Resource.of(url));
+    static <K,V> DataSeriesRead<K,V,DataSeries<K,V>> read(URL url) {
+        return new DataSeriesRead<>(Resource.of(url));
     }
 
     /**
@@ -175,8 +184,8 @@ public interface DataSeries<K,V> extends Cloneable {
      * @param <K>   the key type for series
      * @return      the CSV read adapter
      */
-    static <K,V> DataSeriesCsv<K,V,DataSeries<K,V>> csv(String path) {
-        return new DataSeriesCsv<>(Resource.of(path));
+    static <K,V> DataSeriesRead<K,V,DataSeries<K,V>> read(String path) {
+        return new DataSeriesRead<>(Resource.of(path));
     }
 
     /**
@@ -185,14 +194,14 @@ public interface DataSeries<K,V> extends Cloneable {
      * @param <K>   the key type for series
      * @return      the CSV read adapter
      */
-    static <K,V> DataSeriesCsv<K,V,DataSeries<K,V>> csv(InputStream is) {
-        return new DataSeriesCsv<>(Resource.of(is));
+    static <K,V> DataSeriesRead<K,V,DataSeries<K,V>> read(InputStream is) {
+        return new DataSeriesRead<>(Resource.of(is));
     }
 
 
     static void main(String[] args) {
         var path = "/Users/witdxav/temp/opt-models/bf5489bf-18be-4442-8c49-d659207ceeee-data/opt-data.csv";
-        var series = DataSeries.csv(new File(path)).read("symbol", "##default##price");
+        var series = DataSeries.read(new File(path)).csv("symbol", "##default##price");
         IO.println(series);
     }
 

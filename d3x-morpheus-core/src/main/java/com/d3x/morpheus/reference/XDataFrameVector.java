@@ -157,7 +157,7 @@ abstract class XDataFrameVector<X,Y,R,C,Z> implements DataFrameVector<X,Y,R,C,Z>
     @Override()
     public final Z applyInts(ToIntFunction<DataFrameValue<R,C>> mapper) {
         return forEachValue(value -> {
-            final int result = mapper.applyAsInt(value);
+            var result = mapper.applyAsInt(value);
             value.setInt(result);
         });
     }
@@ -175,7 +175,7 @@ abstract class XDataFrameVector<X,Y,R,C,Z> implements DataFrameVector<X,Y,R,C,Z>
     @Override()
     public final Z applyDoubles(ToDoubleFunction<DataFrameValue<R,C>> mapper) {
         return forEachValue(value -> {
-            final double result = mapper.applyAsDouble(value);
+            var result = mapper.applyAsDouble(value);
             value.setDouble(result);
         });
     }
@@ -209,11 +209,11 @@ abstract class XDataFrameVector<X,Y,R,C,Z> implements DataFrameVector<X,Y,R,C,Z>
         var stepSize = (maxValue - minValue) / binCount;
         var rowKeys = Range.of(minValue, maxValue + stepSize, stepSize);
         var hist = DataFrame.ofInts(rowKeys, "Count");
-        var cursor = hist.cursor().toColAt(0);
+        var cursor = hist.cursor().colAt(0);
         this.forEachValue(v -> {
             var value = v.getDouble();
             hist.rows().lowerKey(value).ifPresent(lowerKey -> {
-                var count = cursor.toRow(lowerKey).getInt();
+                var count = cursor.row(lowerKey).getInt();
                 cursor.setInt(count + 1);
             });
         });
@@ -227,7 +227,7 @@ abstract class XDataFrameVector<X,Y,R,C,Z> implements DataFrameVector<X,Y,R,C,Z>
         if (frame.rowCount() == 0 || frame.colCount() == 0) {
             return Optional.empty();
         } else {
-            final Class<?> type = typeInfo();
+            final Class<?> type = dataClass();
             switch (ArrayType.of(type)) {
                 case INTEGER:   return Bounds.ofInts(toIntStream()).map(v -> (Bounds<V>)v);
                 case LONG:      return Bounds.ofLongs(toLongStream()).map(v -> (Bounds<V>)v);
@@ -275,9 +275,9 @@ abstract class XDataFrameVector<X,Y,R,C,Z> implements DataFrameVector<X,Y,R,C,Z>
             int low = offset;
             int high = offset + length - 1;
             while (low <= high) {
-                final int midIndex = (low + high) >>> 1;
+                var midIndex = (low + high) >>> 1;
                 final T midValue = getValueAt(midIndex);
-                final int result = comparator.compare(midValue, value);
+                var result = comparator.compare(midValue, value);
                 if (result < 0) {
                     low = midIndex + 1;
                 } else if (result > 0) {
@@ -285,11 +285,11 @@ abstract class XDataFrameVector<X,Y,R,C,Z> implements DataFrameVector<X,Y,R,C,Z>
                 } else if (isRow()) {
                     final R rowKey = (R)key();
                     final DataFrameCursor<R,C> cursor = frame.cursor();
-                    return Optional.of(cursor.toRow(rowKey).toColAt(midIndex));
+                    return Optional.of(cursor.row(rowKey).colAt(midIndex));
                 } else {
                     final C colKey = (C)key();
                     final DataFrameCursor<R,C> cursor = frame.cursor();
-                    return Optional.of(cursor.toRowAt(midIndex).toCol(colKey));
+                    return Optional.of(cursor.rowAt(midIndex).col(colKey));
                 }
             }
             return Optional.empty();
@@ -324,7 +324,7 @@ abstract class XDataFrameVector<X,Y,R,C,Z> implements DataFrameVector<X,Y,R,C,Z>
         if (limit == 0 || frame.rowCount() == 0 || frame.colCount() == 0) {
             return Array.empty((Class<V>)key().getClass());
         } else {
-            final Class<?> type = typeInfo();
+            final Class<?> type = dataClass();
             switch (ArrayType.of(type)) {
                 case INTEGER:   return (Array<V>)ArrayUtils.distinct(toIntStream(), limit);
                 case LONG:      return (Array<V>)ArrayUtils.distinct(toLongStream(), limit);
@@ -362,8 +362,8 @@ abstract class XDataFrameVector<X,Y,R,C,Z> implements DataFrameVector<X,Y,R,C,Z>
     @Override
     @SuppressWarnings("unchecked")
     public final <V> Array<V> toArray() {
-        final int length = size();
-        final Class<V> type = (Class<V>)typeInfo();
+        var length = size();
+        final Class<V> type = (Class<V>) dataClass();
         final ArrayBuilder<V> builder = ArrayBuilder.of(length, type);
         switch (ArrayType.of(type)) {
             case INTEGER:   forEach(v -> builder.addInt(v.getInt()));       break;
@@ -377,12 +377,12 @@ abstract class XDataFrameVector<X,Y,R,C,Z> implements DataFrameVector<X,Y,R,C,Z>
 
     @Override()
     public final Stream<DataFrameValue<R,C>> values() {
-        final int valueCount = size();
+        var valueCount = size();
         if (valueCount == 0) {
             return Stream.empty();
         } else {
-            final int partitionSize = valueCount / Runtime.getRuntime().availableProcessors();
-            final int splitThreshold = Math.max(partitionSize, 5000);
+            var partitionSize = valueCount / Runtime.getRuntime().availableProcessors();
+            var splitThreshold = Math.max(partitionSize, 5000);
             return StreamSupport.stream(new DataFrameValueSpliterator<>(0, valueCount-1, valueCount, splitThreshold), isParallel());
         }
     }
@@ -396,8 +396,8 @@ abstract class XDataFrameVector<X,Y,R,C,Z> implements DataFrameVector<X,Y,R,C,Z>
         try {
             statistic.reset();
             for (int i=0; i<length; ++i) {
-                final int ordinal = offset + i;
-                final double value = getDoubleAt(ordinal);
+                var ordinal = offset + i;
+                var value = getDoubleAt(ordinal);
                 statistic.add(value);
             }
             return statistic.getValue();
@@ -462,14 +462,14 @@ abstract class XDataFrameVector<X,Y,R,C,Z> implements DataFrameVector<X,Y,R,C,Z>
             this.length = length;
             this.splitThreshold = splitThreshold;
             this.value = (DataFrameCursor<A,B>)frame.cursor();
-            this.value = isRow() ? value.toRowAt(ordinal()) : value.toColAt(ordinal());
+            this.value = isRow() ? value.rowAt(ordinal()) : value.colAt(ordinal());
         }
 
         @Override
         public boolean tryAdvance(Consumer<? super DataFrameValue<A,B>> action) {
             Asserts.check(action != null, "The consumer action cannot be null");
             if (position <= end) {
-                this.value = isRow() ? value.toColAt(position) : value.toRowAt(position);
+                this.value = isRow() ? value.colAt(position) : value.rowAt(position);
                 this.position++;
                 action.accept(value);
                 return true;
@@ -483,9 +483,9 @@ abstract class XDataFrameVector<X,Y,R,C,Z> implements DataFrameVector<X,Y,R,C,Z>
             if (estimateSize() < splitThreshold) {
                 return null;
             } else {
-                final int newStart = start;
-                final int halfSize = (end - start) / 2;
-                final int newEnd = newStart + halfSize;
+                var newStart = start;
+                var halfSize = (end - start) / 2;
+                var newEnd = newStart + halfSize;
                 this.start = newEnd + 1;
                 this.position = start;
                 return new DataFrameValueSpliterator<>(newStart, newEnd, length, splitThreshold);

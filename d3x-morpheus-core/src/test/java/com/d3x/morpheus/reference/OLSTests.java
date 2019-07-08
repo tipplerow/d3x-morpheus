@@ -61,7 +61,7 @@ public class OLSTests {
      * @return  the frame of motor vehicle features
      */
     private static DataFrame<Integer,String> loadCarDataset() {
-        return DataFrame.read().<Integer>csv("/csv/cars93.csv").read(options -> {
+        return DataFrame.read("/csv/cars93.csv").csv(Integer.class, options -> {
             options.setExcludeColumnIndexes(0);
         });
     }

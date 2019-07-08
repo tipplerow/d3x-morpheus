@@ -77,7 +77,7 @@ class XDataFrameGroupingCols<R,C> implements DataFrameGrouping.Cols<R,C> {
      * @return          the newly create grouping engine
      */
     static <R,C> XDataFrameGroupingCols<R,C> of(XDataFrame<R,C> source, boolean parallel, Array<R> rowKeys) {
-        final int[] ordinals = source.rowKeys().ordinals(rowKeys).toArray();
+        var ordinals = source.rowKeys().ordinals(rowKeys).toArray();
         return XDataFrameGroupingCols.of(source, parallel, column -> {
             final Object[] values = new Object[ordinals.length];
             for (int i=0; i<ordinals.length; ++i) {
@@ -175,7 +175,7 @@ class XDataFrameGroupingCols<R,C> implements DataFrameGrouping.Cols<R,C> {
                 this.groupKeysMap.put(groupKey1, groupKeys1);
             } else {
                 final Class<C> type = groupKeys1.type();
-                final int length = groupKeys2.length();
+                var length = groupKeys2.length();
                 final int newLength = length + groupKeys1.length();
                 final Array<C> combinedKeys = Array.of(type, newLength);
                 combinedKeys.update(0, groupKeys2, 0, groupKeys2.length());
@@ -244,7 +244,7 @@ class XDataFrameGroupingCols<R,C> implements DataFrameGrouping.Cols<R,C> {
                 final Map<Tuple,ArrayBuilder<Y>> groupKeyBuilderMap = new HashMap<>();
                 final XDataFrameColumn<X,Y> column = new XDataFrameColumn<>(source, false);
                 for (int i=from; i<=to; ++i) {
-                    column.moveTo(i);
+                    column.atOrdinal(i);
                     final Y key = column.key();
                     try {
                         final Tuple groupKey = function.apply(column);

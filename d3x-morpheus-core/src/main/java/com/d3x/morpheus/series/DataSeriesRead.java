@@ -33,7 +33,7 @@ import com.d3x.morpheus.util.text.Formats;
  * @param <V>   the value type
  */
 @lombok.AllArgsConstructor()
-public class DataSeriesCsv<K,V,D extends DataSeries<K,V>> {
+public class DataSeriesRead<K,V,D extends DataSeries<K,V>> {
 
     @lombok.NonNull
     private Resource resource;
@@ -43,8 +43,8 @@ public class DataSeriesCsv<K,V,D extends DataSeries<K,V>> {
      * Returns a data series parsed from a CSV resource selecting first two columns
      * @return      the data series result
      */
-    public D read() {
-        return read(o -> {
+    public D csv() {
+        return csv(o -> {
             o.setKeyColIndex(0);
             o.setValColIndex(1);
         });
@@ -57,8 +57,8 @@ public class DataSeriesCsv<K,V,D extends DataSeries<K,V>> {
      * @param valColIndex   the column index for series values
      * @return      the data series result
      */
-    public D read(int keyColIndex, int valColIndex) {
-        return read(o -> {
+    public D csv(int keyColIndex, int valColIndex) {
+        return csv(o -> {
             o.setKeyColIndex(keyColIndex);
             o.setValColIndex(valColIndex);
         });
@@ -71,8 +71,8 @@ public class DataSeriesCsv<K,V,D extends DataSeries<K,V>> {
      * @param valColName   the column name for series values
      * @return      the data series result
      */
-    public D read(String keyColName, String valColName) {
-        return read(o -> {
+    public D csv(String keyColName, String valColName) {
+        return csv(o -> {
             o.setKeyColName(keyColName);
             o.setValColName(valColName);
         });
@@ -84,10 +84,10 @@ public class DataSeriesCsv<K,V,D extends DataSeries<K,V>> {
      * @param configurator  the options configurator function
      * @return              the data series result
      */
-    public D read(Consumer<Options> configurator) {
-        var options = new Options();
+    public D csv(Consumer<CsvOptions> configurator) {
+        var options = new CsvOptions();
         configurator.accept(options);
-        return from(DataFrame.read().<Integer>csv(resource.toInputStream()).read(o -> {
+        return from(DataFrame.read(resource.toInputStream()).csv(Integer.class, o -> {
             options.getHeader().ifPresent(o::setHeader);
             options.getFormats().ifPresent(o::setFormats);
             options.getColumnNames().ifPresent(o::setIncludeColumns);
@@ -103,8 +103,8 @@ public class DataSeriesCsv<K,V,D extends DataSeries<K,V>> {
      */
     @SuppressWarnings("unchecked")
     private D from(DataFrame<Integer,?> frame) {
-        var keyType = (Class<K>)frame.colAt(0).typeInfo();
-        var valueType = (Class<V>)frame.colAt(1).typeInfo();
+        var keyType = (Class<K>)frame.colAt(0).dataClass();
+        var valueType = (Class<V>)frame.colAt(1).dataClass();
         var builder = DataSeriesBuilder.builder(keyType, valueType);
         builder.capacity(frame.rowCount());
         if (valueType.equals(Boolean.class)) {
@@ -146,7 +146,7 @@ public class DataSeriesCsv<K,V,D extends DataSeries<K,V>> {
      * Options to customized data series CSV parsing
      */
     @lombok.NoArgsConstructor()
-    public static class Options {
+    public static class CsvOptions {
 
         @lombok.Setter
         private Boolean header;

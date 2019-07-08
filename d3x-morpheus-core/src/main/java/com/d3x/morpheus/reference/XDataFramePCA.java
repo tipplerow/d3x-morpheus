@@ -225,7 +225,7 @@ class XDataFramePCA<R,C> implements DataFramePCA<R,C> {
         protected void update(double[] eigenValues, Matrix eigenVectors) {
             final Ordering ordering = new Ordering(eigenValues);
             SortAlgorithm.getDefault(false).sort(0, eigenValues.length, ordering, ordering);
-            final int[] indices = ordering.getIndices();
+            var indices = ordering.getIndices();
             final Range<Integer> rowKeys = Range.of(0, eigenValues.length);
             this.eigenValues = DataFrame.ofDoubles(rowKeys, Array.singleton(Field.EIGENVALUE));
             this.eigenValues.applyDoubles(v -> eigenValues[indices[v.rowOrdinal()]]);
@@ -249,7 +249,7 @@ class XDataFramePCA<R,C> implements DataFramePCA<R,C> {
         protected void update(double[] eigenValues, RealMatrix eigenVectors) {
             final Ordering ordering = new Ordering(eigenValues);
             SortAlgorithm.getDefault(false).sort(0, eigenValues.length, ordering, ordering);
-            final int[] indices = ordering.getIndices();
+            var indices = ordering.getIndices();
             final Range<Integer> rowKeys = Range.of(0, eigenValues.length);
             this.eigenValues = DataFrame.ofDoubles(rowKeys, Array.singleton(Field.EIGENVALUE));
             this.eigenValues.applyDoubles(v -> eigenValues[indices[v.rowOrdinal()]]);

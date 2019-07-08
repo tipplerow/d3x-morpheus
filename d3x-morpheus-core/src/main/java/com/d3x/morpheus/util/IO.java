@@ -142,7 +142,7 @@ public class IO {
                 final byte[] buffer = new byte[bufferSize];
                 final StringBuilder result = new StringBuilder();
                 while (true) {
-                    final int read = is.read(buffer);
+                    var read = is.read(buffer);
                     if (read < 0) break;
                     else {
                         result.append(new String(buffer, 0, read));

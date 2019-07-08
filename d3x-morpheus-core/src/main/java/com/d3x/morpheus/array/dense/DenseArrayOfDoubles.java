@@ -134,7 +134,7 @@ class DenseArrayOfDoubles extends ArrayBase<Double> {
 
     @Override()
     public final Array<Double> copy(int start, int end) {
-        final int length = end - start;
+        var length = end - start;
         final DenseArrayOfDoubles clone = new DenseArrayOfDoubles(length, defaultValue);
         System.arraycopy(values, start, clone.values, 0, length);
         return clone;
@@ -155,8 +155,8 @@ class DenseArrayOfDoubles extends ArrayBase<Double> {
 
     @Override
     public final Array<Double> swap(int i, int j) {
-        final double v1 = values[i];
-        final double v2 = values[j];
+        var v1 = values[i];
+        var v2 = values[j];
         this.values[i] = v2;
         this.values[j] = v1;
         return this;
@@ -186,7 +186,7 @@ class DenseArrayOfDoubles extends ArrayBase<Double> {
             for (int i=0; i<fromIndexes.length; ++i) {
                 final int toIndex = toIndexes[i];
                 final int fromIndex = fromIndexes[i];
-                final double update = from.getDouble(fromIndex);
+                var update = from.getDouble(fromIndex);
                 this.setDouble(toIndex, update);
             }
         }
@@ -197,7 +197,7 @@ class DenseArrayOfDoubles extends ArrayBase<Double> {
     @Override
     public final Array<Double> update(int toIndex, Array<Double> from, int fromIndex, int length) {
         for (int i=0; i<length; ++i) {
-            final double update = from.getDouble(fromIndex + i);
+            var update = from.getDouble(fromIndex + i);
             this.setDouble(toIndex + i, update);
         }
         return this;
@@ -207,7 +207,7 @@ class DenseArrayOfDoubles extends ArrayBase<Double> {
     @Override
     public final Array<Double> expand(int newLength) {
         if (newLength > values.length) {
-            final double[] newValues = new double[newLength];
+            var newValues = new double[newLength];
             System.arraycopy(values, 0, newValues, 0, values.length);
             Arrays.fill(newValues, values.length, newValues.length, defaultValue);
             this.values = newValues;
@@ -236,6 +236,18 @@ class DenseArrayOfDoubles extends ArrayBase<Double> {
 
 
     @Override
+    public int getInt(int index) {
+        return (int)values[index];
+    }
+
+
+    @Override
+    public long getLong(int index) {
+        return (long)values[index];
+    }
+
+
+    @Override
     public final double getDouble(int index) {
         return values[index];
     }
@@ -249,7 +261,7 @@ class DenseArrayOfDoubles extends ArrayBase<Double> {
 
     @Override
     public final double setDouble(int index, double value) {
-        final double oldValue = getDouble(index);
+        var oldValue = getDouble(index);
         this.values[index] = value;
         return oldValue;
     }
@@ -257,7 +269,7 @@ class DenseArrayOfDoubles extends ArrayBase<Double> {
 
     @Override
     public final Double setValue(int index, Double value) {
-        final Double oldValue = getValue(index);
+        var oldValue = getValue(index);
         this.values[index] = value != null ? value : Double.NaN;
         return oldValue;
     }
@@ -275,7 +287,7 @@ class DenseArrayOfDoubles extends ArrayBase<Double> {
         final TDoubleSet set = new TDoubleHashSet(capacity);
         final ArrayBuilder<Double> builder = ArrayBuilder.of(capacity, Double.class);
         for (int i=0; i<length(); ++i) {
-            final double value = getDouble(i);
+            var value = getDouble(i);
             if (set.add(value)) {
                 builder.addDouble(value);
                 if (set.size() >= limit) {
@@ -289,12 +301,12 @@ class DenseArrayOfDoubles extends ArrayBase<Double> {
 
     @Override
     public final Array<Double> cumSum() {
-        final int length = length();
+        var length = length();
         final Array<Double> result = Array.of(Double.class, length);
         result.setDouble(0, values[0]);
         for (int i=1; i<length; ++i) {
-            final double prior = result.getDouble(i-1);
-            final double current = values[i];
+            var prior = result.getDouble(i-1);
+            var current = values[i];
             if (Double.isNaN(prior)) {
                 result.setDouble(i, current);
             } else if (Double.isNaN(current)) {
@@ -334,7 +346,7 @@ class DenseArrayOfDoubles extends ArrayBase<Double> {
     @SuppressWarnings("unchecked")
     /** Custom serialization */
     private void readObject(ObjectInputStream is) throws IOException, ClassNotFoundException {
-        final int length = is.readInt();
+        var length = is.readInt();
         this.values = new double[length];
         for (int i=0; i<length; ++i) {
             values[i] = is.readDouble();

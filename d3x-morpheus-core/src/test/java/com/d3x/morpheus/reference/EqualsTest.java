@@ -120,7 +120,7 @@ public class EqualsTest {
         final Range<String> rowKeys = Range.of(0, 1000).map(i -> "R" + i);
         final Index<String> colKeys = Index.of(String.class, 10);
         final DataFrame<String,String> frame = DataFrame.ofObjects(rowKeys, colKeys);
-        final int rowCount = frame.rowCount();
+        var rowCount = frame.rowCount();
         frame.cols().add("C1", Array.of(Boolean.class, rowCount)).applyBooleans(v -> random.nextBoolean());
         frame.cols().add("C2", Array.of(Integer.class, rowCount)).applyInts(v -> random.nextInt());
         frame.cols().add("C3", Array.of(Long.class, rowCount)).applyLongs(v -> random.nextLong());

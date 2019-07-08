@@ -16,7 +16,7 @@
 package com.d3x.morpheus.reference;
 
 import java.io.File;
-import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
 
 import com.d3x.morpheus.csv.CsvSink;
@@ -48,8 +48,8 @@ class XDataFrameWrite<R,C> implements DataFrameWrite<R,C> {
     }
 
     @Override
-    public CsvSink<R, C> csv(InputStream is) {
-        return new CsvSinkDefault<>(Resource.of(is), frame);
+    public CsvSink<R, C> csv(OutputStream os) {
+        return new CsvSinkDefault<>(Resource.of(os), frame);
     }
 
     @Override

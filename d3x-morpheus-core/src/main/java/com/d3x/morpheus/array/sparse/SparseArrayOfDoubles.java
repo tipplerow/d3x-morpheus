@@ -185,7 +185,7 @@ class SparseArrayOfDoubles extends ArrayBase<Double> {
     @Override
     public final Array<Double> filter(Predicate<ArrayValue<Double>> predicate) {
         int count = 0;
-        final int length = this.length();
+        var length = this.length();
         final ArrayCursor<Double> cursor = cursor();
         final Array<Double> matches = Array.of(type(), length, loadFactor());  //todo: fix the length of this filter
         for (int i=0; i<length; ++i) {
@@ -338,7 +338,7 @@ class SparseArrayOfDoubles extends ArrayBase<Double> {
 
     @Override
     public final Array<Double> cumSum() {
-        final int length = length();
+        var length = length();
         final Array<Double> result = Array.of(Double.class, length);
         result.setDouble(0, getDouble(0));
         for (int i=1; i<length; ++i) {

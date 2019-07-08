@@ -185,7 +185,7 @@ class SparseArrayOfLongs extends ArrayBase<Long> {
     @Override
     public final Array<Long> filter(Predicate<ArrayValue<Long>> predicate) {
         int count = 0;
-        final int length = this.length();
+        var length = this.length();
         final ArrayCursor<Long> cursor = cursor();
         final Array<Long> matches = Array.of(type(), length, loadFactor());  //todo: fix the length of this filter
         for (int i=0; i<length; ++i) {
@@ -203,8 +203,8 @@ class SparseArrayOfLongs extends ArrayBase<Long> {
             throw new ArrayException("The from index array must have the same length as the to index array");
         } else {
             for (int i=0; i<fromIndexes.length; ++i) {
-                final int toIndex = toIndexes[i];
-                final int fromIndex = fromIndexes[i];
+                var toIndex = toIndexes[i];
+                var fromIndex = fromIndexes[i];
                 final long update = from.getLong(fromIndex);
                 this.setLong(toIndex, update);
             }
@@ -310,9 +310,9 @@ class SparseArrayOfLongs extends ArrayBase<Long> {
         int low = start;
         int high = end - 1;
         while (low <= high) {
-            final int midIndex = (low + high) >>> 1;
+            var midIndex = (low + high) >>> 1;
             final long midValue = getLong(midIndex);
-            final int result = Long.compare(midValue, value);
+            var result = Long.compare(midValue, value);
             if (result < 0) {
                 low = midIndex + 1;
             } else if (result > 0) {
@@ -327,7 +327,7 @@ class SparseArrayOfLongs extends ArrayBase<Long> {
 
     @Override
     public final Array<Long> distinct(int limit) {
-        final int capacity = limit < Integer.MAX_VALUE ? limit : 100;
+        var capacity = limit < Integer.MAX_VALUE ? limit : 100;
         final TLongSet set = new TLongHashSet(capacity);
         final ArrayBuilder<Long> builder = ArrayBuilder.of(capacity, Long.class);
         for (int i=0; i<length(); ++i) {
@@ -345,7 +345,7 @@ class SparseArrayOfLongs extends ArrayBase<Long> {
 
     @Override
     public final Array<Long> cumSum() {
-        final int length = length();
+        var length = length();
         final Array<Long> result = Array.of(Long.class, length);
         result.setLong(0, values.get(0));
         for (int i=1; i<length; ++i) {

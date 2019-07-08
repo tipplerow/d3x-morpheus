@@ -33,7 +33,13 @@ import org.testng.annotations.Test;
  */
 public class DoubleSeriesTests {
 
-    private JsonEngine jsonEngine = DataSeriesJson.registerDefaults(new JsonEngine());
+
+    private static JsonEngine jsonEngine = new JsonEngine();
+
+    static {
+        DataSeriesJson.registerDefaults(jsonEngine);
+        DoubleSeriesJson.registerDefaults(jsonEngine);
+    }
 
 
     private IntFunction ofIntFunction(IntFunction function) {
@@ -55,7 +61,7 @@ public class DoubleSeriesTests {
     @Test()
     public void csvRead() {
         var path = "/csv/aapl.csv";
-        var series = DoubleSeries.<LocalDate>csv(path).read("Date", "Adj Close");
+        var series = DoubleSeries.<LocalDate>read(path).csv("Date", "Adj Close");
         Assert.assertEquals(series.valueClass(), Double.class);
         Assert.assertEquals(series.keyClass(), LocalDate.class);
         Assert.assertEquals(series.size(), 8503);
@@ -72,7 +78,7 @@ public class DoubleSeriesTests {
     @SuppressWarnings("unchecked")
     public void jsonIO() {
         var path = "/csv/aapl.csv";
-        var series = DoubleSeries.<LocalDate>csv(path).read("Date", "Adj Close");
+        var series = DoubleSeries.<LocalDate>read(path).csv("Date", "Adj Close");
         var jsonIO = jsonEngine.io(DoubleSeries.ofType(LocalDate.class));
         var jsonString = jsonIO.toString(series);
         IO.println(jsonString);
@@ -91,7 +97,7 @@ public class DoubleSeriesTests {
     @Test()
     public void mapKeys() {
         var path = "/csv/aapl.csv";
-        var series = DoubleSeries.<LocalDate>csv(path).read("Date", "Adj Close");
+        var series = DoubleSeries.<LocalDate>read(path).csv("Date", "Adj Close");
         var result = series.mapKeys(LocalDate.class, v -> v.minusDays(1));
         Assert.assertEquals(result.size(), series.size());
         Assert.assertEquals(result.valueClass(), series.valueClass());
@@ -108,7 +114,7 @@ public class DoubleSeriesTests {
     @Test()
     public void filterKeys() {
         var path = "/csv/aapl.csv";
-        var series = DoubleSeries.<LocalDate>csv(path).read("Date", "Adj Close");
+        var series = DoubleSeries.<LocalDate>read(path).csv("Date", "Adj Close");
         var result1 = series.filter(v -> v.getDayOfWeek() == DayOfWeek.MONDAY);
         Assert.assertTrue(result1.size() > 0);
         Assert.assertTrue(result1.size() < series.size());
@@ -124,7 +130,7 @@ public class DoubleSeriesTests {
     @Test()
     public void sorting1() {
         var path = "/csv/aapl.csv";
-        var series = DoubleSeries.<LocalDate>csv(path).read("Date", "Adj Close");
+        var series = DoubleSeries.<LocalDate>read(path).csv("Date", "Adj Close");
         var sorted = series.copy();
         sorted.sort((i1, i2) -> {
             var v1 = sorted.getDoubleAt(i1);

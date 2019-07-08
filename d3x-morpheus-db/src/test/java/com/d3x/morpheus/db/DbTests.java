@@ -178,8 +178,8 @@ public class DbTests {
         Assert.assertEquals(frame.rowCount(), 43);
         Assert.assertTrue(frame.rows().containsAll(Arrays.asList(1, 2, 3)));
         Assert.assertTrue(frame.col("ExecutablePath").toValueStream().anyMatch("C:\\Windows\\system32\\taskhost.exe"::equals));
-        Assert.assertEquals(frame.col("TerminationDate").typeInfo(), LocalDate.class);
-        Assert.assertEquals(frame.col("MinimumWorkingSetSize").typeInfo(), Double.class);
+        Assert.assertEquals(frame.col("TerminationDate").dataClass(), LocalDate.class);
+        Assert.assertEquals(frame.col("MinimumWorkingSetSize").dataClass(), Double.class);
         frame.out().print();
     }
 
@@ -205,8 +205,8 @@ public class DbTests {
         Assert.assertEquals(frame.rowCount(), 1685);
         Assert.assertTrue(frame.rows().containsAll(Arrays.asList("SPY", "QQQ", "IWD")));
         Assert.assertTrue(frame.col("Issuer").toValueStream().anyMatch("BlackRock"::equals));
-        Assert.assertEquals(frame.col("Issuer").typeInfo(), String.class);
-        Assert.assertEquals(frame.col("P/E").typeInfo(), Double.class);
+        Assert.assertEquals(frame.col("Issuer").dataClass(), String.class);
+        Assert.assertEquals(frame.col("P/E").dataClass(), Double.class);
         frame.out().print();
     }
 
@@ -215,7 +215,7 @@ public class DbTests {
     @Test(dataProvider = "databases")
     public void testEtfWrite(String dbName) {
         var source = dataSourceMap.get(dbName);
-        var frame = DataFrame.read().<String>csv("/csv/etf.csv").read(options -> {
+        var frame = DataFrame.read("/csv/etf.csv").csv(String.class, options -> {
             options.setRowKeyColumnName("Ticker");
             options.setColumnType("Geography", String.class);
         });
@@ -234,7 +234,7 @@ public class DbTests {
     @Test(dataProvider = "databases")
     public void testWriteProcessLog(String dbName) {
         var path = "/csv/process.csv";
-        var frame = DataFrame.read().<Integer>csv(path).read(options -> {
+        var frame = DataFrame.read(path).csv(Integer.class, options -> {
             options.setRowKeyColumnName("ProcessId");
             options.setCharset(StandardCharsets.UTF_16);
             options.setColumnType("ExecutionState", String.class);
@@ -246,7 +246,7 @@ public class DbTests {
 
         frame.out().print();
         frame.cols().forEach(col -> {
-            IO.println(col.key() + ", type: " + col.typeInfo());
+            IO.println(col.key() + ", type: " + col.dataClass());
         });
 
         var sink = new DbSink(dataSourceMap.get(dbName));

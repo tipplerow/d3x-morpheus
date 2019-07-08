@@ -23,9 +23,7 @@ import com.d3x.morpheus.array.ArrayType;
 import com.d3x.morpheus.frame.DataFrame;
 import com.d3x.morpheus.frame.DataFrameAlgebra;
 import com.d3x.morpheus.frame.DataFrameColumn;
-import com.d3x.morpheus.frame.DataFrameCursor;
 import com.d3x.morpheus.frame.DataFrameException;
-import com.d3x.morpheus.frame.DataFrameRow;
 import com.d3x.morpheus.util.Asserts;
 
 /**
@@ -87,7 +85,7 @@ public abstract class XDataFrameAlgebra<R,C> implements DataFrameAlgebra<R,C> {
             Asserts.notNull(scalar, "The scalar value cannot be null");
             final DataFrame<R,C> result = frame.copy();
             result.cols().forEach(column -> {
-                final ArrayType type = ArrayType.of(column.typeInfo());
+                final ArrayType type = ArrayType.of(column.dataClass());
                 if (type.isInteger()) {
                     column.applyInts(v -> {
                         final int left = v.getInt();
@@ -124,7 +122,7 @@ public abstract class XDataFrameAlgebra<R,C> implements DataFrameAlgebra<R,C> {
             Asserts.check(frame.colCount() == other.colCount(), "The column counts of the two frames must match");
             final DataFrame<R,C> result = frame.copy();
             result.cols().forEach(column -> {
-                final ArrayType type = ArrayType.of(column.typeInfo());
+                final ArrayType type = ArrayType.of(column.dataClass());
                 final DataFrameColumn otherCol = other.colAt(column.ordinal());
                 if (type.isInteger()) {
                     column.applyInts(v -> {
@@ -163,7 +161,7 @@ public abstract class XDataFrameAlgebra<R,C> implements DataFrameAlgebra<R,C> {
             Asserts.notNull(scalar, "The scalar value cannot be null");
             final DataFrame<R,C> result = frame.copy();
             result.cols().forEach(column -> {
-                final ArrayType type = ArrayType.of(column.typeInfo());
+                final ArrayType type = ArrayType.of(column.dataClass());
                 if (type.isInteger()) {
                     column.applyInts(v -> {
                         final int left = v.getInt();
@@ -200,7 +198,7 @@ public abstract class XDataFrameAlgebra<R,C> implements DataFrameAlgebra<R,C> {
             Asserts.check(frame.colCount() == other.colCount(), "The column counts of the two frames must match");
             final DataFrame<R,C> result = frame.copy();
             result.cols().forEach(column -> {
-                final ArrayType type = ArrayType.of(column.typeInfo());
+                final ArrayType type = ArrayType.of(column.dataClass());
                 final DataFrameColumn otherCol = other.colAt(column.ordinal());
                 if (type.isInteger()) {
                     column.applyInts(v -> {
@@ -239,7 +237,7 @@ public abstract class XDataFrameAlgebra<R,C> implements DataFrameAlgebra<R,C> {
             Asserts.notNull(scalar, "The scalar value cannot be null");
             final DataFrame<R,C> result = frame.copy();
             result.cols().forEach(column -> {
-                final ArrayType type = ArrayType.of(column.typeInfo());
+                final ArrayType type = ArrayType.of(column.dataClass());
                 if (type.isInteger()) {
                     column.applyInts(v -> {
                         final int left = v.getInt();
@@ -276,7 +274,7 @@ public abstract class XDataFrameAlgebra<R,C> implements DataFrameAlgebra<R,C> {
             Asserts.check(frame.colCount() == other.colCount(), "The column counts of the two frames must match");
             final DataFrame<R,C> result = frame.copy();
             result.cols().forEach(column -> {
-                final ArrayType type = ArrayType.of(column.typeInfo());
+                final ArrayType type = ArrayType.of(column.dataClass());
                 final DataFrameColumn otherCol = other.colAt(column.ordinal());
                 if (type.isInteger()) {
                     column.applyInts(v -> {
@@ -338,7 +336,7 @@ public abstract class XDataFrameAlgebra<R,C> implements DataFrameAlgebra<R,C> {
             Asserts.notNull(scalar.doubleValue() != 0d, "The scalar value cannot be zero");
             final DataFrame<R,C> result = frame.copy();
             result.cols().forEach(column -> {
-                final ArrayType type = ArrayType.of(column.typeInfo());
+                final ArrayType type = ArrayType.of(column.dataClass());
                 if (type.isInteger()) {
                     column.applyInts(v -> {
                         final int left = v.getInt();
@@ -375,7 +373,7 @@ public abstract class XDataFrameAlgebra<R,C> implements DataFrameAlgebra<R,C> {
             Asserts.check(frame.colCount() == other.colCount(), "The column counts of the two frames must match");
             final DataFrame<R,C> result = frame.copy();
             result.cols().forEach(column -> {
-                final ArrayType type = ArrayType.of(column.typeInfo());
+                final ArrayType type = ArrayType.of(column.dataClass());
                 final DataFrameColumn otherCol = other.colAt(column.ordinal());
                 if (type.isInteger()) {
                     column.applyInts(v -> {
@@ -443,29 +441,29 @@ public abstract class XDataFrameAlgebra<R,C> implements DataFrameAlgebra<R,C> {
         protected void compute() {
             try {
                 if (length > threshold) {
-                    final int halfLength = length / 2;
-                    final int offset1 = offset;
-                    final int offset2 = offset + halfLength;
+                    var halfLength = length / 2;
+                    var offset1 = offset;
+                    var offset2 = offset + halfLength;
                     invokeAll(
                         new DotProduct(left, right, result, offset1, halfLength, threshold),
                         new DotProduct(left, right, result, offset2, length - halfLength, threshold)
                     );
                 } else {
-                    final int rowCount = result.rowCount();
-                    final int innerDim = left.colCount();
-                    final DataFrameCursor<?,?> cursor = result.cursor();
-                    final DataFrameRow<?,?> leftRow = left.rowAt(0);
-                    final DataFrameColumn<?,?> rightColumn = right.colAt(0);
+                    var rowCount = result.rowCount();
+                    var innerDim = left.colCount();
+                    var cursor = result.cursor();
+                    var leftRow = left.rows().cursor();
+                    var rightColumn = right.cols().cursor();
                     for (int i=0; i<length; ++i) {
-                        final int index = offset + i;
-                        final int rowOrdinal = index % rowCount;
-                        final int colOrdinal = index / rowCount;
-                        leftRow.moveTo(rowOrdinal);
-                        rightColumn.moveTo(colOrdinal);
+                        var index = offset + i;
+                        var rowOrdinal = index % rowCount;
+                        var colOrdinal = index / rowCount;
+                        leftRow.atOrdinal(rowOrdinal);
+                        rightColumn.atOrdinal(colOrdinal);
                         double value = 0d;
                         for (int k=0; k<innerDim; ++k) {
-                            final double v1 = leftRow.getDoubleAt(k);
-                            final double v2 = rightColumn.getDoubleAt(k);
+                            var v1 = leftRow.getDoubleAt(k);
+                            var v2 = rightColumn.getDoubleAt(k);
                             value += v1 * v2;
                         }
                         cursor.at(rowOrdinal, colOrdinal).setDouble(value);

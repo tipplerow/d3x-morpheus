@@ -638,28 +638,28 @@ public class TestMatrix {
             FILE.close();
             R = Matrix.read(new BufferedReader(new FileReader("JamaTestMatrix.out")));
             if (A.minus(R).norm1() < .001 ) {
-               try_success("print()/read()...","");
+               try_success("print()/csv()...","");
             } else {
-               errorCount = try_failure(errorCount,"print()/read()...","Matrix read from file does not match Matrix printed to file");
+               errorCount = try_failure(errorCount,"print()/csv()...","Matrix csv from file does not match Matrix printed to file");
             }
          } catch ( java.io.IOException ioe ) {
-           warningCount = try_warning(warningCount,"print()/read()...","unexpected I/O error, unable to run print/read test;  check write permission in current directory and retry");
+           warningCount = try_warning(warningCount,"print()/csv()...","unexpected I/O error, unable to run print/csv test;  check write permission in current directory and retry");
          } catch(Exception e) {
             try {
                e.printStackTrace(System.out);
-               warningCount = try_warning(warningCount,"print()/read()...","Formatting error... will try JDK1.1 reformulation...");
+               warningCount = try_warning(warningCount,"print()/csv()...","Formatting error... will try JDK1.1 reformulation...");
                DecimalFormat fmt = new DecimalFormat("0.0000");
                PrintWriter FILE = new PrintWriter(new FileOutputStream("JamaTestMatrix.out"));
                A.print(FILE,fmt,10);
                FILE.close();
                R = Matrix.read(new BufferedReader(new FileReader("JamaTestMatrix.out")));
                if (A.minus(R).norm1() < .001 ) {
-                  try_success("print()/read()...","");
+                  try_success("print()/csv()...","");
                } else {
-                  errorCount = try_failure(errorCount,"print()/read() (2nd attempt) ...","Matrix read from file does not match Matrix printed to file");
+                  errorCount = try_failure(errorCount,"print()/csv() (2nd attempt) ...","Matrix csv from file does not match Matrix printed to file");
                }
             } catch ( java.io.IOException ioe ) {
-              warningCount = try_warning(warningCount,"print()/read()...","unexpected I/O error, unable to run print/read test;  check write permission in current directory and retry");
+              warningCount = try_warning(warningCount,"print()/csv()...","unexpected I/O error, unable to run print/csv test;  check write permission in current directory and retry");
          }
       }
 

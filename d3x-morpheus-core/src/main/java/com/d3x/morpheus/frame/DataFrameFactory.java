@@ -22,6 +22,8 @@ import java.util.Iterator;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import com.d3x.morpheus.util.Resource;
+
 /**
  * The factory class used to manufacture new <code>DataFrame</code> instances in various ways.
  *
@@ -93,10 +95,11 @@ public abstract class DataFrameFactory {
     }
 
     /**
-     * Returns a reference to the DataFrame read interface
+     * Returns a reference to the DataFrame read interface for resource
+     * @param resource  the resource to read from
      * @return  the DataFrame read interface
      */
-    public abstract DataFrameRead read();
+    public abstract DataFrameRead read(Resource resource);
 
     /**
      * Returns an empty DataFrame with zero length rows and columns

@@ -21,7 +21,7 @@ package com.d3x.morpheus.frame;
  * The <code>DataFrameVector</code> interface is parameterized in 5 types, which makes a it
  * rather cumbersome to pass around directly. The <code>DataFrameRow</code> and <code>DataFrameColumn</code>
  * interfaces exist to address this, and also provide a strongly typed interface to distinguish
- * row vectors from column vectors should that be desirable.
+ * row vectors from column vectors.
  *
  * @param <R>   the row key type
  * @param <C>   the column key type
@@ -31,5 +31,41 @@ package com.d3x.morpheus.frame;
  * @author  Xavier Witdouck
  */
 public interface DataFrameColumn<R,C> extends DataFrameVector<C,R,R,C,DataFrameColumn<R,C>> {
+
+    /**
+     * An interface to a movable DataFrameRow
+     * @param <R>   the row key type
+     * @param <C>   the column key type
+     */
+    interface Cursor<R,C> extends DataFrameColumn<R,C> {
+
+        /**
+         * Moves the column cursor to the column key specified if it exists
+         * @param colKey    the column key
+         * @return          true if key exists, false otherwise
+         */
+        boolean tryKey(C colKey);
+
+        /**
+         * Moves the column cursor to the column ordinal if it is not out of bounds
+         * @param colOrdinal    the column ordinal
+         * @return              true if ordinal is in bounds, false otherwise
+         */
+        boolean tryOrdinal(int colOrdinal);
+
+        /**
+         * Moves the column cursor to the column key specified
+         * @param colKey    the column key
+         * @return          this column cursor
+         */
+        Cursor<R,C> atKey(C colKey);
+
+        /**
+         * Moves the column cursor to the column ordinal
+         * @param colOrdinal    the column ordinal
+         * @return              this column cursor
+         */
+        Cursor<R,C> atOrdinal(int colOrdinal);
+    }
 
 }

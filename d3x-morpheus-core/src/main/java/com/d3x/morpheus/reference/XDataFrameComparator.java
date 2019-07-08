@@ -307,8 +307,8 @@ abstract class XDataFrameComparator implements IntComparator {
 
         @Override()
         public final int compare(int ordinal1, int ordinal2) {
-            this.row1.moveTo(ordinal1);
-            this.row2.moveTo(ordinal2);
+            this.row1.atOrdinal(ordinal1);
+            this.row2.atOrdinal(ordinal2);
             return comparator.compare(row1, row2);
         }
 
@@ -360,8 +360,8 @@ abstract class XDataFrameComparator implements IntComparator {
 
         @Override()
         public final int compare(int ordinal1, int ordinal2) {
-            this.column1.moveTo(ordinal1);
-            this.column2.moveTo(ordinal2);
+            this.column1.atOrdinal(ordinal1);
+            this.column2.atOrdinal(ordinal2);
             return comparator.compare(column1, column2);
         }
 

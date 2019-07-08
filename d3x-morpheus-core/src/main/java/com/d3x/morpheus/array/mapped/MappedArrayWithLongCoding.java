@@ -184,7 +184,7 @@ class MappedArrayWithLongCoding<T> extends ArrayBase<T> {
     @Override()
     public final Array<T> copy(int start, int end) {
         try {
-            final int newLength = end - start;
+            var newLength = end - start;
             final File newFile = MappedArrayConstructor.randomFile(true);
             final MappedArrayWithLongCoding<T> copy = new MappedArrayWithLongCoding<>(newLength, defaultValue, coding, newFile);
             for (int i=0; i<newLength; ++i) {
@@ -222,7 +222,7 @@ class MappedArrayWithLongCoding<T> extends ArrayBase<T> {
     public final Array<T> filter(Predicate<ArrayValue<T>> predicate) {
         int count = 0;
         final ArrayCursor<T> cursor = cursor();
-        final int length = this.length();
+        var length = this.length();
         final Array<T> matches = Array.of(type(), length, loadFactor());
         for (int i=0; i<length; ++i) {
             cursor.moveTo(i);
@@ -239,8 +239,8 @@ class MappedArrayWithLongCoding<T> extends ArrayBase<T> {
             throw new ArrayException("The from index array must have the same length as the to index array");
         } else {
             for (int i=0; i<fromIndexes.length; ++i) {
-                final int toIndex = toIndexes[i];
-                final int fromIndex = fromIndexes[i];
+                var toIndex = toIndexes[i];
+                var fromIndex = fromIndexes[i];
                 final T update = from.getValue(fromIndex);
                 this.setValue(toIndex, update);
             }
@@ -344,7 +344,7 @@ class MappedArrayWithLongCoding<T> extends ArrayBase<T> {
 
     @Override
     public Array<T> distinct(int limit) {
-        final int capacity = limit < Integer.MAX_VALUE ? limit : 100;
+        var capacity = limit < Integer.MAX_VALUE ? limit : 100;
         final TLongSet set = new TLongHashSet(capacity);
         final ArrayBuilder<T> builder = ArrayBuilder.of(capacity, type());
         for (int i=0; i<length(); ++i) {

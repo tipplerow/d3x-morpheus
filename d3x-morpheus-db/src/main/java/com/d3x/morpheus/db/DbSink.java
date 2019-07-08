@@ -215,7 +215,7 @@ public class DbSink {
                         throw new DataFrameException("No match for sql column name: " + sqlColName);
                     }
                     var dataType = frame.cols().type(colKey);
-                    var cursor = frame.cursor().toCol(colKey);
+                    var cursor = frame.cursor().col(colKey);
                     var mapper = options.getColumnMappings().getMapper(dataType);
                     columnList.add(new ValueAdapter(sqlColName, sqlType, cursor, mapper));
                 }
@@ -427,7 +427,7 @@ public class DbSink {
         @Override()
         void apply(PreparedStatement stmt, int stmtIndex, DataFrameRow<R,C> row) {
             try {
-                this.cursor.toRowAt(row.ordinal());
+                this.cursor.rowAt(row.ordinal());
                 if (cursor.isNull()) {
                     stmt.setNull(stmtIndex, colType.getTypeCode());
                 } else {

@@ -166,7 +166,7 @@ public class QuandlSource {
             for (int i=0; i<maxPages; ++i) {
                 final URL url = createUrl("/api/v3/databases.csv", "page=" + i + "&per_page=" + pageSize);
                 System.out.println("Calling: " + url);
-                var frame = DataFrame.read().<Integer>csv(url).read(options -> {
+                var frame = DataFrame.read(url).csv(Integer.class, options -> {
                     options.setRowKeyColumnName("id");
                     options.setColumnType("datasets_count", Long.class);
                     options.setColumnType("downloads", Long.class);
@@ -315,7 +315,7 @@ public class QuandlSource {
             var queryString = options.toQueryString();
             final URL url = createUrl("/api/v3/datasets/" + database + "/" + dataset + ".csv", queryString);
             IO.println(url);
-            return DataFrame.read().<LocalDate>csv(url).read(csvOptions -> {
+            return DataFrame.read(url).csv(LocalDate.class, csvOptions -> {
                 csvOptions.setColIndexPredicate(index -> index != 0);
                 csvOptions.setRowKeyColumnIndex(0);
             });
@@ -342,14 +342,14 @@ public class QuandlSource {
             final String urlPath = "/api/v3/datatables/" + database + "/" + dataset + ".csv";
             final URL url = createUrl(urlPath, queryString);
             response = doGet(url.toString(), null);
-            final DataFrame<Integer,String> frame = DataFrame.read().csv(response.getEntity().getContent()).read();
+            final DataFrame<Integer,String> frame = DataFrame.read(response.getEntity().getContent()).csv();
             Header cursorId = response.getFirstHeader("Cursor_ID");
             while (cursorId != null) {
                 final String nextQuery = queryString + "&qopts.cursor_id=" + cursorId.getValue();
                 final URL nextUrl = createUrl(urlPath, nextQuery);
                 IO.close(response);
                 response = doGet(nextUrl.toString(), null);
-                final DataFrame<Integer,String> nextPage = DataFrame.read().csv(response.getEntity().getContent()).read();
+                final DataFrame<Integer,String> nextPage = DataFrame.read(response.getEntity().getContent()).csv();
                 final DataFrame<Integer,String> nextFrame = nextPage.rows().mapKeys(row -> frame.rowCount() + row.ordinal());
                 cursorId = response.getFirstHeader("Cursor_ID");
                 frame.rows().addAll(nextFrame);

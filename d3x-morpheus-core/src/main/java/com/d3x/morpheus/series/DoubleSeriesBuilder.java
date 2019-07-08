@@ -330,6 +330,11 @@ public interface DoubleSeriesBuilder<K> extends DataSeriesBuilder<K,Double> {
         }
 
         @Override
+        public boolean contains(K key) {
+            return values.containsKey(key);
+        }
+
+        @Override
         public final Stream<K> keys() {
             return keys.stream().values();
         }
@@ -411,6 +416,11 @@ public interface DoubleSeriesBuilder<K> extends DataSeriesBuilder<K,Double> {
         }
 
         @Override
+        public boolean contains(K key) {
+            return values.containsKey(coding.getCode(key));
+        }
+
+        @Override
         public final Stream<K> keys() {
             return keys.stream().values();
         }
@@ -489,6 +499,11 @@ public interface DoubleSeriesBuilder<K> extends DataSeriesBuilder<K,Double> {
         @Override
         public final int size() {
             return values.size();
+        }
+
+        @Override
+        public boolean contains(K key) {
+            return values.containsKey(coding.getCode(key));
         }
 
         @Override

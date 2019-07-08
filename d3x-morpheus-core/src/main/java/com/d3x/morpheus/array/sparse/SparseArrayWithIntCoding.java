@@ -175,8 +175,8 @@ class SparseArrayWithIntCoding<T> extends ArrayBase<T> {
 
     @Override
     public final Array<T> swap(int i, int j) {
-        final int v1 = getInt(i);
-        final int v2 = getInt(j);
+        var v1 = getInt(i);
+        var v2 = getInt(j);
         this.codes.put(i, v2);
         this.codes.put(j, v1);
         return this;
@@ -186,7 +186,7 @@ class SparseArrayWithIntCoding<T> extends ArrayBase<T> {
     @Override
     public final Array<T> filter(Predicate<ArrayValue<T>> predicate) {
         int count = 0;
-        final int length = this.length();
+        var length = this.length();
         final ArrayCursor<T> cursor = cursor();
         final Array<T> matches = Array.of(type(), length, loadFactor());
         for (int i=0; i<length; ++i) {
@@ -204,8 +204,8 @@ class SparseArrayWithIntCoding<T> extends ArrayBase<T> {
             throw new ArrayException("The from index array must have the same length as the to index array");
         } else {
             for (int i=0; i<fromIndexes.length; ++i) {
-                final int toIndex = toIndexes[i];
-                final int fromIndex = fromIndexes[i];
+                var toIndex = toIndexes[i];
+                var fromIndex = fromIndexes[i];
                 final T update = from.getValue(fromIndex);
                 this.setValue(toIndex, update);
             }
@@ -240,7 +240,7 @@ class SparseArrayWithIntCoding<T> extends ArrayBase<T> {
 
     @Override
     public Array<T> fill(T value, int start, int end) {
-        final int fillCode = coding.getCode(value);
+        var fillCode = coding.getCode(value);
         if (fillCode == defaultCode) {
             this.codes.clear();
         } else {
@@ -263,7 +263,7 @@ class SparseArrayWithIntCoding<T> extends ArrayBase<T> {
         if (value == null) {
             return isNull(index);
         } else {
-            final int code = coding.getCode(value);
+            var code = coding.getCode(value);
             return code == codes.get(index);
         }
     }
@@ -279,13 +279,13 @@ class SparseArrayWithIntCoding<T> extends ArrayBase<T> {
     @Override
     public final T getValue(int index) {
         this.checkBounds(index, length);
-        final int code = codes.get(index);
+        var code = codes.get(index);
         return coding.getValue(code);
     }
 
     @Override
     public int setInt(int index, int value) {
-        final int oldValue = getInt(index);
+        var oldValue = getInt(index);
         if (value == defaultCode) {
             this.codes.remove(index);
             return oldValue;
@@ -298,7 +298,7 @@ class SparseArrayWithIntCoding<T> extends ArrayBase<T> {
     @Override
     public final T setValue(int index, T value) {
         final T oldValue = getValue(index);
-        final int code = coding.getCode(value);
+        var code = coding.getCode(value);
         if (code == defaultCode) {
             this.codes.remove(index);
             return oldValue;
@@ -311,11 +311,11 @@ class SparseArrayWithIntCoding<T> extends ArrayBase<T> {
 
     @Override
     public Array<T> distinct(int limit) {
-        final int capacity = limit < Integer.MAX_VALUE ? limit : 100;
+        var capacity = limit < Integer.MAX_VALUE ? limit : 100;
         final TIntSet set = new TIntHashSet(capacity);
         final ArrayBuilder<T> builder = ArrayBuilder.of(capacity, type());
         for (int i=0; i<length(); ++i) {
-            final int code = getInt(i);
+            var code = getInt(i);
             if (set.add(code)) {
                 final T value = getValue(i);
                 builder.add(value);
@@ -331,7 +331,7 @@ class SparseArrayWithIntCoding<T> extends ArrayBase<T> {
     @Override
     public final void read(ObjectInputStream is, int count) throws IOException {
         for (int i=0; i<count; ++i) {
-            final int value = is.readInt();
+            var value = is.readInt();
             this.codes.put(i, value);
         }
     }
@@ -340,7 +340,7 @@ class SparseArrayWithIntCoding<T> extends ArrayBase<T> {
     @Override
     public final void write(ObjectOutputStream os, int[] indexes) throws IOException {
         for (int index : indexes) {
-            final int value = getInt(index);
+            var value = getInt(index);
             os.writeInt(value);
         }
     }

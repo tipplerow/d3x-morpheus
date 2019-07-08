@@ -246,7 +246,7 @@ public abstract class HttpClient {
                     return stream;
                 }
             } catch (Exception ex) {
-                throw new RuntimeException("Failed to read from input stream", ex);
+                throw new RuntimeException("Failed to csv from input stream", ex);
             }
         }
 

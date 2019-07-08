@@ -141,7 +141,7 @@ class IndexWithLongCoding<T> extends IndexBase<T> implements WithLongCoding<T> {
         if (isFilter()) {
             throw new IndexException("Cannot add keys to a filter on another index");
         } else {
-            final int[] count = new int[1];
+            var count = new int[1];
             keys.forEach(key -> {
                 final long code = coding.getCode(key);
                 if (!indexMap.containsKey(code)) {

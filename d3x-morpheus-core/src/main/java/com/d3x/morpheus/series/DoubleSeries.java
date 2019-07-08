@@ -243,8 +243,8 @@ public interface DoubleSeries<K> extends DataSeries<K,Double> {
      * @param <K>   the key type for series
      * @return      the CSV read adapter
      */
-    static <K> DataSeriesCsv<K,Double,DoubleSeries<K>> csv(File file) {
-        return new DataSeriesCsv<>(Resource.of(file));
+    static <K> DataSeriesRead<K,Double,DoubleSeries<K>> read(File file) {
+        return new DataSeriesRead<>(Resource.of(file));
     }
 
     /**
@@ -253,8 +253,8 @@ public interface DoubleSeries<K> extends DataSeries<K,Double> {
      * @param <K>   the key type for series
      * @return      the CSV read adapter
      */
-    static <K> DataSeriesCsv<K,Double,DoubleSeries<K>> csv(URL url) {
-        return new DataSeriesCsv<>(Resource.of(url));
+    static <K> DataSeriesRead<K,Double,DoubleSeries<K>> read(URL url) {
+        return new DataSeriesRead<>(Resource.of(url));
     }
 
     /**
@@ -263,8 +263,8 @@ public interface DoubleSeries<K> extends DataSeries<K,Double> {
      * @param <K>   the key type for series
      * @return      the CSV read adapter
      */
-    static <K> DataSeriesCsv<K,Double,DoubleSeries<K>> csv(String path) {
-        return new DataSeriesCsv<>(Resource.of(path));
+    static <K> DataSeriesRead<K,Double,DoubleSeries<K>> read(String path) {
+        return new DataSeriesRead<>(Resource.of(path));
     }
 
     /**
@@ -273,8 +273,8 @@ public interface DoubleSeries<K> extends DataSeries<K,Double> {
      * @param <K>   the key type for series
      * @return      the CSV read adapter
      */
-    static <K> DataSeriesCsv<K,Double,DoubleSeries<K>> csv(InputStream is) {
-        return new DataSeriesCsv<>(Resource.of(is));
+    static <K> DataSeriesRead<K,Double,DoubleSeries<K>> read(InputStream is) {
+        return new DataSeriesRead<>(Resource.of(is));
     }
 
     /**
@@ -320,6 +320,10 @@ public interface DoubleSeries<K> extends DataSeries<K,Double> {
             @Override
             public Stream<K> keys() {
                 return Stream.empty();
+            }
+            @Override
+            public boolean contains(K key) {
+                return false;
             }
             @Override
             public double getDouble(K key) {

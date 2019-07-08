@@ -62,8 +62,8 @@ public class MeanAbsDev implements Statistic1 {
         } else {
             double result = 0d;
             for (int i=0; i<n; ++i) {
-                final double value = sample[i];
-                final double dev = Math.abs(value - m1);
+                var value = sample[i];
+                var dev = Math.abs(value - m1);
                 result += (dev - result) / (i+1);
             }
             return result;
@@ -134,7 +134,7 @@ public class MeanAbsDev implements Statistic1 {
 
         final MeanAbsDev stat = new MeanAbsDev(values.length);
         for (double value : values) stat.add(value);
-        final double result = stat.getValue();
+        var result = stat.getValue();
         System.out.println("V1=" + result + ", V2=27.22320613");
     }
 }

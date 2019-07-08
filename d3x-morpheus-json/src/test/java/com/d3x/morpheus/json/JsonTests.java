@@ -69,7 +69,7 @@ public class JsonTests {
      */
     @SuppressWarnings("unchecked")
     private <T> DataFrame<T,String> load(Class<T> rowType, String resource) {
-        return DataFrame.read().<T>csv(resource).read(options -> {
+        return DataFrame.read(resource).csv(rowType, options -> {
             options.setRowKeyColumnIndex(0);
             options.setParser("DataFrame", rowType, value -> {
                 if (rowType == String.class) {

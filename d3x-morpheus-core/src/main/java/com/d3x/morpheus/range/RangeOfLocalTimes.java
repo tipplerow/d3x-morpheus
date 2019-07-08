@@ -76,7 +76,7 @@ class RangeOfLocalTimes extends RangeBase<LocalTime> {
 
     @Override
     public List<Range<LocalTime>> split(int splitThreshold) {
-        final int[] segmentSteps = getSegmentSteps((int)estimateSize());
+        var segmentSteps = getSegmentSteps((int)estimateSize());
         if (segmentSteps[0] < splitThreshold) {
             return Collections.singletonList(this);
         } else {

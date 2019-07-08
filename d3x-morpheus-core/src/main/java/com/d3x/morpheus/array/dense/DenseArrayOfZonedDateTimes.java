@@ -176,7 +176,7 @@ class DenseArrayOfZonedDateTimes extends ArrayBase<ZonedDateTime> {
 
     @Override()
     public final Array<ZonedDateTime> copy(int start, int end) {
-        final int length = end - start;
+        var length = end - start;
         final DenseArrayOfZonedDateTimes clone = new DenseArrayOfZonedDateTimes(length, defaultValue);
         System.arraycopy(values, start, clone.values, 0, length);
         System.arraycopy(zoneIds, start, clone.zoneIds, 0, length);
@@ -392,7 +392,7 @@ class DenseArrayOfZonedDateTimes extends ArrayBase<ZonedDateTime> {
 
     /** Custom serialization */
     private void writeObject(ObjectOutputStream os) throws IOException {
-        final int length = values.length;
+        var length = values.length;
         os.writeInt(length);
         os.writeLong(defaultValueAsLong);
         os.writeObject(defaultValue);
@@ -406,7 +406,7 @@ class DenseArrayOfZonedDateTimes extends ArrayBase<ZonedDateTime> {
     @SuppressWarnings("unchecked")
     /** Custom serialization */
     private void readObject(ObjectInputStream is) throws IOException, ClassNotFoundException {
-        final int length = is.readInt();
+        var length = is.readInt();
         this.values = new long[length];
         this.zoneIds = new short[length];
         this.defaultValueAsLong = is.readLong();

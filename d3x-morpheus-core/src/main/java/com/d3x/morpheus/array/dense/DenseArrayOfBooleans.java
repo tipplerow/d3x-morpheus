@@ -135,7 +135,7 @@ class DenseArrayOfBooleans extends ArrayBase<Boolean> {
 
     @Override()
     public final Array<Boolean> copy(int start, int end) {
-        final int length = end - start;
+        var length = end - start;
         final DenseArrayOfBooleans clone = new DenseArrayOfBooleans(length, defaultValue);
         System.arraycopy(values, start, clone.values, 0, length);
         return clone;
@@ -332,7 +332,7 @@ class DenseArrayOfBooleans extends ArrayBase<Boolean> {
     @SuppressWarnings("unchecked")
     /** Custom serialization */
     private void readObject(ObjectInputStream is) throws IOException, ClassNotFoundException {
-        final int length = is.readInt();
+        var length = is.readInt();
         this.values = new boolean[length];
         for (int i=0; i<length; ++i) {
             values[i] = is.readBoolean();

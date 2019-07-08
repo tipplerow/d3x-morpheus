@@ -153,7 +153,7 @@ class DenseArrayWithLongCoding<T> extends ArrayBase<T> implements WithLongCoding
 
     @Override()
     public final Array<T> copy(int start, int end) {
-        final int length = end - start;
+        var length = end - start;
         final DenseArrayWithLongCoding<T> clone = new DenseArrayWithLongCoding<>(length, defaultValue, coding);
         System.arraycopy(codes, start, clone.codes, 0, length);
         return clone;
@@ -202,8 +202,8 @@ class DenseArrayWithLongCoding<T> extends ArrayBase<T> implements WithLongCoding
             throw new ArrayException("The from index array must have the same length as the to index array");
         } else {
             for (int i=0; i<fromIndexes.length; ++i) {
-                final int toIndex = toIndexes[i];
-                final int fromIndex = fromIndexes[i];
+                var toIndex = toIndexes[i];
+                var fromIndex = fromIndexes[i];
                 final T update = from.getValue(fromIndex);
                 this.setValue(toIndex, update);
             }
@@ -299,7 +299,7 @@ class DenseArrayWithLongCoding<T> extends ArrayBase<T> implements WithLongCoding
 
     @Override
     public Array<T> distinct(int limit) {
-        final int capacity = limit < Integer.MAX_VALUE ? limit : 100;
+        var capacity = limit < Integer.MAX_VALUE ? limit : 100;
         final TLongSet set = new TLongHashSet(capacity);
         final ArrayBuilder<T> builder = ArrayBuilder.of(capacity, type());
         for (int i=0; i<length(); ++i) {
@@ -345,7 +345,7 @@ class DenseArrayWithLongCoding<T> extends ArrayBase<T> implements WithLongCoding
     /** Custom serialization */
     private void readObject(ObjectInputStream is) throws IOException, ClassNotFoundException {
         this.coding = (LongCoding<T>)is.readObject();
-        final int length = is.readInt();
+        var length = is.readInt();
         this.codes = new long[length];
         for (int i=0; i<length; ++i) {
             codes[i] = is.readLong();

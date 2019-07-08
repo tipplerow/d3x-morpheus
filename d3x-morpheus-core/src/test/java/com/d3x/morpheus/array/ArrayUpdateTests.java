@@ -57,11 +57,11 @@ public class ArrayUpdateTests {
         final Random random = new Random();
         final Array<T> array1 = ArraysBasicTests.createRandomArray(type, 5000, style).shuffle(2);
         final Array<T> array2 = ArraysBasicTests.createRandomArray(type, 5000, style).shuffle(2);
-        final int[] ints1 = IntStream.range(0, 20).map(i -> random.nextInt(5000)).distinct().toArray();
-        final int[] ints2 = IntStream.range(0, 20).map(i -> random.nextInt(5000)).distinct().toArray();
+        var ints1 = IntStream.range(0, 20).map(i -> random.nextInt(5000)).distinct().toArray();
+        var ints2 = IntStream.range(0, 20).map(i -> random.nextInt(5000)).distinct().toArray();
         final int count = Math.min(ints1.length, ints2.length);
-        final int[] fromIndexes = new int[count];
-        final int[] toIndexes = new int[count];
+        var fromIndexes = new int[count];
+        var toIndexes = new int[count];
         System.arraycopy(ints1, 0, fromIndexes, 0, count);
         System.arraycopy(ints2, 0, toIndexes, 0, count);
         Assert.assertFalse(array1.equals(array2), "The two arrays are not equal");

@@ -126,7 +126,7 @@ class IndexOfInts extends IndexBase<Integer> {
         if (isFilter()) {
             throw new IndexException("Cannot add keys to an filter on another index");
         } else {
-            final int[] count = new int[1];
+            var count = new int[1];
             keys.forEach(key -> {
                 final int keyAsInt = key;
                 if (!indexMap.containsKey(keyAsInt)) {
@@ -191,7 +191,7 @@ class IndexOfInts extends IndexBase<Integer> {
     public final void forEachEntry(IndexConsumer<Integer> consumer) {
         final int size = size();
         for (int i = 0; i < size; ++i) {
-            final Integer key = keyArray().getValue(i);
+            var key = keyArray().getValue(i);
             final int index = indexMap.get(key);
             consumer.accept(key, index);
         }

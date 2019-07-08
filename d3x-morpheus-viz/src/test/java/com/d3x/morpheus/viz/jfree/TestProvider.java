@@ -29,7 +29,7 @@ public class TestProvider {
      * @return              the DataFrame result
      */
     public static DataFrame<LocalDate,String> getQuotes(String ticker) {
-        return DataFrame.read().<LocalDate>csv("/" + ticker + ".csv").read(options -> {
+        return DataFrame.read("/" + ticker + ".csv").csv(LocalDate.class, options -> {
             options.setRowKeyColumnName("Date");
         });
     }

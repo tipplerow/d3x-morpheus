@@ -59,14 +59,14 @@ public class CountTask<T> extends RecursiveTask<Integer> {
     public Integer compute() {
         try {
             if (array.length() == 0) return 0;
-            final int length = to - from + 1;
+            var length = to - from + 1;
             if (length > splitThreshold) {
                 final int splitLength = (to - from) / 2;
                 final int midPoint = from + splitLength;
                 final ForkJoinTask<Integer> left = new CountTask(array, from, midPoint, splitThreshold, predicate).fork();
                 final CountTask right = new CountTask(array, midPoint + 1, to, splitThreshold, predicate);
-                final Integer x = right.compute();
-                final Integer y  = left.join();
+                var x = right.compute();
+                var y  = left.join();
                 return x + y;
             } else {
                 int count = 0;

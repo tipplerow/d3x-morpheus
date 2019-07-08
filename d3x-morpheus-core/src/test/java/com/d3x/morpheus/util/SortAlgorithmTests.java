@@ -42,7 +42,7 @@ public class SortAlgorithmTests {
 
     @Test(dataProvider = "args")
     public void testSortAscending(SortAlgorithm.Type type, boolean parallel) {
-        final int[] values = ThreadLocalRandom.current().ints(5000000).toArray();
+        var values = ThreadLocalRandom.current().ints(5000000).toArray();
         final IntComparator comp = (i1, i2) -> Integer.compare(values[i1], values[i2]);
         final Swapper swapper = (i1, i2) -> { int x = values[i1]; values[i1] = values[i2]; values[i2] = x; };
         SortAlgorithm.of(type, parallel).sort(0, values.length, comp, swapper);

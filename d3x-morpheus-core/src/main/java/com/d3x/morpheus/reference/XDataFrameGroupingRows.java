@@ -83,7 +83,7 @@ class XDataFrameGroupingRows<R,C> implements DataFrameGrouping.Rows<R,C> {
             final int ordinal = source.colKeys().getOrdinal(colKey);
             return XDataFrameGroupingRows.of(source, parallel, row -> Tuple.of(row.<Object>getValueAt(ordinal)));
         } else {
-            final int[] ordinals = source.colKeys().ordinals(colKeys).toArray();
+            var ordinals = source.colKeys().ordinals(colKeys).toArray();
             return XDataFrameGroupingRows.of(source, parallel, row -> {
                 final Object[] values = new Object[colKeys.length()];
                 for (int i=0; i<ordinals.length; ++i) {
@@ -233,7 +233,7 @@ class XDataFrameGroupingRows<R,C> implements DataFrameGrouping.Rows<R,C> {
                 final Map<Tuple,ArrayBuilder<X>> groupKeyMap = new HashMap<>();
                 final XDataFrameRow<X,Y> row = new XDataFrameRow<>(source, false);
                 for (int i=from; i<=to; ++i) {
-                    row.moveTo(i);
+                    row.atOrdinal(i);
                     final X rowKey = row.key();
                     try {
                         final Tuple groupKey = function.apply(row);

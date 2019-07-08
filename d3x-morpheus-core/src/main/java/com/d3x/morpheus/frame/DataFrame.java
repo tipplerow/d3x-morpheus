@@ -33,6 +33,7 @@ import javax.imageio.ImageIO;
 import com.d3x.morpheus.index.Index;
 import com.d3x.morpheus.range.Range;
 import com.d3x.morpheus.stats.Stats;
+import com.d3x.morpheus.util.Resource;
 import com.d3x.morpheus.util.functions.ToBooleanFunction;
 
 /**
@@ -392,13 +393,46 @@ public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperation
         return DataFrameFactory.getInstance();
     }
 
+
     /**
-     * Returns a reference to the DataFrame read interfavce
+     * Returns a reference to a DataFrame reader for resource
+     * @param file  the file to read from
      * @return      the DataFrame read interface
      */
-    static DataFrameRead read() {
-        return DataFrameFactory.getInstance().read();
+    static DataFrameRead read(File file) {
+        return DataFrameFactory.getInstance().read(Resource.of(file));
     }
+
+
+    /**
+     * Returns a reference to a DataFrame reader for resource
+     * @param url   the url to read from
+     * @return      the DataFrame read interface
+     */
+    static DataFrameRead read(URL url) {
+        return DataFrameFactory.getInstance().read(Resource.of(url));
+    }
+
+
+    /**
+     * Returns a reference to a DataFrame reader for resource
+     * @param path  the file path or classpath resource to read from
+     * @return      the DataFrame read interface
+     */
+    static DataFrameRead read(String path) {
+        return DataFrameFactory.getInstance().read(Resource.of(path));
+    }
+
+
+    /**
+     * Returns a reference to a DataFrame reader for resource
+     * @param is    the input stream to read from
+     * @return      the DataFrame read interface
+     */
+    static DataFrameRead read(InputStream is) {
+        return DataFrameFactory.getInstance().read(Resource.of(is));
+    }
+
 
     /**
      * Returns a source of the type specified

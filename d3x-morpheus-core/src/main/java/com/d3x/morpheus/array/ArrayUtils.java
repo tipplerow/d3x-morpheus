@@ -157,7 +157,7 @@ public class ArrayUtils {
         final DistinctDoubles distinct = new DistinctDoubles(limit);
         final PrimitiveIterator.OfDouble iterator = values.iterator();
         while (iterator.hasNext()) {
-            final double value = iterator.next();
+            var value = iterator.next();
             final boolean hitLimit = distinct.add(value);
             if (hitLimit) {
                 break;

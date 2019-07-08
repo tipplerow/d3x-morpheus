@@ -38,28 +38,28 @@ public interface DataFrameCursor<R,C> extends DataFrameValue<R,C> {
      * @param key   the row key
      * @return      this cursor
      */
-    DataFrameCursor<R,C> toRow(R key);
+    DataFrameCursor<R,C> row(R key);
 
     /**
      * Moves this cursor to the column key specified, leaving row location unchanged
      * @param colKey    the column key
      * @return          this cursor
      */
-    DataFrameCursor<R,C> toCol(C colKey);
+    DataFrameCursor<R,C> col(C colKey);
 
     /**
      * Moves this cursor to the row ordinal specified, leaving column location unchanged
      * @param ordinal   the row ordinal
      * @return          this cursor
      */
-    DataFrameCursor<R,C> toRowAt(int ordinal);
+    DataFrameCursor<R,C> rowAt(int ordinal);
 
     /**
      * Moves this cursor to the column ordinal specified, leaving row location unchanged
      * @param colOrdinal    the column ordinal
      * @return              this cursor
      */
-    DataFrameCursor<R,C> toColAt(int colOrdinal);
+    DataFrameCursor<R,C> colAt(int colOrdinal);
 
     /**
      * Moves this cursor to the row and column key specified
@@ -67,7 +67,7 @@ public interface DataFrameCursor<R,C> extends DataFrameValue<R,C> {
      * @param colKey    the column key
      * @return          this cursor
      */
-    DataFrameCursor<R,C> atKeys(R rowKey, C colKey);
+    DataFrameCursor<R,C> locate(R rowKey, C colKey);
 
     /**
      * Moves this cursor to the row and column ordinals specified
@@ -76,5 +76,13 @@ public interface DataFrameCursor<R,C> extends DataFrameValue<R,C> {
      * @return              this cursor
      */
     DataFrameCursor<R,C> at(int rowOrdinal, int colOrdinal);
+
+    /**
+     * Moves cursor to row and column key if they both exist, otherwise retains existing position
+     * @param rowKey    the row key
+     * @param colKey    the column key
+     * @return          true if cursor moved, false if one or both keys do not exist
+     */
+    boolean tryMove(R rowKey, C colKey);
 
 }

@@ -23,7 +23,7 @@ import java.util.function.Predicate;
 
 import com.d3x.morpheus.array.ArrayType;
 import com.d3x.morpheus.frame.DataFrame;
-import com.d3x.morpheus.frame.DataFrameCursor;
+import com.d3x.morpheus.frame.DataFrameException;
 import com.d3x.morpheus.frame.DataFrameRow;
 import com.d3x.morpheus.frame.DataFrameValue;
 import com.d3x.morpheus.index.Index;
@@ -39,7 +39,7 @@ import com.d3x.morpheus.util.Bounds;
  *
  * @author  Xavier Witdouck
  */
-class XDataFrameRow<R,C> extends XDataFrameVector<R,C,R,C,DataFrameRow<R,C>> implements DataFrameRow<R,C> {
+class XDataFrameRow<R,C> extends XDataFrameVector<R,C,R,C,DataFrameRow<R,C>> implements DataFrameRow.Cursor<R,C> {
 
     private static final long serialVersionUID = 1L;
 
@@ -69,19 +69,19 @@ class XDataFrameRow<R,C> extends XDataFrameVector<R,C,R,C,DataFrameRow<R,C>> imp
         this.frame = frame;
         this.data = frame.content();
         if (rowOrdinal >= 0) {
-            this.moveTo(rowOrdinal);
+            this.atOrdinal(rowOrdinal);
         }
     }
 
 
     @Override()
     public final DataFrameRow<R,C> forEachValue(Consumer<DataFrameValue<R,C>> consumer) {
-        final int colCount = frame.colCount();
+        var colCount = frame.colCount();
         if (colCount > 0) {
-            final int rowOrdinal = ordinal();
-            final DataFrameCursor<R,C> cursor = frame.cursor().at(rowOrdinal, 0);
+            var rowOrdinal = ordinal();
+            var cursor = frame.cursor().at(rowOrdinal, 0);
             for (int i=0; i<colCount; ++i) {
-                cursor.toColAt(i);
+                cursor.colAt(i);
                 consumer.accept(cursor);
             }
         }
@@ -91,13 +91,13 @@ class XDataFrameRow<R,C> extends XDataFrameVector<R,C,R,C,DataFrameRow<R,C>> imp
 
     @Override
     public final Iterator<DataFrameValue<R,C>> iterator() {
-        final int rowOrdinal = ordinal();
-        final DataFrameCursor<R,C> cursor = frame.cursor().toRowAt(rowOrdinal);
-        return new Iterator<DataFrameValue<R,C>>() {
+        var rowOrdinal = ordinal();
+        var cursor = frame.cursor().rowAt(rowOrdinal);
+        return new Iterator<>() {
             private int ordinal = 0;
             @Override
             public final DataFrameValue<R,C> next() {
-                return cursor.toColAt(ordinal++);
+                return cursor.colAt(ordinal++);
             }
             @Override
             public final boolean hasNext() {
@@ -109,18 +109,18 @@ class XDataFrameRow<R,C> extends XDataFrameVector<R,C,R,C,DataFrameRow<R,C>> imp
 
     @Override
     public final Iterator<DataFrameValue<R,C>> iterator(Predicate<DataFrameValue<R,C>> predicate) {
-        final int rowOrdinal = ordinal();
-        final DataFrameCursor<R,C> cursor = frame.cursor().toRowAt(rowOrdinal);
-        return new Iterator<DataFrameValue<R,C>>() {
+        var rowOrdinal = ordinal();
+        var cursor = frame.cursor().rowAt(rowOrdinal);
+        return new Iterator<>() {
             private int ordinal = 0;
             @Override
             public final DataFrameValue<R,C> next() {
-                return cursor.toColAt(ordinal++);
+                return cursor.colAt(ordinal++);
             }
             @Override
             public final boolean hasNext() {
                 while (ordinal < frame.colCount()) {
-                    cursor.toColAt(ordinal);
+                    cursor.colAt(ordinal);
                     if (predicate == null || predicate.test(cursor)) {
                         return true;
                     } else {
@@ -135,10 +135,10 @@ class XDataFrameRow<R,C> extends XDataFrameVector<R,C,R,C,DataFrameRow<R,C>> imp
 
     @Override()
     public final Optional<DataFrameValue<R,C>> first(Predicate<DataFrameValue<R,C>> predicate) {
-        final DataFrameCursor<R,C> value = frame().cursor();
-        value.toRowAt(ordinal());
+        var value = frame().cursor();
+        value.rowAt(ordinal());
         for (int i=0; i<size(); ++i) {
-            value.toColAt(i);
+            value.colAt(i);
             if (predicate.test(value)) {
                 return Optional.of(value);
             }
@@ -149,10 +149,10 @@ class XDataFrameRow<R,C> extends XDataFrameVector<R,C,R,C,DataFrameRow<R,C>> imp
 
     @Override()
     public final Optional<DataFrameValue<R,C>> last(Predicate<DataFrameValue<R,C>> predicate) {
-        final DataFrameCursor<R,C> value = frame().cursor();
-        value.toRowAt(ordinal());
+        var value = frame().cursor();
+        value.rowAt(ordinal());
         for (int i=size()-1; i>=0; --i) {
-            value.toColAt(i);
+            value.colAt(i);
             if (predicate.test(value)) {
                 return Optional.of(value);
             }
@@ -166,13 +166,13 @@ class XDataFrameRow<R,C> extends XDataFrameVector<R,C,R,C,DataFrameRow<R,C>> imp
             return Optional.empty();
         } else {
             return first(predicate).map(first -> {
-                final int colStart = first.colOrdinal();
-                final DataFrameCursor<R,C> result = frame.cursor().at(first.rowOrdinal(), first.colOrdinal());
-                final DataFrameCursor<R,C> value = frame.cursor().at(first.rowOrdinal(), first.colOrdinal());
+                var colStart = first.colOrdinal();
+                var result = frame.cursor().at(first.rowOrdinal(), first.colOrdinal());
+                var value = frame.cursor().at(first.rowOrdinal(), first.colOrdinal());
                 for (int i=colStart+1; i<frame.colCount(); ++i) {
-                    value.toColAt(i);
+                    value.colAt(i);
                     if (predicate.test(value) && value.compareTo(result) < 0) {
-                        result.toColAt(value.colOrdinal());
+                        result.colAt(value.colOrdinal());
                     }
                 }
                 return result;
@@ -187,13 +187,13 @@ class XDataFrameRow<R,C> extends XDataFrameVector<R,C,R,C,DataFrameRow<R,C>> imp
             return Optional.empty();
         } else {
             return first(predicate).map(first -> {
-                final int colStart = first.colOrdinal();
-                final DataFrameCursor<R,C> result = frame.cursor().at(first.rowOrdinal(), first.colOrdinal());
-                final DataFrameCursor<R,C> value = frame.cursor().at(first.rowOrdinal(), first.colOrdinal());
+                var colStart = first.colOrdinal();
+                var result = frame.cursor().at(first.rowOrdinal(), first.colOrdinal());
+                var value = frame.cursor().at(first.rowOrdinal(), first.colOrdinal());
                 for (int i=colStart+1; i<frame.colCount(); ++i) {
-                    value.toColAt(i);
+                    value.colAt(i);
                     if (predicate.test(value) && value.compareTo(result) > 0) {
-                        result.toColAt(value.colOrdinal());
+                        result.colAt(value.colOrdinal());
                     }
                 }
                 return result;
@@ -207,13 +207,13 @@ class XDataFrameRow<R,C> extends XDataFrameVector<R,C,R,C,DataFrameRow<R,C>> imp
         if (frame.rowCount() == 0 || frame.colCount() == 0) {
             return Optional.empty();
         } else {
-            final R rowKey = key();
-            final DataFrameCursor<R,C> result = frame.cursor().toRow(rowKey);
-            final DataFrameCursor<R,C> value = frame.cursor().toRow(rowKey);
+            var rowKey = key();
+            var result = frame.cursor().row(rowKey);
+            var value = frame.cursor().row(rowKey);
             for (int i=0; i<frame.colCount(); ++i) {
-                value.toColAt(i);
+                value.colAt(i);
                 if (comparator.compare(value, result) < 0) {
-                    result.toColAt(value.colOrdinal());
+                    result.colAt(value.colOrdinal());
                 }
             }
             return Optional.of(result);
@@ -226,13 +226,13 @@ class XDataFrameRow<R,C> extends XDataFrameVector<R,C,R,C,DataFrameRow<R,C>> imp
         if (frame.rowCount() == 0 || frame.colCount() == 0) {
             return Optional.empty();
         } else {
-            final R rowKey = key();
-            final DataFrameCursor<R,C> result = frame.cursor().toRow(rowKey);
-            final DataFrameCursor<R,C> value = frame.cursor().toRow(rowKey);
+            var rowKey = key();
+            var result = frame.cursor().row(rowKey);
+            var value = frame.cursor().row(rowKey);
             for (int i=0; i<frame.colCount(); ++i) {
-                value.toColAt(i);
+                value.colAt(i);
                 if (comparator.compare(value, result) > 0) {
-                    result.toColAt(value.colOrdinal());
+                    result.colAt(value.colOrdinal());
                 }
             }
             return Optional.of(result);
@@ -246,23 +246,23 @@ class XDataFrameRow<R,C> extends XDataFrameVector<R,C,R,C,DataFrameRow<R,C>> imp
             return Optional.empty();
         } else {
             return first(predicate).map(first -> {
-                final int colStart = first.colOrdinal();
-                final DataFrameCursor<R,C> cursor = frame.cursor().at(first.rowOrdinal(), first.colOrdinal());
-                final DataFrameCursor<R,C> minValue = frame.cursor().at(first.rowOrdinal(), first.colOrdinal());
-                final DataFrameCursor<R,C> maxValue = frame.cursor().at(first.rowOrdinal(), first.colOrdinal());
+                var colStart = first.colOrdinal();
+                var cursor = frame.cursor().at(first.rowOrdinal(), first.colOrdinal());
+                var minValue = frame.cursor().at(first.rowOrdinal(), first.colOrdinal());
+                var maxValue = frame.cursor().at(first.rowOrdinal(), first.colOrdinal());
                 for (int i=colStart+1; i<frame.colCount(); ++i) {
-                    cursor.toColAt(i);
+                    cursor.colAt(i);
                     if (predicate.test(cursor)) {
                         if (minValue.compareTo(cursor) < 0) {
-                            minValue.toColAt(cursor.colOrdinal());
+                            minValue.colAt(cursor.colOrdinal());
                         }
                         if (maxValue.compareTo(cursor) > 0) {
-                            maxValue.toColAt(cursor.colOrdinal());
+                            maxValue.colAt(cursor.colOrdinal());
                         }
                     }
                 }
-                final V lower = minValue.getValue();
-                final V upper = maxValue.getValue();
+                var lower = minValue.<V>getValue();
+                var upper = maxValue.<V>getValue();
                 return Bounds.of(lower, upper);
             });
         }
@@ -287,34 +287,64 @@ class XDataFrameRow<R,C> extends XDataFrameVector<R,C,R,C,DataFrameRow<R,C>> imp
 
     @Override()
     public final DataFrame<R,C> rank() {
-        final double[] values = toDoubleStream().toArray();
-        final double[] ranks = XDataFrameRank.rank(values);
-        final Index<C> colKeys = Index.of(frame.cols().keyArray());
+        var values = toDoubleStream().toArray();
+        var ranks = XDataFrameRank.rank(values);
+        var colKeys = Index.of(frame.cols().keyArray());
         return DataFrame.ofDoubles(key(), colKeys).applyDoubles(v -> ranks[v.rowOrdinal()]);
     }
 
 
-    @Override()
-    public final XDataFrameRow<R,C> moveTo(R key) {
-        this.rowOrdinal = data.rowKeys().getOrdinal(key);
-        this.rowIndex = data.rowKeys().getCoordinateAt(rowOrdinal);
-        this.rowKey = key;
-        return this;
+    @Override
+    public final boolean tryKey(R rowKey) {
+        if (!data.rowKeys().contains(rowKey)) {
+            return false;
+        } else {
+            this.atKey(rowKey);
+            return true;
+        }
+    }
+
+
+    @Override
+    public final boolean tryOrdinal(int rowOrdinal) {
+        if (rowOrdinal < 0 || rowOrdinal >= size()) {
+            return false;
+        } else {
+            this.atOrdinal(rowOrdinal);
+            return true;
+        }
     }
 
 
     @Override()
-    public final XDataFrameRow<R,C> moveTo(int ordinal) {
-        this.rowKey = data.rowKeys().getKey(ordinal);
-        this.rowIndex = data.rowKeys().getCoordinateAt(ordinal);
-        this.rowOrdinal = ordinal;
-        return this;
+    public final XDataFrameRow<R,C> atKey(R key) {
+        try {
+            this.rowOrdinal = data.rowKeys().getOrdinal(key);
+            this.rowIndex = data.rowKeys().getCoordinateAt(rowOrdinal);
+            this.rowKey = key;
+            return this;
+        } catch (Exception ex) {
+            throw new DataFrameException(ex.getMessage(), ex);
+        }
+    }
+
+
+    @Override()
+    public final XDataFrameRow<R,C> atOrdinal(int ordinal) {
+        try {
+            this.rowKey = data.rowKeys().getKey(ordinal);
+            this.rowIndex = data.rowKeys().getCoordinateAt(ordinal);
+            this.rowOrdinal = ordinal;
+            return this;
+        } catch (Exception ex) {
+            throw new DataFrameException(ex.getMessage(), ex);
+        }
     }
 
 
     @Override()
     public final boolean isNumeric() {
-        return ArrayType.of(typeInfo()).isNumeric();
+        return ArrayType.of(dataClass()).isNumeric();
     }
 
 
@@ -335,7 +365,7 @@ class XDataFrameRow<R,C> extends XDataFrameVector<R,C,R,C,DataFrameRow<R,C>> imp
     }
 
     @Override
-    public final Class<?> typeInfo() {
+    public final Class<?> dataClass() {
         return data.rowType(rowKey);
     }
 

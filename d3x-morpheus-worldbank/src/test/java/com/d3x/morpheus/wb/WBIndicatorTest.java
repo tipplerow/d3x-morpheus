@@ -55,7 +55,7 @@ public class WBIndicatorTest {
 
     @Test()
     public void testC02() {
-        var expected = DataFrame.read().<LocalDate>csv("/indicators/EN.ATM.CO2E.PC.csv").read(options -> {
+        var expected = DataFrame.read("/indicators/EN.ATM.CO2E.PC.csv").csv(LocalDate.class, options -> {
             options.setRowKeyColumnIndex(0);
         });
         final DataFrame<LocalDate,String> actual = source.read(options -> {
@@ -75,7 +75,7 @@ public class WBIndicatorTest {
 
     @Test(enabled = false)
     public void testAll() {
-        var frame = DataFrame.read().csv("/Users/witdxav/Dropbox/data/world-bank/WDI/WDIData.csv").read();
+        var frame = DataFrame.read("/Users/witdxav/Dropbox/data/world-bank/WDI/WDIData.csv").csv();
         frame.out().print();
 
         final Set<String> indicatorSet = new HashSet<>();

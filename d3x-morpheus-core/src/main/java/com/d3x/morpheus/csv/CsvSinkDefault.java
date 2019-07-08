@@ -61,7 +61,7 @@ public class CsvSinkDefault<R,C> implements CsvSink<R,C> {
             var rowKeyType = frame.rows().keyType();
             var cursor = frame.cursor();
             var rowKeyPrinter = Optional.ofNullable(options.getRowKeyPrinter()).orElse(formats.getPrinterOrFail(rowKeyType));
-            var colPrinters = frame.cols().stream().map(c -> formats.getPrinterOrFail(c.key(), c.typeInfo())).collect(Collectors.toList());
+            var colPrinters = frame.cols().stream().map(c -> formats.getPrinterOrFail(c.key(), c.dataClass())).collect(Collectors.toList());
             for (int i = 0; i < frame.rowCount(); ++i) {
                 var row = new StringBuilder();
                 if (options.isIncludeRowHeader()) {
@@ -69,10 +69,10 @@ public class CsvSinkDefault<R,C> implements CsvSink<R,C> {
                     row.append(rowKeyPrinter.apply(rowKey));
                     row.append(separator);
                 }
-                cursor.toRowAt(i);
+                cursor.rowAt(i);
                 for (int j = 0; j < frame.colCount(); ++j) {
                     var printer = colPrinters.get(j);
-                    cursor.toColAt(j);
+                    cursor.colAt(j);
                     switch (printer.getStyle()) {
                         case BOOLEAN:   row.append(printer.apply(cursor.getBoolean()));   break;
                         case INTEGER:   row.append(printer.apply(cursor.getInt()));       break;

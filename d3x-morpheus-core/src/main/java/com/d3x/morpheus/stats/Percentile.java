@@ -102,7 +102,7 @@ public class Percentile implements Statistic1 {
         final Percentile stat1 = new Percentile(0.5);
         final Median stat2 = new Median();
         for (double value : values) stat1.add(value);
-        final double result1 = stat1.getValue();
+        var result1 = stat1.getValue();
         final double result2 = stat2.evaluate(values);
         if (result1 != result2) {
             throw new RuntimeException("Error: " + result1 + " != " + result2);

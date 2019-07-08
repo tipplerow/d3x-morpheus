@@ -366,7 +366,7 @@ public class AlgebraTests {
     public void testPseudoInverse(DataFrameAlgebra.Lib lib, boolean parallel) {
         DataFrameAlgebra.LIBRARY.set(lib);
         var path = "./src/test/resources/pca/svd/poppet-svd-eigenvectors.csv";
-        var source = DataFrame.read().<String>csv(path).read();
+        var source = DataFrame.read(path).csv();
         Array.of(20, 77, 95, 135, 233, 245).forEach(count -> {
             var frame = source.cols().select(col -> col.ordinal() < count);
             var inverse = frame.inverse();

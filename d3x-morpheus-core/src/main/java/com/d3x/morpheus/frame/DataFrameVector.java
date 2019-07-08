@@ -127,7 +127,7 @@ public interface DataFrameVector<X,Y,R,C,Z> extends DataFrameOperations<R,C,Z>, 
      * Returns the most specific type that describes elements of this vector
      * @return      the most specific type that describes elements of this vector
      */
-    Class<?> typeInfo();
+    Class<?> dataClass();
 
     /**
      * Returns the ranks of the values in this vector
@@ -149,20 +149,6 @@ public interface DataFrameVector<X,Y,R,C,Z> extends DataFrameOperations<R,C,Z>, 
      * @return      the array of distinct values in this vector
      */
     <V> Array<V> distinct(int limit);
-
-    /**
-     * Moves this vector so it points at the location with the specified key
-     * @param key   the vector key to move to
-     * @return      this row reference
-     */
-    Z moveTo(X key);
-
-    /**
-     * Moves this vector so it points at the location with the specified ordinal
-     * @param ordinal   the vector ordinal to move to
-     * @return          this row reference
-     */
-    Z moveTo(int ordinal);
 
     /**
      * Returns a stream of primitive integers

@@ -112,7 +112,7 @@ public class BoundsTests {
             final Comparable upper = bounds.get().upper();
             Assert.assertEquals(lower, min.getValue(), "Lower bounds matches min value");
             Assert.assertEquals(upper, max.getValue(), "Upper bounds matches max value");
-            if (ArrayType.of(column.typeInfo()).isNumeric()) {
+            if (ArrayType.of(column.dataClass()).isNumeric()) {
                 final double minValue = column.stats().min();
                 final double maxValue = column.stats().max();
                 Assert.assertEquals(((Number)lower).doubleValue(), minValue, "Lower bounds matches min stats value");

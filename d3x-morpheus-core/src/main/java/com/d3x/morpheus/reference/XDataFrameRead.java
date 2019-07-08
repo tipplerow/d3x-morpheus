@@ -15,12 +15,11 @@
  */
 package com.d3x.morpheus.reference;
 
-import java.io.File;
-import java.io.InputStream;
-import java.net.URL;
+import java.util.function.Consumer;
 
 import com.d3x.morpheus.csv.CsvSource;
 import com.d3x.morpheus.csv.CsvSourceDefault;
+import com.d3x.morpheus.frame.DataFrame;
 import com.d3x.morpheus.frame.DataFrameRead;
 import com.d3x.morpheus.util.Resource;
 
@@ -31,25 +30,20 @@ import com.d3x.morpheus.util.Resource;
  *
  * @author  Xavier Witdouck
  */
+@lombok.AllArgsConstructor()
 class XDataFrameRead implements DataFrameRead {
 
+    @lombok.NonNull
+    private Resource resource;
+
+
     @Override
-    public <R> CsvSource<R> csv(File file) {
-        return new CsvSourceDefault<>(Resource.of(file));
+    public DataFrame<Integer, String> csv() {
+        return new CsvSourceDefault(resource).read();
     }
 
     @Override
-    public <R> CsvSource<R> csv(URL url) {
-        return new CsvSourceDefault<>(Resource.of(url));
-    }
-
-    @Override
-    public <R> CsvSource<R> csv(InputStream is) {
-        return new CsvSourceDefault<>(Resource.of(is));
-    }
-
-    @Override
-    public <R> CsvSource<R> csv(String resource) {
-        return new CsvSourceDefault<>(Resource.of(resource));
+    public <R> DataFrame<R, String> csv(Class<R> rowType, Consumer<CsvSource.Options> configurator) {
+        return new CsvSourceDefault(resource).read(rowType, configurator);
     }
 }

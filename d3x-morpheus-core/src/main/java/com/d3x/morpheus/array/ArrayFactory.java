@@ -96,7 +96,7 @@ public abstract class ArrayFactory {
         } else if (!array.getClass().isArray()) {
             throw new IllegalArgumentException("The argument must be an array");
         } else {
-            final int length = java.lang.reflect.Array.getLength(array);
+            var length = java.lang.reflect.Array.getLength(array);
             final Class<T> arrayClass = resolveType(array);
             final T defaultValue = ArrayType.defaultValue(arrayClass);
             final Array<T> mArray = dense().apply(arrayClass, length, defaultValue, null);
@@ -104,13 +104,13 @@ public abstract class ArrayFactory {
                 final boolean[] booleans = (boolean[])array;
                 return mArray.applyBooleans(v -> booleans[v.index()]);
             } else if (arrayClass == int.class) {
-                final int[] ints = (int[])array;
+                var ints = (int[])array;
                 return mArray.applyInts(v -> ints[v.index()]);
             } else if (arrayClass == long.class) {
                 final long[] longs = (long[])array;
                 return mArray.applyLongs(v -> longs[v.index()]);
             } else if (arrayClass == double.class) {
-                final double[] doubles = (double[])array;
+                var doubles = (double[])array;
                 return mArray.applyDoubles(v -> doubles[v.index()]);
             } else {
                 final Object[] objects = (Object[])array;
@@ -150,7 +150,7 @@ public abstract class ArrayFactory {
      */
     @SuppressWarnings("unchecked")
     private static <T> Class<T> resolveType(Object values) {
-        final int length = java.lang.reflect.Array.getLength(values);
+        var length = java.lang.reflect.Array.getLength(values);
         final Class<T> componentType = (Class<T>)values.getClass().getComponentType();
         if (length == 1 && componentType == Object.class) {
             final Object entry = java.lang.reflect.Array.get(values, 0);

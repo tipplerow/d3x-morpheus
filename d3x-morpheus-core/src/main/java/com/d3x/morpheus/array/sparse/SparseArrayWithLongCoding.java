@@ -187,7 +187,7 @@ class SparseArrayWithLongCoding<T> extends ArrayBase<T> {
     @Override
     public final Array<T> filter(Predicate<ArrayValue<T>> predicate) {
         int count = 0;
-        final int length = this.length();
+        var length = this.length();
         final ArrayCursor<T> cursor = cursor();
         final Array<T> matches = Array.of(type(), length, loadFactor());
         for (int i=0; i<length; ++i) {

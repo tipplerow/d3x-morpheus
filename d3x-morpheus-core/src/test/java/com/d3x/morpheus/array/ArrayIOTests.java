@@ -88,7 +88,7 @@ public class ArrayIOTests {
         ObjectOutputStream os = null;
         ObjectInputStream is = null;
         final Array<T> array1 = ArraySortTests.random(type, 5000, style);
-        final int[] indexes = new int[] { 5, 10, 14, 100, 234, 456, 787, 999, 1340, 3450, 4566 };
+        var indexes = new int[] { 5, 10, 14, 100, 234, 456, 787, 999, 1340, 3450, 4566 };
         final Array<T> array2 = Array.of(type, indexes.length, ArrayType.defaultValue(type), style);
         try {
             final File file = new File(directory, "Array-" + array1.typeCode().name() + "-" + array1.style().isSparse() + ".ser");

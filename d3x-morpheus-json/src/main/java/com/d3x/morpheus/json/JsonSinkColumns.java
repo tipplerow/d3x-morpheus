@@ -52,7 +52,7 @@ class JsonSinkColumns<R,C> implements JsonSink<R,C> {
             for (DataFrameColumn<?,?> column : frame.cols()) {
                 final Object colKey = column.key();
                 final Class<?> keyType = colKey.getClass();
-                final Class<?> valueType = column.typeInfo();
+                final Class<?> valueType = column.dataClass();
                 final String colName = formats.getPrinterOrFail(keyType).apply(colKey);
                 writer.name(colName);
                 writer.beginObject();

@@ -69,6 +69,12 @@ public interface DataFrameRows<R,C> extends DataFrameAxis<R,C,R,C,DataFrameRow<R
     Array<R> addAll(Iterable<R> keys, Function<DataFrameValue<R,C>,?> initials);
 
     /**
+     * Returns a newly created row cursor
+     * @return      the newly created row cursor
+     */
+    DataFrameRow.Cursor<R,C> cursor();
+
+    /**
      * Returns a reference to the stats API for the row dimension
      * @return      the stats API to operate in the row dimension
      */

@@ -188,7 +188,7 @@ abstract class XDataFrameAxisBase<X,Y,R,C,V extends DataFrameVector<?,?,R,C,?>,T
 
     @Override
     public final int ordinalOrFail(X key) {
-        final int ordinal = axis.getOrdinal(key);
+        var ordinal = axis.getOrdinal(key);
         if (ordinal >= 0) {
             return ordinal;
         } else {
@@ -221,14 +221,14 @@ abstract class XDataFrameAxisBase<X,Y,R,C,V extends DataFrameVector<?,?,R,C,?>,T
         if (count() == 0) {
             return Stream.empty();
         } else if (axisType == Type.ROWS) {
-            final int rowCount = frame.rowCount();
-            final int partitionSize = rowCount / Runtime.getRuntime().availableProcessors();
-            final int splitThreshold = Math.max(partitionSize, 10000);
+            var rowCount = frame.rowCount();
+            var partitionSize = rowCount / Runtime.getRuntime().availableProcessors();
+            var splitThreshold = Math.max(partitionSize, 10000);
             return StreamSupport.stream(new DataFrameVectorSpliterator<>(0, rowCount-1, rowCount, splitThreshold), frame.isParallel());
         } else if (axisType == Type.COLS) {
-            final int colCount = frame.colCount();
-            final int partitionSize = colCount / Runtime.getRuntime().availableProcessors();
-            final int splitThreshold = Math.max(partitionSize, 10000);
+            var colCount = frame.colCount();
+            var partitionSize = colCount / Runtime.getRuntime().availableProcessors();
+            var splitThreshold = Math.max(partitionSize, 10000);
             return StreamSupport.stream(new DataFrameVectorSpliterator<>(0, colCount-1, colCount, splitThreshold), frame.isParallel());
         } else {
             throw new DataFrameException("Unsupported axis type: " + axisType);
@@ -257,8 +257,8 @@ abstract class XDataFrameAxisBase<X,Y,R,C,V extends DataFrameVector<?,?,R,C,?>,T
 
     @Override
     public final Iterator<V> iterator() {
-        final V vector = createVector(frame, 0);
-        return new Iterator<V>() {
+        var vector = createVector(frame, 0);
+        return new Iterator<>() {
             private int ordinal;
             @Override
             public final boolean hasNext() {
@@ -267,8 +267,13 @@ abstract class XDataFrameAxisBase<X,Y,R,C,V extends DataFrameVector<?,?,R,C,?>,T
             @Override
             @SuppressWarnings("unchecked")
             public final V next() {
-                ((XDataFrameVector)vector).moveTo(ordinal++);
-                return vector;
+                if (vector instanceof XDataFrameRow) {
+                    var row = (XDataFrameRow)vector;
+                    return (V)row.atOrdinal(ordinal++);
+                } else {
+                    var column = (XDataFrameColumn)vector;
+                    return (V)column.atOrdinal(ordinal++);
+                }
             }
         };
     }
@@ -278,15 +283,24 @@ abstract class XDataFrameAxisBase<X,Y,R,C,V extends DataFrameVector<?,?,R,C,?>,T
     @Parallel
     public final void forEach(Consumer<? super V> consumer) {
         if (parallel) {
-            final int count = count();
-            final ForEachVector action = new ForEachVector(0, count - 1, consumer);
+            var count = count();
+            var action = new ForEachVector(0, count - 1, consumer);
             ForkJoinPool.commonPool().invoke(action);
         } else if (count() > 0) {
-            final int count = count();
-            final V vector = createVector(frame, 0);
-            for (int ordinal=0; ordinal < count; ++ordinal) {
-                ((XDataFrameVector)vector).moveTo(ordinal);
-                consumer.accept(vector);
+            var count = count();
+            var vector = createVector(frame, 0);
+            if (vector instanceof XDataFrameRow) {
+                var row = (XDataFrameRow)vector;
+                for (int ordinal=0; ordinal < count; ++ordinal) {
+                    row.atOrdinal(ordinal);
+                    consumer.accept(vector);
+                }
+            } else {
+                var column = (XDataFrameColumn)vector;
+                for (int ordinal=0; ordinal < count; ++ordinal) {
+                    column.atOrdinal(ordinal);
+                    consumer.accept(vector);
+                }
             }
         }
     }
@@ -376,12 +390,12 @@ abstract class XDataFrameAxisBase<X,Y,R,C,V extends DataFrameVector<?,?,R,C,?>,T
     @Parallel
     public final DataFrame<R,C> select(Predicate<V> predicate) {
         if (parallel) {
-            final int count = count();
+            var count = count();
             final Select select = new Select(0, count-1, predicate);
             final Array<X> keys = ForkJoinPool.commonPool().invoke(select);
             return createFilter(frame, keys);
         } else {
-            final int count = count();
+            var count = count();
             if (count == 0) {
                 return createFilter(frame, Collections.emptyList());
             } else {
@@ -395,12 +409,23 @@ abstract class XDataFrameAxisBase<X,Y,R,C,V extends DataFrameVector<?,?,R,C,?>,T
 
     @Override
     public final Optional<V> first(Predicate<V> predicate) {
-        final int count = count();
-        final V vector = createVector(frame, 0);
-        for (int ordinal=0; ordinal < count; ++ordinal) {
-            ((XDataFrameVector)vector).moveTo(ordinal);
-            if (predicate.test(vector)) {
-                return Optional.of(vector);
+        var count = count();
+        var vector = createVector(frame, 0);
+        if (vector instanceof XDataFrameRow) {
+            var row = (XDataFrameRow)vector;
+            for (int ordinal=0; ordinal < count; ++ordinal) {
+                row.atOrdinal(ordinal);
+                if (predicate.test(vector)) {
+                    return Optional.of(vector);
+                }
+            }
+        } else {
+            var column = (XDataFrameColumn)vector;
+            for (int ordinal=0; ordinal < count; ++ordinal) {
+                column.atOrdinal(ordinal);
+                if (predicate.test(vector)) {
+                    return Optional.of(vector);
+                }
             }
         }
         return Optional.empty();
@@ -409,12 +434,23 @@ abstract class XDataFrameAxisBase<X,Y,R,C,V extends DataFrameVector<?,?,R,C,?>,T
 
     @Override
     public final Optional<V> last(Predicate<V> predicate) {
-        final int count = count();
-        final V vector = createVector(frame, 0);
-        for (int ordinal=count-1; ordinal >= 0; --ordinal) {
-            ((XDataFrameVector)vector).moveTo(ordinal);
-            if (predicate.test(vector)) {
-                return Optional.of(vector);
+        var count = count();
+        var vector = createVector(frame, 0);
+        if (vector instanceof XDataFrameRow) {
+            var row = (XDataFrameRow)vector;
+            for (int ordinal=count-1; ordinal >= 0; --ordinal) {
+                row.atOrdinal(ordinal);
+                if (predicate.test(vector)) {
+                    return Optional.of(vector);
+                }
+            }
+        } else {
+            var column = (XDataFrameColumn)vector;
+            for (int ordinal=count-1; ordinal >= 0; --ordinal) {
+                column.atOrdinal(ordinal);
+                if (predicate.test(vector)) {
+                    return Optional.of(vector);
+                }
             }
         }
         return Optional.empty();
@@ -468,16 +504,25 @@ abstract class XDataFrameAxisBase<X,Y,R,C,V extends DataFrameVector<?,?,R,C,?>,T
         @SuppressWarnings("unchecked")
         protected void compute() {
             try {
-                final int count = to - from + 1;
-                final int threshold = parallel ? DataFrameOptions.getRowSplitThreshold(frame) : Integer.MAX_VALUE;
+                var count = to - from + 1;
+                var threshold = parallel ? DataFrameOptions.getRowSplitThreshold(frame) : Integer.MAX_VALUE;
                 if (count <= threshold) {
-                    for (int i=from; i<=to; ++i) {
-                        ((XDataFrameVector)vector).moveTo(i);
-                        this.consumer.accept(vector);
+                    if (vector instanceof XDataFrameRow) {
+                        var row = (XDataFrameRow)vector;
+                        for (int i=from; i<=to; ++i) {
+                            row.atOrdinal(i);
+                            this.consumer.accept(vector);
+                        }
+                    } else {
+                        var column = (XDataFrameColumn)vector;
+                        for (int i=from; i<=to; ++i) {
+                            column.atOrdinal(i);
+                            this.consumer.accept(vector);
+                        }
                     }
                 } else {
-                    final int splitCount = (to - from) / 2;
-                    final int midPoint = from + splitCount;
+                    var splitCount = (to - from) / 2;
+                    var midPoint = from + splitCount;
                     invokeAll(
                         new ForEachVector(from, midPoint, consumer),
                         new ForEachVector(midPoint+1, to, consumer)
@@ -520,19 +565,31 @@ abstract class XDataFrameAxisBase<X,Y,R,C,V extends DataFrameVector<?,?,R,C,?>,T
         }
 
         @Override
+        @SuppressWarnings("unchecked")
         protected Array<X> compute() {
-            final int count = to - from + 1;
-            final Class<X> keyType = keyType();
+            var count = to - from + 1;
+            var keyType = keyType();
             if (count > threshold) {
                 return split();
             } else {
-                final int rowCount = count();
-                final V vector = createVector(frame, 0);
-                final ArrayBuilder<X> builder = ArrayBuilder.of(rowCount > 0 ? rowCount : 10, keyType);
-                for (int ordinal=from; ordinal<=to; ++ordinal) {
-                    ((XDataFrameVector)vector).moveTo(ordinal);
-                    if (predicate.test(vector)) {
-                        builder.add((X)vector.key());
+                var rowCount = count();
+                var vector = createVector(frame, 0);
+                var builder = ArrayBuilder.of(rowCount > 0 ? rowCount : 10, keyType);
+                if (vector instanceof XDataFrameRow) {
+                    var row = (XDataFrameRow)vector;
+                    for (int ordinal=from; ordinal<=to; ++ordinal) {
+                        row.atOrdinal(ordinal);
+                        if (predicate.test(vector)) {
+                            builder.add((X)vector.key());
+                        }
+                    }
+                } else {
+                    var column = (XDataFrameColumn)vector;
+                    for (int ordinal=from; ordinal<=to; ++ordinal) {
+                        column.atOrdinal(ordinal);
+                        if (predicate.test(vector)) {
+                            builder.add((X)vector.key());
+                        }
                     }
                 }
                 return builder.toArray();
@@ -544,14 +601,14 @@ abstract class XDataFrameAxisBase<X,Y,R,C,V extends DataFrameVector<?,?,R,C,?>,T
          * @return  the join results from the two sub-tasks
          */
         private Array<X> split() {
-            final int splitCount = (to - from) / 2;
-            final int midPoint = from + splitCount;
+            var splitCount = (to - from) / 2;
+            var midPoint = from + splitCount;
             final Select left  = new Select(from, midPoint, predicate);
             final Select right = new Select(midPoint + 1, to, predicate);
             left.fork();
             final Array<X> rightAns = right.compute();
             final Array<X> leftAns  = left.join();
-            final int size = Math.max(rightAns.length() + leftAns.length(), 10);
+            var size = Math.max(rightAns.length() + leftAns.length(), 10);
             final ArrayBuilder<X> builder = ArrayBuilder.of(size, keyType());
             builder.addAll(leftAns);
             builder.addAll(rightAns);
@@ -596,12 +653,12 @@ abstract class XDataFrameAxisBase<X,Y,R,C,V extends DataFrameVector<?,?,R,C,?>,T
             Asserts.check(action != null, "The consumer action cannot be null");
             if (position <= end) {
                 if (vector instanceof XDataFrameRow) {
-                    ((XDataFrameRow)vector).moveTo(position);
+                    ((XDataFrameRow)vector).atOrdinal(position);
                     ++position;
                     action.accept(vector);
                     return true;
                 } else if (vector instanceof XDataFrameColumn) {
-                    ((XDataFrameColumn)vector).moveTo(position);
+                    ((XDataFrameColumn)vector).atOrdinal(position);
                     ++position;
                     action.accept(vector);
                     return true;
@@ -618,9 +675,9 @@ abstract class XDataFrameAxisBase<X,Y,R,C,V extends DataFrameVector<?,?,R,C,?>,T
             if (estimateSize() < splitThreshold) {
                 return null;
             } else {
-                final int newStart = start;
-                final int halfSize = (end - start) / 2;
-                final int newEnd = newStart + halfSize;
+                var newStart = start;
+                var halfSize = (end - start) / 2;
+                var newEnd = newStart + halfSize;
                 this.start = newEnd + 1;
                 this.position = start;
                 return new DataFrameVectorSpliterator<>(newStart, newEnd, count, splitThreshold);
@@ -676,16 +733,16 @@ abstract class XDataFrameAxisBase<X,Y,R,C,V extends DataFrameVector<?,?,R,C,?>,T
         @Override
         protected V compute() {
             if (count() == 0) return null;
-            final int count = toOrdinal - fromOrdinal + 1;
+            var count = toOrdinal - fromOrdinal + 1;
             if (count > threshold) {
-                final int partitionSize = (toOrdinal - fromOrdinal) / 2;
-                final int midPoint = fromOrdinal + partitionSize;
-                final MinVector left  = new MinVector(fromOrdinal, midPoint, comparator);
-                final MinVector right = new MinVector(midPoint + 1, toOrdinal, comparator);
+                var partitionSize = (toOrdinal - fromOrdinal) / 2;
+                var midPoint = fromOrdinal + partitionSize;
+                var left  = new MinVector(fromOrdinal, midPoint, comparator);
+                var right = new MinVector(midPoint + 1, toOrdinal, comparator);
                 left.fork();
-                final V rightAns = right.compute();
-                final V leftAns  = left.join();
-                final int compare = comparator.compare(leftAns, rightAns);
+                var rightAns = right.compute();
+                var leftAns  = left.join();
+                var compare = comparator.compare(leftAns, rightAns);
                 return compare > 0 ? rightAns : leftAns;
             } else {
                 return argMin();
@@ -696,13 +753,24 @@ abstract class XDataFrameAxisBase<X,Y,R,C,V extends DataFrameVector<?,?,R,C,?>,T
          * Returns the min row or column vector
          * @return  the min row or column vector
          */
+        @SuppressWarnings("unchecked")
         private V argMin() {
-            V minVector = createVector(frame, fromOrdinal);
-            final V otherVector = createVector(frame, fromOrdinal);
-            for (int i=fromOrdinal+1; i<=toOrdinal; ++i) {
-                ((XDataFrameVector)otherVector).moveTo(i);
-                final int compare = comparator.compare(minVector, otherVector);
-                if (compare > 0) ((XDataFrameVector)minVector).moveTo(i);
+            var minVector = createVector(frame, fromOrdinal);
+            var otherVector = createVector(frame, fromOrdinal);
+            if (minVector instanceof XDataFrameRow) {
+                var minRow = (XDataFrameRow<R,C>)minVector;
+                var otherRow = (XDataFrameRow<R,C>)otherVector;
+                for (int i=fromOrdinal+1; i<=toOrdinal; ++i) {
+                    var compare = comparator.compare(minVector, (V)otherRow.atOrdinal(i));
+                    if (compare > 0) minRow.atOrdinal(i);
+                }
+            } else {
+                var minColumn = (XDataFrameColumn<R,C>)minVector;
+                var otherColumn = (XDataFrameColumn<R,C>)otherVector;
+                for (int i=fromOrdinal+1; i<=toOrdinal; ++i) {
+                    var compare = comparator.compare(minVector, (V)otherColumn.atOrdinal(i));
+                    if (compare > 0) minColumn.atOrdinal(i);
+                }
             }
             return minVector;
         }
@@ -739,16 +807,16 @@ abstract class XDataFrameAxisBase<X,Y,R,C,V extends DataFrameVector<?,?,R,C,?>,T
         @Override
         protected V compute() {
             if (count() == 0) return null;
-            final int count = toOrdinal - fromOrdinal + 1;
+            var count = toOrdinal - fromOrdinal + 1;
             if (count > threshold) {
-                final int partitionSize = (toOrdinal - fromOrdinal) / 2;
-                final int midPoint = fromOrdinal + partitionSize;
-                final MaxVector left  = new MaxVector(fromOrdinal, midPoint, comparator);
-                final MaxVector right = new MaxVector(midPoint + 1, toOrdinal, comparator);
+                var partitionSize = (toOrdinal - fromOrdinal) / 2;
+                var midPoint = fromOrdinal + partitionSize;
+                var left  = new MaxVector(fromOrdinal, midPoint, comparator);
+                var right = new MaxVector(midPoint + 1, toOrdinal, comparator);
                 left.fork();
-                final V rightAns = right.compute();
-                final V leftAns  = left.join();
-                final int compare = comparator.compare(leftAns, rightAns);
+                var rightAns = right.compute();
+                var leftAns  = left.join();
+                var compare = comparator.compare(leftAns, rightAns);
                 return compare < 0 ? rightAns : leftAns;
             } else {
                 return argMax();
@@ -759,13 +827,24 @@ abstract class XDataFrameAxisBase<X,Y,R,C,V extends DataFrameVector<?,?,R,C,?>,T
          * Returns the min row or column vector
          * @return  the min row or column vector
          */
+        @SuppressWarnings("unchecked")
         private V argMax() {
-            V maxVector = createVector(frame, fromOrdinal);
-            final V otherVector = createVector(frame, fromOrdinal);
-            for (int i=fromOrdinal+1; i<=toOrdinal; ++i) {
-                ((XDataFrameVector)otherVector).moveTo(i);
-                final int compare = comparator.compare(otherVector, maxVector);
-                if (compare > 0) ((XDataFrameVector)maxVector).moveTo(i);
+            var maxVector = createVector(frame, fromOrdinal);
+            var otherVector = createVector(frame, fromOrdinal);
+            if (maxVector instanceof XDataFrameRow) {
+                var maxRow = (XDataFrameRow<R,C>)maxVector;
+                var otherRow = (XDataFrameRow<R,C>)otherVector;
+                for (int i=fromOrdinal+1; i<=toOrdinal; ++i) {
+                    var compare = comparator.compare((V)otherRow.atOrdinal(i), (V)maxRow);
+                    if (compare > 0) maxRow.atOrdinal(i);
+                }
+            } else {
+                var maxColumn = (XDataFrameColumn<R,C>)maxVector;
+                var otherColumn = (XDataFrameColumn<R,C>)otherVector;
+                for (int i=fromOrdinal+1; i<=toOrdinal; ++i) {
+                    var compare = comparator.compare((V)otherColumn.atOrdinal(i), (V)maxColumn);
+                    if (compare > 0) maxColumn.atOrdinal(i);
+                }
             }
             return maxVector;
         }

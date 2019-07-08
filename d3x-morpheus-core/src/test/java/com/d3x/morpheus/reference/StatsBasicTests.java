@@ -39,48 +39,48 @@ public class StatsBasicTests {
     }
 
     private DataFrame<Integer,String> loadSourceData() {
-        return DataFrame.read().csv("/stats/source-data.csv").read();
+        return DataFrame.read("/stats/source-data.csv").csv();
     }
 
 
     private DataFrame<Integer,StatType> loadExpectedRowStats(StatType stat) {
         switch (stat) {
-            case MIN:               return DataFrame.read().<Integer>csv("/stats/row-min.csv").read().cols().mapKeys(x -> stat);
-            case MAX:               return DataFrame.read().<Integer>csv("/stats/row-max.csv").read().cols().mapKeys(x -> stat);
-            case SUM:               return DataFrame.read().<Integer>csv("/stats/row-sum.csv").read().cols().mapKeys(x -> stat);
-            case MEAN:              return DataFrame.read().<Integer>csv("/stats/row-mean.csv").read().cols().mapKeys(x -> stat);
-            case MAD:               return DataFrame.read().<Integer>csv("/stats/row-mad.csv").read().cols().mapKeys(x -> stat);
-            case SEM:               return DataFrame.read().<Integer>csv("/stats/row-sem.csv").read().cols().mapKeys(x -> stat);
-            case COUNT:             return DataFrame.read().<Integer>csv("/stats/row-count.csv").read().cols().mapKeys(x -> stat);
-            case SKEWNESS:          return DataFrame.read().<Integer>csv("/stats/row-skew.csv").read().cols().mapKeys(x -> stat);
-            case KURTOSIS:          return DataFrame.read().<Integer>csv("/stats/row-kurt.csv").read().cols().mapKeys(x -> stat);
-            case VARIANCE:          return DataFrame.read().<Integer>csv("/stats/row-var.csv").read().cols().mapKeys(x -> stat);
-            case STD_DEV:           return DataFrame.read().<Integer>csv("/stats/row-std.csv").read().cols().mapKeys(x -> stat);
-            case MEDIAN:            return DataFrame.read().<Integer>csv("/stats/row-median.csv").read().cols().mapKeys(x -> stat);
-            case PERCENTILE:        return DataFrame.read().<Integer>csv("/stats/row-percentile-80th.csv").read().cols().mapKeys(x -> stat);
-            case AUTO_CORREL:  return DataFrame.read().<Integer>csv("/stats/row-autocorr-5.csv").read().cols().mapKeys(x -> stat);
-            case SUM_SQUARES:       return DataFrame.read().<Integer>csv("/stats/row-sumSquares.csv").read().cols().mapKeys(x -> stat);
+            case MIN:               return DataFrame.read("/stats/row-min.csv").csv().cols().mapKeys(x -> stat);
+            case MAX:               return DataFrame.read("/stats/row-max.csv").csv().cols().mapKeys(x -> stat);
+            case SUM:               return DataFrame.read("/stats/row-sum.csv").csv().cols().mapKeys(x -> stat);
+            case MEAN:              return DataFrame.read("/stats/row-mean.csv").csv().cols().mapKeys(x -> stat);
+            case MAD:               return DataFrame.read("/stats/row-mad.csv").csv().cols().mapKeys(x -> stat);
+            case SEM:               return DataFrame.read("/stats/row-sem.csv").csv().cols().mapKeys(x -> stat);
+            case COUNT:             return DataFrame.read("/stats/row-count.csv").csv().cols().mapKeys(x -> stat);
+            case SKEWNESS:          return DataFrame.read("/stats/row-skew.csv").csv().cols().mapKeys(x -> stat);
+            case KURTOSIS:          return DataFrame.read("/stats/row-kurt.csv").csv().cols().mapKeys(x -> stat);
+            case VARIANCE:          return DataFrame.read("/stats/row-var.csv").csv().cols().mapKeys(x -> stat);
+            case STD_DEV:           return DataFrame.read("/stats/row-std.csv").csv().cols().mapKeys(x -> stat);
+            case MEDIAN:            return DataFrame.read("/stats/row-median.csv").csv().cols().mapKeys(x -> stat);
+            case PERCENTILE:        return DataFrame.read("/stats/row-percentile-80th.csv").csv().cols().mapKeys(x -> stat);
+            case AUTO_CORREL:       return DataFrame.read("/stats/row-autocorr-5.csv").csv().cols().mapKeys(x -> stat);
+            case SUM_SQUARES:       return DataFrame.read("/stats/row-sumSquares.csv").csv().cols().mapKeys(x -> stat);
             default:    throw new IllegalArgumentException("Unexpected stat type: " + stat);
         }
     }
 
     private DataFrame<StatType,String> loadExpectedColStats(StatType stat) {
         switch (stat) {
-            case MIN:               return DataFrame.read().csv("/stats/column-min.csv").read().rows().mapKeys(x -> stat);
-            case MAX:               return DataFrame.read().csv("/stats/column-max.csv").read().rows().mapKeys(x -> stat);
-            case SUM:               return DataFrame.read().csv("/stats/column-sum.csv").read().rows().mapKeys(x -> stat);
-            case MEAN:              return DataFrame.read().csv("/stats/column-mean.csv").read().rows().mapKeys(x -> stat);
-            case MAD:               return DataFrame.read().csv("/stats/column-mad.csv").read().rows().mapKeys(x -> stat);
-            case SEM:               return DataFrame.read().csv("/stats/column-sem.csv").read().rows().mapKeys(x -> stat);
-            case COUNT:             return DataFrame.read().csv("/stats/column-count.csv").read().rows().mapKeys(x -> stat);
-            case SKEWNESS:          return DataFrame.read().csv("/stats/column-skew.csv").read().rows().mapKeys(x -> stat);
-            case KURTOSIS:          return DataFrame.read().csv("/stats/column-kurt.csv").read().rows().mapKeys(x -> stat);
-            case VARIANCE:          return DataFrame.read().csv("/stats/column-var.csv").read().rows().mapKeys(x -> stat);
-            case STD_DEV:           return DataFrame.read().csv("/stats/column-std.csv").read().rows().mapKeys(x -> stat);
-            case MEDIAN:            return DataFrame.read().csv("/stats/column-median.csv").read().rows().mapKeys(x -> stat);
-            case PERCENTILE:        return DataFrame.read().csv("/stats/column-percentile-80th.csv").read().rows().mapKeys(x -> stat);
-            case AUTO_CORREL:  return DataFrame.read().csv("/stats/column-autocorr-5.csv").read().rows().mapKeys(x -> stat);
-            case SUM_SQUARES:       return DataFrame.read().csv("/stats/column-sumSquares.csv").read().rows().mapKeys(x -> stat);
+            case MIN:               return DataFrame.read("/stats/column-min.csv").csv().rows().mapKeys(x -> stat);
+            case MAX:               return DataFrame.read("/stats/column-max.csv").csv().rows().mapKeys(x -> stat);
+            case SUM:               return DataFrame.read("/stats/column-sum.csv").csv().rows().mapKeys(x -> stat);
+            case MEAN:              return DataFrame.read("/stats/column-mean.csv").csv().rows().mapKeys(x -> stat);
+            case MAD:               return DataFrame.read("/stats/column-mad.csv").csv().rows().mapKeys(x -> stat);
+            case SEM:               return DataFrame.read("/stats/column-sem.csv").csv().rows().mapKeys(x -> stat);
+            case COUNT:             return DataFrame.read("/stats/column-count.csv").csv().rows().mapKeys(x -> stat);
+            case SKEWNESS:          return DataFrame.read("/stats/column-skew.csv").csv().rows().mapKeys(x -> stat);
+            case KURTOSIS:          return DataFrame.read("/stats/column-kurt.csv").csv().rows().mapKeys(x -> stat);
+            case VARIANCE:          return DataFrame.read("/stats/column-var.csv").csv().rows().mapKeys(x -> stat);
+            case STD_DEV:           return DataFrame.read("/stats/column-std.csv").csv().rows().mapKeys(x -> stat);
+            case MEDIAN:            return DataFrame.read("/stats/column-median.csv").csv().rows().mapKeys(x -> stat);
+            case PERCENTILE:        return DataFrame.read("/stats/column-percentile-80th.csv").csv().rows().mapKeys(x -> stat);
+            case AUTO_CORREL:       return DataFrame.read("/stats/column-autocorr-5.csv").csv().rows().mapKeys(x -> stat);
+            case SUM_SQUARES:       return DataFrame.read("/stats/column-sumSquares.csv").csv().rows().mapKeys(x -> stat);
             default:    throw new IllegalArgumentException("Unexpected stat type: " + stat);
         }
     }

@@ -129,7 +129,7 @@ public class ArrayBuilderTests {
     public void testWithIntegers(int initialSize) {
         final Random random = new Random();
         final ArrayBuilder<Integer> builder = ArrayBuilder.of(initialSize);
-        final int[] expected = new int[1000];
+        var expected = new int[1000];
         for (int i=0; i<expected.length; ++i) {
             expected[i] = random.nextInt();
             builder.add(expected[i]);

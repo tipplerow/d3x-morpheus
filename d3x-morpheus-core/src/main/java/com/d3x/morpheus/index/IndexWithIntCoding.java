@@ -141,7 +141,7 @@ class IndexWithIntCoding<T> extends IndexBase<T> implements WithIntCoding<T> {
         if (isFilter()) {
             throw new IndexException("Cannot add keys to an filter on another index");
         } else {
-            final int[] count = new int[1];
+            var count = new int[1];
             keys.forEach(key -> {
                 final int code = coding.getCode(key);
                 if (!indexMap.containsKey(code)) {
