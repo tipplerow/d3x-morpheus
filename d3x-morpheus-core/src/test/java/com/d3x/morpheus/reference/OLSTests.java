@@ -132,8 +132,8 @@ public class OLSTests {
     public void testSLR() {
         final Index<String> rowKeys = Range.of(0, 5000).map(i -> "R" + i).toIndex(String.class);
         final DataFrame<String,String> frame = DataFrame.of(rowKeys, String.class, columns -> {
-            columns.add("Y", Double.class).applyDoubles(v -> v.rowOrdinal() + 1d + (Math.random() * 2));
-            columns.add("X", Double.class).applyDoubles(v -> v.rowOrdinal() + 1d + (Math.random() * 3));
+            columns.add("Y", Double.class, v -> v.rowOrdinal() + 1d + (Math.random() * 2));
+            columns.add("X", Double.class, v -> v.rowOrdinal() + 1d + (Math.random() * 3));
         });
         final SimpleRegression benchmark = new SimpleRegression(true);
         frame.rows().forEach(row -> benchmark.addData(row.getDoubleAt(1), row.getDoubleAt(0)));
@@ -148,11 +148,11 @@ public class OLSTests {
     public void testMLR(double threshold) {
         final Range<String> rowKeys = Range.of(0, 5000).map(i -> "R" + i);
         final DataFrame<String,String> frame = DataFrame.of(rowKeys, String.class, columns -> {
-            columns.add("Y", Double.class).applyDoubles(v -> v.rowOrdinal() + 1d + (Math.random() * 2));
-            columns.add("X1", Double.class).applyDoubles(v -> v.rowOrdinal() + 1d + (Math.random() * 3));
-            columns.add("X2", Double.class).applyDoubles(v -> v.rowOrdinal() + 1d + (Math.random() * 4));
-            columns.add("X3", Double.class).applyDoubles(v -> v.rowOrdinal() + 1d + (Math.random() * 5));
-            columns.add("X4", Double.class).applyDoubles(v -> v.rowOrdinal() + 1d + (Math.random() * 6));
+            columns.add("Y", Double.class, v -> v.rowOrdinal() + 1d + (Math.random() * 2));
+            columns.add("X1", Double.class, v -> v.rowOrdinal() + 1d + (Math.random() * 3));
+            columns.add("X2", Double.class, v -> v.rowOrdinal() + 1d + (Math.random() * 4));
+            columns.add("X3", Double.class, v -> v.rowOrdinal() + 1d + (Math.random() * 5));
+            columns.add("X4", Double.class, v -> v.rowOrdinal() + 1d + (Math.random() * 6));
         });
 
         final OLSMultipleLinearRegression model = new OLSMultipleLinearRegression(threshold);
@@ -175,8 +175,8 @@ public class OLSTests {
     public void testSLRvsMLR() {
         final Range<String> rowKeys = Range.of(0, 5000).map(i -> "R" + i);
         final DataFrame<String,String> frame = DataFrame.of(rowKeys, String.class, columns -> {
-            columns.add("Y", Double.class).applyDoubles(v -> v.rowOrdinal() + 1d + (Math.random() * 2));
-            columns.add("X", Double.class).applyDoubles(v -> v.rowOrdinal() + 1d + (Math.random() * 3));
+            columns.add("Y", Double.class, v -> v.rowOrdinal() + 1d + (Math.random() * 2));
+            columns.add("X", Double.class, v -> v.rowOrdinal() + 1d + (Math.random() * 3));
         });
 
         frame.regress().ols("Y", "X", true, slr -> {

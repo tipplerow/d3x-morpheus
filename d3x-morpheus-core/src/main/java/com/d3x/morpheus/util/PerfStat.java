@@ -270,9 +270,9 @@ public class PerfStat implements java.io.Serializable {
                     this.callTimeStats.add(convert(t2 - t1));
                     this.memoryStats.add(memory / Math.pow(1024, 2));
                     this.gcTimeStats.add(convert(t4-t3));
-                    cursor.at(i - warmUpCount, 0).setDouble(convert(t2 - t1));
-                    cursor.at(i - warmUpCount, 1).setDouble(convert(t4 - t3));
-                    cursor.at(i - warmUpCount, 2).setDouble(convert((t2 - t1) + (t4 - t3)));
+                    cursor.atOrdinals(i - warmUpCount, 0).setDouble(convert(t2 - t1));
+                    cursor.atOrdinals(i - warmUpCount, 1).setDouble(convert(t4 - t3));
+                    cursor.atOrdinals(i - warmUpCount, 2).setDouble(convert((t2 - t1) + (t4 - t3)));
                 }
             }
             return this;
@@ -396,7 +396,7 @@ public class PerfStat implements java.io.Serializable {
                 final DataFrameCursor<String,String> gcCursor = gcStats.cursor();
                 resultList.add(timeStats.applyDoubles(v -> {
                     var runTime = v.getDouble();
-                    var gcTime = gcCursor.locate(v.rowKey(), v.colKey()).getDouble();
+                    var gcTime = gcCursor.atKeys(v.rowKey(), v.colKey()).getDouble();
                     return runTime + gcTime;
                 }));
             }

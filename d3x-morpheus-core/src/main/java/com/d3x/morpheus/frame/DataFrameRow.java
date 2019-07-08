@@ -41,6 +41,13 @@ public interface DataFrameRow<R,C> extends DataFrameVector<R,C,R,C,DataFrameRow<
     interface Cursor<R,C> extends DataFrameRow<R,C> {
 
         /**
+         * Adds a row for key if it does not exist, and moves cursor to row key
+         * @param rowKey    the row key to add
+         * @return          this row cursor positioned at row key
+         */
+        Cursor<R,C> add(R rowKey);
+
+        /**
          * Moves the row cursor to the row key specified if it exists
          * @param rowKey    the row key
          * @return          true if key exists, false otherwise

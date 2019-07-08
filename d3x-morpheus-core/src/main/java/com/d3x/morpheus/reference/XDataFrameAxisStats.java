@@ -400,8 +400,8 @@ class XDataFrameAxisStats<K,R,C,X,Y> extends XDataFrameStatsBase<X,Y> implements
                 final double weight = Math.log(0.5d) / halfLife;
                 final double alpha = 1d - Math.exp(weight);
                 for (int colOrdinal=from; colOrdinal<=to; ++colOrdinal) {
-                    final DataFrameCursor<R,C> source = frame.cursor().at(0, colOrdinal);
-                    final DataFrameCursor<R,C> target = result.cursor().at(0, colOrdinal);
+                    final DataFrameCursor<R,C> source = frame.cursor().atOrdinals(0, colOrdinal);
+                    final DataFrameCursor<R,C> target = result.cursor().atOrdinals(0, colOrdinal);
                     if (rowCount > 0) target.setDouble(source.getDouble());
                     for (int rowOrdinal=1; rowOrdinal<rowCount; ++rowOrdinal) {
                         final double rawValue = source.rowAt(rowOrdinal).getDouble();

@@ -76,8 +76,8 @@ public class DataFrameAsserts {
         DataFrameCursor<?,?> expectedCursor = expected.cursor();
         for (int j = 0; j<expected.colCount(); ++j) {
             for (int i=0; i<expected.rowCount(); ++i) {
-                final Object expectedValue = expectedCursor.at(i,j).getValue();
-                final Object actualValue = actualCursor.at(i,j).getValue();
+                final Object expectedValue = expectedCursor.atOrdinals(i,j).getValue();
+                final Object actualValue = actualCursor.atOrdinals(i,j).getValue();
                 if (expectedValue != null && actualValue != null) {
                     final Class type1 = expectedValue.getClass();
                     final Class type2 = actualValue.getClass();

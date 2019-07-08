@@ -107,7 +107,7 @@ public class StatsTest1 {
     @Test(dataProvider="allStats")
     public void testStatFailsOnNumeric(StatType stat) {
         final DataFrame<String,String> frame = TestDataFrames.random(double.class, 100, 100);
-        frame.cols().add("DateColumn", Object.class).applyValues(v -> "X:" + Math.random());
+        frame.cols().add("DateColumn", Object.class, v -> "X:" + Math.random());
         switch (stat) {
             case MIN:               frame.stats().min();            break;
             case MAX:               frame.stats().max();            break;

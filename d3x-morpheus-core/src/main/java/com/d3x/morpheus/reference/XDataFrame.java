@@ -212,37 +212,6 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
 
 
     @Override()
-    @SuppressWarnings("unchecked")
-    public final DataFrame<R,C> copy() {
-        try {
-            final Array<R> newRowKeys = rowKeys().toArray();
-            final Index<C> newColKeys = Index.of(colKeys().type(),  colKeys().size());
-            final XDataFrameContent<R,C> content = new XDataFrameContent<>(newRowKeys, newColKeys, Object.class);
-            final XDataFrame<R,C> newFrame = new XDataFrame<>(content, parallel);
-            this.cols().sequential().forEach(column -> {
-                final C colKey = column.key();
-                final Class<?> colClass = column.dataClass();
-                final ArrayType arrayType = ArrayType.of(colClass);
-                final DataFrameColumn<R,C> newColumn = newFrame.cols().add(colKey, colClass);
-                switch (arrayType) {
-                    case BOOLEAN:       newColumn.applyBooleans(v -> column.getBooleanAt(v.rowOrdinal()));  break;
-                    case INTEGER:       newColumn.applyInts(v -> column.getIntAt(v.rowOrdinal()));          break;
-                    case LONG:          newColumn.applyLongs(v -> column.getLongAt(v.rowOrdinal()));        break;
-                    case DOUBLE:        newColumn.applyDoubles(v -> column.getDoubleAt(v.rowOrdinal()));    break;
-                    case LOCAL_TIME:    newColumn.applyLongs(v -> column.getLongAt(v.rowOrdinal()));        break;
-                    case LOCAL_DATE:    newColumn.applyLongs(v -> column.getLongAt(v.rowOrdinal()));        break;
-                    case ENUM:          newColumn.applyInts(v -> column.getIntAt(v.rowOrdinal()));          break;
-                    default:            newColumn.applyValues(v -> column.getValueAt(v.rowOrdinal()));      break;
-                }
-            });
-            return newFrame;
-        } catch (Throwable t) {
-            throw new DataFrameException("Failed to create a deep copy of DataFrame", t);
-        }
-    }
-
-
-    @Override()
     public final int rowCount() {
         return rowKeys().size();
     }
@@ -284,13 +253,13 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
 
     @Override
     public final DataFrameValue<R,C> get(R rowKey, C colKey) {
-        return data.cursor(this).locate(rowKey, colKey);
+        return data.cursor(this).atKeys(rowKey, colKey);
     }
 
 
     @Override
     public final DataFrameValue<R, C> at(int rowOrdinal, int colOrdinal) {
-        return data.cursor(this).at(rowOrdinal, colOrdinal);
+        return data.cursor(this).atOrdinals(rowOrdinal, colOrdinal);
     }
 
 
@@ -493,6 +462,70 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
 
 
     @Override()
+    @SuppressWarnings("unchecked")
+    public final DataFrame<R,C> copy() {
+        try {
+            var newRowKeys = rowKeys().toArray();
+            var newColKeys = Index.of(colKeys().type(),  colKeys().size());
+            var content = new XDataFrameContent<>(newRowKeys, newColKeys, Object.class);
+            var newFrame = new XDataFrame<R,C>(content, parallel);
+            var newColumn = newFrame.cols().cursor();
+            this.cols().sequential().forEach(column -> {
+                var colKey = column.key();
+                var colClass = column.dataClass();
+                var arrayType = ArrayType.of(colClass);
+                newFrame.cols().add(colKey, colClass);
+                newColumn.atKey(colKey);
+                switch (arrayType) {
+                    case BOOLEAN:       newColumn.applyBooleans(v -> column.getBooleanAt(v.rowOrdinal()));  break;
+                    case INTEGER:       newColumn.applyInts(v -> column.getIntAt(v.rowOrdinal()));          break;
+                    case LONG:          newColumn.applyLongs(v -> column.getLongAt(v.rowOrdinal()));        break;
+                    case DOUBLE:        newColumn.applyDoubles(v -> column.getDoubleAt(v.rowOrdinal()));    break;
+                    case LOCAL_TIME:    newColumn.applyLongs(v -> column.getLongAt(v.rowOrdinal()));        break;
+                    case LOCAL_DATE:    newColumn.applyLongs(v -> column.getLongAt(v.rowOrdinal()));        break;
+                    case ENUM:          newColumn.applyInts(v -> column.getIntAt(v.rowOrdinal()));          break;
+                    default:            newColumn.applyValues(v -> column.getValueAt(v.rowOrdinal()));      break;
+                }
+            });
+            return newFrame;
+        } catch (Throwable t) {
+            throw new DataFrameException("Failed to create a deep copy of DataFrame", t);
+        }
+    }
+
+
+    @Override()
+    public final DataFrame<R,C> update(DataFrame<R,C> update, boolean addRows, boolean addColumns) throws DataFrameException {
+        try {
+            var other = (XDataFrame<R,C>)update;
+            if (addRows) rows().addAll(update.rows().keyArray());
+            if (addColumns) cols().addAll(update);
+            var rowKeys = rowKeys().intersect(other.rowKeys());
+            var colKeys = colKeys().intersect(other.colKeys());
+            var sourceRows = other.rowKeys().ordinals(rowKeys).toArray();
+            var sourceCols = other.colKeys().ordinals(colKeys).toArray();
+            var targetRows = this.rowKeys().ordinals(rowKeys).toArray();
+            var targetCols = this.colKeys().ordinals(colKeys).toArray();
+            var sourceCursor = other.cursor();
+            var targetCursor = this.cursor();
+            for (int i=0; i<sourceRows.length; ++i) {
+                sourceCursor.rowAt(sourceRows[i]);
+                targetCursor.rowAt(targetRows[i]);
+                for (int j=0; j<sourceCols.length; ++j) {
+                    sourceCursor.colAt(sourceCols[j]);
+                    targetCursor.colAt(targetCols[j]);
+                    final Object value = sourceCursor.getValue();
+                    targetCursor.setValue(value);
+                }
+            }
+            return this;
+        } catch (Throwable t) {
+            throw new DataFrameException("DataFrame data bulk update failed: " + t.getMessage(), t);
+        }
+    }
+
+
+    @Override()
     public DataFrame<R,C> sign() throws DataFrameException {
         var rowCount = rowCount();
         var colCount = colCount();
@@ -683,37 +716,6 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
 
 
     @Override()
-    public final DataFrame<R,C> update(DataFrame<R,C> update, boolean addRows, boolean addColumns) throws DataFrameException {
-        try {
-            var other = (XDataFrame<R,C>)update;
-            if (addRows) rows().addAll(update.rows().keyArray());
-            if (addColumns) cols().addAll(update);
-            var rowKeys = rowKeys().intersect(other.rowKeys());
-            var colKeys = colKeys().intersect(other.colKeys());
-            var sourceRows = other.rowKeys().ordinals(rowKeys).toArray();
-            var sourceCols = other.colKeys().ordinals(colKeys).toArray();
-            var targetRows = this.rowKeys().ordinals(rowKeys).toArray();
-            var targetCols = this.colKeys().ordinals(colKeys).toArray();
-            var sourceCursor = other.cursor();
-            var targetCursor = this.cursor();
-            for (int i=0; i<sourceRows.length; ++i) {
-                sourceCursor.rowAt(sourceRows[i]);
-                targetCursor.rowAt(targetRows[i]);
-                for (int j=0; j<sourceCols.length; ++j) {
-                    sourceCursor.colAt(sourceCols[j]);
-                    targetCursor.colAt(targetCols[j]);
-                    final Object value = sourceCursor.getValue();
-                    targetCursor.setValue(value);
-                }
-            }
-            return this;
-        } catch (Throwable t) {
-            throw new DataFrameException("DataFrame data bulk update failed: " + t.getMessage(), t);
-        }
-    }
-
-
-    @Override()
     public Iterator<DataFrameValue<R,C>> iterator() {
         var value = cursor();
         return new Iterator<>() {
@@ -721,7 +723,7 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
             private int colIndex = 0;
             @Override
             public DataFrameValue<R,C> next() {
-                value.at(rowIndex++, colIndex);
+                value.atOrdinals(rowIndex++, colIndex);
                 if (rowIndex == rowCount()) {
                     rowIndex = 0;
                     colIndex++;
@@ -744,7 +746,7 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
             private int colIndex = 0;
             @Override
             public DataFrameValue<R,C> next() {
-                value.at(rowIndex++, colIndex);
+                value.atOrdinals(rowIndex++, colIndex);
                 if (rowIndex == rowCount()) {
                     rowIndex = 0;
                     colIndex++;
@@ -754,7 +756,7 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
             @Override
             public boolean hasNext() {
                 while (rowIndex < rowCount() && colIndex < colCount()) {
-                    value.at(rowIndex, colIndex);
+                    value.atOrdinals(rowIndex, colIndex);
                     if (predicate == null || predicate.test(value)) {
                         return true;
                     } else {
@@ -1230,7 +1232,7 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
                 for (int index=from; index<=to; ++index) {
                     var rowOrdinal = index % rowCount;
                     var colOrdinal = index / rowCount;
-                    value.at(rowOrdinal, colOrdinal);
+                    value.atOrdinals(rowOrdinal, colOrdinal);
                     var result = mapper.applyAsBoolean(value);
                     value.setBoolean(result);
                 }
@@ -1278,7 +1280,7 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
                 for (int index=from; index<=to; ++index) {
                     var rowOrdinal = index % rowCount;
                     var colOrdinal = index / rowCount;
-                    value.at(rowOrdinal, colOrdinal);
+                    value.atOrdinals(rowOrdinal, colOrdinal);
                     var result = mapper.applyAsInt(value);
                     value.setInt(result);
                 }
@@ -1326,7 +1328,7 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
                 for (int index=from; index<=to; ++index) {
                     var rowOrdinal = index % rowCount;
                     var colOrdinal = index / rowCount;
-                    value.at(rowOrdinal, colOrdinal);
+                    value.atOrdinals(rowOrdinal, colOrdinal);
                     var result = mapper.applyAsLong(value);
                     value.setLong(result);
                 }
@@ -1374,7 +1376,7 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
                 for (int index=from; index<=to; ++index) {
                     var rowOrdinal = index % rowCount;
                     var colOrdinal = index / rowCount;
-                    value.at(rowOrdinal, colOrdinal);
+                    value.atOrdinals(rowOrdinal, colOrdinal);
                     var result = mapper.applyAsDouble(value);
                     value.setDouble(result);
                 }
@@ -1422,7 +1424,7 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
                 for (int index=from; index<=to; ++index) {
                     var rowOrdinal = index % rowCount;
                     var colOrdinal = index / rowCount;
-                    value.at(rowOrdinal, colOrdinal);
+                    value.atOrdinals(rowOrdinal, colOrdinal);
                     var result = mapper.apply(value);
                     value.setValue(result);
                 }
@@ -1470,7 +1472,7 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
                 for (int index=from; index<=to; ++index) {
                     var rowOrdinal = index % rowCount;
                     var colOrdinal = index / rowCount;
-                    cursor.at(rowOrdinal, colOrdinal);
+                    cursor.atOrdinals(rowOrdinal, colOrdinal);
                     consumer.accept(cursor);
                 }
             }
@@ -1518,7 +1520,7 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
             if (position <= end) {
                 var rowOrdinal = position % rowCount;
                 var colOrdinal = position / rowCount;
-                this.value.at(rowOrdinal, colOrdinal);
+                this.value.atOrdinals(rowOrdinal, colOrdinal);
                 this.position++;
                 action.accept(value);
                 return true;
@@ -1737,9 +1739,9 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
                             value.colAt(j);
                             if (predicate.test(value)) {
                                 if (min && value.compareTo(result) < 0) {
-                                    result.at(value.rowOrdinal(), value.colOrdinal());
+                                    result.atOrdinals(value.rowOrdinal(), value.colOrdinal());
                                 } else if (!min && value.compareTo(result) > 0) {
-                                    result.at(value.rowOrdinal(), value.colOrdinal());
+                                    result.atOrdinals(value.rowOrdinal(), value.colOrdinal());
                                 }
                             }
                         }
@@ -1757,9 +1759,9 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
                             value.rowAt(j);
                             if (predicate.test(value)) {
                                 if (min && value.compareTo(result) < 0) {
-                                    result.at(value.rowOrdinal(), value.colOrdinal());
+                                    result.atOrdinals(value.rowOrdinal(), value.colOrdinal());
                                 } else if (!min && value.compareTo(result) > 0) {
-                                    result.at(value.rowOrdinal(), value.colOrdinal());
+                                    result.atOrdinals(value.rowOrdinal(), value.colOrdinal());
                                 }
                             }
                         }
@@ -1776,7 +1778,7 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
         private Optional<DataFrameCursor<R,C>> initial() {
             var result = cursor();
             if (rowCount() > colCount()) {
-                result.at(offset, 0);
+                result.atOrdinals(offset, 0);
                 for (int i=0; i<length; ++i) {
                     if (predicate.test(result)) break;
                     result.rowAt(offset + i);
@@ -1788,7 +1790,7 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
                     }
                 }
             } else {
-                result.at(0, offset);
+                result.atOrdinals(0, offset);
                 for (int i=0; i<length; ++i) {
                     if (predicate.test(result)) break;
                     result.colAt(offset + i);
@@ -1876,9 +1878,9 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
                             value.colAt(j);
                             if (predicate.test(value)) {
                                 if (value.compareTo(min) < 0) {
-                                    min.at(value.rowOrdinal(), value.colOrdinal());
+                                    min.atOrdinals(value.rowOrdinal(), value.colOrdinal());
                                 } else if (value.compareTo(max) > 0) {
-                                    max.at(value.rowOrdinal(), value.colOrdinal());
+                                    max.atOrdinals(value.rowOrdinal(), value.colOrdinal());
                                 }
                             }
                         }
@@ -1900,9 +1902,9 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
                             value.rowAt(j);
                             if (predicate.test(value)) {
                                 if (value.compareTo(min) < 0) {
-                                    min.at(value.rowOrdinal(), value.colOrdinal());
+                                    min.atOrdinals(value.rowOrdinal(), value.colOrdinal());
                                 } else if (value.compareTo(max) > 0) {
-                                    max.at(value.rowOrdinal(), value.colOrdinal());
+                                    max.atOrdinals(value.rowOrdinal(), value.colOrdinal());
                                 }
                             }
                         }
@@ -1921,7 +1923,7 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
         private Optional<DataFrameCursor<R,C>> initial() {
             var result = cursor();
             if (rowCount() > colCount()) {
-                result.at(offset, 0);
+                result.atOrdinals(offset, 0);
                 for (int i=0; i<length; ++i) {
                     if (predicate.test(result)) break;
                     result.rowAt(offset + i);
@@ -1933,7 +1935,7 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
                     }
                 }
             } else {
-                result.at(0, offset);
+                result.atOrdinals(0, offset);
                 for (int i=0; i<length; ++i) {
                     if (predicate.test(result)) break;
                     result.colAt(offset + i);

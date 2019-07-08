@@ -40,7 +40,7 @@ public interface DataFrameColumns<R,C> extends DataFrameAxis<C,R,R,C,DataFrameCo
      * @param type      the data type for the column
      * @return          a reference to the column for the key specified
      */
-    DataFrameColumn<R,C> add(C key, Class<?> type);
+    boolean add(C key, Class<?> type);
 
     /**
      * Adds a column if one does not already exist with the values provided
@@ -48,7 +48,7 @@ public interface DataFrameColumns<R,C> extends DataFrameAxis<C,R,R,C,DataFrameCo
      * @param values    the values for column
      * @return          a reference to the column for the key specified
      */
-    DataFrameColumn<R,C> add(C key, Iterable<?> values);
+    boolean add(C key, Iterable<?> values);
 
     /**
      * Adds a column if one does not already exist for the key specified
@@ -57,7 +57,7 @@ public interface DataFrameColumns<R,C> extends DataFrameAxis<C,R,R,C,DataFrameCo
      * @param seed      the function that seeds values for the column
      * @return          a reference to the column for the key specified
      */
-    <T> DataFrame<R,C> add(C key, Class<T> type, Function<DataFrameValue<R,C>,T> seed);
+    <T> boolean add(C key, Class<T> type, Function<DataFrameValue<R,C>,T> seed);
 
     /**
      * Adds columns to this frame based on the column key and value mapping

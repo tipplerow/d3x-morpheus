@@ -25,6 +25,7 @@ import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.Random;
 
+import com.d3x.morpheus.array.Array;
 import com.d3x.morpheus.frame.DataFrame;
 import com.d3x.morpheus.array.ArrayType;
 import com.d3x.morpheus.index.Index;
@@ -124,15 +125,15 @@ public class TestDataFrames {
         final Random random = new Random();
         final Index<T> rowKeys = createRange(rowType, rowCount).toIndex(rowType);
         return DataFrame.of(rowKeys, String.class, columns -> {
-            columns.add("BooleanColumn", Boolean.class).applyBooleans(v -> random.nextBoolean());
-            columns.add("IntegerColumn", Integer.class).applyInts(v -> random.nextInt());
-            columns.add("LongColumn", Long.class).applyLongs(v -> random.nextLong());
-            columns.add("DoubleColumn", Double.class).applyDoubles(v -> random.nextDouble());
-            columns.add("LocalDateColumn", LocalDate.class).applyValues(v -> LocalDate.now().plusDays(v.rowOrdinal()));
-            columns.add("LocalTimeColumn", LocalTime.class).applyValues(v -> LocalDateTime.now().minusSeconds(v.rowOrdinal()).toLocalTime());
-            columns.add("LocalDateTimeColumn", LocalDateTime.class).applyValues(v -> LocalDateTime.now().plusDays(v.rowOrdinal()));
-            columns.add("ZonedDateTimeColumn", ZonedDateTime.class).applyValues(v -> ZonedDateTime.now().plusDays(v.rowOrdinal()));
-            columns.add("EnumColumn", Month.class).applyValues(v -> LocalDateTime.now().minusDays(v.rowOrdinal()).getMonth());
+            columns.add("BooleanColumn", Array.of(Boolean.class, rowCount).applyBooleans(v -> random.nextBoolean()));
+            columns.add("IntegerColumn", Array.of(Integer.class, rowCount).applyInts(v -> random.nextInt()));
+            columns.add("LongColumn", Array.of(Long.class, rowCount).applyLongs(v -> random.nextLong()));
+            columns.add("DoubleColumn", Array.of(Double.class, rowCount).applyDoubles(v -> random.nextDouble()));
+            columns.add("LocalDateColumn", Array.of(LocalDate.class, rowCount).applyValues(v -> LocalDate.now().plusDays(v.index())));
+            columns.add("LocalTimeColumn", Array.of(LocalTime.class, rowCount).applyValues(v -> LocalDateTime.now().minusSeconds(v.index()).toLocalTime()));
+            columns.add("LocalDateTimeColumn", Array.of(LocalDateTime.class, rowCount).applyValues(v -> LocalDateTime.now().plusDays(v.index())));
+            columns.add("ZonedDateTimeColumn", Array.of(ZonedDateTime.class, rowCount).applyValues(v -> ZonedDateTime.now().plusDays(v.index())));
+            columns.add("EnumColumn", Array.of(Month.class, rowCount).applyValues(v -> LocalDateTime.now().minusDays(v.index()).getMonth()));
         });
     }
 

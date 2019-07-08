@@ -356,15 +356,15 @@ abstract class XDataFrameLeastSquares<R,C> implements DataFrameLeastSquares<R,C>
             for (int i=0; i<regressors.size(); ++i) {
                 final C regressor = regressors.get(i);
                 final double betaParam = betaVector.getEntry(i + offset);
-                final double betaStdError = betaCursor.locate(regressor, Field.STD_ERROR).getDouble();
+                final double betaStdError = betaCursor.atKeys(regressor, Field.STD_ERROR).getDouble();
                 final double tStat = betaParam / betaStdError;
                 final double pValue = distribution.cumulativeProbability(-Math.abs(tStat)) * 2d;
                 final double betaCI = betaStdError * distribution.inverseCumulativeProbability(1d - alpha / 2d);
-                this.betaCursor.locate(regressor, Field.PARAMETER).setDouble(betaParam);
-                this.betaCursor.locate(regressor, Field.T_STAT).setDouble(tStat);
-                this.betaCursor.locate(regressor, Field.P_VALUE).setDouble(pValue);
-                this.betaCursor.locate(regressor, Field.CI_LOWER).setDouble(betaParam - betaCI);
-                this.betaCursor.locate(regressor, Field.CI_UPPER).setDouble(betaParam + betaCI);
+                this.betaCursor.atKeys(regressor, Field.PARAMETER).setDouble(betaParam);
+                this.betaCursor.atKeys(regressor, Field.T_STAT).setDouble(tStat);
+                this.betaCursor.atKeys(regressor, Field.P_VALUE).setDouble(pValue);
+                this.betaCursor.atKeys(regressor, Field.CI_LOWER).setDouble(betaParam - betaCI);
+                this.betaCursor.atKeys(regressor, Field.CI_UPPER).setDouble(betaParam + betaCI);
             }
         } catch (Exception ex) {
             throw new DataFrameException("Failed to compute regression coefficient t-stats and p-values", ex);
@@ -486,7 +486,7 @@ abstract class XDataFrameLeastSquares<R,C> implements DataFrameLeastSquares<R,C>
     @Override
     public double getBetaValue(C regressor, Field field) {
         this.computeIf();
-        return betaCursor.locate(regressor, field).getDouble();
+        return betaCursor.atKeys(regressor, field).getDouble();
     }
 
 
@@ -523,7 +523,7 @@ abstract class XDataFrameLeastSquares<R,C> implements DataFrameLeastSquares<R,C>
                 double fitted = intercept;
                 for (int i=0; i<regressors.size(); ++i) {
                     final C regressor = regressors.get(i);
-                    final double x = cursor.locate(rowKey, regressor).getDouble();
+                    final double x = cursor.atKeys(rowKey, regressor).getDouble();
                     final double value = x * slopes[i];
                     fitted += value;
                 }
@@ -663,7 +663,7 @@ abstract class XDataFrameLeastSquares<R,C> implements DataFrameLeastSquares<R,C>
                 return this.interceptCursor.col(field).getDouble();
             } else {
                 final C regressor = (C)value.rowKey();
-                return betaCursor.locate(regressor, field).getDouble();
+                return betaCursor.atKeys(regressor, field).getDouble();
             }
         });
     }

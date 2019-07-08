@@ -466,7 +466,7 @@ public abstract class XDataFrameAlgebra<R,C> implements DataFrameAlgebra<R,C> {
                             var v2 = rightColumn.getDoubleAt(k);
                             value += v1 * v2;
                         }
-                        cursor.at(rowOrdinal, colOrdinal).setDouble(value);
+                        cursor.atOrdinals(rowOrdinal, colOrdinal).setDouble(value);
                     }
                 }
             } catch (Exception ex) {

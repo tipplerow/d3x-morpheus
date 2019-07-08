@@ -95,8 +95,8 @@ public class CorrelationTests {
     @Test(dataProvider = "style")
     public void testCorrelationWithNonNumericColumns(boolean parallel) throws IOException {
         var source = loadSourceData();
-        var input = source.cols().add("NonNumeric", String.class, v -> "Value:" + v.rowOrdinal());
-        var columns = parallel ? input.cols().parallel() : input.cols().sequential();
+        source.cols().add("NonNumeric", String.class, v -> "Value:" + v.rowOrdinal());
+        var columns = parallel ? source.cols().parallel() : source.cols().sequential();
         var corrActual = columns.stats().correlation();
         var corrExpected = loadExpectedColumnCorr();
         DataFrameAsserts.assertEqualsByIndex(corrExpected, corrActual);

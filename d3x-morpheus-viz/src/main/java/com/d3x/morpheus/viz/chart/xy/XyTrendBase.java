@@ -99,7 +99,7 @@ public abstract class XyTrendBase implements XyTrend {
                     this.beta = slr.getBetaValue("Regressor", DataFrameLeastSquares.Field.PARAMETER);
                     this.intercept = slr.getInterceptValue(DataFrameLeastSquares.Field.PARAMETER);
                     this.rSquared = slr.getRSquared();
-                    columns.add(trendKey, Double.class).applyDoubles(v -> {
+                    columns.add(trendKey, Double.class, v -> {
                         final double x = v.rowKey();
                         return beta * x + intercept;
                     });
@@ -121,8 +121,8 @@ public abstract class XyTrendBase implements XyTrend {
         final int seriesIndex = frame.cols().ordinal(seriesKey);
         final IntFunction<X> domainFunc = dataset.domainFunction();
         return DataFrame.of(rowKeys, Object.class, columns -> {
-            columns.add("Regressor", Double.class).applyDoubles(v -> ((Number)domainFunc.apply(v.rowOrdinal())).doubleValue());
-            columns.add(seriesKey, Double.class).applyDoubles(v -> frame.getDoubleAt(v.rowOrdinal(), seriesIndex));
+            columns.add("Regressor", Double.class, v -> ((Number)domainFunc.apply(v.rowOrdinal())).doubleValue());
+            columns.add(seriesKey, Double.class, v -> frame.getDoubleAt(v.rowOrdinal(), seriesIndex));
         });
     }
 

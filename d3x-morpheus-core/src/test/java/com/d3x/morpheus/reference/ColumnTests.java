@@ -469,28 +469,28 @@ public class ColumnTests {
         } else if (type == int.class) {
             target.cols().keys().forEach(colKey -> {
                 target.col(colKey).applyInts(v -> {
-                    return cursor.locate(v.rowKey(), colKey).getInt();
+                    return cursor.atKeys(v.rowKey(), colKey).getInt();
                 });
             });
             DataFrameAsserts.assertEqualsByIndex(source, target);
         } else if (type == long.class) {
             target.cols().keys().forEach(colKey -> {
                 target.col(colKey).applyLongs(v -> {
-                    return cursor.locate(v.rowKey(), colKey).getLong();
+                    return cursor.atKeys(v.rowKey(), colKey).getLong();
                 });
             });
             DataFrameAsserts.assertEqualsByIndex(source, target);
         } else if (type == double.class) {
             target.cols().keys().forEach(colKey -> {
                 target.col(colKey).applyDoubles(v -> {
-                    return cursor.locate(v.rowKey(), colKey).getDouble();
+                    return cursor.atKeys(v.rowKey(), colKey).getDouble();
                 });
             });
             DataFrameAsserts.assertEqualsByIndex(source, target);
         } else {
             target.cols().keys().forEach(colKey -> {
                 target.col(colKey).applyValues(v -> {
-                    return cursor.locate(v.rowKey(), colKey).getValue();
+                    return cursor.atKeys(v.rowKey(), colKey).getValue();
                 });
             });
             DataFrameAsserts.assertEqualsByIndex(source, target);

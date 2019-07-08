@@ -154,11 +154,11 @@ class XDataFrameAlgebraApache<R,C> extends XDataFrameAlgebra<R,C> {
             }
             @Override
             public double getEntry(int rowIndex, int colIndex) throws OutOfRangeException {
-                return cursor.at(rowIndex, colIndex).getDouble();
+                return cursor.atOrdinals(rowIndex, colIndex).getDouble();
             }
             @Override
             public void setEntry(int rowIndex, int colIndex, double value) throws OutOfRangeException {
-                cursor.at(rowIndex, colIndex).setDouble(value);
+                cursor.atOrdinals(rowIndex, colIndex).setDouble(value);
             }
         };
     }

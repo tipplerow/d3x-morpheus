@@ -478,9 +478,10 @@ public interface ChartFactory {
      * @return              the resulting chart
      */
     default <R extends Comparable,C extends Comparable> Chart<XyPlot<Double>> withResidualsVsFitted(DataFrameLeastSquares<R,C> model, Consumer<Chart<XyPlot<Double>>> consumer) {
-        final DataFrame<R,String> residuals = model.getResiduals();
-        final DataFrame<R,String> fittedValues = model.getFittedValues();
-        final DataFrame<R,String> zeroLine = fittedValues.copy().cols().add("Zero", Double.class, v -> 0d);
+        var residuals = model.getResiduals();
+        var fittedValues = model.getFittedValues();
+        var zeroLine = fittedValues.copy();
+        zeroLine.cols().add("Zero", Double.class, v -> 0d);
         final DataFrame<R,String> combined = DataFrame.concatColumns(residuals, fittedValues);
         return Chart.create().withLinePlot(combined, "Fitted", chart -> {
             chart.title().withText("Least Squares Residuals vs Fitted Values");

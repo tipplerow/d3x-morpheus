@@ -89,8 +89,8 @@ public class CovarianceTests {
     @Test(dataProvider = "style")
     public void testCovarianceWithNonNumericColumns(boolean parallel) {
         var source = loadSourceData();
-        var input = source.cols().add("NonNumeric", String.class, v -> "Value:" + v.rowOrdinal());
-        var columns = parallel ? input.cols().parallel() : input.cols().sequential();
+        source.cols().add("NonNumeric", String.class, v -> "Value:" + v.rowOrdinal());
+        var columns = parallel ? source.cols().parallel() : source.cols().sequential();
         var covActual = columns.stats().covariance();
         var covExpected = loadExpectedColumnCov();
         DataFrameAsserts.assertEqualsByIndex(covExpected, covActual);

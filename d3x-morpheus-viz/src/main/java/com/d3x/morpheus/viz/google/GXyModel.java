@@ -134,23 +134,25 @@ class GXyModel<X extends Comparable,S extends Comparable> implements XyModel<X,S
             if (domainKeyTypeSet.size() > 1) {
                 throw new ChartException("Non-homogeneous key types for domain dimension: " + domainKeyTypeSet);
             } else {
-                final Class<X> domainKeyType = domainKeyTypeSet.iterator().next();
-                final Class<S> seriesKeyType = seriesKeyTypeSet.size() > 1 ? (Class<S>)Comparable.class : seriesKeyTypeSet.iterator().next();
-                final int rowCount = datasets.stream().mapToInt(GXyDataset::getDomainSize).max().orElse(0);
-                final int colCount = datasets.stream().mapToInt(GXyDataset::getSeriesCount).sum();
-                final Index<X> rows = Index.of(domainKeyType, rowCount);
-                final Index<S> columns = Index.of(seriesKeyType, colCount);
-                final DataFrame<X,S> frame = DataFrame.ofDoubles(rows, columns);
+                var domainKeyType = domainKeyTypeSet.iterator().next();
+                var seriesKeyType = seriesKeyTypeSet.size() > 1 ? (Class<S>)Comparable.class : seriesKeyTypeSet.iterator().next();
+                var rowCount = datasets.stream().mapToInt(GXyDataset::getDomainSize).max().orElse(0);
+                var colCount = datasets.stream().mapToInt(GXyDataset::getSeriesCount).sum();
+                var rows = Index.of(domainKeyType, rowCount);
+                var columns = Index.of(seriesKeyType, colCount);
+                var frame = DataFrame.ofDoubles(rows, columns);
+                var cursor = frame.cursor();
                 datasets.forEach(dataset -> {
-                    final Iterable<X> domainKeys = dataset.getDomainValues();
+                    var domainKeys = dataset.getDomainValues();
                     frame.rows().addAll(domainKeys);
                     for (int j=0; j<dataset.getSeriesCount(); ++j) {
-                        final S seriesKey = dataset.getSeriesKey(j);
-                        final int colOrdinal = frame.cols().add(seriesKey, Double.class).ordinal();
+                        var seriesKey = dataset.getSeriesKey(j);
+                        frame.cols().add(seriesKey, Double.class);
+                        cursor.col(seriesKey);
                         for (int i=0; i<dataset.getDomainSize(); ++i) {
-                            final X domainKey = dataset.getDomainValue(i);
-                            final double value = dataset.getRangeValue(i, j);
-                            frame.row(domainKey).setDoubleAt(colOrdinal, value);
+                            var domainKey = dataset.getDomainValue(i);
+                            var value = dataset.getRangeValue(i, j);
+                            cursor.row(domainKey).setDouble(value);
                         }
                     }
                 });

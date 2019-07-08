@@ -121,11 +121,11 @@ public class EqualsTest {
         final Index<String> colKeys = Index.of(String.class, 10);
         final DataFrame<String,String> frame = DataFrame.ofObjects(rowKeys, colKeys);
         var rowCount = frame.rowCount();
-        frame.cols().add("C1", Array.of(Boolean.class, rowCount)).applyBooleans(v -> random.nextBoolean());
-        frame.cols().add("C2", Array.of(Integer.class, rowCount)).applyInts(v -> random.nextInt());
-        frame.cols().add("C3", Array.of(Long.class, rowCount)).applyLongs(v -> random.nextLong());
-        frame.cols().add("C4", Array.of(Double.class, rowCount)).applyDoubles(v -> random.nextDouble());
-        frame.cols().add("C5", Array.of(String.class, rowCount)).applyValues(v -> "X:" + random.nextDouble());
+        frame.cols().add("C1", Array.of(Boolean.class, rowCount).applyBooleans(v -> random.nextBoolean()));
+        frame.cols().add("C2", Array.of(Integer.class, rowCount).applyInts(v -> random.nextInt()));
+        frame.cols().add("C3", Array.of(Long.class, rowCount).applyLongs(v -> random.nextLong()));
+        frame.cols().add("C4", Array.of(Double.class, rowCount).applyDoubles(v -> random.nextDouble()));
+        frame.cols().add("C5", Array.of(String.class, rowCount).applyValues(v -> "X:" + random.nextDouble()));
         final DataFrame<String,String> copy = frame.copy();
         Assert.assertTrue(frame.equals(copy), "The frames are equal");
     }
