@@ -167,9 +167,9 @@ public abstract class ArrayBase<T> implements Array<T> {
     public final Array<T> concat(Array<T> other) {
         final Class<T> clazz = type();
         final Array<T> result = Array.of(clazz, length() + other.length());
-        final int[] indexes1 = IntStream.range(0, length()).toArray();
-        final int[] indexes2 = IntStream.range(0, other.length()).toArray();
-        final int[] indexes3 = IntStream.range(0, other.length()).map(i -> i+this.length()).toArray();
+        var indexes1 = IntStream.range(0, length()).toArray();
+        var indexes2 = IntStream.range(0, other.length()).toArray();
+        var indexes3 = IntStream.range(0, other.length()).map(i -> i+this.length()).toArray();
         result.update(this, indexes1, indexes1);
         result.update(other, indexes2, indexes3);
         return result;
@@ -286,7 +286,7 @@ public abstract class ArrayBase<T> implements Array<T> {
 
     @Override
     public final Array<T> applyBooleans(ToBooleanFunction<ArrayValue<T>> function) {
-        final int length = length();
+        var length = length();
         if (length > 0) {
             final ApplyValues action = new ApplyValues(0, length - 1, function);
             if (isParallel()) {
@@ -301,7 +301,7 @@ public abstract class ArrayBase<T> implements Array<T> {
 
     @Override
     public final Array<T> applyInts(ToIntFunction<ArrayValue<T>> function) {
-        final int length = length();
+        var length = length();
         if (length > 0) {
             final ApplyValues action = new ApplyValues(0, length - 1, function);
             if (isParallel()) {
@@ -316,7 +316,7 @@ public abstract class ArrayBase<T> implements Array<T> {
 
     @Override
     public final Array<T> applyLongs(ToLongFunction<ArrayValue<T>> function) {
-        final int length = length();
+        var length = length();
         if (length > 0) {
             final ApplyValues action = new ApplyValues(0, length - 1, function);
             if (isParallel()) {
@@ -331,7 +331,7 @@ public abstract class ArrayBase<T> implements Array<T> {
 
     @Override
     public final Array<T> applyDoubles(ToDoubleFunction<ArrayValue<T>> function) {
-        final int length = length();
+        var length = length();
         if (length > 0) {
             final ApplyValues action = new ApplyValues(0, length - 1, function);
             if (isParallel()) {
@@ -346,7 +346,7 @@ public abstract class ArrayBase<T> implements Array<T> {
 
     @Override
     public final Array<T> applyValues(Function<ArrayValue<T>,T> function) {
-        final int length = length();
+        var length = length();
         if (length > 0) {
             final ApplyValues action = new ApplyValues(0, length - 1, function);
             if (isParallel()) {
@@ -361,7 +361,7 @@ public abstract class ArrayBase<T> implements Array<T> {
 
     @Override
     public final void forEach(Consumer<? super T> consumer) {
-        final int length = length();
+        var length = length();
         if (isParallel() && length > 0) {
             final int processors = Runtime.getRuntime().availableProcessors();
             final int splitThreshold = parallel ? Math.max(length() / processors, 10000) : Integer.MAX_VALUE;
@@ -377,7 +377,7 @@ public abstract class ArrayBase<T> implements Array<T> {
 
     @Override
     public Array<T> forEachBoolean(BooleanConsumer consumer) {
-        final int length = length();
+        var length = length();
         if (isParallel() && length > 0) {
             final int processors = Runtime.getRuntime().availableProcessors();
             final int splitThreshold = parallel ? Math.max(length() / processors, 10000) : Integer.MAX_VALUE;
@@ -394,7 +394,7 @@ public abstract class ArrayBase<T> implements Array<T> {
 
     @Override
     public Array<T> forEachInt(IntConsumer consumer) {
-        final int length = length();
+        var length = length();
         if (isParallel() && length > 0) {
             final int processors = Runtime.getRuntime().availableProcessors();
             final int splitThreshold = parallel ? Math.max(length() / processors, 10000) : Integer.MAX_VALUE;
@@ -411,7 +411,7 @@ public abstract class ArrayBase<T> implements Array<T> {
 
     @Override
     public Array<T> forEachLong(LongConsumer consumer) {
-        final int length = length();
+        var length = length();
         if (isParallel() && length > 0) {
             final int processors = Runtime.getRuntime().availableProcessors();
             final int splitThreshold = parallel ? Math.max(length() / processors, 10000) : Integer.MAX_VALUE;
@@ -428,7 +428,7 @@ public abstract class ArrayBase<T> implements Array<T> {
 
     @Override
     public final Array<T> forEachDouble(DoubleConsumer consumer) {
-        final int length = length();
+        var length = length();
         if (isParallel() && length > 0) {
             final int processors = Runtime.getRuntime().availableProcessors();
             final int splitThreshold = parallel ? Math.max(length() / processors, 10000) : Integer.MAX_VALUE;
@@ -436,7 +436,7 @@ public abstract class ArrayBase<T> implements Array<T> {
             ForkJoinPool.commonPool().invoke(action);
         } else {
             for (int i=0; i<length; ++i) {
-                final double value = getDouble(i);
+                var value = getDouble(i);
                 consumer.accept(value);
             }
         }
@@ -445,7 +445,7 @@ public abstract class ArrayBase<T> implements Array<T> {
 
     @Override
     public final Array<T> forEachValue(Consumer<ArrayValue<T>> consumer) {
-        final int length = length();
+        var length = length();
         if (isParallel() && length > 0) {
             final int processors = Runtime.getRuntime().availableProcessors();
             final int splitThreshold = parallel ? Math.max(length() / processors, 10000) : Integer.MAX_VALUE;
@@ -461,7 +461,7 @@ public abstract class ArrayBase<T> implements Array<T> {
 
     @Override
     public final Optional<ArrayValue<T>> previous(T value) {
-        final int length = length();
+        var length = length();
         if (length == 0) {
             return Optional.empty();
         } else {
@@ -479,7 +479,7 @@ public abstract class ArrayBase<T> implements Array<T> {
 
     @Override
     public final Optional<ArrayValue<T>> next(T value) {
-        final int length = length();
+        var length = length();
         if (length == 0) {
             return Optional.empty();
         } else {
@@ -524,7 +524,7 @@ public abstract class ArrayBase<T> implements Array<T> {
         if (length() == 0) {
             return Optional.empty();
         } else {
-            final int length = this.length();
+            var length = this.length();
             final ArrayCursor<T> cursor = cursor();
             for (int i=0; i<length; ++i) {
                 cursor.moveTo(i);
@@ -542,7 +542,7 @@ public abstract class ArrayBase<T> implements Array<T> {
         if (length() == 0) {
             return Optional.empty();
         } else {
-            final int length = this.length();
+            var length = this.length();
             final ArrayCursor<T> cursor = cursor();
             for (int i=length-1; i>=0; --i) {
                 cursor.moveTo(i);
@@ -650,7 +650,7 @@ public abstract class ArrayBase<T> implements Array<T> {
     @Override()
     public Array<T> shuffle(int count) {
         final Random random = ThreadLocalRandom.current();
-        final int length = length();
+        var length = length();
         for (int i=0; i<count; ++i) {
             for (int j=0; j<length; ++j) {
                 this.swap(j, random.nextInt(length));
@@ -809,7 +809,7 @@ public abstract class ArrayBase<T> implements Array<T> {
      * @return      true if all elements are equal
      */
     private boolean booleanEquals(Array<?> array) {
-        final int length = array.length();
+        var length = array.length();
         for (int i=0; i<length; ++i) {
             final boolean v1 = array.getBoolean(i);
             final boolean v2 = this.getBoolean(i);
@@ -827,7 +827,7 @@ public abstract class ArrayBase<T> implements Array<T> {
      * @return      true if all elements are equal
      */
     private boolean intEquals(Array<?> array) {
-        final int length = array.length();
+        var length = array.length();
         for (int i=0; i<length; ++i) {
             final int v1 = array.getInt(i);
             final int v2 = this.getInt(i);
@@ -845,7 +845,7 @@ public abstract class ArrayBase<T> implements Array<T> {
      * @return      true if all elements are equal
      */
     private boolean longEquals(Array<?> array) {
-        final int length = array.length();
+        var length = array.length();
         for (int i=0; i<length; ++i) {
             final long v1 = array.getLong(i);
             final long v2 = this.getLong(i);
@@ -863,10 +863,10 @@ public abstract class ArrayBase<T> implements Array<T> {
      * @return      true if all elements are equal
      */
     private boolean doubleEquals(Array<?> array) {
-        final int length = array.length();
+        var length = array.length();
         for (int i=0; i<length; ++i) {
-            final double v1 = array.getDouble(i);
-            final double v2 = this.getDouble(i);
+            var v1 = array.getDouble(i);
+            var v2 = this.getDouble(i);
             if (Double.doubleToLongBits(v1) != Double.doubleToLongBits(v2)) {
                 return false;
             }
@@ -881,7 +881,7 @@ public abstract class ArrayBase<T> implements Array<T> {
      * @return      true if all elements are equal
      */
     private boolean objectEquals(Array<?> array) {
-        final int length = array.length();
+        var length = array.length();
         for (int i=0; i<length; ++i) {
             final Object v1 = array.getValue(i);
             final Object v2 = this.getValue(i);
@@ -989,7 +989,7 @@ public abstract class ArrayBase<T> implements Array<T> {
                     final ArrayValueCursor cursor = new ArrayValueCursor();
                     for (int i=from; i<=to; ++i) {
                         cursor.moveTo(i);
-                        final double result = typedFunction.applyAsDouble(cursor);
+                        var result = typedFunction.applyAsDouble(cursor);
                         ArrayBase.this.setDouble(i, result);
                     }
                 } else {
@@ -1079,7 +1079,7 @@ public abstract class ArrayBase<T> implements Array<T> {
                     final ArrayValueCursor cursor = new ArrayValueCursor();
                     for (int i=from; i<=to; ++i) {
                         cursor.moveTo(i);
-                        final double result = typedFunction.applyAsDouble(cursor);
+                        var result = typedFunction.applyAsDouble(cursor);
                         target.setDouble(i, result);
                     }
                 } else {
@@ -1157,9 +1157,9 @@ public abstract class ArrayBase<T> implements Array<T> {
                         typedConsumer.accept(value);
                     }
                 } else if (consumer instanceof DoubleConsumer) {
-                    final DoubleConsumer typedConsumer = (DoubleConsumer)consumer;
+                    var typedConsumer = (DoubleConsumer)consumer;
                     for (int i=from; i<=to; ++i) {
-                        final double value = getDouble(i);
+                        var value = getDouble(i);
                         typedConsumer.accept(value);
                     }
                 } else {

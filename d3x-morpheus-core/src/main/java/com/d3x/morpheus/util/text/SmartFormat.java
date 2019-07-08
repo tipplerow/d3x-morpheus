@@ -106,7 +106,7 @@ public class SmartFormat extends java.text.Format {
             buffer.append(value.toString());
             return buffer;
         } else if (value instanceof Double) {
-            final Double doubleValue = (Double)value;
+            var doubleValue = (Double)value;
             if (Double.isNaN(doubleValue)) {
                 buffer.append("NaN");
             } else if (Math.abs(doubleValue) > 1000000000d) {

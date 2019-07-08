@@ -123,7 +123,7 @@ class IndexOfObjects<K> extends IndexBase<K> {
         if (isFilter()) {
             throw new IndexException("Cannot add keys to an filter on another index");
         } else {
-            final int[] count = new int[1];
+            var count = new int[1];
             keys.forEach(key -> {
                 if (!indexMap.containsKey(key)) {
                     final int index = indexMap.size();

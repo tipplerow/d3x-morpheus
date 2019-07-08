@@ -75,6 +75,12 @@ public interface DataFrameColumns<R,C> extends DataFrameAxis<C,R,R,C,DataFrameCo
     Array<C> addAll(Iterable<C> colKeys, Class<?> type);
 
     /**
+     * Returns a newly created column cursor
+     * @return      the newly created column cursor
+     */
+    DataFrameColumn.Cursor<R,C> cursor();
+
+    /**
      * Returns a reference to the stats API for the column dimension
      * @return      the stats API to operate in the column dimension
      */

@@ -71,7 +71,7 @@ class ArrayStats<T extends Number> implements Stats<Number> {
      */
     private Number compute(Statistic1 stat) {
         for (int i=0; i<length; ++i) {
-            final double value = array.getDouble(offset + i);
+            var value = array.getDouble(offset + i);
             if (!Double.isNaN(value)) {
                 stat.add(value);
             }

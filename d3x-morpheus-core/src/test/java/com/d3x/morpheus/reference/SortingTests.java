@@ -251,10 +251,10 @@ public class SortingTests {
             for (int j = 0; j<frame.colCount(); ++j) {
                 final LocalDate date = frame.rows().key(i);
                 final String column = frame.cols().key(j);
-                final int rowIndexLeft = frame.rows().ordinal(date);
-                final int colIndexLeft = frame.cols().ordinal(column);
-                final int rowIndexRight = sorted.rows().ordinal(date);
-                final int colIndexRight = sorted.cols().ordinal(column);
+                var rowIndexLeft = frame.rows().ordinal(date);
+                var colIndexLeft = frame.cols().ordinal(column);
+                var rowIndexRight = sorted.rows().ordinal(date);
+                var colIndexRight = sorted.cols().ordinal(column);
                 final Object left = frame.getValueAt(rowIndexLeft, colIndexLeft);
                 final Object right = sorted.getValueAt(rowIndexRight, colIndexRight);
                 Assert.assertEquals(left, right, "Values equal at (" + date + "," + column + ")");
@@ -297,7 +297,7 @@ public class SortingTests {
 
     @Test()
     public void testSortLargeFrame() throws Exception {
-        final int size = 5000000;
+        var size = 5000000;
         final long t1 = System.nanoTime();
         final Range<Integer> rows = Range.of(0, size);
         final Range<Integer> columns = Range.of(0, 10);
@@ -314,19 +314,19 @@ public class SortingTests {
 
     @Test()
     public void testSortBasic() {
-        final int size = 5000000;
-        final int[] modelIndexes = IntStream.range(0, size).toArray();
+        var size = 5000000;
+        var modelIndexes = IntStream.range(0, size).toArray();
         final double[] values = IntStream.range(0, size).mapToDouble(i -> Math.random()).toArray();
         final IntComparator comparator = (int viewIndex1, int viewIndex2) -> {
-            final int modelIndex1 = modelIndexes[viewIndex1];
-            final int modelIndex2 = modelIndexes[viewIndex2];
+            var modelIndex1 = modelIndexes[viewIndex1];
+            var modelIndex2 = modelIndexes[viewIndex2];
             final double v1 = values[modelIndex1];
             final double v2 = values[modelIndex2];
             return Double.compare(v1, v2);
         };
         final Swapper swapper = (int viewIndex1, int viewIndex2) -> {
-            final int modelIndex1 = modelIndexes[viewIndex1];
-            final int modelIndex2 = modelIndexes[viewIndex2];
+            var modelIndex1 = modelIndexes[viewIndex1];
+            var modelIndex2 = modelIndexes[viewIndex2];
             modelIndexes[viewIndex1] = modelIndex2;
             modelIndexes[viewIndex2] = modelIndex1;
         };
@@ -355,11 +355,11 @@ public class SortingTests {
             final DataFrame<LocalDate,String> df1 = frame.rows().select(row -> row.getBoolean("Booleans") == booleanValue);
             Assert.assertTrue(df1.rowCount() > 0, "There is at least one row with boolean = " + booleanValue);
             for (int j=1; j<df1.rowCount(); ++j) {
-                final int int1 = df1.col("Integers").getIntAt(j - 1);
-                final int int2 = df1.col("Integers").getIntAt(j);
+                var int1 = df1.col("Integers").getIntAt(j - 1);
+                var int2 = df1.col("Integers").getIntAt(j);
                 Assert.assertTrue(Integer.compare(int1, int2) <= 0, "Integers are sorted for boolean=" + booleanValue + ": " + int1 + " > " + int2);
             }
-            final int[] intValues = df1.col("Integers").toIntStream().distinct().toArray();
+            var intValues = df1.col("Integers").toIntStream().distinct().toArray();
             for (int intValue: intValues) {
                 final DataFrame<LocalDate,String> df2 = df1.rows().select(row -> row.getInt("Integers") == intValue);
                 Assert.assertTrue(df2.rowCount() > 0, "There is at least one row with value = " + intValue);
@@ -440,11 +440,11 @@ public class SortingTests {
             final DataFrame<LocalDate,String> df1 = frame.rows().select(row -> row.getBoolean("Booleans") == booleanValue);
             Assert.assertTrue(df1.rowCount() > 0, "There is at least one row with boolean = " + booleanValue);
             for (int j=1; j<df1.rowCount(); ++j) {
-                final int int1 = df1.col("Integers").getIntAt(j - 1);
-                final int int2 = df1.col("Integers").getIntAt(j);
+                var int1 = df1.col("Integers").getIntAt(j - 1);
+                var int2 = df1.col("Integers").getIntAt(j);
                 Assert.assertTrue(Integer.compare(int1, int2) <= 0, "Integers are sorted for boolean=" + booleanValue);
             }
-            final int[] intValues = df1.col("Integers").toIntStream().distinct().toArray();
+            var intValues = df1.col("Integers").toIntStream().distinct().toArray();
             for (int intValue: intValues) {
                 final DataFrame<LocalDate,String> df2 = df1.rows().select(row -> row.getInt("Integers") == intValue);
                 Assert.assertTrue(df2.rowCount() > 0, "There is at least one row with value = " + intValue);
@@ -520,8 +520,8 @@ public class SortingTests {
         sorted.out().print();
         sorted.rows().forEach(row -> {
             if (row.ordinal() > 0) {
-                final Integer key0 = sorted.rows().key(row.ordinal()-1);
-                final Integer key1 = sorted.rows().key(row.ordinal());
+                var key0 = sorted.rows().key(row.ordinal()-1);
+                var key1 = sorted.rows().key(row.ordinal());
                 if (ascending) {
                     Assert.assertTrue(key0.compareTo(key1) < 0, "Keys are in ascending order");
                 } else {
@@ -609,8 +609,8 @@ public class SortingTests {
      * @return          the newly created test frame
      */
     private DataFrame<String,LocalDate> createColumnTestFrame(Class type, boolean parallel, int colCount) {
-        final int rowCount = 10;
-        final int intervalSize = 5;
+        var rowCount = 10;
+        var intervalSize = 5;
         final Random random = new Random();
         final LocalDate startDate = LocalDate.of(1990,1,1);
         final DataFrame<String,LocalDate> frame = DataFrame.of(String.class, LocalDate.class);

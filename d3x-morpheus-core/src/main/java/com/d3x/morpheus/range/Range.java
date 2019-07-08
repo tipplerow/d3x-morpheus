@@ -180,7 +180,7 @@ public interface Range<T> extends Iterable<T> {
     @SuppressWarnings("unchecked")
     default Array<T> toArray(boolean parallel) {
         if (!parallel) {
-            final int length = (int)estimateSize();
+            var length = (int)estimateSize();
             final Iterable<Object> iterable = (Iterable<Object>)this;
             return (Array<T>)ArrayBuilder.of(length).addAll(iterable).toArray();
         } else {
@@ -197,7 +197,7 @@ public interface Range<T> extends Iterable<T> {
     @SuppressWarnings("unchecked")
     default Array<T> toArray(Class<T> type) {
         if (this instanceof RangeBase) {
-            final int length = (int)((RangeBase)this).estimateSize();
+            var length = (int)((RangeBase)this).estimateSize();
             return stream().collect(ArrayUtils.toArray(type, length));
         } else {
             return stream().collect(ArrayUtils.toArray(type, 1000));
@@ -211,7 +211,7 @@ public interface Range<T> extends Iterable<T> {
      */
     default Index<T> toIndex(Class<T> type) {
         if (this instanceof RangeBase) {
-            final int length = (int)((RangeBase)this).estimateSize();
+            var length = (int)((RangeBase)this).estimateSize();
             return Index.of(stream().collect(ArrayUtils.toArray(type, length)));
         } else {
             return Index.of(stream().collect(ArrayUtils.toArray(type, 1000)));

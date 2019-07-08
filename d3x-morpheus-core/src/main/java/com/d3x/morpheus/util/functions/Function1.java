@@ -195,7 +195,7 @@ public class Function1<I,O> implements Function<I,O> {
             final long longValue = applyAsLong(value);
             return longValue == 0L ? (O)ZERO_LONG : (O)Long.valueOf(longValue);
         } else if (style == FunctionStyle.DOUBLE) {
-            final double doubleValue = applyAsDouble(value);
+            var doubleValue = applyAsDouble(value);
             return Double.isNaN(doubleValue) ? (O)NAN_DOUBLE : doubleValue == 0d ? (O)ZERO_DOUBLE : (O)Double.valueOf(doubleValue);
         } else {
             throw new UnsupportedOperationException("This function is not implemented: " + style);

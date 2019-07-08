@@ -60,7 +60,7 @@ class XDataFramePrinter {
         try {
             final String[] headers = getHeaderTokens(frame);
             final String[][] data = getDataTokens(frame);
-            final int[] widths = getWidths(headers, data);
+            var widths = getWidths(headers, data);
             final String dataTemplate = getDataTemplate(widths);
             final String headerTemplate = getHeaderTemplate(widths, headers);
             final int totalWidth = IntStream.of(widths).map(w -> w + 5).sum()-1;
@@ -120,7 +120,7 @@ class XDataFramePrinter {
         final String[][] data = new String[rowCount][colCount];
         final DataFrameCursor<?,?> cursor = frame.cursor().at(0, 0);
         for (int i=0; i<rowCount; ++i) {
-            cursor.toRowAt(i);
+            cursor.rowAt(i);
             for (int j=0; j<=frame.colCount(); ++j) {
                 try {
                     if (j == 0) {
@@ -128,7 +128,7 @@ class XDataFramePrinter {
                         final String rowText = rowKeyPrinter.apply(rowKey);
                         data[i][j] = rowText;
                     } else {
-                        cursor.toColAt(j-1);
+                        cursor.colAt(j-1);
                         final Printer<Object> printer = printers.get(j -1);
                         final Object value = cursor.getValue();
                         final String text =  printer.apply(value);
@@ -153,7 +153,7 @@ class XDataFramePrinter {
         final Printer<Object> objectPrinter = formats.getPrinterOrFail(Object.class);
         return frame.cols().stream().map(col -> {
             final Object colKey = col.key();
-            final Class<?> colType = col.typeInfo();
+            final Class<?> colType = col.dataClass();
             final Printer<Object> printer0 = formats.getPrinter(colKey);
             final Printer<Object> printer1 = formats.getPrinter(colType);
             final Printer<Object> printer = printer0 != null ? printer0 : printer1;
@@ -169,7 +169,7 @@ class XDataFramePrinter {
      * @return          the required column widths
      */
     private static int[] getWidths(String[] headers, String[][] data) {
-        final int[] widths = new int[headers.length];
+        var widths = new int[headers.length];
         for (int j=0; j<headers.length; ++j) {
             final String header = headers[j];
             widths[j] = Math.max(widths[j], header != null ? header.length() : 0);
@@ -192,7 +192,7 @@ class XDataFramePrinter {
     private static String getHeaderTemplate(int[] widths, String[] headers) {
         return IntStream.range(0, widths.length).mapToObj(i -> {
             final int width = widths[i];
-            final int length = headers[i].length();
+            var length = headers[i].length();
             final int leading = (width - length) / 2;
             final int trailing = width - (length + leading);
             final StringBuilder text = new StringBuilder();

@@ -92,7 +92,7 @@ public class BinarySearchTests {
         indexes.forEachValue(v -> {
             final int index = v.getInt();
             final int offset = Math.max(0, index - 1295);
-            final int length = Math.min(values.length() - offset, offset + 31374);
+            var length = Math.min(values.length() - offset, offset + 31374);
             final double target = values.getDouble(index);
             final Optional<DataFrameValue<String,Integer>> match1 = frame.rowAt(0).binarySearch(target);
             final Optional<DataFrameValue<String,Integer>> match2 = frame.rowAt(0).binarySearch(target, Double::compare);
@@ -117,7 +117,7 @@ public class BinarySearchTests {
         indexes.forEachValue(v -> {
             final int index = v.getInt();
             final int offset = Math.max(0, index - 1295);
-            final int length = Math.min(values.length() - offset, offset + 31374);
+            var length = Math.min(values.length() - offset, offset + 31374);
             final double target = values.getDouble(index);
             final Optional<DataFrameValue<Integer,String>> match1 = frame.colAt(0).binarySearch(target);
             final Optional<DataFrameValue<Integer,String>> match2 = frame.colAt(0).binarySearch(target, Double::compare);

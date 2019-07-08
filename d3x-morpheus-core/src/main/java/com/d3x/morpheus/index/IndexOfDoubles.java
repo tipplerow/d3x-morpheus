@@ -121,7 +121,7 @@ class IndexOfDoubles extends IndexBase<Double> {
         if (isFilter()) {
             throw new IndexException("Cannot add keys to an filter on another index");
         } else {
-            final int[] count = new int[1];
+            var count = new int[1];
             keys.forEach(key -> {
                 final double keyAsDouble = key;
                 if (!indexMap.containsKey(keyAsDouble)) {

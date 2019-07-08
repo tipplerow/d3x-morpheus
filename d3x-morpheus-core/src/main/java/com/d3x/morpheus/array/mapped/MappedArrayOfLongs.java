@@ -180,7 +180,7 @@ class MappedArrayOfLongs extends ArrayBase<Long> {
     @Override()
     public final Array<Long> copy(int start, int end) {
         try {
-            final int newLength = end - start;
+            var newLength = end - start;
             final File newFile = MappedArrayConstructor.randomFile(true);
             final MappedArrayOfLongs copy = new MappedArrayOfLongs(newLength, defaultValue, newFile);
             for (int i=0; i<newLength; ++i) {
@@ -245,8 +245,8 @@ class MappedArrayOfLongs extends ArrayBase<Long> {
             throw new ArrayException("The from index array must have the same length as the to index array");
         } else {
             for (int i=0; i<fromIndexes.length; ++i) {
-                final int toIndex = toIndexes[i];
-                final int fromIndex = fromIndexes[i];
+                var toIndex = toIndexes[i];
+                var fromIndex = fromIndexes[i];
                 final long update = from.getLong(fromIndex);
                 this.setLong(toIndex, update);
             }
@@ -347,9 +347,9 @@ class MappedArrayOfLongs extends ArrayBase<Long> {
             int low = start;
             int high = end - 1;
             while (low <= high) {
-                final int midIndex = (low + high) >>> 1;
+                var midIndex = (low + high) >>> 1;
                 final long midValue = buffer.get(midIndex);
-                final int result = Long.compare(midValue, value);
+                var result = Long.compare(midValue, value);
                 if (result < 0) {
                     low = midIndex + 1;
                 } else if (result > 0) {
@@ -367,7 +367,7 @@ class MappedArrayOfLongs extends ArrayBase<Long> {
 
     @Override
     public final Array<Long> distinct(int limit) {
-        final int capacity = limit < Integer.MAX_VALUE ? limit : 100;
+        var capacity = limit < Integer.MAX_VALUE ? limit : 100;
         final TLongSet set = new TLongHashSet(capacity);
         final ArrayBuilder<Long> builder = ArrayBuilder.of(capacity, Long.class);
         for (int i=0; i<length(); ++i) {
@@ -385,7 +385,7 @@ class MappedArrayOfLongs extends ArrayBase<Long> {
 
     @Override
     public final Array<Long> cumSum() {
-        final int length = length();
+        var length = length();
         final Array<Long> result = Array.of(Long.class, length);
         result.setLong(0, buffer.get(0));
         for (int i=1; i<length; ++i) {

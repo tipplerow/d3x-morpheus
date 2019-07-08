@@ -37,7 +37,7 @@ public class ArrayMappedTests {
 
     @Test()
     public void testBuild() {
-        final int length = 10000;
+        var length = 10000;
         final Array<Double> dense = Array.of(Double.class, length).applyDoubles(v -> Math.random() * 100);
         final Array<Double> mapped = Array.map(Double.class, length, Double.NaN).applyDoubles(v -> dense.getDouble(v.index()));
         for (int i=0; i<mapped.length(); ++i) {
@@ -55,7 +55,7 @@ public class ArrayMappedTests {
 
     @Test()
     public void testCopy() {
-        final int length = 10000;
+        var length = 10000;
         final Array<Double> mapped = Array.map(Double.class, length, Double.NaN).applyDoubles(v -> Math.random() * 100);
         final Array<Double> copy = mapped.copy();
         Assert.assertEquals(mapped.length(), copy.length());

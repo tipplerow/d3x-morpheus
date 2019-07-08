@@ -298,7 +298,7 @@ public class RowTests {
     public void testIntStream()  {
         final DataFrame<String,String> frame = TestDataFrames.random(int.class, 100, 100);
         frame.rows().forEach(row -> {
-            final int[] rowValues = row.toIntStream().toArray();
+            var rowValues = row.toIntStream().toArray();
             for (int i = 0; i < row.size(); ++i) {
                 final String rowKey = row.key();
                 final String colKey = frame.cols().key(i);
@@ -606,7 +606,7 @@ public class RowTests {
 
     @Test()
     public void testStreamOfRows() {
-        final int[] rowCount = new int[1];
+        var rowCount = new int[1];
         final LocalDate start = LocalDate.now().minusYears(10);
         final Index<String> columns = Index.ofObjects("X", "Y", "Z");
         final Index<LocalDate> dates = Range.of(0, 5000).map(start::plusDays).toIndex(LocalDate.class);

@@ -123,17 +123,17 @@ class XDataFrameStatsRolling<R,C> extends XDataFrameStatsBase<R,C> {
                 final DataFrameCursor<R,C> readCursor = frame.cursor();
                 final DataFrameCursor<R,C> writeCursor = result.cursor();
                 for (int rowIndex = from; rowIndex < rowCount; ++rowIndex) {
-                    readCursor.toRowAt(rowIndex);
-                    writeCursor.toRowAt(rowIndex);
+                    readCursor.rowAt(rowIndex);
+                    writeCursor.rowAt(rowIndex);
                     for (int colIndex = windowSize-1; colIndex < colCount; colIndex++) {
                         this.statistic.reset();
                         final int from = colIndex - windowSize + 1;
                         for (int i = from; i <= colIndex; ++i) {
-                            final double value = readCursor.toColAt(i).getDouble();
+                            final double value = readCursor.colAt(i).getDouble();
                             this.statistic.add(value);
                         }
                         final double statValue = statistic.getValue();
-                        writeCursor.toColAt(colIndex);
+                        writeCursor.colAt(colIndex);
                         writeCursor.setDouble(statValue);
                     }
                 }
@@ -183,18 +183,18 @@ class XDataFrameStatsRolling<R,C> extends XDataFrameStatsBase<R,C> {
                 final DataFrameCursor<R,C> readCursor = frame.cursor();
                 final DataFrameCursor<R,C> writeCursor = result.cursor();
                 for (int colIndex = from; colIndex < colCount; ++colIndex) {
-                    readCursor.toColAt(colIndex);
-                    writeCursor.toColAt(colIndex);
+                    readCursor.colAt(colIndex);
+                    writeCursor.colAt(colIndex);
                     for (int rowIndex = windowSize-1; rowIndex < rowCount; rowIndex++) {
                         this.statistic.reset();
                         final int from = rowIndex - windowSize + 1;
                         for (int i = from; i <= rowIndex; ++i) {
-                            readCursor.toRowAt(i);
+                            readCursor.rowAt(i);
                             final double value = readCursor.getDouble();
                             this.statistic.add(value);
                         }
                         final double statValue = statistic.getValue();
-                        writeCursor.toRowAt(rowIndex);
+                        writeCursor.rowAt(rowIndex);
                         writeCursor.setDouble(statValue);
                     }
                 }

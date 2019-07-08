@@ -65,7 +65,7 @@ abstract class RangeBase<T> implements Range<T> {
     int[] getSegmentSteps(int totalStepCount) {
         final int segmentStepCount = totalStepCount / Runtime.getRuntime().availableProcessors();
         final int segmentCount = totalStepCount / segmentStepCount;
-        final int[] segmentSteps = new int[segmentCount];
+        var segmentSteps = new int[segmentCount];
         Arrays.fill(segmentSteps, segmentStepCount);
         final int padding = totalStepCount - IntStream.of(segmentSteps).sum();
         if (padding > 0) segmentSteps[segmentSteps.length-1] += padding;

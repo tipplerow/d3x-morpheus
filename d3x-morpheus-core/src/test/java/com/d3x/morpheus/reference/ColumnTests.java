@@ -126,10 +126,10 @@ public class ColumnTests {
         final DataFrame<Integer,Integer> frame = TestDataFrames.random2(type, 100000, 10);
         final DataFrameColumns<Integer,Integer> columns = parallel ? frame.cols().parallel() : frame.cols().sequential();
         columns.forEach(column -> {
-            final ArrayType arrayType = ArrayType.of(column.typeInfo());
+            final ArrayType arrayType = ArrayType.of(column.dataClass());
             column.forEachValue(value -> {
-                final Integer rowKey = value.rowKey();
-                final Integer colKey = value.colKey();
+                var rowKey = value.rowKey();
+                var colKey = value.colKey();
                 final int rowOrdinal = frame.rows().ordinal(rowKey);
                 final int colOrdinal = frame.cols().ordinal(colKey);
                 switch (arrayType) {
@@ -294,7 +294,7 @@ public class ColumnTests {
     public void testIntStream() throws Exception {
         final DataFrame<String,String> frame = TestDataFrames.random(int.class, 100, 100);
         frame.cols().forEach(column -> {
-            final int[] columnValues = column.values().mapToInt(DataFrameValue::getInt).toArray();
+            var columnValues = column.values().mapToInt(DataFrameValue::getInt).toArray();
             for (int i = 0; i < column.size(); ++i) {
                 final String rowKey = frame.rows().key(i);
                 final String colKey = column.key();
@@ -462,35 +462,35 @@ public class ColumnTests {
         if (type == boolean.class) {
             target.cols().keys().forEach(colKey -> {
                 target.col(colKey).applyBooleans(v -> {
-                    return cursor.toRowAt(v.rowOrdinal()).toCol(colKey).getBoolean();
+                    return cursor.rowAt(v.rowOrdinal()).col(colKey).getBoolean();
                 });
             });
             DataFrameAsserts.assertEqualsByIndex(source, target);
         } else if (type == int.class) {
             target.cols().keys().forEach(colKey -> {
                 target.col(colKey).applyInts(v -> {
-                    return cursor.atKeys(v.rowKey(), colKey).getInt();
+                    return cursor.locate(v.rowKey(), colKey).getInt();
                 });
             });
             DataFrameAsserts.assertEqualsByIndex(source, target);
         } else if (type == long.class) {
             target.cols().keys().forEach(colKey -> {
                 target.col(colKey).applyLongs(v -> {
-                    return cursor.atKeys(v.rowKey(), colKey).getLong();
+                    return cursor.locate(v.rowKey(), colKey).getLong();
                 });
             });
             DataFrameAsserts.assertEqualsByIndex(source, target);
         } else if (type == double.class) {
             target.cols().keys().forEach(colKey -> {
                 target.col(colKey).applyDoubles(v -> {
-                    return cursor.atKeys(v.rowKey(), colKey).getDouble();
+                    return cursor.locate(v.rowKey(), colKey).getDouble();
                 });
             });
             DataFrameAsserts.assertEqualsByIndex(source, target);
         } else {
             target.cols().keys().forEach(colKey -> {
                 target.col(colKey).applyValues(v -> {
-                    return cursor.atKeys(v.rowKey(), colKey).getValue();
+                    return cursor.locate(v.rowKey(), colKey).getValue();
                 });
             });
             DataFrameAsserts.assertEqualsByIndex(source, target);
@@ -574,7 +574,7 @@ public class ColumnTests {
 
     @Test()
     public void testStreamOfColumns() {
-        final int[] colCount = new int[1];
+        var colCount = new int[1];
         final LocalDate start = LocalDate.now().minusYears(10);
         final LocalDate end = start.plusDays(5000);
         final Index<LocalDate> rowKeys = Range.of(start, end).toIndex(LocalDate.class);
@@ -644,7 +644,7 @@ public class ColumnTests {
         final DataFrame<Integer,String> frame = TestDataFrames.createMixedRandomFrame(Integer.class, 1000);
         frame.cols().forEach(column -> {
             final Array<?> array = column.toArray();
-            final Class<?> expectedType = column.typeInfo();
+            final Class<?> expectedType = column.dataClass();
             Assert.assertEquals(array.type(), expectedType, "Type is as expected");
             column.forEachValue(v -> {
                 final Object expected = v.getValue();

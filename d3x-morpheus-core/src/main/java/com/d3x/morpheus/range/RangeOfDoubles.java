@@ -72,7 +72,7 @@ class RangeOfDoubles extends RangeBase<Double> {
 
     @Override
     public List<Range<Double>> split(int splitThreshold) {
-        final int[] segmentSteps = getSegmentSteps((int)estimateSize());
+        var segmentSteps = getSegmentSteps((int)estimateSize());
         if (segmentSteps[0] < splitThreshold) {
             return Collections.singletonList(this);
         } else {

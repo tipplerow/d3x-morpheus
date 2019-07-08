@@ -81,7 +81,7 @@ public interface Tuple extends Comparable<Tuple>, Serializable {
     @SuppressWarnings("unchecked")
     default int compareTo(Tuple other) {
         try {
-            final int length = Math.max(size(), other.size());
+            var length = Math.max(size(), other.size());
             for (int i=0; i<length; ++i) {
                 final Object v1 = i < this.size() ? item(i) : null;
                 final Object v2 = i < other.size() ? other.item(i) : null;

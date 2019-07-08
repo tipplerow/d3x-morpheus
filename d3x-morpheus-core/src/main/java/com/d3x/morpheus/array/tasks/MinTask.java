@@ -59,7 +59,7 @@ public class MinTask<T> extends RecursiveTask<T> {
     public T compute() {
         try {
             if (array.length() == 0) return null;
-            final int length = to - from + 1;
+            var length = to - from + 1;
             if (length > splitThreshold) {
                 final int splitLength = (to - from) / 2;
                 final int midPoint = from + splitLength;

@@ -85,11 +85,11 @@ class XDataFrameRows<R,C> extends XDataFrameAxisBase<R,C,R,C,DataFrameRow<R,C>,D
             return content.rowKeys().getOrdinal(key);
         } else {
             final XDataFrame<R,C> frame = frame();
-            final int ordinal = content.rowKeys().getOrdinal(key);
+            var ordinal = content.rowKeys().getOrdinal(key);
             if (initials != null) {
-                final DataFrameCursor<R,C> value = frame.cursor().toRowAt(ordinal);
+                final DataFrameCursor<R,C> value = frame.cursor().rowAt(ordinal);
                 for (int i=0; i<frame.colCount(); ++i) {
-                    value.toColAt(i);
+                    value.colAt(i);
                     final Object result = initials.apply(value);
                     value.setValue(result);
                 }
@@ -111,9 +111,9 @@ class XDataFrameRows<R,C> extends XDataFrameAxisBase<R,C,R,C,DataFrameRow<R,C>,D
         if (initials != null) {
             final DataFrameCursor<R,C> cursor = frame().cursor();
             added.forEach(rowKey -> {
-                cursor.toRow(rowKey);
+                cursor.row(rowKey);
                 for (int i=0; i<frame().colCount(); ++i) {
-                    cursor.toColAt(i);
+                    cursor.colAt(i);
                     Object value = initials.apply(cursor);
                     cursor.setValue(value);
                 }
@@ -160,6 +160,11 @@ class XDataFrameRows<R,C> extends XDataFrameAxisBase<R,C,R,C,DataFrameRow<R,C>,D
     }
 
     @Override
+    public DataFrameRow.Cursor<R, C> cursor() {
+        return new XDataFrameRow<>(frame(), isParallel());
+    }
+
+    @Override
     public final DataFrameAxisStats<R,R,C,R,StatType> stats() {
         return new XDataFrameAxisStats<>(frame(), isParallel(), false);
     }
@@ -196,7 +201,7 @@ class XDataFrameRows<R,C> extends XDataFrameAxisBase<R,C,R,C,DataFrameRow<R,C>,D
             return frame().copy().rows().demean(true);
         } else {
             frame().rows().forEach(row -> {
-                final double mean = row.stats().mean();
+                var mean = row.stats().mean();
                 row.applyDoubles(v -> v.getDouble() - mean);
             });
             return frame();
@@ -209,7 +214,7 @@ class XDataFrameRows<R,C> extends XDataFrameAxisBase<R,C,R,C,DataFrameRow<R,C>,D
             throw new DataFrameException("Row axis is immutable for this frame, call copy() first");
         } else {
             var row = new XDataFrameRow<R,C>(frame(), false);
-            return frame().mapRowKeys((key, ordinal) -> mapper.apply(row.moveTo(ordinal)));
+            return frame().mapRowKeys((key, ordinal) -> mapper.apply(row.atOrdinal(ordinal)));
         }
     }
 
@@ -221,12 +226,12 @@ class XDataFrameRows<R,C> extends XDataFrameAxisBase<R,C,R,C,DataFrameRow<R,C>,D
         final DataFrameCursor<R,StatType> cursor = result.cursor();
         this.filter(DataFrameRow::isNumeric).forEach(row -> {
             final R key = row.key();
-            cursor.toRow(key);
+            cursor.row(key);
             final Stats<Double> rowStats = row.stats();
             for (int j = 0; j < statKeys.length(); ++j) {
                 final StatType stat = statKeys.getValue(j);
-                final double value = stat.apply(rowStats);
-                cursor.toColAt(j).setDouble(value);
+                var value = stat.apply(rowStats);
+                cursor.colAt(j).setDouble(value);
             }
         });
         return result;
@@ -235,10 +240,10 @@ class XDataFrameRows<R,C> extends XDataFrameAxisBase<R,C,R,C,DataFrameRow<R,C>,D
 
     @Override
     public final void forEachValue(R key, Consumer<DataFrameValue<R, C>> consumer) {
-        final int colCount = frame().colCount();
-        final DataFrameCursor<R,C> cursor = frame().cursor().toRow(key);
+        var colCount = frame().colCount();
+        final DataFrameCursor<R,C> cursor = frame().cursor().row(key);
         for (int j=0; j<colCount; ++j) {
-            cursor.toColAt(j);
+            cursor.colAt(j);
             consumer.accept(cursor);
         }
     }
@@ -246,10 +251,10 @@ class XDataFrameRows<R,C> extends XDataFrameAxisBase<R,C,R,C,DataFrameRow<R,C>,D
 
     @Override
     public final DataFrame<R,C> applyBooleans(R key, ToBooleanFunction<DataFrameValue<R,C>> function) {
-        final int colCount = frame().colCount();
-        final DataFrameCursor<R,C> cursor = frame().cursor().toRow(key);
+        var colCount = frame().colCount();
+        final DataFrameCursor<R,C> cursor = frame().cursor().row(key);
         for (int j=0; j<colCount; ++j) {
-            final boolean value = function.applyAsBoolean(cursor.toColAt(j));
+            final boolean value = function.applyAsBoolean(cursor.colAt(j));
             cursor.setBoolean(value);
         }
         return frame();
@@ -258,10 +263,10 @@ class XDataFrameRows<R,C> extends XDataFrameAxisBase<R,C,R,C,DataFrameRow<R,C>,D
 
     @Override
     public final DataFrame<R,C> applyInts(R key, ToIntFunction<DataFrameValue<R,C>> function) {
-        final int colCount = frame().colCount();
-        final DataFrameCursor<R,C> cursor = frame().cursor().toRow(key);
+        var colCount = frame().colCount();
+        final DataFrameCursor<R,C> cursor = frame().cursor().row(key);
         for (int j=0; j<colCount; ++j) {
-            final int value = function.applyAsInt(cursor.toColAt(j));
+            var value = function.applyAsInt(cursor.colAt(j));
             cursor.setInt(value);
         }
         return frame();
@@ -270,10 +275,10 @@ class XDataFrameRows<R,C> extends XDataFrameAxisBase<R,C,R,C,DataFrameRow<R,C>,D
 
     @Override
     public final DataFrame<R,C> applyLongs(R key, ToLongFunction<DataFrameValue<R,C>> function) {
-        final int colCount = frame().colCount();
-        final DataFrameCursor<R,C> cursor = frame().cursor().toRow(key);
+        var colCount = frame().colCount();
+        final DataFrameCursor<R,C> cursor = frame().cursor().row(key);
         for (int j=0; j<colCount; ++j) {
-            final long value = function.applyAsLong(cursor.toColAt(j));
+            final long value = function.applyAsLong(cursor.colAt(j));
             cursor.setLong(value);
         }
         return frame();
@@ -282,10 +287,10 @@ class XDataFrameRows<R,C> extends XDataFrameAxisBase<R,C,R,C,DataFrameRow<R,C>,D
 
     @Override
     public final DataFrame<R,C> applyDoubles(R key, ToDoubleFunction<DataFrameValue<R,C>> function) {
-        final int colCount = frame().colCount();
-        final DataFrameCursor<R,C> cursor = frame().cursor().toRow(key);
+        var colCount = frame().colCount();
+        final DataFrameCursor<R,C> cursor = frame().cursor().row(key);
         for (int j=0; j<colCount; ++j) {
-            final double value = function.applyAsDouble(cursor.toColAt(j));
+            var value = function.applyAsDouble(cursor.colAt(j));
             cursor.setDouble(value);
         }
         return frame();
@@ -294,10 +299,10 @@ class XDataFrameRows<R,C> extends XDataFrameAxisBase<R,C,R,C,DataFrameRow<R,C>,D
 
     @Override
     public final <T> DataFrame<R,C> applyValues(R key, Function<DataFrameValue<R,C>, T> function) {
-        final int colCount = frame().colCount();
-        final DataFrameCursor<R,C> cursor = frame().cursor().toRow(key);
+        var colCount = frame().colCount();
+        final DataFrameCursor<R,C> cursor = frame().cursor().row(key);
         for (int j=0; j<colCount; ++j) {
-            final T value = function.apply(cursor.toColAt(j));
+            final T value = function.apply(cursor.colAt(j));
             cursor.setValue(value);
         }
         return frame();
@@ -312,160 +317,160 @@ class XDataFrameRows<R,C> extends XDataFrameAxisBase<R,C,R,C,DataFrameRow<R,C>,D
     @Override
     public final boolean getBoolean(R rowKey, int colOrdinal) {
         final XDataFrameContent<R,C> data = frame().content();
-        final int rowIndex = data.rowCoordinate(rowKey);
-        final int colIndex = data.colCoordinateAt(colOrdinal);
+        var rowIndex = data.rowCoordinate(rowKey);
+        var colIndex = data.colCoordinateAt(colOrdinal);
         return data.booleanAt(rowIndex, colIndex);
     }
 
     @Override
     public final boolean getBooleanAt(int rowOrdinal, C colKey) {
         final XDataFrameContent<R,C> data = frame().content();
-        final int rowIndex = data.rowCoordinateAt(rowOrdinal);
-        final int colIndex = data.colCoordinate(colKey);
+        var rowIndex = data.rowCoordinateAt(rowOrdinal);
+        var colIndex = data.colCoordinate(colKey);
         return data.booleanAt(rowIndex, colIndex);
     }
 
     @Override
     public final int getInt(R rowKey, int colOrdinal) {
         final XDataFrameContent<R,C> data = frame().content();
-        final int rowIndex = data.rowCoordinate(rowKey);
-        final int colIndex = data.colCoordinateAt(colOrdinal);
+        var rowIndex = data.rowCoordinate(rowKey);
+        var colIndex = data.colCoordinateAt(colOrdinal);
         return data.intAt(rowIndex, colIndex);
     }
 
     @Override
     public final int getIntAt(int rowOrdinal, C colKey) {
         final XDataFrameContent<R,C> data = frame().content();
-        final int rowIndex = data.rowCoordinateAt(rowOrdinal);
-        final int colIndex = data.colCoordinate(colKey);
+        var rowIndex = data.rowCoordinateAt(rowOrdinal);
+        var colIndex = data.colCoordinate(colKey);
         return data.intAt(rowIndex, colIndex);
     }
 
     @Override
     public final long getLong(R rowKey, int colOrdinal) {
         final XDataFrameContent<R,C> data = frame().content();
-        final int rowIndex = data.rowCoordinate(rowKey);
-        final int colIndex = data.colCoordinateAt(colOrdinal);
+        var rowIndex = data.rowCoordinate(rowKey);
+        var colIndex = data.colCoordinateAt(colOrdinal);
         return data.longAt(rowIndex, colIndex);
     }
 
     @Override
     public final long getLongAt(int rowOrdinal, C colKey) {
         final XDataFrameContent<R,C> data = frame().content();
-        final int rowIndex = data.rowCoordinateAt(rowOrdinal);
-        final int colIndex = data.colCoordinate(colKey);
+        var rowIndex = data.rowCoordinateAt(rowOrdinal);
+        var colIndex = data.colCoordinate(colKey);
         return data.longAt(rowIndex, colIndex);
     }
 
     @Override
     public final double getDouble(R rowKey, int colOrdinal) {
         final XDataFrameContent<R,C> data = frame().content();
-        final int rowIndex = data.rowCoordinate(rowKey);
-        final int colIndex = data.colCoordinateAt(colOrdinal);
+        var rowIndex = data.rowCoordinate(rowKey);
+        var colIndex = data.colCoordinateAt(colOrdinal);
         return data.doubleAt(rowIndex, colIndex);
     }
 
     @Override
     public final double getDoubleAt(int rowOrdinal, C colKey) {
         final XDataFrameContent<R,C> data = frame().content();
-        final int rowIndex = data.rowCoordinateAt(rowOrdinal);
-        final int colIndex = data.colCoordinate(colKey);
+        var rowIndex = data.rowCoordinateAt(rowOrdinal);
+        var colIndex = data.colCoordinate(colKey);
         return data.doubleAt(rowIndex, colIndex);
     }
 
     @Override
     public final <V> V getValue(R rowKey, int colOrdinal) {
         final XDataFrameContent<R,C> data = frame().content();
-        final int rowIndex = data.rowCoordinate(rowKey);
-        final int colIndex = data.colCoordinateAt(colOrdinal);
+        var rowIndex = data.rowCoordinate(rowKey);
+        var colIndex = data.colCoordinateAt(colOrdinal);
         return data.valueAt(rowIndex, colIndex);
     }
 
     @Override
     public final <V> V getValueAt(int rowOrdinal, C colKey) {
         final XDataFrameContent<R,C> data = frame().content();
-        final int rowIndex = data.rowCoordinateAt(rowOrdinal);
-        final int colIndex = data.colCoordinate(colKey);
+        var rowIndex = data.rowCoordinateAt(rowOrdinal);
+        var colIndex = data.colCoordinate(colKey);
         return data.valueAt(rowIndex, colIndex);
     }
 
     @Override
     public final boolean setBoolean(R rowKey, int colOrdinal, boolean value) {
         final XDataFrameContent<R,C> data = frame().content();
-        final int rowIndex = data.rowCoordinate(rowKey);
-        final int colIndex = data.colCoordinateAt(colOrdinal);
+        var rowIndex = data.rowCoordinate(rowKey);
+        var colIndex = data.colCoordinateAt(colOrdinal);
         return data.booleanAt(rowIndex, colIndex, value);
     }
 
     @Override
     public final boolean setBooleanAt(int rowOrdinal, C colKey, boolean value) {
         final XDataFrameContent<R,C> data = frame().content();
-        final int rowIndex = data.rowCoordinateAt(rowOrdinal);
-        final int colIndex = data.colCoordinate(colKey);
+        var rowIndex = data.rowCoordinateAt(rowOrdinal);
+        var colIndex = data.colCoordinate(colKey);
         return data.booleanAt(rowIndex, colIndex, value);
     }
 
     @Override
     public final int setInt(R rowKey, int colOrdinal, int value) {
         final XDataFrameContent<R,C> data = frame().content();
-        final int rowIndex = data.rowCoordinate(rowKey);
-        final int colIndex = data.colCoordinateAt(colOrdinal);
+        var rowIndex = data.rowCoordinate(rowKey);
+        var colIndex = data.colCoordinateAt(colOrdinal);
         return data.intAt(rowIndex, colIndex, value);
     }
 
     @Override
     public final int setIntAt(int rowOrdinal, C colKey, int value) {
         final XDataFrameContent<R,C> data = frame().content();
-        final int rowIndex = data.rowCoordinateAt(rowOrdinal);
-        final int colIndex = data.colCoordinate(colKey);
+        var rowIndex = data.rowCoordinateAt(rowOrdinal);
+        var colIndex = data.colCoordinate(colKey);
         return data.intAt(rowIndex, colIndex, value);
     }
 
     @Override
     public final long setLong(R rowKey, int colOrdinal, long value) {
         final XDataFrameContent<R,C> data = frame().content();
-        final int rowIndex = data.rowCoordinate(rowKey);
-        final int colIndex = data.colCoordinateAt(colOrdinal);
+        var rowIndex = data.rowCoordinate(rowKey);
+        var colIndex = data.colCoordinateAt(colOrdinal);
         return data.longAt(rowIndex, colIndex, value);
     }
 
     @Override
     public final long setLongAt(int rowOrdinal, C colKey, long value) {
         final XDataFrameContent<R,C> data = frame().content();
-        final int rowIndex = data.rowCoordinateAt(rowOrdinal);
-        final int colIndex = data.colCoordinate(colKey);
+        var rowIndex = data.rowCoordinateAt(rowOrdinal);
+        var colIndex = data.colCoordinate(colKey);
         return data.longAt(rowIndex, colIndex, value);
     }
 
     @Override
     public final double setDouble(R rowKey, int colOrdinal, double value) {
         final XDataFrameContent<R,C> data = frame().content();
-        final int rowIndex = data.rowCoordinate(rowKey);
-        final int colIndex = data.colCoordinateAt(colOrdinal);
+        var rowIndex = data.rowCoordinate(rowKey);
+        var colIndex = data.colCoordinateAt(colOrdinal);
         return data.doubleAt(rowIndex, colIndex, value);
     }
 
     @Override
     public final double setDoubleAt(int rowOrdinal, C colKey, double value) {
         final XDataFrameContent<R,C> data = frame().content();
-        final int rowIndex = data.rowCoordinateAt(rowOrdinal);
-        final int colIndex = data.colCoordinate(colKey);
+        var rowIndex = data.rowCoordinateAt(rowOrdinal);
+        var colIndex = data.colCoordinate(colKey);
         return data.doubleAt(rowIndex, colIndex, value);
     }
 
     @Override
     public final <V> V setValue(R rowKey, int colOrdinal, V value) {
         final XDataFrameContent<R,C> data = frame().content();
-        final int rowIndex = data.rowCoordinate(rowKey);
-        final int colIndex = data.colCoordinateAt(colOrdinal);
+        var rowIndex = data.rowCoordinate(rowKey);
+        var colIndex = data.colCoordinateAt(colOrdinal);
         return data.valueAt(rowIndex, colIndex, value);
     }
 
     @Override
     public final <V> V setValueAt(int rowOrdinal, C colKey, V value) {
         final XDataFrameContent<R,C> data = frame().content();
-        final int rowIndex = data.rowCoordinateAt(rowOrdinal);
-        final int colIndex = data.colCoordinate(colKey);
+        var rowIndex = data.rowCoordinateAt(rowOrdinal);
+        var colIndex = data.colCoordinate(colKey);
         return data.valueAt(rowIndex, colIndex, value);
     }
 }

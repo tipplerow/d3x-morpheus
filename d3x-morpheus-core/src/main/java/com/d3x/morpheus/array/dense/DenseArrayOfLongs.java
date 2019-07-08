@@ -135,7 +135,7 @@ class DenseArrayOfLongs extends ArrayBase<Long> {
 
     @Override()
     public final Array<Long> copy(int start, int end) {
-        final int length = end - start;
+        var length = end - start;
         final DenseArrayOfLongs clone = new DenseArrayOfLongs(length, defaultValue);
         System.arraycopy(values, start, clone.values, 0, length);
         return clone;
@@ -296,7 +296,7 @@ class DenseArrayOfLongs extends ArrayBase<Long> {
 
     @Override
     public final Array<Long> cumSum() {
-        final int length = length();
+        var length = length();
         final Array<Long> result = Array.of(Long.class, length);
         result.setLong(0, values[0]);
         for (int i=1; i<length; ++i) {
@@ -335,7 +335,7 @@ class DenseArrayOfLongs extends ArrayBase<Long> {
     @SuppressWarnings("unchecked")
     /** Custom serialization */
     private void readObject(ObjectInputStream is) throws IOException, ClassNotFoundException {
-        final int length = is.readInt();
+        var length = is.readInt();
         this.values = new long[length];
         for (int i=0; i<length; ++i) {
             values[i] = is.readLong();

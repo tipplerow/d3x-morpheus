@@ -135,7 +135,7 @@ class DenseArrayOfObjects<T> extends ArrayBase<T> {
 
     @Override()
     public final Array<T> copy(int start, int end) {
-        final int length = end - start;
+        var length = end - start;
         final DenseArrayOfObjects<T> clone = new DenseArrayOfObjects<>(type(), length, defaultValue);
         System.arraycopy(values, start, clone.values, 0, length);
         return clone;
@@ -356,7 +356,7 @@ class DenseArrayOfObjects<T> extends ArrayBase<T> {
     @SuppressWarnings("unchecked")
     /** Custom serialization */
     private void readObject(ObjectInputStream is) throws IOException, ClassNotFoundException {
-        final int length = is.readInt();
+        var length = is.readInt();
         this.values = new Object[length];
         for (int i=0; i<length; ++i) {
             values[i] = is.readObject();

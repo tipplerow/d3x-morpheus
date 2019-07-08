@@ -276,7 +276,7 @@ public abstract class SortAlgorithm {
 
         @Override
         protected void compute() {
-            final int len = to - from;
+            var len = to - from;
             if ( len < PARALLEL_QUICKSORT_NO_FORK ) {
                 SortAlgorithm.fastUtil(false).sort( from, to, comp, swapper );
                 return;

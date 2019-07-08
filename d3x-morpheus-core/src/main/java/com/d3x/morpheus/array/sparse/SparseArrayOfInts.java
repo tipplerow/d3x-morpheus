@@ -122,7 +122,7 @@ class SparseArrayOfInts extends ArrayBase<Integer> {
         var fillPct = (double)values.size() / length();
         var clone = new SparseArrayOfInts(indexes.length, fillPct, defaultValue);
         for (int i = 0; i < indexes.length; ++i) {
-            final int value = getInt(indexes[i]);
+            var value = getInt(indexes[i]);
             clone.setInt(i, value);
         }
         return clone;
@@ -134,7 +134,7 @@ class SparseArrayOfInts extends ArrayBase<Integer> {
         var fillPct = (double)values.size() / length();
         var clone = new SparseArrayOfInts(indexes.length(), fillPct, defaultValue);
         for (int i = 0; i < indexes.length(); ++i) {
-            final int value = getInt(indexes.getInt(i));
+            var value = getInt(indexes.getInt(i));
             clone.setInt(i, value);
         }
         return clone;
@@ -147,7 +147,7 @@ class SparseArrayOfInts extends ArrayBase<Integer> {
         var fillPct = (double)values.size() / length();
         var clone = new SparseArrayOfInts(length, fillPct, defaultValue);
         for (int i=0; i<length; ++i) {
-            final int value = getInt(start+i);
+            var value = getInt(start+i);
             if (value != defaultValue) {
                 clone.setValue(i, value);
             }
@@ -159,8 +159,8 @@ class SparseArrayOfInts extends ArrayBase<Integer> {
     @Override
     protected final Array<Integer> sort(int start, int end, int multiplier) {
         return doSort(start, end, (i, j) -> {
-            final int v1 = values.get(i);
-            final int v2 = values.get(j);
+            var v1 = values.get(i);
+            var v2 = values.get(j);
             return multiplier * Integer.compare(v1, v2);
         });
     }
@@ -174,8 +174,8 @@ class SparseArrayOfInts extends ArrayBase<Integer> {
 
     @Override
     public final Array<Integer> swap(int i, int j) {
-        final int v1 = getInt(i);
-        final int v2 = getInt(j);
+        var v1 = getInt(i);
+        var v2 = getInt(j);
         this.setInt(i, v2);
         this.setInt(j, v1);
         return this;
@@ -185,7 +185,7 @@ class SparseArrayOfInts extends ArrayBase<Integer> {
     @Override
     public final Array<Integer> filter(Predicate<ArrayValue<Integer>> predicate) {
         int count = 0;
-        final int length = this.length();
+        var length = this.length();
         final ArrayCursor<Integer> cursor = cursor();
         final Array<Integer> matches = Array.of(type(), length, loadFactor());  //todo: fix the length of this filter
         for (int i=0; i<length; ++i) {
@@ -203,7 +203,7 @@ class SparseArrayOfInts extends ArrayBase<Integer> {
             throw new ArrayException("The from index array must have the same length as the to index array");
         } else {
             for (int i=0; i<fromIndexes.length; ++i) {
-                final int toIndex = toIndexes[i];
+                var toIndex = toIndexes[i];
                 final int fromIndex = fromIndexes[i];
                 final int update = from.getInt(fromIndex);
                 this.setInt(toIndex, update);
@@ -298,7 +298,7 @@ class SparseArrayOfInts extends ArrayBase<Integer> {
     @Override
     public final Integer setValue(int index, Integer value) {
         this.checkBounds(index, length);
-        final Integer oldValue = getValue(index);
+        var oldValue = getValue(index);
         if (value == null) {
             this.values.remove(index);
             return oldValue;
@@ -349,7 +349,7 @@ class SparseArrayOfInts extends ArrayBase<Integer> {
 
     @Override
     public final Array<Integer> cumSum() {
-        final int length = length();
+        var length = length();
         final Array<Integer> result = Array.of(Integer.class, length);
         result.setInt(0, values.get(0));
         for (int i=1; i<length; ++i) {

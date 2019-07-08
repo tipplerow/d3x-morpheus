@@ -131,7 +131,7 @@ class MappedArrayOfInts extends ArrayBase<Integer> {
             final File newFile = MappedArrayConstructor.randomFile(true);
             final MappedArrayOfInts copy = new MappedArrayOfInts(length, defaultValue, newFile);
             for (int i=0; i<length; ++i) {
-                final int v = getInt(i);
+                var v = getInt(i);
                 copy.buffer.put(i, v);
             }
             return copy;
@@ -180,11 +180,11 @@ class MappedArrayOfInts extends ArrayBase<Integer> {
     @Override()
     public final Array<Integer> copy(int start, int end) {
         try {
-            final int newLength = end - start;
+            var newLength = end - start;
             final File newFile = MappedArrayConstructor.randomFile(true);
             final MappedArrayOfInts copy = new MappedArrayOfInts(newLength, defaultValue, newFile);
             for (int i=0; i<newLength; ++i) {
-                final int value = buffer.get(start + i);
+                var value = buffer.get(start + i);
                 if (Integer.compare(value, defaultValue) != 0) {
                     copy.buffer.put(i, value);
                 }
@@ -199,8 +199,8 @@ class MappedArrayOfInts extends ArrayBase<Integer> {
     @Override
     protected final Array<Integer> sort(int start, int end, int multiplier) {
         return doSort(start, end, (i, j) -> {
-            final int v1 = getInt(i);
-            final int v2 = getInt(j);
+            var v1 = getInt(i);
+            var v2 = getInt(j);
             return multiplier * Integer.compare(v1, v2);
         });
     }
@@ -208,16 +208,16 @@ class MappedArrayOfInts extends ArrayBase<Integer> {
 
     @Override
     public final int compare(int i, int j) {
-        final int v1 = getInt(i);
-        final int v2 = getInt(j);
+        var v1 = getInt(i);
+        var v2 = getInt(j);
         return Integer.compare(v1, v2);
     }
 
 
     @Override
     public final Array<Integer> swap(int i, int j) {
-        final int v1 = getInt(i);
-        final int v2 = getInt(j);
+        var v1 = getInt(i);
+        var v2 = getInt(j);
         this.setInt(i, v2);
         this.setInt(j, v1);
         return this;
@@ -245,9 +245,9 @@ class MappedArrayOfInts extends ArrayBase<Integer> {
             throw new ArrayException("The from index array must have the same length as the to index array");
         } else {
             for (int i=0; i<fromIndexes.length; ++i) {
-                final int toIndex = toIndexes[i];
-                final int fromIndex = fromIndexes[i];
-                final int update = from.getInt(fromIndex);
+                var toIndex = toIndexes[i];
+                var fromIndex = fromIndexes[i];
+                var update = from.getInt(fromIndex);
                 this.setInt(toIndex, update);
             }
         }
@@ -258,7 +258,7 @@ class MappedArrayOfInts extends ArrayBase<Integer> {
     @Override
     public final Array<Integer> update(int toIndex, Array<Integer> from, int fromIndex, int length) {
         for (int i=0; i<length; ++i) {
-            final int update = from.getInt(fromIndex + i);
+            var update = from.getInt(fromIndex + i);
             this.setInt(toIndex + i, update);
         }
         return this;
@@ -282,7 +282,7 @@ class MappedArrayOfInts extends ArrayBase<Integer> {
 
     @Override
     public final Array<Integer> fill(Integer value, int start, int end) {
-        final int fillValue = value == null ? defaultValue : value;
+        var fillValue = value == null ? defaultValue : value;
         for (int i=start; i<end; ++i) {
             this.buffer.put(i, fillValue);
         }
@@ -333,7 +333,7 @@ class MappedArrayOfInts extends ArrayBase<Integer> {
     @Override
     public final int setInt(int index, int value) {
         this.checkBounds(index, length);
-        final int oldValue = buffer.get(index);
+        var oldValue = buffer.get(index);
         this.buffer.put(index, value);
         return oldValue;
     }
@@ -341,7 +341,7 @@ class MappedArrayOfInts extends ArrayBase<Integer> {
 
     @Override
     public final Integer setValue(int index, Integer value) {
-        final Integer oldValue = getValue(index);
+        var oldValue = getValue(index);
         this.buffer.put(index, value != null ? value : defaultValue);
         return oldValue;
     }
@@ -353,9 +353,9 @@ class MappedArrayOfInts extends ArrayBase<Integer> {
             int low = start;
             int high = end - 1;
             while (low <= high) {
-                final int midIndex = (low + high) >>> 1;
-                final int midValue = buffer.get(midIndex);
-                final int result = Integer.compare(midValue, value);
+                var midIndex = (low + high) >>> 1;
+                var midValue = buffer.get(midIndex);
+                var result = Integer.compare(midValue, value);
                 if (result < 0) {
                     low = midIndex + 1;
                 } else if (result > 0) {
@@ -373,11 +373,11 @@ class MappedArrayOfInts extends ArrayBase<Integer> {
 
     @Override
     public final Array<Integer> distinct(int limit) {
-        final int capacity = limit < Integer.MAX_VALUE ? limit : 100;
+        var capacity = limit < Integer.MAX_VALUE ? limit : 100;
         final TIntSet set = new TIntHashSet(capacity);
         final ArrayBuilder<Integer> builder = ArrayBuilder.of(capacity, Integer.class);
         for (int i=0; i<length(); ++i) {
-            final int value = getInt(i);
+            var value = getInt(i);
             if (set.add(value)) {
                 builder.addInt(value);
                 if (set.size() >= limit) {
@@ -391,12 +391,12 @@ class MappedArrayOfInts extends ArrayBase<Integer> {
 
     @Override
     public final Array<Integer> cumSum() {
-        final int length = length();
+        var length = length();
         final Array<Integer> result = Array.of(Integer.class, length);
         result.setInt(0, buffer.get(0));
         for (int i=1; i<length; ++i) {
-            final int prior = result.getInt(i-1);
-            final int current = buffer.get(i);
+            var prior = result.getInt(i-1);
+            var current = buffer.get(i);
             result.setInt(i, prior + current);
         }
         return result;
@@ -406,7 +406,7 @@ class MappedArrayOfInts extends ArrayBase<Integer> {
     @Override
     public final void read(ObjectInputStream is, int count) throws IOException {
         for (int i=0; i<count; ++i) {
-            final int value = is.readInt();
+            var value = is.readInt();
             this.setInt(i, value);
         }
     }
@@ -415,7 +415,7 @@ class MappedArrayOfInts extends ArrayBase<Integer> {
     @Override
     public final void write(ObjectOutputStream os, int[] indexes) throws IOException {
         for (int index : indexes) {
-            final int value = getInt(index);
+            var value = getInt(index);
             os.writeInt(value);
         }
     }
@@ -425,7 +425,7 @@ class MappedArrayOfInts extends ArrayBase<Integer> {
         os.writeInt(length);
         os.writeInt(defaultValue);
         for (int i=0; i<length; ++i) {
-            final int value = getInt(i);
+            var value = getInt(i);
             os.writeInt(value);
         }
     }
@@ -440,7 +440,7 @@ class MappedArrayOfInts extends ArrayBase<Integer> {
         this.channel = new RandomAccessFile(file, "rw").getChannel();
         this.buffer = channel.map(FileChannel.MapMode.READ_WRITE, 0, BYTE_COUNT * length).asIntBuffer();
         for (int i=0; i<length; ++i) {
-            final int value = is.readInt();
+            var value = is.readInt();
             this.setInt(i, value);
         }
     }

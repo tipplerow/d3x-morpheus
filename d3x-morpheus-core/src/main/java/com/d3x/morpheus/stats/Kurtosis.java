@@ -47,12 +47,12 @@ public class Kurtosis implements Statistic1 {
         if (n < 3) {
             return Double.NaN;
         } else {
-            final double variance = m2 / (n - 1d);
+            var variance = m2 / (n - 1d);
             if (n <= 3 || variance < 10E-20) {
                 return 0d;
             } else {
-                final double numerator = (n * (n + 1d) * m4 - 3d * m2 * m2 * (n - 1d));
-                final double denominator = ((n - 1d) * (n - 2d) * (n - 3d) * variance * variance);
+                var numerator = (n * (n + 1d) * m4 - 3d * m2 * m2 * (n - 1d));
+                var denominator = ((n - 1d) * (n - 2d) * (n - 3d) * variance * variance);
                 return numerator / denominator;
             }
         }
@@ -65,11 +65,11 @@ public class Kurtosis implements Statistic1 {
 
     @Override
     public long add(double value) {
-        final double prevM2 = m2;
-        final double prevM3 = m3;
-        final double dev = value - m1;
-        final double nDev = dev / ++n;
-        final double nDevSq = nDev * nDev;
+        var prevM2 = m2;
+        var prevM3 = m3;
+        var dev = value - m1;
+        var nDev = dev / ++n;
+        var nDevSq = nDev * nDev;
         this.m1 += nDev;
         this.m2 += (n - 1d) * dev * nDev;
         this.m3 = m3 - 3d * nDev * prevM2 + (n - 1d) * (n - 2d) * nDevSq * dev;
@@ -105,8 +105,8 @@ public class Kurtosis implements Statistic1 {
             stat1.add(value);
             stat2.increment(value);
         }
-        final double result1 = stat1.getValue();
-        final double result2 = stat2.getResult();
+        var result1 = stat1.getValue();
+        var result2 = stat2.getResult();
         if (result1 != result2) {
             throw new RuntimeException("Error: " + result1 + " != " + result2);
         }

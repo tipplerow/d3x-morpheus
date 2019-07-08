@@ -37,7 +37,7 @@ public class StreamTests {
 
     @Test()
     public void testForEach() {
-        final DataFrame<String,String> frame = TestDataFrames.random(double.class, 100, 100);
+        var frame = TestDataFrames.random(double.class, 100, 100);
         frame.forEachValue(value -> {
             final String row = value.rowKey();
             final String column = value.colKey();
@@ -55,7 +55,7 @@ public class StreamTests {
     @Test()
     public void testIntStream() {
         final DataFrame<String,String> frame = TestDataFrames.random(int.class, 100, 100);
-        final int[] values1 = frame.values().mapToInt(DataFrameValue::getInt).toArray();
+        var values1 = frame.values().mapToInt(DataFrameValue::getInt).toArray();
         for (int colIndex = 0; colIndex<frame.colCount(); ++colIndex) {
             for (int rowIndex=0; rowIndex<frame.rowCount(); ++rowIndex) {
                 final int index = colIndex * frame.rowCount() + rowIndex;

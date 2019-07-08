@@ -203,7 +203,7 @@ public interface IntCoding<T> extends Coding<T> {
             final IntComparator comparator = (i, j) -> values[i].compareTo(values[j]);
             SortAlgorithm.getDefault(false).sort(0, values.length, comparator, (i, j) -> {
                 final T v1 = values[i]; values[i] = values[j]; values[j] = v1;
-                final int code = codes[i]; codes[i] = codes[j]; codes[j] = code;
+                var code = codes[i]; codes[i] = codes[j]; codes[j] = code;
             });
         }
 

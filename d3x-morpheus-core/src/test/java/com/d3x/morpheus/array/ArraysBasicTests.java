@@ -317,7 +317,7 @@ public class ArraysBasicTests {
     @Test(dataProvider = "SparseOrDense")
     public void testIntArray(boolean sparse) {
         final Random random = new Random();
-        final int[] values = new int[100];
+        var values = new int[100];
         final float loadFactor = sparse ? 0.5F : 1F;
         final Array<Integer> array = Array.of(Integer.class, values.length, loadFactor);
         for (int i=0; i<values.length; ++i) {
@@ -331,7 +331,7 @@ public class ArraysBasicTests {
         for (int i=0; i<values.length; ++i) {
             final int v1 = values[i];
             final int v2 = array.getInt(i);
-            final Integer v3 = array.getValue(i);
+            var v3 = array.getValue(i);
             Assert.assertEquals(v1, v2, "Values match at " + i);
             Assert.assertEquals(v2, v3.intValue(), "Values match at " + i);
         }
@@ -353,7 +353,7 @@ public class ArraysBasicTests {
         for (int i=100; i<200; ++i) {
             final int v1 = values[i-100];
             final int v2 = array.getInt(i);
-            final Integer v3 = array.getValue(i);
+            var v3 = array.getValue(i);
             Assert.assertEquals(v1, v2, "Values match at " + i);
             Assert.assertEquals(v2, v3.intValue(), "Values match at " + i);
         }
@@ -726,7 +726,7 @@ public class ArraysBasicTests {
         final int size = 1000;
         final Random random = new Random();
         final boolean[] booleans = new boolean[size];
-        final int[] integers = new int[size];
+        var integers = new int[size];
         final long[] longs = new long[size];
         final double[] doubles = new double[size];
         final LocalDate[] localDates = new LocalDate[size];
@@ -876,7 +876,7 @@ public class ArraysBasicTests {
                 Assert.assertTrue(filter.getBoolean(i), "Value is true at " + i);
             }
         } else {
-            final int[] indexes = IntStream.of(2, 45, 234, 456, 567, 598, 623, 734, 845, 867, 921, 956, 999).toArray();
+            var indexes = IntStream.of(2, 45, 234, 456, 567, 598, 623, 734, 845, 867, 921, 956, 999).toArray();
             final Set<T> includes = array.copy(indexes).stream().values().collect(Collectors.toSet());
             final Array<T> filter = array.filter(v -> includes.contains(v.getValue()));
             Assert.assertEquals(filter.type(), type, "The filter has same type as source");
@@ -921,7 +921,7 @@ public class ArraysBasicTests {
             final Array<Boolean> array = Array.of((Class<Boolean>)type, values.length, false, style).applyBooleans(v -> values[v.index()]);
             assertFirstAndLast(array, values, arrayType);
         } else if (arrayType == ArrayType.INTEGER) {
-            final int[] values = new int[1000];
+            var values = new int[1000];
             for (int i=0; i<values.length; ++i) values[i] = random.nextInt();
             final Array<Integer> array = Array.of((Class<Integer>)type, values.length, 0, style).applyInts(v -> values[v.index()]);
             assertFirstAndLast(array, values, arrayType);
@@ -1023,7 +1023,7 @@ public class ArraysBasicTests {
 
     @Test(dataProvider = "types")
     public <T> void testStream(Class<T> type, ArrayStyle style) {
-        final int[] index = new int[1];
+        var index = new int[1];
         final Array<T> array = createRandomArray(type, 10000, style);
         Assert.assertEquals(array.length(), 10000, "Array length matches");
         array.stream().values().forEach(v -> Assert.assertEquals(v, array.getValue(index[0]++), "Values match at index: " + (index[0]-1)));
@@ -1135,7 +1135,7 @@ public class ArraysBasicTests {
             case BOOLEAN:           array.getDouble(0);     break;
             case INTEGER:           array.getBoolean(0);    break;
             case LONG:              array.getBoolean(0);    break;
-            case DOUBLE:            array.getLong(0);       break;
+            case DOUBLE:            array.getBoolean(0);    break;
             case STRING:            array.getInt(0);        break;
             case ENUM:              array.getBoolean(0);    break;
             case CURRENCY:          array.getLong(0);       break;

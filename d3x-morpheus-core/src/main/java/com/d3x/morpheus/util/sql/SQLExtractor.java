@@ -223,7 +223,7 @@ public class SQLExtractor implements Cloneable {
      * @throws SQLException     if there is a SQL error
      */
     public double getDouble(ResultSet rs, int colIndex) throws SQLException {
-        final double value = rs.getDouble(colIndex);
+        var value = rs.getDouble(colIndex);
         return rs.wasNull() ? Double.NaN : value;
     }
 
@@ -271,7 +271,7 @@ public class SQLExtractor implements Cloneable {
         @Override
         @SuppressWarnings("unchecked")
         public <V> V getValue(ResultSet rs, int colIndex) throws SQLException {
-            final double value = rs.getDouble(colIndex);
+            var value = rs.getDouble(colIndex);
             return rs.wasNull() ? null : (V)Double.valueOf(value);
         }
     }

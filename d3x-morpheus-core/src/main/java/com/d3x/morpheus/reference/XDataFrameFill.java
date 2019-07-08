@@ -45,18 +45,18 @@ class XDataFrameFill<R,C> implements DataFrameFill {
     public final int up(int intervals) {
         try {
             int totalCount = 0;
-            final int rowCount = frame.rowCount();
-            final int colCount = frame.colCount();
+            var rowCount = frame.rowCount();
+            var colCount = frame.colCount();
             final DataFrameCursor<R,C> cursor = frame.cursor();
             for (int j=0; j<colCount; ++j) {
                 int fillCount = 0;
-                cursor.toColAt(j);
+                cursor.colAt(j);
                 for (int i=rowCount-2; i>=0; --i) {
-                    final Object current = cursor.toRowAt(i).getValue();
+                    final Object current = cursor.rowAt(i).getValue();
                     if (current == null || (current instanceof Number && Double.isNaN(((Number)current).doubleValue()))) {
                         if (fillCount < intervals) {
-                            final Object next = cursor.toRowAt(i + 1).getValue();
-                            cursor.toRowAt(i).setValue(next);
+                            final Object next = cursor.rowAt(i + 1).getValue();
+                            cursor.rowAt(i).setValue(next);
                             fillCount++;
                             totalCount++;
                         }
@@ -76,18 +76,18 @@ class XDataFrameFill<R,C> implements DataFrameFill {
     public final int down(int intervals) {
         try {
             int totalCount = 0;
-            final int rowCount = frame.rowCount();
-            final int colCount = frame.colCount();
+            var rowCount = frame.rowCount();
+            var colCount = frame.colCount();
             final DataFrameCursor<R,C> cursor = frame.cursor();
             for (int j=0; j<colCount; ++j) {
                 int fillCount = 0;
-                cursor.toColAt(j);
+                cursor.colAt(j);
                 for (int i=1; i<rowCount; ++i) {
-                    final Object current = cursor.toRowAt(i).getValue();
+                    final Object current = cursor.rowAt(i).getValue();
                     if (current == null || (current instanceof Number && Double.isNaN(((Number)current).doubleValue()))) {
                         if (fillCount < intervals) {
-                            final Object previous = cursor.toRowAt(i-1).getValue();
-                            cursor.toRowAt(i).setValue(previous);
+                            final Object previous = cursor.rowAt(i-1).getValue();
+                            cursor.rowAt(i).setValue(previous);
                             fillCount++;
                             totalCount++;
                         }
@@ -107,19 +107,19 @@ class XDataFrameFill<R,C> implements DataFrameFill {
     public final int left(int intervals) {
         try {
             int totalCount = 0;
-            final int rowCount = frame.rowCount();
-            final int colCount = frame.colCount();
+            var rowCount = frame.rowCount();
+            var colCount = frame.colCount();
             final DataFrameCursor<R,C> cursor = frame.cursor();
             for (int rowIndex=0; rowIndex<rowCount; ++rowIndex) {
                 int fillCount = 0;
-                cursor.toRowAt(rowIndex);
+                cursor.rowAt(rowIndex);
                 for (int colIndex=colCount-2; colIndex >= 0; --colIndex) {
-                    final Object current = cursor.toColAt(colIndex).getValue();
+                    final Object current = cursor.colAt(colIndex).getValue();
                     if (current == null || (current instanceof Number && Double.isNaN(((Number)current).doubleValue()))) {
                         if (fillCount < intervals) {
-                            cursor.toColAt(colIndex+1).getValue();
-                            final Object previous = cursor.toColAt(colIndex+1).getValue();
-                            cursor.toColAt(colIndex).setValue(previous);
+                            cursor.colAt(colIndex+1).getValue();
+                            final Object previous = cursor.colAt(colIndex+1).getValue();
+                            cursor.colAt(colIndex).setValue(previous);
                             fillCount++;
                             totalCount++;
                         }
@@ -140,20 +140,20 @@ class XDataFrameFill<R,C> implements DataFrameFill {
     public final int right(int intervals) {
         try {
             int totalCount = 0;
-            final int rowCount = frame.rowCount();
-            final int colCount = frame.colCount();
+            var rowCount = frame.rowCount();
+            var colCount = frame.colCount();
             final Object[] nullValues = getNullValues();
             final DataFrameCursor<R,C> cursor = frame.cursor();
             for (int rowIndex=0; rowIndex<rowCount; ++rowIndex) {
                 int fillCount = 0;
-                cursor.toRowAt(rowIndex);
+                cursor.rowAt(rowIndex);
                 for (int colIndex=1; colIndex<colCount; ++colIndex) {
                     final Object nullValue = nullValues[colIndex];
-                    final Object current = cursor.toColAt(colIndex).getValue();
+                    final Object current = cursor.colAt(colIndex).getValue();
                     if (equals(current, nullValue)) {
                         if (fillCount < intervals) {
-                            final Object previous = cursor.toColAt(colIndex-1).getValue();
-                            cursor.toColAt(colIndex).setValue(previous);
+                            final Object previous = cursor.colAt(colIndex-1).getValue();
+                            cursor.colAt(colIndex).setValue(previous);
                             fillCount++;
                             totalCount++;
                         }
@@ -178,8 +178,8 @@ class XDataFrameFill<R,C> implements DataFrameFill {
         if (left == null && right == null) {
             return true;
         } else if (left instanceof Number && right instanceof Number) {
-            final double v1 = ((Number)left).doubleValue();
-            final double v2 = ((Number)right).doubleValue();
+            var v1 = ((Number)left).doubleValue();
+            var v2 = ((Number)right).doubleValue();
             return Double.isNaN(v1) && Double.isNaN(v2) || v1 == v2;
         } else if (left != null && right != null) {
             return left.equals(right);

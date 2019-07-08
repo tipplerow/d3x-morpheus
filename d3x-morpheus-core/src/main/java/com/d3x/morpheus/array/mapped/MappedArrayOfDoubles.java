@@ -379,7 +379,7 @@ class MappedArrayOfDoubles extends ArrayBase<Double> {
 
     @Override
     public final Array<Double> cumSum() {
-        final int length = length();
+        var length = length();
         final Array<Double> result = Array.of(Double.class, length);
         result.setDouble(0, getDouble(0));
         for (int i=1; i<length; ++i) {

@@ -121,7 +121,7 @@ class IndexOfLongs extends IndexBase<Long> {
         if (isFilter()) {
             throw new IndexException("Cannot add keys to an filter on another index");
         } else {
-            final int[] count = new int[1];
+            var count = new int[1];
             keys.forEach(key -> {
                 final long keyAsLong = key;
                 if (!indexMap.containsKey(keyAsLong)) {

@@ -135,7 +135,7 @@ class DenseArrayOfInts extends ArrayBase<Integer> {
 
     @Override()
     public final Array<Integer> copy(int start, int end) {
-        final int length = end - start;
+        var length = end - start;
         final DenseArrayOfInts clone = new DenseArrayOfInts(length, defaultValue);
         System.arraycopy(values, start, clone.values, 0, length);
         return clone;
@@ -208,7 +208,7 @@ class DenseArrayOfInts extends ArrayBase<Integer> {
     @Override
     public final Array<Integer> expand(int newLength) {
         if (newLength > values.length) {
-            final int[] newValues = new int[newLength];
+            var newValues = new int[newLength];
             System.arraycopy(values, 0, newValues, 0, values.length);
             Arrays.fill(newValues, values.length, newValues.length, defaultValue);
             this.values = newValues;
@@ -263,7 +263,7 @@ class DenseArrayOfInts extends ArrayBase<Integer> {
 
     @Override
     public final Integer setValue(int index, Integer value) {
-        final Integer oldValue = getValue(index);
+        var oldValue = getValue(index);
         if (value == null) {
             this.values[index] = defaultValue;
             return oldValue;
@@ -300,7 +300,7 @@ class DenseArrayOfInts extends ArrayBase<Integer> {
 
     @Override
     public final Array<Integer> cumSum() {
-        final int length = length();
+        var length = length();
         final Array<Integer> result = Array.of(Integer.class, length);
         result.setInt(0, values[0]);
         for (int i=1; i<length; ++i) {
@@ -339,7 +339,7 @@ class DenseArrayOfInts extends ArrayBase<Integer> {
     @SuppressWarnings("unchecked")
     /** Custom serialization */
     private void readObject(ObjectInputStream is) throws IOException, ClassNotFoundException {
-        final int length = is.readInt();
+        var length = is.readInt();
         this.values = new int[length];
         for (int i=0; i<length; ++i) {
             values[i] = is.readInt();

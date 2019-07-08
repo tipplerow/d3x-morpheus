@@ -141,35 +141,35 @@ public class CsvTests {
         assertEquals(frame.rows().lastKey(), Optional.of(8502));
 
         final DataFrameCursor<Integer,String> cursor = frame.cursor();
-        cursor.toRowAt(0);
-        assertEquals(cursor.toCol("Date").getValue(), LocalDate.of(1980, 12, 12));
-        assertEquals(cursor.toCol("Open").getDouble(), 28.74984, 0.00001);
-        assertEquals(cursor.toCol("High").getDouble(), 28.87472, 0.00001);
-        assertEquals(cursor.toCol("Low").getDouble(), 28.74984, 0.00001);
-        assertEquals(cursor.toCol("Close").getDouble(), 28.74984, 0.00001);
-        assertEquals(cursor.toCol("Volume").getLong(), 117258400L);
-        assertEquals(cursor.toCol("Adj Close").getDouble(), 0.44203, 0.00001);
+        cursor.rowAt(0);
+        assertEquals(cursor.col("Date").getValue(), LocalDate.of(1980, 12, 12));
+        assertEquals(cursor.col("Open").getDouble(), 28.74984, 0.00001);
+        assertEquals(cursor.col("High").getDouble(), 28.87472, 0.00001);
+        assertEquals(cursor.col("Low").getDouble(), 28.74984, 0.00001);
+        assertEquals(cursor.col("Close").getDouble(), 28.74984, 0.00001);
+        assertEquals(cursor.col("Volume").getLong(), 117258400L);
+        assertEquals(cursor.col("Adj Close").getDouble(), 0.44203, 0.00001);
 
-        cursor.toRowAt(7690);
-        assertEquals(cursor.toCol("Date").getValue(), LocalDate.of(2011, 6, 8));
-        assertEquals(cursor.toCol("Open").getDouble(), 331.77997, 0.00001);
-        assertEquals(cursor.toCol("High").getDouble(), 334.79999, 0.00001);
-        assertEquals(cursor.toCol("Low").getDouble(), 330.64996, 0.00001);
-        assertEquals(cursor.toCol("Close").getDouble(), 332.24002, 0.00001);
-        assertEquals(cursor.toCol("Volume").getLong(), 83430900L);
-        assertEquals(cursor.toCol("Adj Close").getDouble(), 44.76965, 0.00001);
+        cursor.rowAt(7690);
+        assertEquals(cursor.col("Date").getValue(), LocalDate.of(2011, 6, 8));
+        assertEquals(cursor.col("Open").getDouble(), 331.77997, 0.00001);
+        assertEquals(cursor.col("High").getDouble(), 334.79999, 0.00001);
+        assertEquals(cursor.col("Low").getDouble(), 330.64996, 0.00001);
+        assertEquals(cursor.col("Close").getDouble(), 332.24002, 0.00001);
+        assertEquals(cursor.col("Volume").getLong(), 83430900L);
+        assertEquals(cursor.col("Adj Close").getDouble(), 44.76965, 0.00001);
 
-        cursor.toRowAt(8502);
-        assertEquals(cursor.toCol("Date").getValue(), LocalDate.of(2014, 8, 29));
-        assertEquals(cursor.toCol("Open").getDouble(), 102.86, 0.00001);
-        assertEquals(cursor.toCol("High").getDouble(), 102.9, 0.00001);
-        assertEquals(cursor.toCol("Low").getDouble(), 102.2, 0.00001);
-        assertEquals(cursor.toCol("Close").getDouble(), 102.5, 0.00001);
-        assertEquals(cursor.toCol("Volume").getLong(), 44595000L);
-        assertEquals(cursor.toCol("Adj Close").getDouble(), 101.65627, 0.00001);
+        cursor.rowAt(8502);
+        assertEquals(cursor.col("Date").getValue(), LocalDate.of(2014, 8, 29));
+        assertEquals(cursor.col("Open").getDouble(), 102.86, 0.00001);
+        assertEquals(cursor.col("High").getDouble(), 102.9, 0.00001);
+        assertEquals(cursor.col("Low").getDouble(), 102.2, 0.00001);
+        assertEquals(cursor.col("Close").getDouble(), 102.5, 0.00001);
+        assertEquals(cursor.col("Volume").getLong(), 44595000L);
+        assertEquals(cursor.col("Adj Close").getDouble(), 101.65627, 0.00001);
 
         for (int i=0; i<frame.rows().count(); ++i) {
-            final Integer rowKey = frame.rows().key(i);
+            var rowKey = frame.rows().key(i);
             assertEquals(rowKey.intValue(), i, "Row key matches at index " + i);
         }
     }
@@ -194,31 +194,31 @@ public class CsvTests {
         assertEquals(frame.rows().key(0), LocalDate.of(1980, 12, 12));
 
         final DataFrameCursor<LocalDate,String> cursor = frame.cursor();
-        cursor.toRow(LocalDate.of(1980, 12, 12));
-        assertEquals(cursor.toCol("Open").getDouble(), 28.74984, 0.00001);
-        assertEquals(cursor.toCol("High").getDouble(), 28.87472, 0.00001);
-        assertEquals(cursor.toCol("Low").getDouble(), 28.74984, 0.00001);
-        assertEquals(cursor.toCol("Close").getDouble(), 28.74984, 0.00001);
-        assertEquals(cursor.toCol("Volume").getLong(), 117258400L);
-        assertEquals(cursor.toCol("Adj Close").getDouble(), 0.44203, 0.00001);
+        cursor.row(LocalDate.of(1980, 12, 12));
+        assertEquals(cursor.col("Open").getDouble(), 28.74984, 0.00001);
+        assertEquals(cursor.col("High").getDouble(), 28.87472, 0.00001);
+        assertEquals(cursor.col("Low").getDouble(), 28.74984, 0.00001);
+        assertEquals(cursor.col("Close").getDouble(), 28.74984, 0.00001);
+        assertEquals(cursor.col("Volume").getLong(), 117258400L);
+        assertEquals(cursor.col("Adj Close").getDouble(), 0.44203, 0.00001);
 
-        cursor.toRow(LocalDate.of(2011, 6, 8));
+        cursor.row(LocalDate.of(2011, 6, 8));
         assertEquals(frame.rows().key(7690), LocalDate.of(2011, 6, 8));
-        assertEquals(cursor.toCol("Open").getDouble(), 331.77997, 0.00001);
-        assertEquals(cursor.toCol("High").getDouble(), 334.79999, 0.00001);
-        assertEquals(cursor.toCol("Low").getDouble(), 330.64996, 0.00001);
-        assertEquals(cursor.toCol("Close").getDouble(), 332.24002, 0.00001);
-        assertEquals(cursor.toCol("Volume").getLong(), 83430900L);
-        assertEquals(cursor.toCol("Adj Close").getDouble(), 44.76965, 0.00001);
+        assertEquals(cursor.col("Open").getDouble(), 331.77997, 0.00001);
+        assertEquals(cursor.col("High").getDouble(), 334.79999, 0.00001);
+        assertEquals(cursor.col("Low").getDouble(), 330.64996, 0.00001);
+        assertEquals(cursor.col("Close").getDouble(), 332.24002, 0.00001);
+        assertEquals(cursor.col("Volume").getLong(), 83430900L);
+        assertEquals(cursor.col("Adj Close").getDouble(), 44.76965, 0.00001);
 
-        cursor.toRow(LocalDate.of(2014, 8, 29));
+        cursor.row(LocalDate.of(2014, 8, 29));
         assertEquals(frame.rows().key(8502), LocalDate.of(2014, 8, 29));
-        assertEquals(cursor.toCol("Open").getDouble(), 102.86, 0.00001);
-        assertEquals(cursor.toCol("High").getDouble(), 102.9, 0.00001);
-        assertEquals(cursor.toCol("Low").getDouble(), 102.2, 0.00001);
-        assertEquals(cursor.toCol("Close").getDouble(), 102.5, 0.00001);
-        assertEquals(cursor.toCol("Volume").getLong(), 44595000L);
-        assertEquals(cursor.toCol("Adj Close").getDouble(), 101.65627, 0.00001);
+        assertEquals(cursor.col("Open").getDouble(), 102.86, 0.00001);
+        assertEquals(cursor.col("High").getDouble(), 102.9, 0.00001);
+        assertEquals(cursor.col("Low").getDouble(), 102.2, 0.00001);
+        assertEquals(cursor.col("Close").getDouble(), 102.5, 0.00001);
+        assertEquals(cursor.col("Volume").getLong(), 44595000L);
+        assertEquals(cursor.col("Adj Close").getDouble(), 101.65627, 0.00001);
 
         for (int i=0; i<frame.rows().count(); ++i) {
             final LocalDate rowKey = frame.rows().key(i);
@@ -246,23 +246,23 @@ public class CsvTests {
         assertEquals(frame.cols().type("Adj Close"), Double.class);
 
         final DataFrameCursor<Integer,String> cursor = frame.cursor();
-        cursor.toRowAt(0);
-        assertEquals(cursor.toCol("Date").getValue(), LocalDate.of(2012, 1, 3));
-        assertEquals(cursor.toCol("Open").getDouble(), 409.39996, 0.00001);
-        assertEquals(cursor.toCol("High").getDouble(), 412.5, 0.00001);
-        assertEquals(cursor.toCol("Low").getDouble(), 409, 0.00001);
-        assertEquals(cursor.toCol("Close").getDouble(), 411.22998, 0.00001);
-        assertEquals(cursor.toCol("Volume").getLong(), 75555200L);
-        assertEquals(cursor.toCol("Adj Close").getDouble(), 55.41362, 0.00001);
+        cursor.rowAt(0);
+        assertEquals(cursor.col("Date").getValue(), LocalDate.of(2012, 1, 3));
+        assertEquals(cursor.col("Open").getDouble(), 409.39996, 0.00001);
+        assertEquals(cursor.col("High").getDouble(), 412.5, 0.00001);
+        assertEquals(cursor.col("Low").getDouble(), 409, 0.00001);
+        assertEquals(cursor.col("Close").getDouble(), 411.22998, 0.00001);
+        assertEquals(cursor.col("Volume").getLong(), 75555200L);
+        assertEquals(cursor.col("Adj Close").getDouble(), 55.41362, 0.00001);
 
-        cursor.toRowAt(249);
-        assertEquals(cursor.toCol("Date").getValue(), LocalDate.of(2012, 12, 31));
-        assertEquals(cursor.toCol("Open").getDouble(), 510.53003, 0.00001);
-        assertEquals(cursor.toCol("High").getDouble(), 535.39996, 0.00001);
-        assertEquals(cursor.toCol("Low").getDouble(), 509, 0.00001);
-        assertEquals(cursor.toCol("Close").getDouble(), 532.17004, 0.00001);
-        assertEquals(cursor.toCol("Volume").getLong(), 164873100L);
-        assertEquals(cursor.toCol("Adj Close").getDouble(), 72.34723, 0.00001);
+        cursor.rowAt(249);
+        assertEquals(cursor.col("Date").getValue(), LocalDate.of(2012, 12, 31));
+        assertEquals(cursor.col("Open").getDouble(), 510.53003, 0.00001);
+        assertEquals(cursor.col("High").getDouble(), 535.39996, 0.00001);
+        assertEquals(cursor.col("Low").getDouble(), 509, 0.00001);
+        assertEquals(cursor.col("Close").getDouble(), 532.17004, 0.00001);
+        assertEquals(cursor.col("Volume").getLong(), 164873100L);
+        assertEquals(cursor.col("Adj Close").getDouble(), 72.34723, 0.00001);
 
         frame.rows().forEach(row -> assertTrue(row.<LocalDate>getValue("Date").getYear() == 2012));
     }
@@ -288,7 +288,7 @@ public class CsvTests {
         frame.rows().forEach(row -> {
             for (String column : columns) {
                 final Object actual = row.getValue(column);
-                final Object expect = cursor.toRow(row.key()).toCol(column).getValue();
+                final Object expect = cursor.row(row.key()).col(column).getValue();
                 assertEquals(actual, expect, "The values match for " + row.key() + ", " + column);
             }
         });
@@ -320,7 +320,7 @@ public class CsvTests {
             assertTrue(date.getYear() == 2012);
             for (String column : Arrays.asList("Close", "Volume")) {
                 final Object actual = row.getValue(column);
-                final Object expect = cursor.toRow(date).toCol(column).getValue();
+                final Object expect = cursor.row(date).col(column).getValue();
                 assertEquals(actual, expect, "The values match for " + row.key() + ", " + column);
             }
         });
@@ -431,29 +431,29 @@ public class CsvTests {
         assertEquals(frame.cols().type("Adj Close"), Double.class);
 
         final DataFrameCursor<LocalDate,String> cursor = frame.cursor();
-        cursor.toRow(LocalDate.of(1980, 12, 12));
+        cursor.row(LocalDate.of(1980, 12, 12));
         assertEquals(frame.rows().key(0), LocalDate.of(1980, 12, 12));
-        assertEquals(cursor.toCol("High").getDouble(), 28.87472, 0.00001);
-        assertEquals(cursor.toCol("Low").getDouble(), 28.74984, 0.00001);
-        assertEquals(cursor.toCol("Close").getDouble(), 28.74984, 0.00001);
-        assertEquals(cursor.toCol("Volume").getLong(), 117258400L);
-        assertEquals(cursor.toCol("Adj Close").getDouble(), 0.44203, 0.00001);
+        assertEquals(cursor.col("High").getDouble(), 28.87472, 0.00001);
+        assertEquals(cursor.col("Low").getDouble(), 28.74984, 0.00001);
+        assertEquals(cursor.col("Close").getDouble(), 28.74984, 0.00001);
+        assertEquals(cursor.col("Volume").getLong(), 117258400L);
+        assertEquals(cursor.col("Adj Close").getDouble(), 0.44203, 0.00001);
 
-        cursor.toRow(LocalDate.of(2011, 6, 8));
+        cursor.row(LocalDate.of(2011, 6, 8));
         assertEquals(frame.rows().key(7690), LocalDate.of(2011, 6, 8));
-        assertEquals(cursor.toCol("High").getDouble(), 334.79999, 0.00001);
-        assertEquals(cursor.toCol("Low").getDouble(), 330.64996, 0.00001);
-        assertEquals(cursor.toCol("Close").getDouble(), 332.24002, 0.00001);
-        assertEquals(cursor.toCol("Volume").getLong(), 83430900L);
-        assertEquals(cursor.toCol("Adj Close").getDouble(), 44.76965, 0.00001);
+        assertEquals(cursor.col("High").getDouble(), 334.79999, 0.00001);
+        assertEquals(cursor.col("Low").getDouble(), 330.64996, 0.00001);
+        assertEquals(cursor.col("Close").getDouble(), 332.24002, 0.00001);
+        assertEquals(cursor.col("Volume").getLong(), 83430900L);
+        assertEquals(cursor.col("Adj Close").getDouble(), 44.76965, 0.00001);
 
-        cursor.toRow(LocalDate.of(2014, 8, 29));
+        cursor.row(LocalDate.of(2014, 8, 29));
         assertEquals(frame.rows().key(8502), LocalDate.of(2014, 8, 29));
-        assertEquals(cursor.toCol("High").getDouble(), 102.9, 0.00001);
-        assertEquals(cursor.toCol("Low").getDouble(), 102.2, 0.00001);
-        assertEquals(cursor.toCol("Close").getDouble(), 102.5, 0.00001);
-        assertEquals(cursor.toCol("Volume").getLong(), 44595000L);
-        assertEquals(cursor.toCol("Adj Close").getDouble(), 101.65627, 0.00001);
+        assertEquals(cursor.col("High").getDouble(), 102.9, 0.00001);
+        assertEquals(cursor.col("Low").getDouble(), 102.2, 0.00001);
+        assertEquals(cursor.col("Close").getDouble(), 102.5, 0.00001);
+        assertEquals(cursor.col("Volume").getLong(), 44595000L);
+        assertEquals(cursor.col("Adj Close").getDouble(), 101.65627, 0.00001);
     }
 
 
@@ -476,29 +476,29 @@ public class CsvTests {
         assertEquals(frame.cols().type("Adj Close"), Double.class);
 
         final DataFrameCursor<LocalDate,String> cursor = frame.cursor();
-        cursor.toRow(LocalDate.of(1980, 12, 12));
+        cursor.row(LocalDate.of(1980, 12, 12));
         assertEquals(frame.rows().key(0), LocalDate.of(1980, 12, 12));
-        assertEquals(cursor.toCol("High").getDouble(), 28.87472, 0.00001);
-        assertEquals(cursor.toCol("Low").getDouble(), 28.74984, 0.00001);
-        assertEquals(cursor.toCol("Close").getDouble(), 28.74984, 0.00001);
-        assertEquals(cursor.toCol("Volume").getLong(), 117258400L);
-        assertEquals(cursor.toCol("Adj Close").getDouble(), 0.44203, 0.00001);
+        assertEquals(cursor.col("High").getDouble(), 28.87472, 0.00001);
+        assertEquals(cursor.col("Low").getDouble(), 28.74984, 0.00001);
+        assertEquals(cursor.col("Close").getDouble(), 28.74984, 0.00001);
+        assertEquals(cursor.col("Volume").getLong(), 117258400L);
+        assertEquals(cursor.col("Adj Close").getDouble(), 0.44203, 0.00001);
 
-        cursor.toRow(LocalDate.of(2011, 6, 8));
+        cursor.row(LocalDate.of(2011, 6, 8));
         assertEquals(frame.rows().key(7690), LocalDate.of(2011, 6, 8));
-        assertEquals(cursor.toCol("High").getDouble(), 334.79999, 0.00001);
-        assertEquals(cursor.toCol("Low").getDouble(), 330.64996, 0.00001);
-        assertEquals(cursor.toCol("Close").getDouble(), 332.24002, 0.00001);
-        assertEquals(cursor.toCol("Volume").getLong(), 83430900L);
-        assertEquals(cursor.toCol("Adj Close").getDouble(), 44.76965, 0.00001);
+        assertEquals(cursor.col("High").getDouble(), 334.79999, 0.00001);
+        assertEquals(cursor.col("Low").getDouble(), 330.64996, 0.00001);
+        assertEquals(cursor.col("Close").getDouble(), 332.24002, 0.00001);
+        assertEquals(cursor.col("Volume").getLong(), 83430900L);
+        assertEquals(cursor.col("Adj Close").getDouble(), 44.76965, 0.00001);
 
-        cursor.toRow(LocalDate.of(2014, 8, 29));
+        cursor.row(LocalDate.of(2014, 8, 29));
         assertEquals(frame.rows().key(8502), LocalDate.of(2014, 8, 29));
-        assertEquals(cursor.toCol("High").getDouble(), 102.9, 0.00001);
-        assertEquals(cursor.toCol("Low").getDouble(), 102.2, 0.00001);
-        assertEquals(cursor.toCol("Close").getDouble(), 102.5, 0.00001);
-        assertEquals(cursor.toCol("Volume").getLong(), 44595000L);
-        assertEquals(cursor.toCol("Adj Close").getDouble(), 101.65627, 0.00001);
+        assertEquals(cursor.col("High").getDouble(), 102.9, 0.00001);
+        assertEquals(cursor.col("Low").getDouble(), 102.2, 0.00001);
+        assertEquals(cursor.col("Close").getDouble(), 102.5, 0.00001);
+        assertEquals(cursor.col("Volume").getLong(), 44595000L);
+        assertEquals(cursor.col("Adj Close").getDouble(), 101.65627, 0.00001);
     }
 
 

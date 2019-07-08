@@ -88,7 +88,7 @@ public class MappingTests {
     public void testMapToBooleans(DataFrame<LocalDate,String> source) {
         final DataFrame<LocalDate,String> target = source.mapToBooleans(DataFrameValue::isDouble);
         DataFrameAsserts.assertEqualStructure(source, target);
-        target.cols().forEach(col -> Assert.assertEquals(col.typeInfo(), Boolean.class));
+        target.cols().forEach(col -> Assert.assertEquals(col.dataClass(), Boolean.class));
         source.forEachValue(v -> {
             final Object sourceValue = v.getValue();
             final boolean isDouble = sourceValue instanceof Double;
@@ -104,17 +104,17 @@ public class MappingTests {
     @Test(dataProvider = "frames")
     public void testMapToInts(DataFrame<LocalDate,String> source) {
         final DataFrame<LocalDate,String> target = source.mapToInts(v -> {
-            final int i = v.rowOrdinal();
-            final int j = v.colOrdinal();
+            var i = v.rowOrdinal();
+            var j = v.colOrdinal();
             return (i + j) * (i + j + 1) + j;
         });
         DataFrameAsserts.assertEqualStructure(source, target);
-        target.cols().forEach(col -> Assert.assertEquals(col.typeInfo(), Integer.class));
+        target.cols().forEach(col -> Assert.assertEquals(col.dataClass(), Integer.class));
         source.forEachValue(v -> {
-            final int i = v.rowOrdinal();
-            final int j = v.colOrdinal();
-            final int expected = (i + j) * (i + j + 1) + j;
-            final int targetValue = target.getIntAt(v.rowOrdinal(), v.colOrdinal());
+            var i = v.rowOrdinal();
+            var j = v.colOrdinal();
+            var expected = (i + j) * (i + j + 1) + j;
+            var targetValue = target.getIntAt(v.rowOrdinal(), v.colOrdinal());
             Assert.assertEquals(targetValue, expected, "Expected result for: " + v);
         });
     }
@@ -123,15 +123,15 @@ public class MappingTests {
     @Test(dataProvider = "frames")
     public void testMapToLongs(DataFrame<LocalDate,String> source) {
         final DataFrame<LocalDate,String> target = source.mapToLongs(v -> {
-            final int i = v.rowOrdinal();
-            final int j = v.colOrdinal();
+            var i = v.rowOrdinal();
+            var j = v.colOrdinal();
             return (long)((i + j) * (i + j + 1) + j);
         });
         DataFrameAsserts.assertEqualStructure(source, target);
-        target.cols().forEach(col -> Assert.assertEquals(col.typeInfo(), Long.class));
+        target.cols().forEach(col -> Assert.assertEquals(col.dataClass(), Long.class));
         source.forEachValue(v -> {
-            final int i = v.rowOrdinal();
-            final int j = v.colOrdinal();
+            var i = v.rowOrdinal();
+            var j = v.colOrdinal();
             final long expected = (i + j) * (i + j + 1) + j;
             final long targetValue = target.getLongAt(v.rowOrdinal(), v.colOrdinal());
             Assert.assertEquals(targetValue, expected, "Expected result for: " + v);
@@ -142,15 +142,15 @@ public class MappingTests {
     @Test(dataProvider = "frames")
     public void testMapToDoubles(DataFrame<LocalDate,String> source) {
         final DataFrame<LocalDate,String> target = source.mapToDoubles(v -> {
-            final int i = v.rowOrdinal();
-            final int j = v.colOrdinal();
+            var i = v.rowOrdinal();
+            var j = v.colOrdinal();
             return (double)((i + j) * (i + j + 1) + j);
         });
         DataFrameAsserts.assertEqualStructure(source, target);
-        target.cols().forEach(col -> Assert.assertEquals(col.typeInfo(), Double.class));
+        target.cols().forEach(col -> Assert.assertEquals(col.dataClass(), Double.class));
         source.forEachValue(v -> {
-            final int i = v.rowOrdinal();
-            final int j = v.colOrdinal();
+            var i = v.rowOrdinal();
+            var j = v.colOrdinal();
             final double expected = (i + j) * (i + j + 1) + j;
             final double targetValue = target.getDoubleAt(v.rowOrdinal(), v.colOrdinal());
             Assert.assertEquals(targetValue, expected, "Expected result for: " + v);
@@ -161,15 +161,15 @@ public class MappingTests {
     @Test(dataProvider = "frames")
     public void testMapToObjects(DataFrame<LocalDate,String> source) {
         final DataFrame<LocalDate,String> target = source.mapToObjects(String.class, v -> {
-            final int i = v.rowOrdinal();
-            final int j = v.colOrdinal();
+            var i = v.rowOrdinal();
+            var j = v.colOrdinal();
             return String.format("(%s, %s)", i, j);
         });
         DataFrameAsserts.assertEqualStructure(source, target);
-        target.cols().forEach(col -> Assert.assertEquals(col.typeInfo(), String.class));
+        target.cols().forEach(col -> Assert.assertEquals(col.dataClass(), String.class));
         source.forEachValue(v -> {
-            final int i = v.rowOrdinal();
-            final int j = v.colOrdinal();
+            var i = v.rowOrdinal();
+            var j = v.colOrdinal();
             final String expected = String.format("(%s, %s)", i, j);
             final String targetValue = target.getValueAt(v.rowOrdinal(), v.colOrdinal());
             Assert.assertEquals(targetValue, expected, "Expected result for: " + v);
@@ -185,7 +185,7 @@ public class MappingTests {
             source.cols().select(col -> !col.key().equals("D")),
             target.cols().select(col -> !col.key().equals("D"))
         );
-        Assert.assertEquals(target.col("D").typeInfo(), Boolean.class);
+        Assert.assertEquals(target.col("D").dataClass(), Boolean.class);
         source.forEachValue(v -> {
             if (v.colKey().equals("D")) {
                 final boolean expected = v.getDouble() > 0.5d;
@@ -208,11 +208,11 @@ public class MappingTests {
             source.cols().select(col -> !col.key().equals("D")),
             target.cols().select(col -> !col.key().equals("D"))
         );
-        Assert.assertEquals(target.col("D").typeInfo(), Integer.class);
+        Assert.assertEquals(target.col("D").dataClass(), Integer.class);
         source.forEachValue(v -> {
             if (v.colKey().equals("D")) {
-                final int expected = (int)(v.getDouble() * 100);
-                final int actual = target.getIntAt(v.rowOrdinal(), v.colOrdinal());
+                var expected = (int)(v.getDouble() * 100);
+                var actual = target.getIntAt(v.rowOrdinal(), v.colOrdinal());
                 Assert.assertEquals(actual, expected, String.format("Values match at coordinates (%s,%s)", v.rowKey(), v.colKey()));
             } else {
                 final Object v1 = v.getValue();
@@ -231,7 +231,7 @@ public class MappingTests {
             source.cols().select(col -> !col.key().equals("D")),
             target.cols().select(col -> !col.key().equals("D"))
         );
-        Assert.assertEquals(target.col("D").typeInfo(), Long.class);
+        Assert.assertEquals(target.col("D").dataClass(), Long.class);
         source.forEachValue(v -> {
             if (v.colKey().equals("D")) {
                 final long expected = (long)(v.getDouble() * 100);
@@ -254,7 +254,7 @@ public class MappingTests {
             source.cols().select(col -> !col.key().equals("E")),
             target.cols().select(col -> !col.key().equals("E"))
         );
-        Assert.assertEquals(target.col("E").typeInfo(), Double.class);
+        Assert.assertEquals(target.col("E").dataClass(), Double.class);
         source.forEachValue(v -> {
             if (v.colKey().equals("E")) {
                 final double expected = v.<LocalDate>getValue().getDayOfMonth() * 10d;

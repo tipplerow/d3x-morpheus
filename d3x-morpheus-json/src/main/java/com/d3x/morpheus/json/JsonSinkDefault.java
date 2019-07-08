@@ -78,7 +78,7 @@ public class JsonSinkDefault<R,C> extends JsonSinkBase<R,C> {
                 writer.beginObject();
                 writer.name("key").value(formats.format(v.key()));
                 writer.name("keyType").value(getTypeName(v.key().getClass()));
-                writer.name("dataType").value(getTypeName(v.typeInfo()));
+                writer.name("dataType").value(getTypeName(v.dataClass()));
                 writer.name("ordinal").value(v.ordinal());
                 writer.name("default").nullValue();
                 writer.name("sparse").value(false);

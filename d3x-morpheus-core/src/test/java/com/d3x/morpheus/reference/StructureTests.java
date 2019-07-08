@@ -245,8 +245,8 @@ public class StructureTests {
         selection.cols().forEach(col -> assertTrue(col.key() % 2 == 0));
 
         selection.forEachValue(v -> {
-            final Integer rowKey = v.rowKey();
-            final Integer colKey = v.colKey();
+            var rowKey = v.rowKey();
+            var colKey = v.colKey();
             final double actual = v.getDouble();
             final double expected = source.getDouble(rowKey, colKey);
             assertEquals(actual, expected, 0.00001, "Values match at coordinates (" + rowKey + ", " + colKey + ")");

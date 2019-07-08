@@ -59,7 +59,7 @@ public class MaxTask<T> extends RecursiveTask<T> {
     public T compute() {
         try {
             if (array.length() == 0) return null;
-            final int length = to - from + 1;
+            var length = to - from + 1;
             if (length > splitThreshold) {
                 final int splitLength = (to - from) / 2;
                 final int midPoint = from + splitLength;
@@ -148,7 +148,7 @@ public class MaxTask<T> extends RecursiveTask<T> {
         for (int i = from; i <= to; ++i) {
             if (!array.isNull(i)) {
                 count++;
-                final double value = array.getDouble(i);
+                var value = array.getDouble(i);
                 maxValue = Double.compare(value, maxValue) > 0 ? value : maxValue;
             }
         }

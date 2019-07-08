@@ -365,7 +365,7 @@ abstract class IndexBase<K> implements Index<K>, Swapper {
      * @param capacity the capacity to support
      */
     final void ensureCapacity(int capacity) {
-        final int length = keys.length();
+        var length = keys.length();
         if (length < capacity) {
             int newCapacity = length + (length >> 1);
             if (newCapacity - capacity < 0) newCapacity = capacity;

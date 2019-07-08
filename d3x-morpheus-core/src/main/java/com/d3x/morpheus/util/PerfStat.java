@@ -395,8 +395,8 @@ public class PerfStat implements java.io.Serializable {
                 final DataFrame<String,String> gcStats = perStat.getGcStats();
                 final DataFrameCursor<String,String> gcCursor = gcStats.cursor();
                 resultList.add(timeStats.applyDoubles(v -> {
-                    final double runTime = v.getDouble();
-                    final double gcTime = gcCursor.atKeys(v.rowKey(), v.colKey()).getDouble();
+                    var runTime = v.getDouble();
+                    var gcTime = gcCursor.locate(v.rowKey(), v.colKey()).getDouble();
                     return runTime + gcTime;
                 }));
             }

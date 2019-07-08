@@ -122,7 +122,7 @@ public class ArrayFuncTests {
         final Array<T> copy = array.stream().values().collect(ArrayUtils.toArray());
         Assert.assertEquals(copy, array, "The copied array matches source");
         if (array.typeCode() == ArrayType.INTEGER) {
-            final int[] ints = array.stream().ints().toArray();
+            var ints = array.stream().ints().toArray();
             array.forEachValue(v -> Assert.assertEquals(ints[v.index()], v.getInt(), "Values match for index: " + v.index()));
         } else if (array.typeCode() == ArrayType.LONG) {
             final long[] longs = array.stream().longs().toArray();
@@ -142,7 +142,7 @@ public class ArrayFuncTests {
         final Array<T> copy = array.stream(10, 20).values().collect(ArrayUtils.toArray());
         Assert.assertEquals(copy, array.copy(10, 20), "The copied array matches source");
         if (array.typeCode() == ArrayType.INTEGER) {
-            final int[] ints = array.stream(10, 20).ints().toArray();
+            var ints = array.stream(10, 20).ints().toArray();
             array.copy(10, 20).forEachValue(v -> Assert.assertEquals(ints[v.index()], v.getInt(), "Values match for index: " + v.index()));
         } else if (array.typeCode() == ArrayType.LONG) {
             final long[] longs = array.stream(10, 20).longs().toArray();

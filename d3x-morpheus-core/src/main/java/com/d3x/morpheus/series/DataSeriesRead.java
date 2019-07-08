@@ -103,8 +103,8 @@ public class DataSeriesRead<K,V,D extends DataSeries<K,V>> {
      */
     @SuppressWarnings("unchecked")
     private D from(DataFrame<Integer,?> frame) {
-        var keyType = (Class<K>)frame.colAt(0).typeInfo();
-        var valueType = (Class<V>)frame.colAt(1).typeInfo();
+        var keyType = (Class<K>)frame.colAt(0).dataClass();
+        var valueType = (Class<V>)frame.colAt(1).dataClass();
         var builder = DataSeriesBuilder.builder(keyType, valueType);
         builder.capacity(frame.rowCount());
         if (valueType.equals(Boolean.class)) {

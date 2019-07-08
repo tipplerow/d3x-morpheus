@@ -142,7 +142,7 @@ class MappedArrayWithIntCoding<T> extends ArrayBase<T> implements WithIntCoding<
             final File newFile = MappedArrayConstructor.randomFile(true);
             final MappedArrayWithIntCoding<T> copy = new MappedArrayWithIntCoding<>(length, defaultValue, coding, newFile);
             for (int i=0; i<length; ++i) {
-                final int v = buffer.get(i);
+                var v = buffer.get(i);
                 copy.buffer.put(i, v);
             }
             return copy;
@@ -191,11 +191,11 @@ class MappedArrayWithIntCoding<T> extends ArrayBase<T> implements WithIntCoding<
     @Override()
     public final Array<T> copy(int start, int end) {
         try {
-            final int newLength = end - start;
+            var newLength = end - start;
             final File newFile = MappedArrayConstructor.randomFile(true);
             final MappedArrayWithIntCoding<T> copy = new MappedArrayWithIntCoding<>(newLength, defaultValue, coding, newFile);
             for (int i=0; i<newLength; ++i) {
-                final int value = buffer.get(start + i);
+                var value = buffer.get(start + i);
                 if (Integer.compare(value, defaultCode) != 0) {
                     copy.buffer.put(i, value);
                 }
@@ -210,8 +210,8 @@ class MappedArrayWithIntCoding<T> extends ArrayBase<T> implements WithIntCoding<
     @Override
     protected final Array<T> sort(int start, int end, int multiplier) {
         return doSort(start, end, (i, j) -> {
-            final int v1 = buffer.get(i);
-            final int v2 = buffer.get(j);
+            var v1 = buffer.get(i);
+            var v2 = buffer.get(j);
             return multiplier * Integer.compare(v1, v2);
         });
     }
@@ -219,16 +219,16 @@ class MappedArrayWithIntCoding<T> extends ArrayBase<T> implements WithIntCoding<
 
     @Override
     public final int compare(int i, int j) {
-        final int v1 = buffer.get(i);
-        final int v2 = buffer.get(j);
+        var v1 = buffer.get(i);
+        var v2 = buffer.get(j);
         return Integer.compare(v1, v2);
     }
 
 
     @Override
     public final Array<T> swap(int i, int j) {
-        final int v1 = buffer.get(i);
-        final int v2 = buffer.get(j);
+        var v1 = buffer.get(i);
+        var v2 = buffer.get(j);
         this.buffer.put(j, v1);
         this.buffer.put(i, v2);
         return this;
@@ -256,8 +256,8 @@ class MappedArrayWithIntCoding<T> extends ArrayBase<T> implements WithIntCoding<
             throw new ArrayException("The from index array must have the same length as the to index array");
         } else {
             for (int i=0; i<fromIndexes.length; ++i) {
-                final int toIndex = toIndexes[i];
-                final int fromIndex = fromIndexes[i];
+                var toIndex = toIndexes[i];
+                var fromIndex = fromIndexes[i];
                 final T update = from.getValue(fromIndex);
                 this.setValue(toIndex, update);
             }
@@ -301,7 +301,7 @@ class MappedArrayWithIntCoding<T> extends ArrayBase<T> implements WithIntCoding<
 
     @Override
     public Array<T> fill(T value, int start, int end) {
-        final int code = coding.getCode(value);
+        var code = coding.getCode(value);
         for (int i=start; i<end; ++i) {
             this.buffer.put(i, code);
         }
@@ -320,7 +320,7 @@ class MappedArrayWithIntCoding<T> extends ArrayBase<T> implements WithIntCoding<
         if (value == null) {
             return isNull(index);
         } else {
-            final int code = coding.getCode(value);
+            var code = coding.getCode(value);
             return code == buffer.get(index);
         }
     }
@@ -336,14 +336,14 @@ class MappedArrayWithIntCoding<T> extends ArrayBase<T> implements WithIntCoding<
     @Override
     public final T getValue(int index) {
         this.checkBounds(index, length);
-        final int code = buffer.get(index);
+        var code = buffer.get(index);
         return coding.getValue(code);
     }
 
 
     @Override
     public int setInt(int index, int value) {
-        final int oldValue = getInt(index);
+        var oldValue = getInt(index);
         this.buffer.put(index, value);
         return oldValue;
     }
@@ -359,11 +359,11 @@ class MappedArrayWithIntCoding<T> extends ArrayBase<T> implements WithIntCoding<
 
     @Override
     public Array<T> distinct(int limit) {
-        final int capacity = limit < Integer.MAX_VALUE ? limit : 100;
+        var capacity = limit < Integer.MAX_VALUE ? limit : 100;
         final TIntSet set = new TIntHashSet(capacity);
         final ArrayBuilder<T> builder = ArrayBuilder.of(capacity, type());
         for (int i=0; i<length(); ++i) {
-            final int code = getInt(i);
+            var code = getInt(i);
             if (set.add(code)) {
                 final T value = getValue(i);
                 builder.add(value);
@@ -379,7 +379,7 @@ class MappedArrayWithIntCoding<T> extends ArrayBase<T> implements WithIntCoding<
     @Override
     public final void read(ObjectInputStream is, int count) throws IOException {
         for (int i=0; i<count; ++i) {
-            final int code = is.readInt();
+            var code = is.readInt();
             this.buffer.put(i, code);
         }
     }
@@ -388,7 +388,7 @@ class MappedArrayWithIntCoding<T> extends ArrayBase<T> implements WithIntCoding<
     @Override
     public final void write(ObjectOutputStream os, int[] indexes) throws IOException {
         for (int index : indexes) {
-            final int code = buffer.get(index);
+            var code = buffer.get(index);
             os.writeInt(code);
         }
     }
@@ -400,7 +400,7 @@ class MappedArrayWithIntCoding<T> extends ArrayBase<T> implements WithIntCoding<
         os.writeObject(defaultValue);
         os.writeObject(coding);
         for (int i=0; i<length; ++i) {
-            final int value = buffer.get(i);
+            var value = buffer.get(i);
             os.writeInt(value);
         }
     }
@@ -417,7 +417,7 @@ class MappedArrayWithIntCoding<T> extends ArrayBase<T> implements WithIntCoding<
         this.channel = new RandomAccessFile(file, "rw").getChannel();
         this.buffer = channel.map(FileChannel.MapMode.READ_WRITE, 0, BYTE_COUNT * length).asIntBuffer();
         for (int i=0; i<length; ++i) {
-            final int value = is.readInt();
+            var value = is.readInt();
             this.buffer.put(i, value);
         }
     }
