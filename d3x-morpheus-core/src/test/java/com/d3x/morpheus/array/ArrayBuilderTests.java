@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2014-2017 Xavier Witdouck
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -75,8 +75,8 @@ public class ArrayBuilderTests {
     public void testEmpty() {
         final ArrayBuilder<Boolean> builder = ArrayBuilder.of(10);
         final Array<Boolean> empty = builder.toArray();
-        Assert.assertTrue(empty.length() == 0, "The array is zero length");
-        Assert.assertTrue(empty.typeCode() == ArrayType.OBJECT);
+        Assert.assertEquals(empty.length(), 0, "The array is zero length");
+        Assert.assertEquals(empty.typeCode(), ArrayType.OBJECT);
     }
 
 
@@ -84,15 +84,15 @@ public class ArrayBuilderTests {
     public void testEmptyWithType(Class<?> type) {
         final ArrayBuilder<?> builder = ArrayBuilder.of(10, type);
         final Array<?> empty = builder.toArray();
-        Assert.assertTrue(empty.length() == 0, "The array is zero length");
-        Assert.assertTrue(empty.typeCode() == ArrayType.of(type), "The array types match");
+        Assert.assertEquals(empty.length(), 0, "The array is zero length");
+        Assert.assertEquals(empty.typeCode(), ArrayType.of(type), "The array types match");
     }
 
 
     @Test()
     public void testWhenExpansionRequired() {
         final ArrayBuilder<Double> builder = ArrayBuilder.of(10, Double.class);
-        Range.of(0, 101).forEach(i -> builder.addDouble(Math.random()));
+        Range.of(0, 101).forEach(i -> builder.appendDouble(Math.random()));
         final Array<Double> array = builder.toArray();
         Assert.assertEquals(array.length(), 101, "Array length matches expected");
     }
@@ -101,7 +101,7 @@ public class ArrayBuilderTests {
     @Test()
     public void testWhenContractionRequired() {
         final ArrayBuilder<Double> builder = ArrayBuilder.of(1000, Double.class);
-        Range.of(0, 101).forEach(i -> builder.addDouble(Math.random()));
+        Range.of(0, 101).forEach(i -> builder.appendDouble(Math.random()));
         final Array<Double> array = builder.toArray();
         Assert.assertEquals(array.length(), 101, "Array length matches expected");
     }
@@ -114,7 +114,7 @@ public class ArrayBuilderTests {
         final boolean[] expected = new boolean[1000];
         for (int i=0; i<expected.length; ++i) {
             expected[i] = random.nextBoolean();
-            builder.add(expected[i]);
+            builder.append(expected[i]);
         }
         final Array<Boolean> actual = builder.toArray();
         Assert.assertEquals(actual.length(), expected.length, "The lengths match");
@@ -132,7 +132,7 @@ public class ArrayBuilderTests {
         var expected = new int[1000];
         for (int i=0; i<expected.length; ++i) {
             expected[i] = random.nextInt();
-            builder.add(expected[i]);
+            builder.append(expected[i]);
         }
         final Array<Integer> actual = builder.toArray();
         Assert.assertEquals(actual.length(), expected.length, "The lengths match");
@@ -154,7 +154,7 @@ public class ArrayBuilderTests {
         final long[] expected = new long[1000];
         for (int i=0; i<expected.length; ++i) {
             expected[i] = random.nextLong();
-            builder.add(expected[i]);
+            builder.append(expected[i]);
         }
         final Array<Long> actual = builder.toArray();
         Assert.assertEquals(actual.length(), expected.length, "The lengths match");
@@ -176,7 +176,7 @@ public class ArrayBuilderTests {
         final double[] expected = new double[1000];
         for (int i=0; i<expected.length; ++i) {
             expected[i] = random.nextDouble();
-            builder.add(expected[i]);
+            builder.append(expected[i]);
         }
         final Array<Double> actual = builder.toArray();
         Assert.assertEquals(actual.length(), expected.length, "The lengths match");
@@ -198,7 +198,7 @@ public class ArrayBuilderTests {
         final String[] expected = new String[1000];
         for (int i=0; i<expected.length; ++i) {
             expected[i] = "X=" + random.nextDouble();
-            builder.add(expected[i]);
+            builder.append(expected[i]);
         }
         final Array<String> actual = builder.toArray();
         Assert.assertEquals(actual.length(), expected.length, "The lengths match");
@@ -221,7 +221,7 @@ public class ArrayBuilderTests {
         for (int i=0; i<expected.length; ++i) {
             calender.add(Calendar.DATE, 1);
             expected[i] = calender.getTime();
-            builder.add(expected[i]);
+            builder.append(expected[i]);
         }
         final Array<Date> actual = builder.toArray();
         Assert.assertEquals(actual.length(), expected.length, "The lengths match");
@@ -241,7 +241,7 @@ public class ArrayBuilderTests {
         final ArrayBuilder<Currency> builder = ArrayBuilder.of(initialSize);
         final Currency[] expected = Currency.getAvailableCurrencies().stream().toArray(Currency[]::new);
         for (Currency exp : expected) {
-            builder.add(exp);
+            builder.append(exp);
         }
         final Array<Currency> actual = builder.toArray();
         Assert.assertEquals(actual.length(), expected.length, "The lengths match");
@@ -261,7 +261,7 @@ public class ArrayBuilderTests {
         final ArrayBuilder<TimeZone> builder = ArrayBuilder.of(initialSize);
         final TimeZone[] expected = Stream.of(TimeZone.getAvailableIDs()).map(TimeZone::getTimeZone).toArray(TimeZone[]::new);
         for (TimeZone exp : expected) {
-            builder.add(exp);
+            builder.append(exp);
         }
         final Array<TimeZone> actual = builder.toArray();
         Assert.assertEquals(actual.length(), expected.length, "The lengths match");
@@ -281,7 +281,7 @@ public class ArrayBuilderTests {
         final ArrayBuilder<ZoneId> builder = ArrayBuilder.of(initialSize);
         final ZoneId[] expected = ZoneId.getAvailableZoneIds().stream().map(ZoneId::of).toArray(ZoneId[]::new);
         for (ZoneId exp : expected) {
-            builder.add(exp);
+            builder.append(exp);
         }
         final Array<ZoneId> actual = builder.toArray();
         Assert.assertEquals(actual.length(), expected.length, "The lengths match");
@@ -302,7 +302,7 @@ public class ArrayBuilderTests {
         final LocalDate[] expected = new LocalDate[1000];
         for (int i=0; i<expected.length; ++i) {
             expected[i] = LocalDate.now().plusDays(i);
-            builder.add(expected[i]);
+            builder.append(expected[i]);
         }
         final Array<LocalDate> actual = builder.toArray();
         Assert.assertEquals(actual.length(), expected.length, "The lengths match");
@@ -323,7 +323,7 @@ public class ArrayBuilderTests {
         final LocalTime[] expected = new LocalTime[1000];
         for (int i=0; i<expected.length; ++i) {
             expected[i] = LocalTime.now().plusMinutes(i);
-            builder.add(expected[i]);
+            builder.append(expected[i]);
         }
         final Array<LocalTime> actual = builder.toArray();
         Assert.assertEquals(actual.length(), expected.length, "The lengths match");
@@ -345,7 +345,7 @@ public class ArrayBuilderTests {
         LocalDateTime[] expected = new LocalDateTime[1000];
         for (int i=0; i<expected.length; ++i) {
             expected[i] = now.plusMinutes(i);
-            builder.add(expected[i]);
+            builder.append(expected[i]);
         }
         Array<LocalDateTime> actual = builder.toArray();
         Assert.assertEquals(actual.length(), expected.length, "The lengths match");
@@ -369,7 +369,7 @@ public class ArrayBuilderTests {
         ZonedDateTime[] expected = new ZonedDateTime[1000];
         for (int i=0; i<expected.length; ++i) {
             expected[i] = now.plusMinutes(i);
-            builder.add(expected[i]);
+            builder.append(expected[i]);
         }
         Array<ZonedDateTime> actual = builder.toArray();
         Assert.assertEquals(actual.length(), expected.length, "The lengths match");
@@ -391,23 +391,23 @@ public class ArrayBuilderTests {
         final Object[] expected = new Object[1000];
         for (int i=0; i<100; ++i) {
             expected[i] = ZonedDateTime.now().truncatedTo(ChronoUnit.MILLIS).plusMinutes(i);
-            builder.add(expected[i]);
+            builder.append(expected[i]);
         }
         for (int i=100; i<200; ++i) {
             expected[i] = random.nextDouble();
-            builder.add(expected[i]);
+            builder.append(expected[i]);
         }
         for (int i=200; i<300; ++i) {
             expected[i] = random.nextLong();
-            builder.add(expected[i]);
+            builder.append(expected[i]);
         }
         for (int i=300; i<400; ++i) {
             expected[i] = random.nextInt();
-            builder.add(expected[i]);
+            builder.append(expected[i]);
         }
         for (int i=400; i<1000; ++i) {
             expected[i] = random.nextBoolean();
-            builder.add(expected[i]);
+            builder.append(expected[i]);
         }
         final Array<Object> actual = builder.toArray();
         Assert.assertEquals(actual.length(), expected.length, "The lengths match");
@@ -429,9 +429,9 @@ public class ArrayBuilderTests {
         final Array<Double> array2 = Range.of(0, 768).map(i -> Math.random()).toArray();
         Assert.assertEquals(array1.length(), 1000);
         Assert.assertEquals(array2.length(), 768);
-        array1.forEachValue(v -> builder1.addDouble(v.getDouble()));
-        array2.forEachValue(v -> builder2.addDouble(v.getDouble()));
-        final Array<Double> combined = builder1.addAll(builder2).toArray();
+        array1.forEachValue(v -> builder1.appendDouble(v.getDouble()));
+        array2.forEachValue(v -> builder2.appendDouble(v.getDouble()));
+        final Array<Double> combined = builder1.appendAll(builder2).toArray();
         Assert.assertEquals(combined.length(), array1.length() + array2.length());
         for (int i=0; i<array1.length(); ++i) {
             final double v1 = array1.getDouble(i);
@@ -452,6 +452,129 @@ public class ArrayBuilderTests {
         final Array<Integer> array3 = IntStream.range(0, 1000).boxed().collect(ArrayUtils.toArray(Integer.class, 100));
         Assert.assertEquals(array1, array2);
         Assert.assertEquals(array1, array3);
+    }
+
+
+    @Test()
+    public void testBooleanSetters() {
+        var builder = ArrayBuilder.of(20);
+        builder.setBoolean(3, true);
+        builder.setBoolean(5, true);
+        builder.setBoolean(35, true);
+        builder.appendBoolean(true);
+        var result = builder.toArray();
+        Assert.assertEquals(result.length(), 37);
+        Assert.assertEquals(result.typeCode(), ArrayType.BOOLEAN);
+        result.forEachValue(v -> {
+            var index = v.index();
+            switch (index) {
+                case 3:     Assert.assertTrue(result.getBoolean(index));  break;
+                case 5:     Assert.assertTrue(result.getBoolean(index));  break;
+                case 35:    Assert.assertTrue(result.getBoolean(index));  break;
+                case 36:    Assert.assertTrue(result.getBoolean(index));  break;
+                default:    Assert.assertFalse(result.getBoolean(index));  break;
+            }
+        });
+    }
+
+
+    @Test()
+    public void testIntSetters() {
+        var builder = ArrayBuilder.of(20);
+        builder.setInt(3, 30);
+        builder.setInt(5, 50);
+        builder.setInt(35, 350);
+        builder.appendInt(600);
+        var result = builder.toArray();
+        Assert.assertEquals(result.length(), 37);
+        Assert.assertEquals(result.typeCode(), ArrayType.INTEGER);
+        result.forEachValue(v -> {
+            var index = v.index();
+            switch (index) {
+                case 3:     Assert.assertEquals(result.getInt(index), 30);  break;
+                case 5:     Assert.assertEquals(result.getInt(index), 50);  break;
+                case 35:    Assert.assertEquals(result.getInt(index), 350);  break;
+                case 36:    Assert.assertEquals(result.getInt(index), 600);  break;
+                default:    Assert.assertEquals(result.getInt(index), 0);  break;
+            }
+        });
+    }
+
+
+    @Test()
+    public void testLongSetters() {
+        var builder = ArrayBuilder.of(20);
+        builder.setLong(3, 30);
+        builder.setLong(5, 50);
+        builder.setLong(35, 350);
+        builder.appendLong(600);
+        var result = builder.toArray();
+        Assert.assertEquals(result.length(), 37);
+        Assert.assertEquals(result.typeCode(), ArrayType.LONG);
+        result.forEachValue(v -> {
+            var index = v.index();
+            switch (index) {
+                case 3:     Assert.assertEquals(result.getLong(index), 30L);  break;
+                case 5:     Assert.assertEquals(result.getLong(index), 50L);  break;
+                case 35:    Assert.assertEquals(result.getLong(index), 350L);  break;
+                case 36:    Assert.assertEquals(result.getLong(index), 600L);  break;
+                default:    Assert.assertEquals(result.getLong(index), 0L);  break;
+            }
+        });
+    }
+
+
+
+    @Test()
+    public void testDoubleSetters() {
+        var builder = ArrayBuilder.of(20);
+        builder.setDouble(3, 3.3d);
+        builder.setDouble(5, 5.5d);
+        builder.setDouble(35, 350d);
+        builder.appendDouble(600d);
+        var result = builder.toArray();
+        Assert.assertEquals(result.length(), 37);
+        Assert.assertEquals(result.typeCode(), ArrayType.DOUBLE);
+        result.forEachValue(v -> {
+            var index = v.index();
+            switch (index) {
+                case 3:     Assert.assertEquals(result.getDouble(index), 3.3d, 0.0000001);  break;
+                case 5:     Assert.assertEquals(result.getDouble(index), 5.5d, 0.0000001);  break;
+                case 35:    Assert.assertEquals(result.getDouble(index), 350d, 0.0000001);  break;
+                case 36:    Assert.assertEquals(result.getDouble(index), 600d, 0.0000001);  break;
+                default:    Assert.assertEquals(result.getDouble(index), Double.NaN, 0.000001d);  break;
+            }
+        });
+    }
+
+
+    @Test()
+    public void testValueSetters() {
+        var builder = ArrayBuilder.of(20);
+        builder.setValue(3, true);
+        builder.setInt(5, 50);
+        builder.setLong(35, 350L);
+        builder.appendDouble(600d);
+        builder.append("Hello");
+        var result = builder.toArray();
+        Assert.assertEquals(result.length(), 38);
+        Assert.assertEquals(result.typeCode(), ArrayType.OBJECT);
+        result.forEachValue(v -> {
+            var index = v.index();
+            switch (index) {
+                case 3:     Assert.assertTrue(result.getBoolean(index));  break;
+                case 5:     Assert.assertEquals(result.getInt(index), 50);  break;
+                case 35:    Assert.assertEquals(result.getLong(index), 350L);  break;
+                case 36:    Assert.assertEquals(result.getDouble(index), 600d, 0.0000001);  break;
+                case 37:    Assert.assertEquals(result.getValue(index), "Hello");  break;
+                default:
+                    if (index < 20) {
+                        Assert.assertEquals(result.getValue(index), Boolean.FALSE);  break;
+                    } else {
+                        Assert.assertNull(result.getValue(index));  break;
+                    }
+            }
+        });
     }
 
 }

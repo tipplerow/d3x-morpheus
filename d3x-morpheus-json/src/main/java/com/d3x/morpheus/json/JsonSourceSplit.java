@@ -191,17 +191,17 @@ public class JsonSourceSplit<R,C> implements JsonSource<R,C> {
             for (int i=0; i<colCount; ++i) {
                 var array = arrays.get(i);
                 if (token == JsonToken.BOOLEAN) {
-                    array.addBoolean(reader.nextBoolean());
+                    array.appendBoolean(reader.nextBoolean());
                     token = reader.peek();
                 } else if (token == JsonToken.NUMBER) {
-                    array.addDouble(reader.nextDouble());
+                    array.appendDouble(reader.nextDouble());
                     token = reader.peek();
                 } else if (token == JsonToken.STRING) {
-                    array.add(reader.nextString());
+                    array.append(reader.nextString());
                     token = reader.peek();
                 } else if (token == JsonToken.NULL) {
                     reader.nextNull();
-                    array.add(null);
+                    array.append(null);
                     token = reader.peek();
                 }
             }

@@ -169,7 +169,7 @@ class DenseArrayOfObjects<T> extends ArrayBase<T> {
             cursor.moveTo(i);
             final boolean match = predicate.test(cursor);
             if (match) {
-                builder.add(cursor.getValue());
+                builder.append(cursor.getValue());
             }
         }
         return builder.toArray();
@@ -288,7 +288,11 @@ class DenseArrayOfObjects<T> extends ArrayBase<T> {
     public final boolean setBoolean(int index, boolean value) {
         final Object oldValue = values[index];
         this.values[index] = value;
-        return oldValue instanceof Boolean && (Boolean)oldValue;
+        if (oldValue instanceof Boolean) {
+            return (Boolean)oldValue;
+        } else {
+            return false;
+        }
     }
 
 
@@ -296,7 +300,11 @@ class DenseArrayOfObjects<T> extends ArrayBase<T> {
     public final int setInt(int index, int value) {
         final Object oldValue = values[index];
         this.values[index] = value;
-        return oldValue != null ? ((Number)oldValue).intValue() : 0;
+        if (oldValue instanceof Number) {
+            return ((Number)oldValue).intValue();
+        } else {
+            return 0;
+        }
     }
 
 
@@ -304,7 +312,11 @@ class DenseArrayOfObjects<T> extends ArrayBase<T> {
     public final long setLong(int index, long value) {
         final Object oldValue = values[index];
         this.values[index] = value;
-        return oldValue != null ? ((Number)oldValue).longValue() : 0;
+        if (oldValue instanceof Number) {
+            return ((Number)oldValue).longValue();
+        } else {
+            return 0;
+        }
     }
 
 
@@ -312,7 +324,11 @@ class DenseArrayOfObjects<T> extends ArrayBase<T> {
     public final double setDouble(int index, double value) {
         final Object oldValue = values[index];
         this.values[index] = value;
-        return oldValue != null ? ((Number)oldValue).doubleValue() : Double.NaN;
+        if (oldValue instanceof Number) {
+            return ((Number)oldValue).doubleValue();
+        } else {
+            return Double.NaN;
+        }
     }
 
 

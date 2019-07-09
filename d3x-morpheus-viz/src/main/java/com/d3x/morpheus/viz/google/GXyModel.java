@@ -130,7 +130,7 @@ class GXyModel<X extends Comparable,S extends Comparable> implements XyModel<X,S
     private GXyDataset<X,S> combine(Collection<GXyDataset<X,S>> datasets) {
         return GXyDataset.of(() -> {
             final Set<Class<X>> domainKeyTypeSet = datasets.stream().map(GXyDataset::getDomainKeyType).collect(Collectors.toSet());
-            final Set<Class<S>> seriesKeyTypeSet = datasets.stream().map(d -> d.frame().cols().keyType()).collect(Collectors.toSet());
+            final Set<Class<S>> seriesKeyTypeSet = datasets.stream().map(d -> d.frame().cols().keyClass()).collect(Collectors.toSet());
             if (domainKeyTypeSet.size() > 1) {
                 throw new ChartException("Non-homogeneous key types for domain dimension: " + domainKeyTypeSet);
             } else {

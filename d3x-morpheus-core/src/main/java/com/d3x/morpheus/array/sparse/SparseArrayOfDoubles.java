@@ -326,7 +326,7 @@ class SparseArrayOfDoubles extends ArrayBase<Double> {
         for (int i=0; i<length(); ++i) {
             final double value = getDouble(i);
             if (set.add(value)) {
-                builder.addDouble(value);
+                builder.appendDouble(value);
                 if (set.size() >= limit) {
                     break;
                 }

@@ -333,7 +333,7 @@ class SparseArrayOfLongs extends ArrayBase<Long> {
         for (int i=0; i<length(); ++i) {
             final long value = getLong(i);
             if (set.add(value)) {
-                builder.addLong(value);
+                builder.appendLong(value);
                 if (set.size() >= limit) {
                     break;
                 }

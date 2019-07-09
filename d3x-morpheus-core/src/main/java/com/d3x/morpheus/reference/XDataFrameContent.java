@@ -116,7 +116,7 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
             return Index.of(((Range<K>)keys).toArray());
         } else {
             final Class<K> keyType = (Class<K>)keys.iterator().next().getClass();
-            final Array<K> array = ArrayBuilder.of(1000, keyType).addAll(keys).toArray();
+            final Array<K> array = ArrayBuilder.of(1000, keyType).appendAll(keys).toArray();
             return Index.of(array);
         }
     }

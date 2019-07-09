@@ -147,7 +147,7 @@ class XDataFrameColumns<R,C> extends XDataFrameAxisBase<C,R,R,C,DataFrameColumn<
     public final Array<C> addAll(DataFrame<R,C> other) {
         var frame = frame();
         var source = (XDataFrame<R,C>)other;
-        var builder = ArrayBuilder.of(source.colCount(), source.cols().keyType());
+        var builder = ArrayBuilder.of(source.colCount(), source.cols().keyClass());
         var ignoreDuplicates = DataFrameOptions.isIgnoreDuplicates();
         source.cols().forEach(column -> {
             var colKey = column.key();
@@ -157,7 +157,7 @@ class XDataFrameColumns<R,C> extends XDataFrameAxisBase<C,R,R,C,DataFrameColumn<
             } else if (!exists) {
                 var type = source.content().colType(colKey);
                 frame.cols().add(colKey, type);
-                builder.add(colKey);
+                builder.append(colKey);
             }
         });
         var colKeys = builder.toArray();
@@ -318,7 +318,7 @@ class XDataFrameColumns<R,C> extends XDataFrameAxisBase<C,R,R,C,DataFrameColumn<
      */
     private Function<Consumer<Map<C,Iterable<?>>>,Array<C>> columnAdder() {
         return consumer -> {
-            var keyType = keyType();
+            var keyType = keyClass();
             var columnMap = new LinkedHashMap<C,Iterable<?>>();
             consumer.accept(columnMap);
             var builder = ArrayBuilder.of(columnMap.size(), keyType);
@@ -327,7 +327,7 @@ class XDataFrameColumns<R,C> extends XDataFrameAxisBase<C,R,R,C,DataFrameColumn<
                 var content = frame().content();
                 var added = content.addColumn(colKey, values);
                 if (added) {
-                    builder.add(colKey);
+                    builder.append(colKey);
                 }
             });
             return builder.toArray();

@@ -229,7 +229,7 @@ class XDataFrameGroupingRows<R,C> implements DataFrameGrouping.Rows<R,C> {
             if (count > threshold) {
                 return split();
             } else {
-                final Class<X> keyType = source.rows().keyType();
+                final Class<X> keyType = source.rows().keyClass();
                 final Map<Tuple,ArrayBuilder<X>> groupKeyMap = new HashMap<>();
                 final XDataFrameRow<X,Y> row = new XDataFrameRow<>(source, false);
                 for (int i=from; i<=to; ++i) {
@@ -244,7 +244,7 @@ class XDataFrameGroupingRows<R,C> implements DataFrameGrouping.Rows<R,C> {
                                 groupKeyBuilder = ArrayBuilder.of(1000, keyType);
                                 groupKeyMap.put(tuple, groupKeyBuilder);
                             }
-                            groupKeyBuilder.add(rowKey);
+                            groupKeyBuilder.append(rowKey);
                         }
                     } catch (Exception ex) {
                         throw new DataFrameException("Grouping failed at row: " + rowKey, ex);
@@ -271,7 +271,7 @@ class XDataFrameGroupingRows<R,C> implements DataFrameGrouping.Rows<R,C> {
                 if (existing == null) {
                     rightAns.put(key, value);
                 } else {
-                    existing.addAll(value);
+                    existing.appendAll(value);
                 }
             });
             return rightAns;

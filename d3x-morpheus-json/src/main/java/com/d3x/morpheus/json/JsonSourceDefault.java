@@ -137,7 +137,7 @@ public class JsonSourceDefault<R,C> implements JsonSource<R,C> {
             token = reader.peek();
             var cursor = frame.cursor();
             var formats = options.getFormats();
-            var rowKeyType = frame.rows().keyType();
+            var rowKeyType = frame.rows().keyClass();
             var typeMap = frame.cols().keys().collect(Collectors.toMap(v -> v, v -> frame.cols().type(v)));
             while (token != JsonToken.END_OBJECT) {
                 var rowLabel = reader.nextName();

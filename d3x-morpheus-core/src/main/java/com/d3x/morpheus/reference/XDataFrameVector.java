@@ -366,10 +366,10 @@ abstract class XDataFrameVector<X,Y,R,C,Z> implements DataFrameVector<X,Y,R,C,Z>
         final Class<V> type = (Class<V>) dataClass();
         final ArrayBuilder<V> builder = ArrayBuilder.of(length, type);
         switch (ArrayType.of(type)) {
-            case INTEGER:   forEach(v -> builder.addInt(v.getInt()));       break;
-            case LONG:      forEach(v -> builder.addLong(v.getLong()));     break;
-            case DOUBLE:    forEach(v -> builder.addDouble(v.getDouble())); break;
-            default:        forEach(v -> builder.add(v.getValue()));        break;
+            case INTEGER:   forEach(v -> builder.appendInt(v.getInt()));       break;
+            case LONG:      forEach(v -> builder.appendLong(v.getLong()));     break;
+            case DOUBLE:    forEach(v -> builder.appendDouble(v.getDouble())); break;
+            default:        forEach(v -> builder.append(v.getValue()));        break;
         }
         return builder.toArray();
     }

@@ -182,7 +182,7 @@ public interface Range<T> extends Iterable<T> {
         if (!parallel) {
             var length = (int)estimateSize();
             final Iterable<Object> iterable = (Iterable<Object>)this;
-            return (Array<T>)ArrayBuilder.of(length).addAll(iterable).toArray();
+            return (Array<T>)ArrayBuilder.of(length).appendAll(iterable).toArray();
         } else {
             final ToArrayTask<T> task = new ToArrayTask<>(this, 1000);
             return ForkJoinPool.commonPool().invoke(task);
@@ -622,7 +622,7 @@ public interface Range<T> extends Iterable<T> {
             if (segments.size() == 1) {
                 final int sizeEstimate = (int)range.estimateSize();
                 final Class<T> type = (Class<T>)range.start().getClass();
-                return ArrayBuilder.of(sizeEstimate, type).addAll(range).toArray();
+                return ArrayBuilder.of(sizeEstimate, type).appendAll(range).toArray();
             } else {
                 final Stream<ForkJoinTask<Array<T>>> stream = segments.stream().map(s -> new ToArrayTask<>(s, splitThreshold).fork());
                 final List<ForkJoinTask<Array<T>>> tasks = stream.collect(Collectors.toList());

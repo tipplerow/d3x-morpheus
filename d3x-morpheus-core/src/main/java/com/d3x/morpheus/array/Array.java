@@ -717,7 +717,7 @@ public interface Array<T> extends Iterable<T>, Serializable, Cloneable {
      */
     static <V> Array<V> of(Stream<V> values) {
         var builder = ArrayBuilder.<V>of(100);
-        values.forEach(builder::add);
+        values.forEach(builder::append);
         return builder.toArray();
     }
 
@@ -837,7 +837,7 @@ public interface Array<T> extends Iterable<T>, Serializable, Cloneable {
      * @return          the newly created Array
      */
     static <V> Array<V> ofIterable(Iterable<V> values) {
-        return ArrayBuilder.<V>of(1000).addAll(values).toArray();
+        return ArrayBuilder.<V>of(1000).appendAll(values).toArray();
     }
 
     /**

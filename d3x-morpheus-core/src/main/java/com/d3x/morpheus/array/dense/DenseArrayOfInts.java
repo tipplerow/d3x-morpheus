@@ -172,7 +172,7 @@ class DenseArrayOfInts extends ArrayBase<Integer> {
             cursor.moveTo(i);
             final boolean match = predicate.test(cursor);
             if (match) {
-                builder.addInt(cursor.getInt());
+                builder.appendInt(cursor.getInt());
             }
         }
         return builder.toArray();
@@ -288,7 +288,7 @@ class DenseArrayOfInts extends ArrayBase<Integer> {
         for (int i=0; i<length(); ++i) {
             final int value = getInt(i);
             if (set.add(value)) {
-                builder.addInt(value);
+                builder.appendInt(value);
                 if (set.size() >= limit) {
                     break;
                 }

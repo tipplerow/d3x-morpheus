@@ -77,8 +77,8 @@ public class ArrayUtils {
      */
     public static <T> Collector<T,ArrayBuilder<T>,Array<T>> toArray(Class<T> type, int expectedLength) {
         final Supplier<ArrayBuilder<T>> supplier = () -> ArrayBuilder.of(expectedLength, type);
-        final BinaryOperator<ArrayBuilder<T>> combiner = ArrayBuilder::addAll;
-        final BiConsumer<ArrayBuilder<T>,T> accumulator = ArrayBuilder::add;
+        final BinaryOperator<ArrayBuilder<T>> combiner = ArrayBuilder::appendAll;
+        final BiConsumer<ArrayBuilder<T>,T> accumulator = ArrayBuilder::append;
         final Function<ArrayBuilder<T>,Array<T>> finisher = ArrayBuilder::toArray;
         return Collector.of(supplier, accumulator, combiner, finisher);
     }
@@ -99,10 +99,10 @@ public class ArrayUtils {
             return ((Range<V>) values).toArray();
         } else if (values instanceof Collection) {
             final ArrayBuilder<V> builder = ArrayBuilder.of(((Collection)values).size());
-            return builder.addAll(values).toArray();
+            return builder.appendAll(values).toArray();
         } else {
             final ArrayBuilder<V> builder = ArrayBuilder.of(1000);
-            return builder.addAll(values).toArray();
+            return builder.appendAll(values).toArray();
         }
     }
 
@@ -238,7 +238,7 @@ public class ArrayUtils {
          */
         public final boolean add(int value) {
             final boolean added = distinctSet.add(value);
-            if (added) builder.addInt(value);
+            if (added) builder.appendInt(value);
             return !(distinctSet.size() < limit);
         }
     }
@@ -269,7 +269,7 @@ public class ArrayUtils {
          */
         public final boolean add(long value) {
             final boolean added = distinctSet.add(value);
-            if (added) builder.addLong(value);
+            if (added) builder.appendLong(value);
             return !(distinctSet.size() < limit);
         }
     }
@@ -299,7 +299,7 @@ public class ArrayUtils {
          */
         public final boolean add(double value) {
             final boolean added = distinctSet.add(value);
-            if (added) builder.addDouble(value);
+            if (added) builder.appendDouble(value);
             return !(distinctSet.size() < limit);
         }
     }
@@ -330,7 +330,7 @@ public class ArrayUtils {
          */
         public final boolean add(V value) {
             final boolean added = distinctSet.add(value);
-            if (added) builder.add(value);
+            if (added) builder.append(value);
             return !(distinctSet.size() < limit);
         }
     }

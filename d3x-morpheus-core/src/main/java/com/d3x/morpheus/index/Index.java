@@ -353,7 +353,7 @@ public interface Index<K> extends Iterable<K>, Cloneable, Serializable {
             final int capacity = ((Collection)keys).size();
             return IndexFactory.getInstance().create(type, capacity);
         } else {
-            final Array<K> values = ArrayBuilder.of(10000, type).addAll(keys).toArray();
+            final Array<K> values = ArrayBuilder.of(10000, type).appendAll(keys).toArray();
             return Index.of(values);
         }
     }

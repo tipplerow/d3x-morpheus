@@ -95,7 +95,7 @@ abstract class IndexBase<K> implements Index<K>, Swapper {
         } else {
             final Iterator<K> iterator = keys.iterator();
             final Class<K> clazz = iterator.hasNext() ? (Class<K>) iterator.next().getClass() : (Class<K>) Object.class;
-            return ArrayBuilder.of(1000, clazz).addAll(keys).toArray();
+            return ArrayBuilder.of(1000, clazz).appendAll(keys).toArray();
         }
     }
 
@@ -338,7 +338,7 @@ abstract class IndexBase<K> implements Index<K>, Swapper {
         final int size = Math.max(100, (int) (size() * 0.2));
         final ArrayBuilder<K> builder = ArrayBuilder.of(size, this.keys.type());
         keys.forEach(key -> {
-            if (key != null && contains(key)) builder.add(key);
+            if (key != null && contains(key)) builder.append(key);
         });
         return builder.toArray();
     }

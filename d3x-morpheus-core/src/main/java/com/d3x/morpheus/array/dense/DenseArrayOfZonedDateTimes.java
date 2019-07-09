@@ -218,7 +218,7 @@ class DenseArrayOfZonedDateTimes extends ArrayBase<ZonedDateTime> {
             cursor.moveTo(i);
             final boolean match = predicate.test(cursor);
             if (match) {
-                builder.add(cursor.getValue());
+                builder.append(cursor.getValue());
             }
         }
         return builder.toArray();

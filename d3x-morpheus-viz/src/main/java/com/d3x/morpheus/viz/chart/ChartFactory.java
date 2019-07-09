@@ -110,7 +110,7 @@ public interface ChartFactory {
      * @return              the newly created chart
      */
     default <X extends Comparable,S extends Comparable> Chart<XyPlot<X>> withLinePlot(DataFrame<X,S> frame, Consumer<Chart<XyPlot<X>>> configurator)  {
-        return ofXY(frame.rows().keyType(), chart -> {
+        return ofXY(frame.rows().keyClass(), chart -> {
             chart.plot().<S>data().add(frame);
             chart.plot().render(0).withLines(false, false);
             if (configurator != null) {
@@ -147,7 +147,7 @@ public interface ChartFactory {
      * @return              the newly created chart
      */
     default <X extends Comparable,S extends Comparable> Chart<XyPlot<X>> withAreaPlot(DataFrame<X, S> frame, boolean stacked, Consumer<Chart<XyPlot<X>>> configurator) {
-        return ofXY(frame.rows().keyType(), chart -> {
+        return ofXY(frame.rows().keyClass(), chart -> {
             chart.plot().<S>data().add(frame);
             chart.plot().render(0).withArea(stacked);
             if (configurator != null) {
@@ -185,7 +185,7 @@ public interface ChartFactory {
      * @return              the newly created chart
      */
     default <X extends Comparable,S extends Comparable> Chart<XyPlot<X>> withScatterPlot(DataFrame<X, S> frame, boolean shapes, Consumer<Chart<XyPlot<X>>> configurator) {
-        return ofXY(frame.rows().keyType(), chart -> {
+        return ofXY(frame.rows().keyClass(), chart -> {
             chart.plot().<S>data().add(frame);
             if (shapes) {
                 chart.plot().render(0).withShapes();
@@ -231,7 +231,7 @@ public interface ChartFactory {
      * @return              the newly created chart
      */
     default <X extends Comparable,S extends Comparable> Chart<XyPlot<X>> withBarPlot(DataFrame<X, S> frame, boolean stacked, Consumer<Chart<XyPlot<X>>> configurator) {
-        return ofXY(frame.rows().keyType(), chart -> {
+        return ofXY(frame.rows().keyClass(), chart -> {
             chart.plot().<S>data().add(frame);
             chart.plot().render(0).withBars(stacked, 0d);
             if (configurator != null) {

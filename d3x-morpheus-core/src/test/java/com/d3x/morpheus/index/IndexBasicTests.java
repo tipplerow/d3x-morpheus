@@ -116,7 +116,7 @@ public class IndexBasicTests {
         Assert.assertEquals(toArray(index.iterator()), array, "The array from iterator matches source array");
         assertEquals(index, index.copy(true));
         final ArrayBuilder<T> builder = ArrayBuilder.of(1000);
-        index.forEachEntry((T key, int i) -> builder.add(key));
+        index.forEachEntry((T key, int i) -> builder.append(key));
         Assert.assertEquals(builder.toArray(), array, "The array from iterator matches source array");
     }
 
@@ -270,7 +270,7 @@ public class IndexBasicTests {
      */
     private <T> Array<T> toArray(Iterator<T> iterator) {
         final ArrayBuilder<T> builder = ArrayBuilder.of(1000);
-        while (iterator.hasNext()) builder.add(iterator.next());
+        while (iterator.hasNext()) builder.append(iterator.next());
         return builder.toArray();
     }
 }

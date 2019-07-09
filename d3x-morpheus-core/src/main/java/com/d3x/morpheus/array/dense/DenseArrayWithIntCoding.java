@@ -191,7 +191,7 @@ class DenseArrayWithIntCoding<T> extends ArrayBase<T> implements WithIntCoding<T
             cursor.moveTo(i);
             final boolean match = predicate.test(cursor);
             if (match) {
-                builder.add(cursor.getValue());
+                builder.append(cursor.getValue());
             }
         }
         return builder.toArray();
@@ -309,7 +309,7 @@ class DenseArrayWithIntCoding<T> extends ArrayBase<T> implements WithIntCoding<T
             var code = getInt(i);
             if (set.add(code)) {
                 final T value = getValue(i);
-                builder.add(value);
+                builder.append(value);
                 if (set.size() >= limit) {
                     break;
                 }

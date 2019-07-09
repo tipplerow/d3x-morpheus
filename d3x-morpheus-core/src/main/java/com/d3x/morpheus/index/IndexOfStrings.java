@@ -92,7 +92,7 @@ class IndexOfStrings extends IndexBase<String> {
         for (int i=0; i<count; ++i) {
             final String value = keyArray().getValue(i);
             if (predicate.test(value)) {
-                builder.add(value);
+                builder.append(value);
             }
         }
         final Array<String> filter = builder.toArray();

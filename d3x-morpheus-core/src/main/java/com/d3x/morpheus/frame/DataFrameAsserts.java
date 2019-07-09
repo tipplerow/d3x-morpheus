@@ -49,8 +49,8 @@ public class DataFrameAsserts {
     public static void assertEqualStructure(DataFrame<?,?> actual, DataFrame<?,?> expected) {
         Asserts.assertEquals(actual.rowCount(), expected.rowCount(), "The DataFrame row counts match");
         Asserts.assertEquals(actual.colCount(), expected.colCount(), "The DataFrame column count match");
-        Asserts.assertEquals(actual.rows().keyType(), expected.rows().keyType(), "The DataFrame row key types match");
-        Asserts.assertEquals(actual.cols().keyType(), expected.cols().keyType(), "The DataFrame column key types match");
+        Asserts.assertEquals(actual.rows().keyClass(), expected.rows().keyClass(), "The DataFrame row key types match");
+        Asserts.assertEquals(actual.cols().keyClass(), expected.cols().keyClass(), "The DataFrame column key types match");
         for (int i=0; i<actual.rowCount(); ++i) {
             final Object rowKeyActual = actual.rows().key(i);
             final Object rowKeyExpected = expected.rows().key(i);

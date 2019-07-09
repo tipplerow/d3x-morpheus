@@ -233,7 +233,7 @@ class MappedArrayOfDoubles extends ArrayBase<Double> {
             cursor.moveTo(i);
             final boolean match = predicate.test(cursor);
             if (match) {
-                builder.addDouble(cursor.getDouble());
+                builder.appendDouble(cursor.getDouble());
             }
         }
         return builder.toArray();
@@ -367,7 +367,7 @@ class MappedArrayOfDoubles extends ArrayBase<Double> {
         for (int i=0; i<length(); ++i) {
             final double value = getDouble(i);
             if (set.add(value)) {
-                builder.addDouble(value);
+                builder.appendDouble(value);
                 if (set.size() >= limit) {
                     break;
                 }

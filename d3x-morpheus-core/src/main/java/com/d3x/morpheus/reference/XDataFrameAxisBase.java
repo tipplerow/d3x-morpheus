@@ -137,7 +137,7 @@ abstract class XDataFrameAxisBase<X,Y,R,C,V extends DataFrameVector<?,?,R,C,?>,T
     }
 
     @Override
-    public final Class<X> keyType() {
+    public final Class<X> keyClass() {
         return axis.type();
     }
 
@@ -568,7 +568,7 @@ abstract class XDataFrameAxisBase<X,Y,R,C,V extends DataFrameVector<?,?,R,C,?>,T
         @SuppressWarnings("unchecked")
         protected Array<X> compute() {
             var count = to - from + 1;
-            var keyType = keyType();
+            var keyType = keyClass();
             if (count > threshold) {
                 return split();
             } else {
@@ -580,7 +580,7 @@ abstract class XDataFrameAxisBase<X,Y,R,C,V extends DataFrameVector<?,?,R,C,?>,T
                     for (int ordinal=from; ordinal<=to; ++ordinal) {
                         row.atOrdinal(ordinal);
                         if (predicate.test(vector)) {
-                            builder.add((X)vector.key());
+                            builder.append((X)vector.key());
                         }
                     }
                 } else {
@@ -588,7 +588,7 @@ abstract class XDataFrameAxisBase<X,Y,R,C,V extends DataFrameVector<?,?,R,C,?>,T
                     for (int ordinal=from; ordinal<=to; ++ordinal) {
                         column.atOrdinal(ordinal);
                         if (predicate.test(vector)) {
-                            builder.add((X)vector.key());
+                            builder.append((X)vector.key());
                         }
                     }
                 }
@@ -609,9 +609,9 @@ abstract class XDataFrameAxisBase<X,Y,R,C,V extends DataFrameVector<?,?,R,C,?>,T
             final Array<X> rightAns = right.compute();
             final Array<X> leftAns  = left.join();
             var size = Math.max(rightAns.length() + leftAns.length(), 10);
-            final ArrayBuilder<X> builder = ArrayBuilder.of(size, keyType());
-            builder.addAll(leftAns);
-            builder.addAll(rightAns);
+            final ArrayBuilder<X> builder = ArrayBuilder.of(size, keyClass());
+            builder.appendAll(leftAns);
+            builder.appendAll(rightAns);
             return builder.toArray();
         }
     }

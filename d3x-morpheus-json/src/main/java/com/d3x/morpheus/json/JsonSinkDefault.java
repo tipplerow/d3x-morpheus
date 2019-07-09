@@ -51,8 +51,8 @@ public class JsonSinkDefault<R,C> extends JsonSinkBase<R,C> {
             writer.beginObject();
             writer.name("rowCount").value(frame.rowCount());
             writer.name("colCount").value(frame.colCount());
-            writer.name("rowType").value(getTypeName(frame.rows().keyType()));
-            writer.name("colType").value(getTypeName(frame.cols().keyType()));
+            writer.name("rowType").value(getTypeName(frame.rows().keyClass()));
+            writer.name("colType").value(getTypeName(frame.cols().keyClass()));
             writer.name("columns");
             writeColumns(writer, frame, options);
             writer.name("data");

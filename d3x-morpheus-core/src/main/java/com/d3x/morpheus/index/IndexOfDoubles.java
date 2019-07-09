@@ -92,7 +92,7 @@ class IndexOfDoubles extends IndexBase<Double> {
         for (int i=0; i<count; ++i) {
             final double value = keyArray().getDouble(i);
             if (predicate.test(value)) {
-                builder.addDouble(value);
+                builder.appendDouble(value);
             }
         }
         final Array<Double> filter = builder.toArray();

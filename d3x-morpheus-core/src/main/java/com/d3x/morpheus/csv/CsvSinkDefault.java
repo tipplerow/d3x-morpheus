@@ -58,7 +58,7 @@ public class CsvSinkDefault<R,C> implements CsvSink<R,C> {
             if (options.isIncludeColumnHeader()) {
                 writeHeader(frame, options, os);
             }
-            var rowKeyType = frame.rows().keyType();
+            var rowKeyType = frame.rows().keyClass();
             var cursor = frame.cursor();
             var rowKeyPrinter = Optional.ofNullable(options.getRowKeyPrinter()).orElse(formats.getPrinterOrFail(rowKeyType));
             var colPrinters = frame.cols().stream().map(c -> formats.getPrinterOrFail(c.key(), c.dataClass())).collect(Collectors.toList());
@@ -118,7 +118,7 @@ public class CsvSinkDefault<R,C> implements CsvSink<R,C> {
                 header.append(options.getSeparator());
             }
             var formats = options.getFormats();
-            var printer = formats.getPrinterOrFail(frame.cols().keyType());
+            var printer = formats.getPrinterOrFail(frame.cols().keyClass());
             for (int i = 0; i<frame.colCount(); ++i) {
                 var column = frame.cols().key(i);
                 header.append(printer.apply(column));

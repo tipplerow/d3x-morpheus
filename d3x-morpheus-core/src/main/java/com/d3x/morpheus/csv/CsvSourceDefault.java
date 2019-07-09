@@ -134,7 +134,7 @@ public class CsvSourceDefault implements CsvSource {
             settings.setMaxColumns(options.getMaxColumns());
             settings.setNumberOfRowsToSkip(options.getSkipRowCount());
             settings.setNumberOfRecordsToRead(options.getReadRowCount());
-            settings.setReadInputOnSeparateThread(false);
+            settings.setReadInputOnSeparateThread(true);
             var parser = new CsvParser(settings);
             parser.parse(reader);
             return handler.build();
@@ -344,11 +344,11 @@ public class CsvSourceDefault implements CsvSource {
                 this.resolveParser();
                 var dataType = ArrayType.of(parser.getType());
                 switch (dataType) {
-                    case BOOLEAN:   buffer.forEach(v -> array.addBoolean(parser.applyAsBoolean(v)));    break;
-                    case INTEGER:   buffer.forEach(v -> array.addInt(parser.applyAsInt(v)));            break;
-                    case LONG:      buffer.forEach(v -> array.addLong(parser.applyAsLong(v)));          break;
-                    case DOUBLE:    buffer.forEach(v -> array.addDouble(parser.applyAsDouble(v)));      break;
-                    default:        buffer.forEach(v -> array.add(parser.apply(v)));                    break;
+                    case BOOLEAN:   buffer.forEach(v -> array.appendBoolean(parser.applyAsBoolean(v)));    break;
+                    case INTEGER:   buffer.forEach(v -> array.appendInt(parser.applyAsInt(v)));            break;
+                    case LONG:      buffer.forEach(v -> array.appendLong(parser.applyAsLong(v)));          break;
+                    case DOUBLE:    buffer.forEach(v -> array.appendDouble(parser.applyAsDouble(v)));      break;
+                    default:        buffer.forEach(v -> array.append(parser.apply(v)));                    break;
                 }
             } finally {
                 buffer.clear();

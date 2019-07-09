@@ -94,7 +94,7 @@ class IndexOfObjects<K> extends IndexBase<K> {
         for (int i=0; i<count; ++i) {
             final K value = keyArray().getValue(i);
             if (predicate.test(value)) {
-                builder.add(value);
+                builder.append(value);
             }
         }
         final Array<K> filter = builder.toArray();

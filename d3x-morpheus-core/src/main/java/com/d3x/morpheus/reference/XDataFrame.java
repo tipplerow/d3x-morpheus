@@ -1589,7 +1589,7 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
         @Override
         protected Array<R> compute() {
             var count = to - from + 1;
-            final Class<R> keyType = rows().keyType();
+            final Class<R> keyType = rows().keyClass();
             if (count > threshold) {
                 return split();
             } else {
@@ -1599,7 +1599,7 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
                 for (int ordinal=from; ordinal<=to; ++ordinal) {
                     row.atOrdinal(ordinal);
                     if (predicate.test(row)) {
-                        builder.add(row.key());
+                        builder.append(row.key());
                     }
                 }
                 return builder.toArray();
@@ -1619,10 +1619,10 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
             var rightAns = right.compute();
             var leftAns  = left.join();
             var size = Math.max(rightAns.length() + leftAns.length(), 10);
-            var rowKeyType = rows().keyType();
+            var rowKeyType = rows().keyClass();
             var builder = ArrayBuilder.of(size, rowKeyType);
-            builder.addAll(leftAns);
-            builder.addAll(rightAns);
+            builder.appendAll(leftAns);
+            builder.appendAll(rightAns);
             return builder.toArray();
         }
     }
@@ -1657,7 +1657,7 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
         @Override
         protected Array<C> compute() {
             var count = to - from + 1;
-            var keyType = cols().keyType();
+            var keyType = cols().keyClass();
             if (count > threshold) {
                 return split();
             } else {
@@ -1667,7 +1667,7 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
                 for (int ordinal=from; ordinal<=to; ++ordinal) {
                     column.atOrdinal(ordinal);
                     if (predicate.test(column)) {
-                        builder.add(column.key());
+                        builder.append(column.key());
                     }
                 }
                 return builder.toArray();
@@ -1687,9 +1687,9 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
             var rightAns = right.compute();
             var leftAns  = left.join();
             var size = Math.max(rightAns.length() + leftAns.length(), 10);
-            var builder = ArrayBuilder.of(size, cols().keyType());
-            builder.addAll(leftAns);
-            builder.addAll(rightAns);
+            var builder = ArrayBuilder.of(size, cols().keyClass());
+            builder.appendAll(leftAns);
+            builder.appendAll(rightAns);
             return builder.toArray();
         }
     }

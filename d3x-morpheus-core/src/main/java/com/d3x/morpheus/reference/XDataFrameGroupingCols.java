@@ -240,7 +240,7 @@ class XDataFrameGroupingCols<R,C> implements DataFrameGrouping.Cols<R,C> {
             if (count > threshold) {
                 return split();
             } else {
-                final Class<Y> keyType = source.cols().keyType();
+                final Class<Y> keyType = source.cols().keyClass();
                 final Map<Tuple,ArrayBuilder<Y>> groupKeyBuilderMap = new HashMap<>();
                 final XDataFrameColumn<X,Y> column = new XDataFrameColumn<>(source, false);
                 for (int i=from; i<=to; ++i) {
@@ -255,7 +255,7 @@ class XDataFrameGroupingCols<R,C> implements DataFrameGrouping.Cols<R,C> {
                                 groupKeyBuilder = ArrayBuilder.of(1000, keyType);
                                 groupKeyBuilderMap.put(tuple, groupKeyBuilder);
                             }
-                            groupKeyBuilder.add(key);
+                            groupKeyBuilder.append(key);
                         }
                     } catch (Exception ex) {
                         throw new DataFrameException("Grouping failed at column: " + key, ex);

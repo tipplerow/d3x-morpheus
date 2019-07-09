@@ -86,10 +86,10 @@ public interface DataFrameAxis<X,Y,R,C,V extends DataFrameVector,T extends DataF
     T sequential();
 
     /**
-     * Returns the key type for this dimension
-     * @return      the key type for dimension
+     * Returns the key class for this dimension
+     * @return      the key class for dimension
      */
-    Class<X> keyType();
+    Class<X> keyClass();
 
     /**
      * Returns a stream of row or column keys

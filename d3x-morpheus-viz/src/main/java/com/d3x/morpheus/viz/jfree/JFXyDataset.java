@@ -78,7 +78,7 @@ class JFXyDataset<X extends Comparable,S extends Comparable> extends AbstractXYD
             try {
                 final DataFrame<X,S> frame = frameSupplier.get();
                 if (frame != null) {
-                    final Supplier<Class<X>> domainType = () -> frame.rows().keyType();
+                    final Supplier<Class<X>> domainType = () -> frame.rows().keyClass();
                     final Array<Integer> colOrdinals = Array.of(IntStream.range(0, frame.colCount()).toArray());
                     dataset.update(frame, colOrdinals, domainType, rowIndex -> frame.rows().key(rowIndex));
                 } else {
