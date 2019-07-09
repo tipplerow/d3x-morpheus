@@ -56,7 +56,7 @@ class SparseArrayOfObjects<T> extends ArrayBase<T> {
         super(type, ArrayStyle.SPARSE, false);
         this.length = length;
         this.defaultValue = defaultValue;
-        this.values = new TIntObjectHashMap<>((int)Math.max(length * fillPct, 10d), 0.85f, -1);
+        this.values = new TIntObjectHashMap<>((int)Math.max(length * fillPct, 5d), SparseArrayConstructor.DEFAULT_LOAD_FACTOR, -1);
     }
 
     /**

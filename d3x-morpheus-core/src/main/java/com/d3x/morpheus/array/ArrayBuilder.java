@@ -31,6 +31,7 @@ public class ArrayBuilder<T> {
 
     private int capacity;
     private int index = 0;
+    private double fillPct;
     private Class<T> type;
     private Array<T> array;
     private ArrayType dataType;
@@ -41,22 +42,23 @@ public class ArrayBuilder<T> {
      * @param capacity      the initial capacity for this builder
      * @param type          the optional array element dataType if known (null allowed)
      * @param defaultValue  the default value for the array (null allowed, even for primitive types)
-     * @param loadFactor    the array load factor which must be > 0 and <= 1 (1 implies dense array, < 1 implies spare array)
+     * @param fillPct       the array fill percent which must be > 0 and <= 1 (1 implies dense array, < 1 implies sparse array)
      */
     @SuppressWarnings("unchecked")
-    private ArrayBuilder(int capacity, Class<T> type, T defaultValue, float loadFactor) {
-        Asserts.check(loadFactor > 0f, "The load factor mus be > 0 and <= 1");
-        Asserts.check(loadFactor <= 1f, "The load factor mus be > 0 and <= 1");
+    private ArrayBuilder(int capacity, Class<T> type, T defaultValue, double fillPct) {
+        Asserts.check(fillPct > 0f, "The load factor mus be > 0 and <= 1");
+        Asserts.check(fillPct <= 1f, "The load factor mus be > 0 and <= 1");
+        this.fillPct = fillPct;
         this.capacity = capacity > 0 ? capacity : 10;
         if (type != null) {
             this.type = type;
             this.dataType = ArrayType.of(type);
-            this.array = Array.of(type, this.capacity, defaultValue, loadFactor);
+            this.array = Array.of(type, this.capacity, defaultValue, fillPct);
             this.checkType = false;
         } else if (defaultValue != null) {
             this.type = (Class<T>)defaultValue.getClass();
             this.dataType = ArrayType.of(this.type);
-            this.array = Array.of(this.type, this.capacity, defaultValue, loadFactor);
+            this.array = Array.of(this.type, this.capacity, defaultValue, fillPct);
             this.checkType = false;
         }
     }
@@ -70,6 +72,19 @@ public class ArrayBuilder<T> {
     public static <T> ArrayBuilder<T> of(int initialLength) {
         return new ArrayBuilder<>(initialLength, null, null, 1f);
     }
+
+
+    /**
+     * Returns a newly created builder for a dense arrays with initial length
+     * @param initialLength     the initial capacity for builder
+     * @param fillPct           the array fill percent which must be > 0 and <= 1 (1 implies dense array, < 1 implies sparse array)
+     * @param <T>               the array element dataType
+     * @return                  the newly created builder
+     */
+    public static <T> ArrayBuilder<T> of(int initialLength, double fillPct) {
+        return new ArrayBuilder<>(initialLength, null, null, fillPct);
+    }
+
 
     /**
      * Returns a newly created builder for a dense arrays based on the arguments provided
@@ -245,13 +260,59 @@ public class ArrayBuilder<T> {
     /**
      * Sets a value for this array builder
      * @param index the array index location
-     * @param value the value to apply
+     * @param value the value to add
      */
     @SuppressWarnings("unchecked")
     public final void setDouble(int index, double value) {
         this.checkType((Class<T>)Double.class);
         this.checkLength(index);
         this.array.setDouble(index, value);
+        this.index = Math.max(this.index, index+1);
+    }
+
+
+    /**
+     * Adds the value to the existing value at the index specified
+     * @param index the array index location
+     * @param value the value to add
+     */
+    @SuppressWarnings("unchecked")
+    public final void plusInt(int index, int value) {
+        this.checkType((Class<T>)Integer.class);
+        this.checkLength(index);
+        var existing = array.getInt(index);
+        this.array.setInt(index, existing + value);
+        this.index = Math.max(this.index, index+1);
+    }
+
+
+    /**
+     * Adds the value to the existing value at the index specified
+     * @param index the array index location
+     * @param value the value to add
+     */
+    @SuppressWarnings("unchecked")
+    public final void plusLong(int index, long value) {
+        this.checkType((Class<T>)Long.class);
+        this.checkLength(index);
+        var existing = array.getLong(index);
+        this.array.setLong(index, existing + value);
+        this.index = Math.max(this.index, index+1);
+    }
+
+
+    /**
+     * Adds the value to the existing value at the index specified
+     * @param index the array index location
+     * @param value the value to apply
+     */
+    @SuppressWarnings("unchecked")
+    public final void plusDouble(int index, double value) {
+        this.checkType((Class<T>)Double.class);
+        this.checkLength(index);
+        var existing = array.getDouble(index);
+        var result = Double.isNaN(existing) ? value : existing + value;
+        this.array.setDouble(index, result);
         this.index = Math.max(this.index, index+1);
     }
 
@@ -294,11 +355,11 @@ public class ArrayBuilder<T> {
         if (array == null) {
             this.type = type;
             this.dataType = ArrayType.of(type);
-            this.array = Array.of(type, capacity);
+            this.array = Array.of(type, capacity, fillPct);
             this.checkType = this.dataType != ArrayType.OBJECT;
             this.capacity = array.length();
         } else if (checkType && !isMatch(type)) {
-            var newArray = Array.<T>ofObjects(array.length());
+            var newArray = Array.<T>ofObjects(array.length(), fillPct);
             for (int i=0; i<array.length(); ++i) newArray.setValue(i, array.getValue(i));
             this.array = newArray;
             this.type = (Class<T>)Object.class;

@@ -58,7 +58,7 @@ class SparseArrayOfDoubles extends ArrayBase<Double> {
         super(Double.class, ArrayStyle.SPARSE, false);
         this.length = length;
         this.defaultValue = defaultValue != null ? defaultValue : Double.NaN;
-        this.values = new TIntDoubleHashMap((int)Math.max(length * fillPct, 10d), 0.85f, -1, this.defaultValue);
+        this.values = new TIntDoubleHashMap((int)Math.max(length * fillPct, 5d), SparseArrayConstructor.DEFAULT_LOAD_FACTOR, -1, this.defaultValue);
     }
 
     /**
@@ -353,6 +353,18 @@ class SparseArrayOfDoubles extends ArrayBase<Double> {
             }
         }
         return result;
+    }
+
+
+    @Override()
+    public String toString() {
+        return "Array type=" + typeCode().name()
+            + ", sparse=true"
+            + ", length=" + length()
+            + ", fillPercent=" + ((double)values.size() / length()) * 100d
+            + ", defaultValue=" + defaultValue()
+            + ", start=" + first(v -> true).map(Object::toString).orElse("N/A")
+            + ", end=" + last(v -> true).map(Object::toString).orElse("N/A");
     }
 
 

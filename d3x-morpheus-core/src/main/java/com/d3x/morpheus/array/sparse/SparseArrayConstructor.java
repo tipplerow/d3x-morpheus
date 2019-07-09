@@ -41,6 +41,8 @@ import com.d3x.morpheus.array.coding.LongCoding;
  */
 public class SparseArrayConstructor implements ArrayFactory.Constructor {
 
+    static final float DEFAULT_LOAD_FACTOR = 0.95f;
+
     private static final IntCoding<Year> yearCoding = new IntCoding.OfYear();
     private static final IntCoding<Currency> currencyCoding = new IntCoding.OfCurrency();
     private static final IntCoding<ZoneId> zoneIdCoding = IntCoding.ofZoneId();
@@ -75,7 +77,7 @@ public class SparseArrayConstructor implements ArrayFactory.Constructor {
     @SuppressWarnings("unchecked")
     public <T> Array<T> apply(Class<T> type, int length, double fillPct, T defaultValue) {
         if (type.isEnum()) {
-            final IntCoding<T> enumCoding = (IntCoding<T>)IntCoding.ofEnum((Class<Enum>)type);
+            var enumCoding = (IntCoding<T>)IntCoding.ofEnum((Class<Enum>)type);
             return new SparseArrayWithIntCoding<>(length, fillPct, defaultValue, enumCoding);
         } else {
             switch (ArrayType.of(type)) {
