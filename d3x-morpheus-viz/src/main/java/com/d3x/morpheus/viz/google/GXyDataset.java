@@ -74,7 +74,7 @@ class GXyDataset<X extends Comparable,S extends Comparable> implements XyDataset
                 final DataFrame<X,S> frame = frameSupplier.get();
                 if (frame != null) {
                     final Array<Integer> colOrdinals = Array.of(IntStream.range(0, frame.colCount()).toArray());
-                    final Supplier<Class<X>> domainType = () -> frame.rows().keyType();
+                    final Supplier<Class<X>> domainType = () -> frame.rows().keyClass();
                     dataset.update(frame, colOrdinals, domainType, rowIndex -> frame.rows().key(rowIndex));
                 } else {
                     dataset.clear(true);

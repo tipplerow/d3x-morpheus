@@ -337,7 +337,7 @@ class SparseArrayOfInts extends ArrayBase<Integer> {
         for (int i=0; i<length(); ++i) {
             final int value = getInt(i);
             if (set.add(value)) {
-                builder.addInt(value);
+                builder.appendInt(value);
                 if (set.size() >= limit) {
                     break;
                 }

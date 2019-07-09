@@ -243,7 +243,7 @@ class MappedArrayWithIntCoding<T> extends ArrayBase<T> implements WithIntCoding<
             cursor.moveTo(i);
             final boolean match = predicate.test(cursor);
             if (match) {
-                builder.add(cursor.getValue());
+                builder.append(cursor.getValue());
             }
         }
         return builder.toArray();
@@ -366,7 +366,7 @@ class MappedArrayWithIntCoding<T> extends ArrayBase<T> implements WithIntCoding<
             var code = getInt(i);
             if (set.add(code)) {
                 final T value = getValue(i);
-                builder.add(value);
+                builder.append(value);
                 if (set.size() >= limit) {
                     break;
                 }

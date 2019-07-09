@@ -40,6 +40,13 @@ public interface DataFrameColumn<R,C> extends DataFrameVector<C,R,R,C,DataFrameC
     interface Cursor<R,C> extends DataFrameColumn<R,C> {
 
         /**
+         * Adds a column for key if it does not exist, and moves cursor to column key
+         * @param colKey    the column key to add
+         * @return          this column cursor positioned at column key
+         */
+        Cursor<R,C> add(C colKey, Class<?> dataType);
+
+        /**
          * Moves the column cursor to the column key specified if it exists
          * @param colKey    the column key
          * @return          true if key exists, false otherwise

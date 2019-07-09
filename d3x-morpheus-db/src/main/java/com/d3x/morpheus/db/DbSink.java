@@ -258,7 +258,7 @@ public class DbSink {
 
         var rowKeyColumn = Optional.ofNullable(options.getRowKeyColumn());
         rowKeyColumn.ifPresent(colName -> {
-            var dataType = frame.rows().keyType();
+            var dataType = frame.rows().keyClass();
             var sqlType = options.getColumnMappings().getSqlType(dataType);
             var typeInfo = getSqlTypeString(sqlType);
             ddl.append("    ");

@@ -189,7 +189,7 @@ class DenseArrayWithLongCoding<T> extends ArrayBase<T> implements WithLongCoding
             cursor.moveTo(i);
             final boolean match = predicate.test(cursor);
             if (match) {
-                builder.add(cursor.getValue());
+                builder.append(cursor.getValue());
             }
         }
         return builder.toArray();
@@ -306,7 +306,7 @@ class DenseArrayWithLongCoding<T> extends ArrayBase<T> implements WithLongCoding
             final long code = getLong(i);
             if (set.add(code)) {
                 final T value = getValue(i);
-                builder.add(value);
+                builder.append(value);
                 if (set.size() >= limit) {
                     break;
                 }

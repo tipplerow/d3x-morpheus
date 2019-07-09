@@ -111,7 +111,7 @@ class IndexWithLongCoding<T> extends IndexBase<T> implements WithLongCoding<T> {
         for (int i=0; i<count; ++i) {
             final T key = keyArray().getValue(i);
             if (predicate.test(key)) {
-                builder.add(key);
+                builder.append(key);
             }
         }
         final Array<T> filter = builder.toArray();

@@ -127,7 +127,7 @@ public interface DoubleSeriesBuilder<K> extends DataSeriesBuilder<K,Double> {
         @Override()
         public DoubleSeriesBuilder<K> putDouble(@lombok.NonNull K key, double value) {
             this.capacity(100);
-            this.keys.add(key);
+            this.keys.append(key);
             this.values.put(key, value);
             return this;
         }
@@ -177,7 +177,7 @@ public interface DoubleSeriesBuilder<K> extends DataSeriesBuilder<K,Double> {
         @Override
         public DoubleSeriesBuilder<K> putDouble(K key, double value) {
             this.capacity(100);
-            this.keys.add(key);
+            this.keys.append(key);
             this.values.put(coding.getCode(key), value);
             return this;
         }
@@ -227,7 +227,7 @@ public interface DoubleSeriesBuilder<K> extends DataSeriesBuilder<K,Double> {
         @Override
         public DoubleSeriesBuilder<K> putDouble(K key, double value) {
             this.capacity(100);
-            this.keys.add(key);
+            this.keys.append(key);
             this.values.put(coding.getCode(key), value);
             return this;
         }

@@ -284,7 +284,7 @@ public interface DoubleSeries<K> extends DataSeries<K,Double> {
      * @return          the the does series
      */
     static <R,C> DoubleSeries<R> from(DataFrame<R,C> frame, C colKey) {
-        var keyType = frame.rows().keyType();
+        var keyType = frame.rows().keyClass();
         var result = DoubleSeries.builder(keyType);
         var col = frame.cols().ordinal(colKey);
         frame.rows().forEach(row -> {

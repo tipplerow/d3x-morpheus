@@ -49,8 +49,8 @@ public class DataFrameAsserts {
     public static void assertEqualStructure(DataFrame<?,?> actual, DataFrame<?,?> expected) {
         Asserts.assertEquals(actual.rowCount(), expected.rowCount(), "The DataFrame row counts match");
         Asserts.assertEquals(actual.colCount(), expected.colCount(), "The DataFrame column count match");
-        Asserts.assertEquals(actual.rows().keyType(), expected.rows().keyType(), "The DataFrame row key types match");
-        Asserts.assertEquals(actual.cols().keyType(), expected.cols().keyType(), "The DataFrame column key types match");
+        Asserts.assertEquals(actual.rows().keyClass(), expected.rows().keyClass(), "The DataFrame row key types match");
+        Asserts.assertEquals(actual.cols().keyClass(), expected.cols().keyClass(), "The DataFrame column key types match");
         for (int i=0; i<actual.rowCount(); ++i) {
             final Object rowKeyActual = actual.rows().key(i);
             final Object rowKeyExpected = expected.rows().key(i);
@@ -76,8 +76,8 @@ public class DataFrameAsserts {
         DataFrameCursor<?,?> expectedCursor = expected.cursor();
         for (int j = 0; j<expected.colCount(); ++j) {
             for (int i=0; i<expected.rowCount(); ++i) {
-                final Object expectedValue = expectedCursor.at(i,j).getValue();
-                final Object actualValue = actualCursor.at(i,j).getValue();
+                final Object expectedValue = expectedCursor.atOrdinals(i,j).getValue();
+                final Object actualValue = actualCursor.atOrdinals(i,j).getValue();
                 if (expectedValue != null && actualValue != null) {
                     final Class type1 = expectedValue.getClass();
                     final Class type2 = actualValue.getClass();

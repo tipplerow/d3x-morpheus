@@ -351,7 +351,7 @@ class MappedArrayWithLongCoding<T> extends ArrayBase<T> {
             final long code = getLong(i);
             if (set.add(code)) {
                 final T value = getValue(i);
-                builder.add(value);
+                builder.append(value);
                 if (set.size() >= limit) {
                     break;
                 }

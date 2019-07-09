@@ -136,4 +136,56 @@ public class CursorTests {
     }
 
 
+    @Test()
+    public void addRow() {
+        var frame = testFrame(5, 10);
+        var row = frame.rows().cursor().add("New");
+        row.applyDoubles(v -> 6);
+        frame.out().print();
+        Assert.assertEquals(frame.rowCount(), 6);
+        Assert.assertEquals(frame.colCount(), 10);
+        Assert.assertTrue(frame.rows().contains("New"));
+        Assert.assertTrue(row.values().allMatch(v -> v.getDouble() == 6));
+    }
+
+
+    @Test()
+    public void addColumn() {
+        var frame = testFrame(5, 10).applyDoubles(v -> Math.random());
+        var column = frame.cols().cursor().add("New", Double.class);
+        column.applyDoubles(v -> 20);
+        frame.out().print();
+        Assert.assertEquals(frame.rowCount(), 5);
+        Assert.assertEquals(frame.colCount(), 11);
+        Assert.assertTrue(frame.cols().contains("New"));
+        Assert.assertTrue(column.values().allMatch(v -> v.getDouble() == 20));
+    }
+
+
+    @Test()
+    public void addRowColumn() {
+        var frame = testFrame(5, 5).applyDoubles(v -> Math.random());
+        var cursor = frame.cursor();
+        cursor.add("New", "New", Double.class);
+        frame.row("New").applyDoubles(v -> 10d);
+        frame.col("New").applyValues(v -> 10d);
+        cursor.setDouble(100d);
+        frame.out().print();
+        Assert.assertEquals(frame.rowCount(), 6);
+        Assert.assertEquals(frame.colCount(), 6);
+        Assert.assertTrue(frame.rows().contains("New"));
+        Assert.assertTrue(frame.cols().contains("New"));
+        Assert.assertTrue(frame.values().allMatch(v -> {
+            var rowKey = v.rowKey();
+            var colKey = v.colKey();
+            if (rowKey.equals("New") && colKey.equals("New")) {
+                return v.getDouble() == 100d;
+            } else if (rowKey.equals("New") || colKey.equals("New")) {
+                return v.getDouble() == 10d;
+            } else {
+                return true;
+            }
+        }));
+    }
+
 }

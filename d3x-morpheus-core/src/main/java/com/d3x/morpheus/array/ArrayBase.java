@@ -202,7 +202,7 @@ public abstract class ArrayBase<T> implements Array<T> {
                 for (int i=0; i<length(); ++i) {
                     final T value = getValue(i);
                     if (set.add(value)) {
-                        builder.add(value);
+                        builder.append(value);
                         if (set.size() >= limit) {
                             break;
                         }
@@ -279,7 +279,7 @@ public abstract class ArrayBase<T> implements Array<T> {
     @Override
     public final <R> Array<R> map(Function<ArrayValue<T>,R> mapper) {
         final ArrayBuilder<R> builder = ArrayBuilder.of(length());
-        this.sequential().forEachValue(v -> builder.add(mapper.apply(v)));
+        this.sequential().forEachValue(v -> builder.append(mapper.apply(v)));
         return builder.toArray();
     }
 

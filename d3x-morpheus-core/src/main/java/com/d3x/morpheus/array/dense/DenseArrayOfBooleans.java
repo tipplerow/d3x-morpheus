@@ -172,7 +172,7 @@ class DenseArrayOfBooleans extends ArrayBase<Boolean> {
             cursor.moveTo(i);
             final boolean match = predicate.test(cursor);
             if (match) {
-                builder.addBoolean(cursor.getBoolean());
+                builder.appendBoolean(cursor.getBoolean());
             }
         }
         return builder.toArray();
@@ -296,7 +296,7 @@ class DenseArrayOfBooleans extends ArrayBase<Boolean> {
         for (int i=0; i<length(); ++i) {
             final boolean value = getBoolean(i);
             if (set.add(value ? (short)1 : (short)0)) {
-                builder.addBoolean(value);
+                builder.appendBoolean(value);
                 if (set.size() >= limit) {
                     break;
                 }

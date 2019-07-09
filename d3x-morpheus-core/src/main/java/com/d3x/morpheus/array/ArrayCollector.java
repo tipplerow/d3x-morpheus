@@ -60,8 +60,8 @@ public class ArrayCollector {
      */
     public static <T> Collector<T,ArrayBuilder<T>,Array<T>> of(Class<T> type, int expectedLength) {
         final Supplier<ArrayBuilder<T>> supplier = () -> ArrayBuilder.of(expectedLength, type);
-        final BinaryOperator<ArrayBuilder<T>> combiner = ArrayBuilder::addAll;
-        final BiConsumer<ArrayBuilder<T>,T> accumulator = ArrayBuilder::add;
+        final BinaryOperator<ArrayBuilder<T>> combiner = ArrayBuilder::appendAll;
+        final BiConsumer<ArrayBuilder<T>,T> accumulator = ArrayBuilder::append;
         final Function<ArrayBuilder<T>,Array<T>> finisher = ArrayBuilder::toArray;
         return Collector.of(supplier, accumulator, combiner, finisher);
     }

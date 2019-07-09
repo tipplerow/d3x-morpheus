@@ -52,10 +52,10 @@ class XDataFrameCalculate<R,C> implements DataFrameCalculate<R,C> {
         final DataFrameCursor<R,C> writeCursor = result.cursor();
         for (int i=1; i<rowCount; ++i) {
             for (int j=0; j<colCount; ++j) {
-                final double v0 = readCursor.at(i - 1, j).getDouble();
-                final double v1 = readCursor.at(i, j).getDouble();
+                final double v0 = readCursor.atOrdinals(i - 1, j).getDouble();
+                final double v1 = readCursor.atOrdinals(i, j).getDouble();
                 final double logReturn = Math.log(v1 / v0);
-                writeCursor.at(i, j).setDouble(logReturn);
+                writeCursor.atOrdinals(i, j).setDouble(logReturn);
             }
         }
         return result;
@@ -71,10 +71,10 @@ class XDataFrameCalculate<R,C> implements DataFrameCalculate<R,C> {
         final DataFrameCursor<R,C> writeCursor = result.cursor();
         for (int i=1; i<rowCount; ++i) {
             for (int j=0; j<colCount; ++j) {
-                final double v0 = readCursor.at(0, j).getDouble();
-                final double v1 = readCursor.at(i,j).getDouble();
+                final double v0 = readCursor.atOrdinals(0, j).getDouble();
+                final double v1 = readCursor.atOrdinals(i,j).getDouble();
                 final double cumReturn = v1 / v0 - 1d;
-                writeCursor.at(i, j).setDouble(cumReturn);
+                writeCursor.atOrdinals(i, j).setDouble(cumReturn);
             }
         }
         return result;
@@ -90,10 +90,10 @@ class XDataFrameCalculate<R,C> implements DataFrameCalculate<R,C> {
         final DataFrameCursor<R,C> writeCursor = result.cursor();
         for (int i=1; i<rowCount; ++i) {
             for (int j=0; j<colCount; ++j) {
-                final double v0 = readCursor.at(i - 1, j).getDouble();
-                final double v1 = readCursor.at(i, j).getDouble();
+                final double v0 = readCursor.atOrdinals(i - 1, j).getDouble();
+                final double v1 = readCursor.atOrdinals(i, j).getDouble();
                 final double percentChange = v1 / v0 - 1d;
-                writeCursor.at(i, j).setDouble(percentChange);
+                writeCursor.atOrdinals(i, j).setDouble(percentChange);
             }
         }
         return result;
@@ -121,9 +121,9 @@ class XDataFrameCalculate<R,C> implements DataFrameCalculate<R,C> {
                     final int from = rowOrdinal-windowSize+1;
                     for (int i=from; i<=rowOrdinal; ++i) {
                         count++;
-                        sum += readCursor.at(i, colOrdinal).getDouble();
+                        sum += readCursor.atOrdinals(i, colOrdinal).getDouble();
                     }
-                    writeCursor.at(from, colOrdinal).setDouble(sum / count);
+                    writeCursor.atOrdinals(from, colOrdinal).setDouble(sum / count);
                 }
             }
             return result;
@@ -140,16 +140,16 @@ class XDataFrameCalculate<R,C> implements DataFrameCalculate<R,C> {
             final DataFrameCursor<R,C> readCursor = frame.cursor();
             final DataFrameCursor<R,C> writeCursor = result.cursor();
             for (int colIndex=0; colIndex<colCount; ++colIndex) {
-                final double value = readCursor.at(0, colIndex).getDouble();
-                writeCursor.at(0, colIndex).setDouble(value);
+                final double value = readCursor.atOrdinals(0, colIndex).getDouble();
+                writeCursor.atOrdinals(0, colIndex).setDouble(value);
             }
             final double alpha = 2 / (windowSize + 1d);
             for (int rowIndex=1; rowIndex<rowCount; ++rowIndex) {
                 for (int j=0; j<colCount; ++j) {
-                    final double rawValue = readCursor.at(rowIndex, j).getDouble();
-                    final double emaPrior = writeCursor.at(rowIndex - 1, j).getDouble();
+                    final double rawValue = readCursor.atOrdinals(rowIndex, j).getDouble();
+                    final double emaPrior = writeCursor.atOrdinals(rowIndex - 1, j).getDouble();
                     final double emaValue = rawValue * alpha + (1d - alpha) * emaPrior;
-                    writeCursor.at(rowIndex, j).setDouble(emaValue);
+                    writeCursor.atOrdinals(rowIndex, j).setDouble(emaValue);
                 }
             }
         }
@@ -176,12 +176,12 @@ class XDataFrameCalculate<R,C> implements DataFrameCalculate<R,C> {
                 for (int colOrdinal=0; colOrdinal<colCount; ++colOrdinal) {
                     final int from = rowOrdinal-windowSize+1;
                     for (int i=from; i<=rowOrdinal; ++i) {
-                        final double value = readCursor.at(i, colOrdinal).getDouble();
+                        final double value = readCursor.atOrdinals(i, colOrdinal).getDouble();
                         if (!Double.isNaN(value)) {
                             stdDev.add(value);
                         }
                     }
-                    writeCursor.at(from, colOrdinal).setDouble(stdDev.getValue());
+                    writeCursor.atOrdinals(from, colOrdinal).setDouble(stdDev.getValue());
                 }
             }
             return result;

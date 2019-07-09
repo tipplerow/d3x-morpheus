@@ -45,7 +45,7 @@ class JsonSinkColumns<R,C> implements JsonSink<R,C> {
             final String encoding = options.getEncoding();
             final OutputStream os = options.getResource().toOutputStream();
             final Formats formats = options.getFormats();
-            final Printer<Object> rowPrinter = formats.getPrinterOrFail(frame.rows().keyType());
+            final Printer<Object> rowPrinter = formats.getPrinterOrFail(frame.rows().keyClass());
             writer = new JsonWriter(new OutputStreamWriter(os, encoding));
             writer.setIndent("  ");
             writer.beginObject();

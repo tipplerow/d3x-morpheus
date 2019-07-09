@@ -89,7 +89,7 @@ public class ExcelSource implements DataFrameSource<Integer,String, ExcelSource.
                             final ArrayBuilder<Object> values = valueList.get(j);
                             final Cell cell = row.getCell(colIndex, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL);
                             final Object value = getCellValue(cell, evaluator);
-                            values.add(value);
+                            values.append(value);
                         }
                     }
                 }

@@ -116,7 +116,7 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
             return Index.of(((Range<K>)keys).toArray());
         } else {
             final Class<K> keyType = (Class<K>)keys.iterator().next().getClass();
-            final Array<K> array = ArrayBuilder.of(1000, keyType).addAll(keys).toArray();
+            final Array<K> array = ArrayBuilder.of(1000, keyType).appendAll(keys).toArray();
             return Index.of(array);
         }
     }
@@ -403,7 +403,7 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
         } else if (this.rowKeys.isFilter()) {
             throw new DataFrameException("Cannot add keys to a filtered axis of a DataFrame");
         } else {
-            final boolean added = rowKeys.add(rowKey);
+            var added = rowKeys.add(rowKey);
             var rowCount = rowKeys.size();
             this.ensureCapacity(rowCount);
             return added;
@@ -469,9 +469,9 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
         if (!isColumnStore()) {
             throw new DataFrameException("This DataFrame is configured as a row store, transpose() first");
         } else {
-            final boolean added = colKeys.add(key);
+            var added = colKeys.add(key);
             if (added) {
-                final Array<T> array = ArrayUtils.toArray(values);
+                var array = ArrayUtils.toArray(values);
                 var rowCapacity = rowCapacity();
                 array.expand(rowCapacity);
                 this.data.add(array);
@@ -506,7 +506,7 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
                     for (int i = 0; i < rowCount; ++i) {
                         cursor.rowAt(i);
                         final boolean value = mapper.applyAsBoolean(cursor);
-                        targetValues.setBoolean(cursor.rowIndex, value);
+                        targetValues.setBoolean(cursor.rowCoord, value);
                     }
                     return targetValues;
                 }
@@ -540,7 +540,7 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
                     for (int i = 0; i < rowCount; ++i) {
                         cursor.rowAt(i);
                         var value = mapper.applyAsInt(cursor);
-                        targetValues.setInt(cursor.rowIndex, value);
+                        targetValues.setInt(cursor.rowCoord, value);
                     }
                     return targetValues;
                 }
@@ -574,7 +574,7 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
                     for (int i = 0; i < rowCount; ++i) {
                         cursor.rowAt(i);
                         final long value = mapper.applyAsLong(cursor);
-                        targetValues.setLong(cursor.rowIndex, value);
+                        targetValues.setLong(cursor.rowCoord, value);
                     }
                     return targetValues;
                 }
@@ -608,7 +608,7 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
                     for (int i = 0; i < rowCount; ++i) {
                         cursor.rowAt(i);
                         var value = mapper.applyAsDouble(cursor);
-                        targetValues.setDouble(cursor.rowIndex, value);
+                        targetValues.setDouble(cursor.rowCoord, value);
                     }
                     return targetValues;
                 }
@@ -643,7 +643,7 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
                     for (int i = 0; i < rowCount; ++i) {
                         cursor.rowAt(i);
                         final T value = mapper.apply(cursor);
-                        targetValues.setValue(cursor.rowIndex, value);
+                        targetValues.setValue(cursor.rowCoord, value);
                     }
                     return targetValues;
                 }
@@ -1112,8 +1112,8 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
      */
     private class Cursor implements DataFrameCursor<R,C> {
 
-        private int rowIndex;
-        private int colIndex;
+        private int rowCoord;
+        private int colCoord;
         private int rowOrdinal;
         private int colOrdinal;
         private Array<?> array;
@@ -1212,9 +1212,9 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
         public final boolean isNull() {
             try {
                 if (columnStore) {
-                    return array.isNull(rowIndex);
+                    return array.isNull(rowCoord);
                 } else {
-                    return array.isNull(colIndex);
+                    return array.isNull(colCoord);
                 }
             } catch (Exception ex) {
                 throw new DataFrameException("DataFrame csv error at (" + rowKey() + ", " + colKey() + "): " + ex.getMessage(), ex);
@@ -1268,9 +1268,9 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
         public final boolean getBoolean() {
             try {
                 if (columnStore) {
-                    return array.getBoolean(rowIndex);
+                    return array.getBoolean(rowCoord);
                 } else {
-                    return array.getBoolean(colIndex);
+                    return array.getBoolean(colCoord);
                 }
             } catch (Throwable t) {
                 throw new DataFrameException("DataFrame csv error at (" + rowKey() + ", " + colKey() + "): ", t);
@@ -1281,9 +1281,9 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
         public final int getInt() {
             try {
                 if (columnStore) {
-                    return array.getInt(rowIndex);
+                    return array.getInt(rowCoord);
                 } else {
-                    return array.getInt(colIndex);
+                    return array.getInt(colCoord);
                 }
             } catch (Throwable t) {
                 throw new DataFrameException("DataFrame csv error at (" + rowKey() + ", " + colKey() + "): ", t);
@@ -1294,9 +1294,9 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
         public final long getLong() {
             try {
                 if (columnStore) {
-                    return array.getLong(rowIndex);
+                    return array.getLong(rowCoord);
                 } else {
-                    return array.getLong(colIndex);
+                    return array.getLong(colCoord);
                 }
             } catch (Throwable t) {
                 throw new DataFrameException("DataFrame csv error at (" + rowKey() + ", " + colKey() + "): ", t);
@@ -1307,9 +1307,9 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
         public final double getDouble() {
             try {
                 if (columnStore) {
-                    return array.getDouble(rowIndex);
+                    return array.getDouble(rowCoord);
                 } else {
-                    return array.getDouble(colIndex);
+                    return array.getDouble(colCoord);
                 }
             } catch (Throwable t) {
                 throw new DataFrameException("DataFrame csv error at (" + rowKey() + ", " + colKey() + "): ", t);
@@ -1321,9 +1321,9 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
         public final <V> V getValue() {
             try {
                 if (columnStore) {
-                    return (V)array.getValue(rowIndex);
+                    return (V)array.getValue(rowCoord);
                 } else {
-                    return (V)array.getValue(colIndex);
+                    return (V)array.getValue(colCoord);
                 }
             } catch (Throwable t) {
                 throw new DataFrameException("DataFrame csv error at (" + rowKey() + ", " + colKey() + "): ", t);
@@ -1334,9 +1334,9 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
         public final void setBoolean(boolean value) {
             try {
                 if (columnStore) {
-                    array.setBoolean(rowIndex, value);
+                    array.setBoolean(rowCoord, value);
                 } else {
-                    array.setBoolean(colIndex, value);
+                    array.setBoolean(colCoord, value);
                 }
             } catch (Throwable t) {
                 throw new DataFrameException("DataFrame write error at (" + rowKey() + ", " + colKey() + "): ", t);
@@ -1347,9 +1347,9 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
         public final void setInt(int value) {
             try {
                 if (columnStore) {
-                    array.setInt(rowIndex, value);
+                    array.setInt(rowCoord, value);
                 } else {
-                    array.setInt(colIndex, value);
+                    array.setInt(colCoord, value);
                 }
             } catch (Throwable t) {
                 throw new DataFrameException("DataFrame write error at (" + rowKey() + ", " + colKey() + "): ", t);
@@ -1360,9 +1360,9 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
         public final void setLong(long value) {
             try {
                 if (columnStore) {
-                    array.setLong(rowIndex, value);
+                    array.setLong(rowCoord, value);
                 } else {
-                    array.setLong(colIndex, value);
+                    array.setLong(colCoord, value);
                 }
             } catch (Throwable t) {
                 throw new DataFrameException("DataFrame write error at (" + rowKey() + ", " + colKey() + "): ", t);
@@ -1373,9 +1373,9 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
         public final void setDouble(double value) {
             try {
                 if (columnStore) {
-                    array.setDouble(rowIndex, value);
+                    array.setDouble(rowCoord, value);
                 } else {
-                    array.setDouble(colIndex, value);
+                    array.setDouble(colCoord, value);
                 }
             } catch (Throwable t) {
                 throw new DataFrameException("DataFrame write error at (" + rowKey() + ", " + colKey() + "): ", t);
@@ -1387,9 +1387,9 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
         public final <V> void setValue(V value) {
             try {
                 if (columnStore) {
-                    ((Array<V>)array).setValue(rowIndex, value);
+                    ((Array<V>)array).setValue(rowCoord, value);
                 } else {
-                    ((Array<V>)array).setValue(colIndex, value);
+                    ((Array<V>)array).setValue(colCoord, value);
                 }
             } catch (Throwable t) {
                 throw new DataFrameException("DataFrame write error at (" + rowKey() + ", " + colKey() + "): ", t);
@@ -1397,26 +1397,26 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
         }
 
         @Override
-        public final DataFrameCursor<R,C> rowAt(int ordinal) {
+        public final DataFrameCursor<R,C> rowAt(int row) {
             try {
-                this.rowIndex = rowKeys.getCoordinateAt(ordinal);
-                this.array = columnStore ? array : data.get(rowIndex);
-                this.rowOrdinal = ordinal;
+                this.rowCoord = rowKeys.getCoordinateAt(row);
+                this.array = columnStore ? array : data.get(rowCoord);
+                this.rowOrdinal = row;
                 return this;
             } catch (Throwable t) {
-                throw new DataFrameException("Failed to move cursor to row ordinal " + ordinal, t);
+                throw new DataFrameException("Failed to move cursor to row ordinal " + row, t);
             }
         }
 
         @Override
-        public final DataFrameCursor<R,C> colAt(int ordinal) {
+        public final DataFrameCursor<R,C> colAt(int column) {
             try {
-                this.colIndex = colKeys.getCoordinateAt(ordinal);
-                this.array = columnStore ? data.get(colIndex) : array;
-                this.colOrdinal = ordinal;
+                this.colCoord = colKeys.getCoordinateAt(column);
+                this.array = columnStore ? data.get(colCoord) : array;
+                this.colOrdinal = column;
                 return this;
             } catch (Throwable t) {
-                throw new DataFrameException("Failed to move cursor to column ordinal " + ordinal, t);
+                throw new DataFrameException("Failed to move cursor to column ordinal " + column, t);
             }
         }
 
@@ -1427,7 +1427,60 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
 
 
         @Override
-        public final boolean tryMove(R rowKey, C colKey) {
+        public final DataFrameCursor<R,C> addRow(R rowKey) {
+            if (rowKeys.contains(rowKey)) {
+                return row(rowKey);
+            } else {
+                XDataFrameContent.this.addRow(rowKey);
+                return row(rowKey);
+            }
+        }
+
+
+        @Override
+        public final DataFrameCursor<R,C> addColumn(C colKey, Class<?> dataTye) {
+            if (colKeys.contains(colKey)) {
+                return col(colKey);
+            } else {
+                var values = Array.of(dataTye, rowCapacity());
+                XDataFrameContent.this.addColumn(colKey, values);
+                return col(colKey);
+            }
+        }
+
+
+        @Override
+        public final DataFrameCursor<R, C> add(R rowKey, C colKey, Class<?> dataTye) {
+            this.addRow(rowKey);
+            this.addColumn(colKey, dataTye);
+            return this;
+        }
+
+
+        @Override
+        public final boolean tryRow(R rowKey) {
+            if (!rowKeys.contains(rowKey)) {
+                return false;
+            } else {
+                this.row(rowKey);
+                return true;
+            }
+        }
+
+
+        @Override
+        public final boolean tryColumn(C colKey) {
+            if (!colKeys.contains(colKey)) {
+                return false;
+            } else {
+                this.col(colKey);
+                return true;
+            }
+        }
+
+
+        @Override
+        public final boolean tryKeys(R rowKey, C colKey) {
             if (!rowKeys.contains(rowKey) || !colKeys.contains(colKey)) {
                 return false;
             } else {
@@ -1439,14 +1492,28 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
 
 
         @Override
-        public final DataFrameCursor<R,C> row(R key) {
+        public final boolean tryOrdinals(int rowOrdinal, int colOrdinal) {
+            if (rowOrdinal < 0 || rowOrdinal >= rowKeys.size()) {
+                return false;
+            } else if (colOrdinal < 0 || colOrdinal >= colKeys.size()) {
+                return false;
+            } else {
+                this.rowAt(rowOrdinal);
+                this.colAt(colOrdinal);
+                return true;
+            }
+        }
+
+
+        @Override
+        public final DataFrameCursor<R,C> row(R rowKey) {
             try {
-                var ordinal = rowKeys.getOrdinal(key);
+                var ordinal = rowKeys.getOrdinal(rowKey);
                 return rowAt(ordinal);
             } catch (DataFrameException ex) {
                 throw ex;
             } catch (Throwable t) {
-                throw new DataFrameException("Failed to locate row for " + key, t);
+                throw new DataFrameException("Failed to locate row for " + rowKey, t);
             }
         }
 
@@ -1463,13 +1530,13 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
         }
 
         @Override
-        public final DataFrameCursor<R,C> locate(R rowKey, C colKey) {
+        public final DataFrameCursor<R,C> atKeys(R rowKey, C colKey) {
             return row(rowKey).col(colKey);
         }
 
         @Override
-        public final DataFrameCursor<R,C> at(int rowOrdinal, int colOrdinal) {
-            return rowAt(rowOrdinal).colAt(colOrdinal);
+        public final DataFrameCursor<R,C> atOrdinals(int row, int column) {
+            return rowAt(row).colAt(column);
         }
 
         @Override

@@ -171,7 +171,7 @@ public interface DataSeriesBuilder<K,V> {
         @Override()
         public DataSeriesBuilder<K,V> putValue(@lombok.NonNull K key, V value) {
             this.capacity(100);
-            this.keys.add(key);
+            this.keys.append(key);
             this.values.put(key, value);
             return this;
         }
@@ -226,7 +226,7 @@ public interface DataSeriesBuilder<K,V> {
         @Override
         public DataSeriesBuilder<K,V> putValue(K key, V value) {
             this.capacity(100);
-            this.keys.add(key);
+            this.keys.append(key);
             this.values.put(coding.getCode(key), value);
             return this;
         }
@@ -281,7 +281,7 @@ public interface DataSeriesBuilder<K,V> {
         @Override
         public DataSeriesBuilder<K,V> putValue(K key, V value) {
             this.capacity(100);
-            this.keys.add(key);
+            this.keys.append(key);
             this.values.put(coding.getCode(key), value);
             return this;
         }

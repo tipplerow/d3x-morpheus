@@ -135,13 +135,15 @@ public class JsonSourceDefault<R,C> implements JsonSource<R,C> {
         } else {
             reader.beginObject();
             token = reader.peek();
+            var cursor = frame.cursor();
             var formats = options.getFormats();
-            var rowKeyType = frame.rows().keyType();
+            var rowKeyType = frame.rows().keyClass();
             var typeMap = frame.cols().keys().collect(Collectors.toMap(v -> v, v -> frame.cols().type(v)));
             while (token != JsonToken.END_OBJECT) {
                 var rowLabel = reader.nextName();
                 var rowKey = formats.<R>parse(rowKeyType, rowLabel);
-                var rowIndex = frame.rows().add(rowKey);
+                frame.rows().add(rowKey);
+                cursor.row(rowKey);
                 reader.beginObject();
                 token = reader.peek();
                 while (token != JsonToken.END_OBJECT) {
@@ -153,29 +155,29 @@ public class JsonSourceDefault<R,C> implements JsonSource<R,C> {
                     token = reader.peek();
                     if (token == JsonToken.NULL) {
                         reader.nextNull();
-                        frame.setValueAt(rowIndex, colIndex, null);
+                        cursor.colAt(colIndex).setValue(null);
                         token = reader.peek();
                     } else if (token == JsonToken.BOOLEAN) {
                         var value = reader.nextBoolean();
-                        frame.setBooleanAt(rowIndex, colIndex, value);
+                        cursor.colAt(colIndex).setBoolean(value);
                         token = reader.peek();
                     } else if (token == JsonToken.STRING) {
                         var text = reader.nextString();
                         var parser = formats.getParserOrFail(colKey, dataType);
                         var value = parser.apply(text);
-                        frame.setValueAt(rowIndex, colIndex, value);
+                        cursor.colAt(colIndex).setValue(value);
                         token = reader.peek();
                     } else if (typeCode == ArrayType.DOUBLE) {
                         var value = reader.nextDouble();
-                        frame.setDoubleAt(rowIndex, colIndex, value);
+                        cursor.colAt(colIndex).setDouble(value);
                         token = reader.peek();
                     } else if (typeCode == ArrayType.LONG) {
                         var value = reader.nextLong();
-                        frame.setLongAt(rowIndex, colIndex, value);
+                        cursor.colAt(colIndex).setLong(value);
                         token = reader.peek();
                     } else {
                         var value = reader.nextInt();
-                        frame.setIntAt(rowIndex, colIndex, value);
+                        cursor.colAt(colIndex).setInt(value);
                         token = reader.peek();
                     }
                 }

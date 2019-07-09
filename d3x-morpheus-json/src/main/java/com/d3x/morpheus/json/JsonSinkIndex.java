@@ -47,8 +47,8 @@ public class JsonSinkIndex<R,C> extends JsonSinkBase<R,C> {
     public synchronized void write(JsonWriter writer, DataFrame<R,C> frame, Options options) {
         try {
             writer.beginObject();
-            var rowType = frame.rows().keyType();
-            var colType = frame.cols().keyType();
+            var rowType = frame.rows().keyClass();
+            var colType = frame.cols().keyClass();
             var formats = options.getFormats();
             var rowPrinter = formats.getPrinter(rowType);
             var colPrinter = formats.getPrinter(colType);

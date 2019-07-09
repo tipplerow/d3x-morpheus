@@ -99,7 +99,7 @@ public class DbSource {
                 var rowKeyBuilder = ArrayBuilder.of(rowCapacity, rowKeyType);
                 while (true) {
                     rowKey = rowKeyMapper.apply(resultSet);
-                    rowKeyBuilder.add(rowKey);
+                    rowKeyBuilder.append(rowKey);
                     for (ColumnInfo colInfo : columnList) {
                         colInfo.apply(resultSet);
                     }
@@ -238,11 +238,11 @@ public class DbSource {
         final void apply(ResultSet rs) {
             try {
                 switch (typeCode) {
-                    case BOOLEAN:   array.addBoolean(extractor.getBoolean(rs, index));  break;
-                    case INTEGER:   array.addInt(extractor.getInt(rs, index));          break;
-                    case LONG:      array.addLong(extractor.getLong(rs, index));        break;
-                    case DOUBLE:    array.addDouble(extractor.getDouble(rs, index));    break;
-                    default:        array.add(extractor.getValue(rs, index));           break;
+                    case BOOLEAN:   array.appendBoolean(extractor.getBoolean(rs, index));  break;
+                    case INTEGER:   array.appendInt(extractor.getInt(rs, index));          break;
+                    case LONG:      array.appendLong(extractor.getLong(rs, index));        break;
+                    case DOUBLE:    array.appendDouble(extractor.getDouble(rs, index));    break;
+                    default:        array.append(extractor.getValue(rs, index));           break;
                 }
             } catch (Exception ex) {
                 throw new RuntimeException("Failed to extract data for column " + name, ex);

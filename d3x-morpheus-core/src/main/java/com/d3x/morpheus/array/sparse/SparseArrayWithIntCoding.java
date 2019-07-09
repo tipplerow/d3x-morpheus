@@ -318,7 +318,7 @@ class SparseArrayWithIntCoding<T> extends ArrayBase<T> {
             var code = getInt(i);
             if (set.add(code)) {
                 final T value = getValue(i);
-                builder.add(value);
+                builder.append(value);
                 if (set.size() >= limit) {
                     break;
                 }

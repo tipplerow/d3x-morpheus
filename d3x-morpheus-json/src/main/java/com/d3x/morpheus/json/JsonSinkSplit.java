@@ -82,7 +82,7 @@ public class JsonSinkSplit<R,C> extends JsonSinkBase<R,C> {
      */
     private void writeColKeys(DataFrame<?,?> frame) throws IOException {
         final Formats formats = options.getFormats();
-        final Class<?> keyType = frame.cols().keyType();
+        final Class<?> keyType = frame.cols().keyClass();
         final Printer<Object> printer = formats.getPrinterOrFail(keyType);
         for (DataFrameColumn<?,?> column : frame.cols()) {
             writer.value(printer.apply(column.key()));
@@ -96,7 +96,7 @@ public class JsonSinkSplit<R,C> extends JsonSinkBase<R,C> {
      * @throws IOException  if there is an I/O error
      */
     private void writeRowKeys(DataFrame<?,?> frame) throws IOException {
-        var type = frame.rows().keyType();
+        var type = frame.rows().keyClass();
         if (type.equals(Integer.class)) {
             for (DataFrameRow<?,?> row : frame.rows()) {
                 writer.value((Integer)row.key());

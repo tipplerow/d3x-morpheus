@@ -97,7 +97,7 @@ class IndexOfInts extends IndexBase<Integer> {
         for (int i = 0; i < count; ++i) {
             final int value = keyArray().getInt(i);
             if (predicate.test(value)) {
-                builder.addInt(value);
+                builder.appendInt(value);
             }
         }
         final Array<Integer> filter = builder.toArray();

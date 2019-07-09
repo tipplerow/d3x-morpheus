@@ -70,15 +70,15 @@ public class MappingTests {
         final LocalDate start = LocalDate.now().minusDays(rowCount);
         final Range<LocalDate> rowKeys = Range.of(0, rowCount).map(start::plusDays);
         return DataFrame.of(rowKeys, String.class, columns -> {
-            columns.add("A", Boolean.class).applyBooleans(v -> random.nextBoolean());
-            columns.add("B", Integer.class).applyInts(v -> random.nextInt());
-            columns.add("C", Long.class).applyLongs(v -> random.nextLong());
-            columns.add("D", Double.class).applyDoubles(v -> random.nextDouble());
-            columns.add("E", LocalDate.class).applyValues(v -> LocalDate.now().plusDays(v.rowOrdinal()));
-            columns.add("F", LocalTime.class).applyValues(v -> LocalDateTime.now().minusSeconds(v.rowOrdinal()).toLocalTime());
-            columns.add("G", LocalDateTime.class).applyValues(v -> LocalDateTime.now().plusDays(v.rowOrdinal()));
-            columns.add("H", ZonedDateTime.class).applyValues(v -> ZonedDateTime.now().plusDays(v.rowOrdinal()));
-            columns.add("I", Month.class).applyValues(v -> LocalDateTime.now().minusDays(v.rowOrdinal()).getMonth());
+            columns.add("A", Boolean.class, v -> random.nextBoolean());
+            columns.add("B", Integer.class, v -> random.nextInt());
+            columns.add("C", Long.class, v -> random.nextLong());
+            columns.add("D", Double.class, v -> random.nextDouble());
+            columns.add("E", LocalDate.class, v -> LocalDate.now().plusDays(v.rowOrdinal()));
+            columns.add("F", LocalTime.class, v -> LocalDateTime.now().minusSeconds(v.rowOrdinal()).toLocalTime());
+            columns.add("G", LocalDateTime.class, v -> LocalDateTime.now().plusDays(v.rowOrdinal()));
+            columns.add("H", ZonedDateTime.class, v -> ZonedDateTime.now().plusDays(v.rowOrdinal()));
+            columns.add("I", Month.class, v -> LocalDateTime.now().minusDays(v.rowOrdinal()).getMonth());
         });
     }
 

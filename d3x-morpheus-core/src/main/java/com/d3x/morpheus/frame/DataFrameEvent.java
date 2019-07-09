@@ -54,8 +54,8 @@ public class DataFrameEvent<R,C> implements java.io.Serializable {
     public DataFrameEvent(DataFrame<R,C> frame, Type type, Array<R> rowKeys, Array<C> colKeys) {
         this.frame = frame;
         this.type = type;
-        this.rowKeys = rowKeys != null ? rowKeys : Array.empty(frame.rows().keyType());
-        this.colKeys = colKeys != null ? colKeys : Array.empty(frame.cols().keyType());
+        this.rowKeys = rowKeys != null ? rowKeys : Array.empty(frame.rows().keyClass());
+        this.colKeys = colKeys != null ? colKeys : Array.empty(frame.cols().keyClass());
     }
 
     /**
@@ -65,7 +65,7 @@ public class DataFrameEvent<R,C> implements java.io.Serializable {
      * @return          the newly created event
      */
     public static <X,Y> DataFrameEvent<X,Y> createRowAdd(DataFrame<X,Y> frame, Array<X> rows) {
-        return new DataFrameEvent<>(frame, Type.ADD, rows, Array.empty(frame.cols().keyType()));
+        return new DataFrameEvent<>(frame, Type.ADD, rows, Array.empty(frame.cols().keyClass()));
     }
 
     /**
@@ -75,7 +75,7 @@ public class DataFrameEvent<R,C> implements java.io.Serializable {
      * @return          the newly created event
      */
     public static <X,Y> DataFrameEvent<X,Y> createRowRemove(DataFrame<X,Y> frame, Array<X> rows) {
-        return new DataFrameEvent<>(frame, Type.REMOVE, rows, Array.empty(frame.cols().keyType()));
+        return new DataFrameEvent<>(frame, Type.REMOVE, rows, Array.empty(frame.cols().keyClass()));
     }
 
     /**
@@ -84,7 +84,7 @@ public class DataFrameEvent<R,C> implements java.io.Serializable {
      * @return          the newly created event
      */
     public static <X,Y> DataFrameEvent<X,Y> createColumnAdd(DataFrame<X,Y> frame, Array<Y> columns) {
-        return new DataFrameEvent<>(frame, Type.ADD, Array.empty(frame.rows().keyType()), columns);
+        return new DataFrameEvent<>(frame, Type.ADD, Array.empty(frame.rows().keyClass()), columns);
     }
 
     /**
@@ -93,7 +93,7 @@ public class DataFrameEvent<R,C> implements java.io.Serializable {
      * @return          the newly created event
      */
     public static <X,Y> DataFrameEvent<X,Y> createColumnRemove(DataFrame<X,Y> frame, Array<Y> columns) {
-        return new DataFrameEvent<>(frame, Type.REMOVE, Array.empty(frame.rows().keyType()), columns);
+        return new DataFrameEvent<>(frame, Type.REMOVE, Array.empty(frame.rows().keyClass()), columns);
     }
     /**
      * Returns a new event to signal that a single cell has updated

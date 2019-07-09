@@ -56,7 +56,7 @@ class JFPieModel<X extends Comparable,S extends Comparable> extends AbstractData
         } else {
             final int size = model.getFrame().rowCount();
             final ArrayBuilder<X> builder = ArrayBuilder.of(size);
-            IntStream.range(0, size).forEach(i -> builder.add(model.getItemFunction().apply(i)));
+            IntStream.range(0, size).forEach(i -> builder.append(model.getItemFunction().apply(i)));
             this.itemKeys = Index.of(builder.toArray());
         }
     }

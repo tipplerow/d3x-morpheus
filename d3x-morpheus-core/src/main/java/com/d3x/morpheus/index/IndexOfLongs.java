@@ -92,7 +92,7 @@ class IndexOfLongs extends IndexBase<Long> {
         for (int i=0; i<count; ++i) {
             final long value = keyArray().getLong(i);
             if (predicate.test(value)) {
-                builder.addLong(value);
+                builder.appendLong(value);
             }
         }
         final Array<Long> filter = builder.toArray();

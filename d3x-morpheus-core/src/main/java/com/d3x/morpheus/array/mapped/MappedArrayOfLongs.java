@@ -232,7 +232,7 @@ class MappedArrayOfLongs extends ArrayBase<Long> {
             cursor.moveTo(i);
             final boolean match = predicate.test(cursor);
             if (match) {
-                builder.addLong(cursor.getLong());
+                builder.appendLong(cursor.getLong());
             }
         }
         return builder.toArray();
@@ -373,7 +373,7 @@ class MappedArrayOfLongs extends ArrayBase<Long> {
         for (int i=0; i<length(); ++i) {
             final long value = getLong(i);
             if (set.add(value)) {
-                builder.addLong(value);
+                builder.appendLong(value);
                 if (set.size() >= limit) {
                     break;
                 }

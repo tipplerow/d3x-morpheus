@@ -122,10 +122,10 @@ public class ArrayBuilder<T> {
      * @return  the index assigned to element
      */
     @SuppressWarnings("unchecked")
-    public final int add(T value) {
+    public final int append(T value) {
         if (value != null) {
             this.checkType((Class<T>)value.getClass());
-            this.checkLength();
+            this.checkLength(index);
             this.array.setValue(index, value);
         }
         this.index++;
@@ -138,9 +138,9 @@ public class ArrayBuilder<T> {
      * @return  the index assigned to element
      */
     @SuppressWarnings("unchecked")
-    public final int addBoolean(boolean value) {
+    public final int appendBoolean(boolean value) {
         this.checkType((Class<T>)Boolean.class);
-        this.checkLength();
+        this.checkLength(index);
         this.array.setBoolean(index++, value);
         return index-1;
     }
@@ -151,9 +151,9 @@ public class ArrayBuilder<T> {
      * @return  the index assigned to element
      */
     @SuppressWarnings("unchecked")
-    public final int addInt(int value) {
+    public final int appendInt(int value) {
         this.checkType((Class<T>)Integer.class);
-        this.checkLength();
+        this.checkLength(index);
         this.array.setInt(index++, value);
         return index-1;
     }
@@ -164,9 +164,9 @@ public class ArrayBuilder<T> {
      * @return  the index assigned to element
      */
     @SuppressWarnings("unchecked")
-    public final int addLong(long value) {
+    public final int appendLong(long value) {
         this.checkType((Class<T>)Long.class);
-        this.checkLength();
+        this.checkLength(index);
         this.array.setLong(index++, value);
         return index-1;
     }
@@ -177,38 +177,110 @@ public class ArrayBuilder<T> {
      * @return  the index assigned to element
      */
     @SuppressWarnings("unchecked")
-    public final int addDouble(double value) {
+    public final int appendDouble(double value) {
         this.checkType((Class<T>)Double.class);
-        this.checkLength();
+        this.checkLength(index);
         this.array.setDouble(index++, value);
         return index-1;
     }
 
     /**
-     * Adds all values from the iterable specified
+     * Sets a value for this array builder
+     * @param index the array index location
+     * @param value the value to apply
+     */
+    @SuppressWarnings("unchecked")
+    public final void setValue(int index, T value) {
+        if (value != null) {
+            this.checkType((Class<T>)value.getClass());
+            this.checkLength(index);
+            this.array.setValue(index, value);
+        }
+        this.index = Math.max(this.index, index+1);
+    }
+
+
+    /**
+     * Sets a value for this array builder
+     * @param index the array index location
+     * @param value the value to apply
+     */
+    @SuppressWarnings("unchecked")
+    public final void setBoolean(int index, boolean value) {
+        this.checkType((Class<T>)Boolean.class);
+        this.checkLength(index);
+        this.array.setBoolean(index, value);
+        this.index = Math.max(this.index, index+1);
+    }
+
+
+    /**
+     * Sets a value for this array builder
+     * @param index the array index location
+     * @param value the value to apply
+     */
+    @SuppressWarnings("unchecked")
+    public final void setInt(int index, int value) {
+        this.checkType((Class<T>)Integer.class);
+        this.checkLength(index);
+        this.array.setInt(index, value);
+        this.index = Math.max(this.index, index+1);
+    }
+
+
+    /**
+     * Sets a value for this array builder
+     * @param index the array index location
+     * @param value the value to apply
+     */
+    @SuppressWarnings("unchecked")
+    public final void setLong(int index, long value) {
+        this.checkType((Class<T>)Long.class);
+        this.checkLength(index);
+        this.array.setLong(index, value);
+        this.index = Math.max(this.index, index+1);
+    }
+
+
+    /**
+     * Sets a value for this array builder
+     * @param index the array index location
+     * @param value the value to apply
+     */
+    @SuppressWarnings("unchecked")
+    public final void setDouble(int index, double value) {
+        this.checkType((Class<T>)Double.class);
+        this.checkLength(index);
+        this.array.setDouble(index, value);
+        this.index = Math.max(this.index, index+1);
+    }
+
+
+    /**
+     * Appends all values from the iterable specified
      * @param values    the values to add
      */
-    public final ArrayBuilder<T> addAll(Iterable<T> values) {
+    public final ArrayBuilder<T> appendAll(Iterable<T> values) {
         if (values instanceof Range) {
-            values.forEach(this::add);
+            values.forEach(this::append);
         } else if (values instanceof Array) {
             final Array<T> newArray = (Array<T>)values;
             final int newLength = index + newArray.length();
             this.array.expand(newLength);
             switch (newArray.typeCode()) {
-                case BOOLEAN:           newArray.forEachBoolean(this::addBoolean);  break;
-                case INTEGER:           newArray.forEachInt(this::addInt);          break;
-                case LONG:              newArray.forEachLong(this::addLong);        break;
-                case DOUBLE:            newArray.forEachDouble(this::addDouble);    break;
-                case DATE:              newArray.forEachLong(this::addLong);        break;
-                case INSTANT:           newArray.forEachLong(this::addLong);        break;
-                case LOCAL_DATE:        newArray.forEachLong(this::addLong);        break;
-                case LOCAL_TIME:        newArray.forEachLong(this::addLong);        break;
-                case LOCAL_DATETIME:    newArray.forEachLong(this::addLong);        break;
-                default:                newArray.forEach(this::add);                break;
+                case BOOLEAN:           newArray.forEachBoolean(this::appendBoolean);  break;
+                case INTEGER:           newArray.forEachInt(this::appendInt);          break;
+                case LONG:              newArray.forEachLong(this::appendLong);        break;
+                case DOUBLE:            newArray.forEachDouble(this::appendDouble);    break;
+                case DATE:              newArray.forEachLong(this::appendLong);        break;
+                case INSTANT:           newArray.forEachLong(this::appendLong);        break;
+                case LOCAL_DATE:        newArray.forEachLong(this::appendLong);        break;
+                case LOCAL_TIME:        newArray.forEachLong(this::appendLong);        break;
+                case LOCAL_DATETIME:    newArray.forEachLong(this::appendLong);        break;
+                default:                newArray.forEach(this::append);                break;
             }
         } else {
-            values.forEach(this::add);
+            values.forEach(this::append);
         }
         return this;
     }
@@ -253,9 +325,10 @@ public class ArrayBuilder<T> {
     }
 
     /**
-     * Checks to see if the current length supports adding another value, expanding if necessary
+     * Checks to see if the current length supports set a value at the index specified, expanding if necessary
+     * @param index the index to check whether current length supports this location
      */
-    private void checkLength() {
+    private void checkLength(int index) {
         if (index >= capacity) {
             int newLength = capacity + (capacity >> 1);
             if (newLength < index + 1) newLength = index + 1;
@@ -265,10 +338,10 @@ public class ArrayBuilder<T> {
     }
 
     /**
-     * Adds all items from the other builder
+     * Appends all items from the other builder
      * @param other the other builder
      */
-    public final ArrayBuilder<T> addAll(ArrayBuilder<T> other) {
+    public final ArrayBuilder<T> appendAll(ArrayBuilder<T> other) {
         if (array == null) {
             this.array = other.array.copy();
             return this;
@@ -279,7 +352,7 @@ public class ArrayBuilder<T> {
             for (int i=0; i<other.index; ++i) {
                 //todo: optimize this for common types to avoid boxing
                 final T value = arrayToAdd.getValue(i);
-                this.add(value);
+                this.append(value);
             }
             return this;
         }

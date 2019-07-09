@@ -45,6 +45,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import com.d3x.morpheus.frame.DataFrame;
+import com.d3x.morpheus.frame.DataFrameRow;
 import com.d3x.morpheus.util.IO;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -216,29 +217,31 @@ public class QuandlSource {
         JsonReader reader = null;
         CloseableHttpResponse response = null;
         try {
-            final String search = URLEncoder.encode(expression, "UTF-8");
-            final URL url = createUrl("/api/v3/datasets.json", "query=" + search + "&per_page=2000");
-            final DataFrame<Integer,QuandlField> frame = QuandlDatasetInfo.frame(2000);
+            var search = URLEncoder.encode(expression, "UTF-8");
+            var url = createUrl("/api/v3/datasets.json", "query=" + search + "&per_page=2000");
+            var frame = QuandlDatasetInfo.frame(2000);
+            var row = frame.rows().cursor();
             response = doGet(url.toString(), null);
             reader = new JsonReader(new BufferedReader(new InputStreamReader(response.getEntity().getContent())));
             reader.beginObject();
             reader.nextName();
             reader.beginArray();
             while (reader.hasNext()) {
-                final QuandlDatasetInfo info = gson.fromJson(reader, QuandlDatasetInfo.class);
-                final int row = frame.rows().add(info.getId());
-                frame.rows().setValueAt(row, QuandlField.DATABASE_CODE, info.getDatabaseCode());
-                frame.rows().setValueAt(row, QuandlField.DATASET_CODE, info.getDatasetCode());
-                frame.rows().setValueAt(row, QuandlField.NAME, info.getName());
-                frame.rows().setValueAt(row, QuandlField.DESCRIPTION, info.getDescription());
-                frame.rows().setValueAt(row, QuandlField.LAST_REFRESH_TIME, info.getRefreshedAt());
-                frame.rows().setValueAt(row, QuandlField.START_DATE, info.getOldestAvailableDate());
-                frame.rows().setValueAt(row, QuandlField.END_DATE, info.getNewestAvailableDate());
-                frame.rows().setValueAt(row, QuandlField.COLUMN_NAMES, info.getColumnNames());
-                frame.rows().setValueAt(row, QuandlField.FREQUENCY, info.getFrequency());
-                frame.rows().setValueAt(row, QuandlField.DATASET_TYPE, info.getType());
-                frame.rows().setValueAt(row, QuandlField.PREMIUM, info.isPremium());
-                frame.rows().setValueAt(row, QuandlField.DATABASE_ID, info.getDatabaseId());
+                var info = (QuandlDatasetInfo)gson.fromJson(reader, QuandlDatasetInfo.class);
+                frame.rows().add(info.getId());
+                row.atKey(info.getId());
+                row.setValue(QuandlField.DATABASE_CODE, info.getDatabaseCode());
+                row.setValue(QuandlField.DATASET_CODE, info.getDatasetCode());
+                row.setValue(QuandlField.NAME, info.getName());
+                row.setValue(QuandlField.DESCRIPTION, info.getDescription());
+                row.setValue(QuandlField.LAST_REFRESH_TIME, info.getRefreshedAt());
+                row.setValue(QuandlField.START_DATE, info.getOldestAvailableDate());
+                row.setValue(QuandlField.END_DATE, info.getNewestAvailableDate());
+                row.setValue(QuandlField.COLUMN_NAMES, info.getColumnNames());
+                row.setValue(QuandlField.FREQUENCY, info.getFrequency());
+                row.setValue(QuandlField.DATASET_TYPE, info.getType());
+                row.setValue(QuandlField.PREMIUM, info.isPremium());
+                row.setValue(QuandlField.DATABASE_ID, info.getDatabaseId());
             }
             return frame;
         } catch (Exception ex) {
@@ -468,38 +471,40 @@ public class QuandlSource {
     private class DatabaseCodesProcessor implements RowProcessor {
 
         private DataFrame<String,QuandlField> frame;
+        private DataFrameRow.Cursor<String,QuandlField> row;
         private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         private List<QuandlField> fields = Arrays.asList(NAME, LAST_REFRESH_TIME, START_DATE, END_DATE);
 
         @Override
         public void processStarted(ParsingContext context) {
             this.frame = QuandlField.frame(String.class, 10000, fields);
+            this.row = frame.rows().cursor();
         }
         @Override
         public void processEnded(ParsingContext context) {
 
         }
         @Override
-        public void rowProcessed(String[] row, ParsingContext context) {
+        public void rowProcessed(String[] tokens, ParsingContext context) {
             try {
-                if (row.length < 2) {
-                    System.err.println("Ignoring line: " + String.join(",", row));
+                if (tokens.length < 2) {
+                    System.err.println("Ignoring line: " + String.join(",", tokens));
                 } else {
-                    final String ticker = row[0].trim();
-                    final String name = row[1];
-                    final int rowIndex = frame.rows().add(ticker);
-                    frame.setValueAt(rowIndex, 0, name);
-                    if (row.length == 6) {
-                        final LocalDateTime timestamp = LocalDateTime.parse(row[3], formatter);
-                        final ZonedDateTime zonedDateTime = ZonedDateTime.of(timestamp, ZoneId.of("America/New_York"));
-                        frame.setValueAt(rowIndex, 0, row[1]);
-                        frame.setValueAt(rowIndex, 1, zonedDateTime);
-                        frame.setValueAt(rowIndex, 2, LocalDate.parse(row[4]));
-                        frame.setValueAt(rowIndex, 3, LocalDate.parse(row[5]));
+                    var ticker = tokens[0].trim();
+                    var name = tokens[1];
+                    this.frame.rows().add(ticker);
+                    this.row.atKey(ticker).setValueAt(0, name);
+                    if (tokens.length == 6) {
+                        var timestamp = LocalDateTime.parse(tokens[3], formatter);
+                        var zonedDateTime = ZonedDateTime.of(timestamp, ZoneId.of("America/New_York"));
+                        this.row.setValueAt(0, tokens[1]);
+                        this.row.setValueAt(1, zonedDateTime);
+                        this.row.setValueAt(2, LocalDate.parse(tokens[4]));
+                        this.row.setValueAt(3, LocalDate.parse(tokens[5]));
                     }
                 }
             } catch (Exception ex) {
-                throw new RuntimeException("Failed to process line: " +  String.join(",", row), ex);
+                throw new RuntimeException("Failed to process line: " +  String.join(",", tokens), ex);
             }
         }
     }

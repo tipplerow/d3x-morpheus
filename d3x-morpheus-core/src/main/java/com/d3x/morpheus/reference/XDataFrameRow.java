@@ -79,7 +79,7 @@ class XDataFrameRow<R,C> extends XDataFrameVector<R,C,R,C,DataFrameRow<R,C>> imp
         var colCount = frame.colCount();
         if (colCount > 0) {
             var rowOrdinal = ordinal();
-            var cursor = frame.cursor().at(rowOrdinal, 0);
+            var cursor = frame.cursor().atOrdinals(rowOrdinal, 0);
             for (int i=0; i<colCount; ++i) {
                 cursor.colAt(i);
                 consumer.accept(cursor);
@@ -167,8 +167,8 @@ class XDataFrameRow<R,C> extends XDataFrameVector<R,C,R,C,DataFrameRow<R,C>> imp
         } else {
             return first(predicate).map(first -> {
                 var colStart = first.colOrdinal();
-                var result = frame.cursor().at(first.rowOrdinal(), first.colOrdinal());
-                var value = frame.cursor().at(first.rowOrdinal(), first.colOrdinal());
+                var result = frame.cursor().atOrdinals(first.rowOrdinal(), first.colOrdinal());
+                var value = frame.cursor().atOrdinals(first.rowOrdinal(), first.colOrdinal());
                 for (int i=colStart+1; i<frame.colCount(); ++i) {
                     value.colAt(i);
                     if (predicate.test(value) && value.compareTo(result) < 0) {
@@ -188,8 +188,8 @@ class XDataFrameRow<R,C> extends XDataFrameVector<R,C,R,C,DataFrameRow<R,C>> imp
         } else {
             return first(predicate).map(first -> {
                 var colStart = first.colOrdinal();
-                var result = frame.cursor().at(first.rowOrdinal(), first.colOrdinal());
-                var value = frame.cursor().at(first.rowOrdinal(), first.colOrdinal());
+                var result = frame.cursor().atOrdinals(first.rowOrdinal(), first.colOrdinal());
+                var value = frame.cursor().atOrdinals(first.rowOrdinal(), first.colOrdinal());
                 for (int i=colStart+1; i<frame.colCount(); ++i) {
                     value.colAt(i);
                     if (predicate.test(value) && value.compareTo(result) > 0) {
@@ -247,9 +247,9 @@ class XDataFrameRow<R,C> extends XDataFrameVector<R,C,R,C,DataFrameRow<R,C>> imp
         } else {
             return first(predicate).map(first -> {
                 var colStart = first.colOrdinal();
-                var cursor = frame.cursor().at(first.rowOrdinal(), first.colOrdinal());
-                var minValue = frame.cursor().at(first.rowOrdinal(), first.colOrdinal());
-                var maxValue = frame.cursor().at(first.rowOrdinal(), first.colOrdinal());
+                var cursor = frame.cursor().atOrdinals(first.rowOrdinal(), first.colOrdinal());
+                var minValue = frame.cursor().atOrdinals(first.rowOrdinal(), first.colOrdinal());
+                var maxValue = frame.cursor().atOrdinals(first.rowOrdinal(), first.colOrdinal());
                 for (int i=colStart+1; i<frame.colCount(); ++i) {
                     cursor.colAt(i);
                     if (predicate.test(cursor)) {
@@ -291,6 +291,13 @@ class XDataFrameRow<R,C> extends XDataFrameVector<R,C,R,C,DataFrameRow<R,C>> imp
         var ranks = XDataFrameRank.rank(values);
         var colKeys = Index.of(frame.cols().keyArray());
         return DataFrame.ofDoubles(key(), colKeys).applyDoubles(v -> ranks[v.rowOrdinal()]);
+    }
+
+
+    @Override
+    public final Cursor<R,C> add(R rowKey) {
+        this.frame.rows().add(rowKey);
+        return atKey(rowKey);
     }
 
 

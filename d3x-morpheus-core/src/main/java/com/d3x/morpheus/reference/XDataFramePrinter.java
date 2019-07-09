@@ -92,7 +92,7 @@ class XDataFramePrinter {
     private String[] getHeaderTokens(DataFrame<?,?> frame) {
         final int colCount = frame.colCount() + 1;
         final String[] header = new String[colCount];
-        final Class<?> columnKeyType = frame.cols().keyType();
+        final Class<?> columnKeyType = frame.cols().keyClass();
         final Printer<Object> printer = formats.getPrinterOrFail(columnKeyType, Object.class);
         IntStream.range(0, colCount).forEach(colIndex -> {
             if (colIndex == 0) header[colIndex] = "Index";
@@ -115,10 +115,10 @@ class XDataFramePrinter {
         if (frame.rowCount() == 0) return new String[0][0];
         final int rowCount = Math.min(maxRows, frame.rowCount());
         final int colCount = frame.colCount() + 1;
-        final Printer<Object> rowKeyPrinter = formats.getPrinterOrFail(frame.rows().keyType(), Object.class);
+        final Printer<Object> rowKeyPrinter = formats.getPrinterOrFail(frame.rows().keyClass(), Object.class);
         final List<Printer<Object>> printers = getColumnPrinters(frame);
         final String[][] data = new String[rowCount][colCount];
-        final DataFrameCursor<?,?> cursor = frame.cursor().at(0, 0);
+        final DataFrameCursor<?,?> cursor = frame.cursor().atOrdinals(0, 0);
         for (int i=0; i<rowCount; ++i) {
             cursor.rowAt(i);
             for (int j=0; j<=frame.colCount(); ++j) {
