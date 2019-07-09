@@ -58,7 +58,7 @@ class SparseArrayOfLongs extends ArrayBase<Long> {
         super(Long.class, ArrayStyle.SPARSE, false);
         this.length = length;
         this.defaultValue = defaultValue != null ? defaultValue : 0L;
-        this.values = new TIntLongHashMap((int)Math.max(length * fillPct, 10d), 0.85f, -1, this.defaultValue);
+        this.values = new TIntLongHashMap((int)Math.max(length * fillPct, 5d), SparseArrayConstructor.DEFAULT_LOAD_FACTOR, -1, this.defaultValue);
     }
 
     /**

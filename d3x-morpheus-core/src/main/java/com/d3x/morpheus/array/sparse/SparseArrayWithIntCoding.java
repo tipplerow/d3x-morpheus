@@ -65,7 +65,7 @@ class SparseArrayWithIntCoding<T> extends ArrayBase<T> {
         this.coding = coding;
         this.defaultValue = defaultValue;
         this.defaultCode = coding.getCode(defaultValue);
-        this.codes = new TIntIntHashMap((int)Math.max(length * fillPct, 10d), 0.85f, -1, defaultCode);
+        this.codes = new TIntIntHashMap((int)Math.max(length * fillPct, 5d), SparseArrayConstructor.DEFAULT_LOAD_FACTOR, -1, defaultCode);
     }
 
     /**

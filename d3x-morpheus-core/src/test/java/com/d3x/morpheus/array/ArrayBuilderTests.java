@@ -577,4 +577,42 @@ public class ArrayBuilderTests {
         });
     }
 
+
+    @Test()
+    public void plusInts() {
+        var builder = ArrayBuilder.of(10);
+        builder.appendInt(10);
+        builder.appendInt(20);
+        builder.plusInt(1, 10);
+        var result = builder.toArray();
+        Assert.assertEquals(result.length(),2);
+        Assert.assertEquals(result.getInt(0), 10);
+        Assert.assertEquals(result.getInt(1), 30);
+    }
+
+
+    @Test()
+    public void plusLongs() {
+        var builder = ArrayBuilder.of(10);
+        builder.appendLong(10);
+        builder.appendLong(20);
+        builder.plusLong(1, 10);
+        var result = builder.toArray();
+        Assert.assertEquals(result.length(),2);
+        Assert.assertEquals(result.getLong(0), 10);
+        Assert.assertEquals(result.getLong(1), 30);
+    }
+
+
+    @Test()
+    public void plusDoubles() {
+        var builder = ArrayBuilder.of(10);
+        builder.appendDouble(10d);
+        builder.appendDouble(20d);
+        builder.plusDouble(1, 10d);
+        var result = builder.toArray();
+        Assert.assertEquals(result.length(),2);
+        Assert.assertEquals(result.getDouble(0), 10d, 0.0000001d);
+        Assert.assertEquals(result.getDouble(1), 30d, 0.0000001d);
+    }
 }

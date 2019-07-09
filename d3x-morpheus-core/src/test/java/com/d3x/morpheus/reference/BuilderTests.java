@@ -15,6 +15,8 @@
  */
 package com.d3x.morpheus.reference;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import com.d3x.core.util.StopWatch;
@@ -22,6 +24,7 @@ import com.d3x.morpheus.frame.DataFrame;
 import com.d3x.morpheus.frame.DataFrameAsserts;
 import com.d3x.morpheus.util.IO;
 import org.testng.Assert;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
@@ -32,6 +35,14 @@ import org.testng.annotations.Test;
  * @author  Xavier Witdouck
  */
 public class BuilderTests {
+
+
+    @DataProvider(name="denseOrSparse")
+    public Object[][] denseOrSparse() {
+        return new Object[][] {
+            { false }, { true }
+        };
+    }
 
 
     @Test()
@@ -73,9 +84,11 @@ public class BuilderTests {
 
 
 
-    @Test()
-    public void ints() {
-        var frame = DataFrame.builder(String.class, String.class)
+    @Test(dataProvider="denseOrSparse")
+    public void ints(boolean sparse) {
+        var builder = DataFrame.builder(String.class, String.class).capacity(100, 100);
+        if (sparse) IntStream.range(0, 5).forEach(i -> builder.fillPct("C" + i, 0.2f));
+        var frame = builder
             .putInt("R0", "C0", 5)
             .putInt("R1", "C1", 10)
             .putInt("R2", "C2", 20)
@@ -111,9 +124,11 @@ public class BuilderTests {
     }
 
 
-    @Test()
-    public void longs() {
-        var frame = DataFrame.builder(String.class, String.class)
+    @Test(dataProvider="denseOrSparse")
+    public void longs(boolean sparse) {
+        var builder = DataFrame.builder(String.class, String.class).capacity(100, 100);
+        if (sparse) IntStream.range(0, 5).forEach(i -> builder.fillPct("C" + i, 0.2f));
+        var frame = builder
             .putLong("R0", "C0", 5L)
             .putLong("R1", "C1", 10L)
             .putLong("R2", "C2", 20L)
@@ -150,9 +165,11 @@ public class BuilderTests {
 
 
 
-    @Test()
-    public void doubles() {
-        var frame = DataFrame.builder(String.class, String.class)
+    @Test(dataProvider="denseOrSparse")
+    public void doubles(boolean sparse) {
+        var builder = DataFrame.builder(String.class, String.class).capacity(100, 100);
+        if (sparse) IntStream.range(0, 5).forEach(i -> builder.fillPct("C" + i, 0.2f));
+        var frame = builder
             .putDouble("R0", "C0", 1.1)
             .putDouble("R1", "C1", 2.2)
             .putDouble("R2", "C2", 3.3)
@@ -188,9 +205,11 @@ public class BuilderTests {
     }
 
 
-    @Test()
-    public void strings() {
-        var frame = DataFrame.builder(String.class, String.class)
+    @Test(dataProvider="denseOrSparse")
+    public void strings(boolean sparse) {
+        var builder = DataFrame.builder(String.class, String.class).capacity(100, 100);
+        if (sparse) IntStream.range(0, 5).forEach(i -> builder.fillPct("C" + i, 0.2f));
+        var frame = builder
             .putValue("R0", "C0", "1.1")
             .putValue("R1", "C1", "2.2")
             .putValue("R2", "C2", "3.3")
@@ -237,6 +256,8 @@ public class BuilderTests {
         Assert.assertEquals(expected.colCount(), result.colCount());
         Assert.assertEquals(expected.rows().keyClass(), result.rows().keyClass());
         Assert.assertEquals(expected.cols().keyClass(), result.cols().keyClass());
+        Assert.assertEquals(builder.rowCount(), expected.rowCount());
+        Assert.assertEquals(builder.colCount(), expected.colCount());
         expected.cols().forEach(c -> Assert.assertEquals(c.dataClass(), result.col(c.key()).dataClass()));
         DataFrameAsserts.assertEqualsByIndex(result, expected);
     }
@@ -248,6 +269,8 @@ public class BuilderTests {
         var builder = DataFrame.builder(expected.rows().keyClass(), expected.cols().keyClass()).threadSafe();
         Assert.assertTrue(builder.isThreadSafe());
         expected.parallel().forEach(v -> builder.putValue(v.rowKey(), v.colKey(), v.getValue()));
+        Assert.assertEquals(builder.rowCount(), expected.rowCount());
+        Assert.assertEquals(builder.colCount(), expected.colCount());
         var result = builder.build();
         result.out().print();
         DataFrameAsserts.assertEqualsByIndex(result, expected);
@@ -255,6 +278,104 @@ public class BuilderTests {
 
 
     @Test()
+    public void toBuilder() {
+        var expected = DataFrame.read("/csv/cars93.csv").csv();
+        var result = expected.toBuilder().build();
+        result.out().print();
+        DataFrameAsserts.assertEqualsByIndex(result, expected);
+    }
+
+
+    @Test()
+    public void replaceRowKey() {
+        var builder = DataFrame.builder(String.class, String.class);
+        builder.putDouble("R0", "C0", Math.random());
+        builder.putDouble("R1", "C1", Math.random());
+        builder.putDouble("R2", "C2", Math.random());
+        builder.replaceRowKey("R1", "X1");
+        Assert.assertTrue(builder.hasRow("X1"));
+        Assert.assertFalse(builder.hasRow("R1"));
+        Assert.assertEquals(builder.rowKeys().collect(Collectors.toList()), List.of("R0", "X1", "R2"));
+        Assert.assertEquals(builder.colKeys().collect(Collectors.toList()), List.of("C0", "C1", "C2"));
+        var frame = builder.build();
+        frame.out().print();
+        Assert.assertEquals(frame.rowCount(), 3);
+        Assert.assertEquals(frame.colCount(), 3);
+        Assert.assertTrue(frame.rows().contains("R0"));
+        Assert.assertTrue(frame.rows().contains("X1"));
+        Assert.assertTrue(frame.rows().contains("R2"));
+    }
+
+
+    @Test()
+    public void replaceColKey() {
+        var builder = DataFrame.builder(String.class, String.class);
+        builder.putDouble("X0", "C0", Math.random());
+        builder.putDouble("X1", "C1", Math.random());
+        builder.putDouble("X2", "C2", Math.random());
+        builder.replaceColKey("C1", "X1");
+        Assert.assertTrue(builder.hasColumn("X1"));
+        Assert.assertFalse(builder.hasColumn("C1"));
+        Assert.assertEquals(builder.rowKeys().collect(Collectors.toList()), List.of("X0", "X1", "X2"));
+        Assert.assertEquals(builder.colKeys().collect(Collectors.toList()), List.of("C0", "C2", "X1"));
+        var frame = builder.build();
+        frame.out().print();
+        Assert.assertEquals(frame.rowCount(), 3);
+        Assert.assertEquals(frame.colCount(), 3);
+        Assert.assertTrue(frame.cols().contains("C0"));
+        Assert.assertTrue(frame.cols().contains("X1"));
+        Assert.assertTrue(frame.cols().contains("C2"));
+    }
+
+
+    @Test()
+    public void plusInts() {
+        var frame = DataFrame.builder(String.class, String.class)
+            .putInt("R0", "C0", 10)
+            .putInt("R1", "C1", 20)
+            .putInt("R2", "C2", 30)
+            .plusInt("R1", "C1", 50)
+            .build();
+
+        frame.out().print();
+        Assert.assertEquals(frame.getInt("R0", "C0"), 10);
+        Assert.assertEquals(frame.getInt("R1", "C1"), 70);
+        Assert.assertEquals(frame.getInt("R2", "C2"), 30);
+    }
+
+    @Test()
+    public void plusLongs() {
+        var frame = DataFrame.builder(String.class, String.class)
+            .putLong("R0", "C0", 10L)
+            .putLong("R1", "C1", 20L)
+            .putLong("R2", "C2", 30L)
+            .plusLong("R1", "C1", 50L)
+            .build();
+
+        frame.out().print();
+        Assert.assertEquals(frame.getLong("R0", "C0"), 10L);
+        Assert.assertEquals(frame.getLong("R1", "C1"), 70L);
+        Assert.assertEquals(frame.getLong("R2", "C2"), 30L);
+    }
+
+
+    @Test()
+    public void plusDoubles() {
+        var frame = DataFrame.builder(String.class, String.class)
+            .putDouble("R0", "C0", 10)
+            .putDouble("R1", "C1", 20)
+            .putDouble("R2", "C2", 30)
+            .plusDouble("R1", "C1", 50)
+            .build();
+
+        frame.out().print();
+        Assert.assertEquals(frame.getDouble("R0", "C0"), 10d, 0.000001d);
+        Assert.assertEquals(frame.getDouble("R1", "C1"), 70d, 0.000001d);
+        Assert.assertEquals(frame.getDouble("R2", "C2"), 30d, 0.000001d);
+    }
+
+
+    @Test(enabled = false)
     public void performance() {
         var rowCount = 1000000;
         var colCount = 10;

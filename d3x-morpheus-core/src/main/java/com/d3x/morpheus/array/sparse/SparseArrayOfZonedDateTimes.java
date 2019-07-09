@@ -86,8 +86,8 @@ class SparseArrayOfZonedDateTimes extends ArrayBase<ZonedDateTime> {
         this.defaultValue = defaultValue;
         this.defaultValueAsLong = defaultValue != null ? defaultValue.toInstant().toEpochMilli() : nullValue;
         this.defaultZoneId = defaultValue != null ? zoneIdMap1.get(defaultValue.getZone()) : NULL_ZONE;
-        this.values = new TIntLongHashMap((int)Math.max(length * fillPct, 10d), 0.85f, -1, defaultValueAsLong);
-        this.zoneIds = new TIntShortHashMap((int)Math.max(length * fillPct, 10d), 0.85f, -1, defaultZoneId);
+        this.values = new TIntLongHashMap((int)Math.max(length * fillPct, 5d), SparseArrayConstructor.DEFAULT_LOAD_FACTOR, -1, defaultValueAsLong);
+        this.zoneIds = new TIntShortHashMap((int)Math.max(length * fillPct, 5d), SparseArrayConstructor.DEFAULT_LOAD_FACTOR, -1, defaultZoneId);
     }
 
     /**

@@ -386,6 +386,15 @@ public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperation
 
 
     /**
+     * Returns a newly created builder initialized with the contents of this frame
+     * @return      the newly created builder with contents of this frame
+     */
+    default DataFrameBuilder<R,C> toBuilder() {
+        return new DataFrameBuilder<>(this);
+    }
+
+
+    /**
      * Returns a new DataFrame builder for row and column key types
      * @param rowType   the row key type for builder
      * @param colType   the column key type for builder

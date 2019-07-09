@@ -525,7 +525,7 @@ public abstract class ArrayBase<T> implements Array<T> {
             return Optional.empty();
         } else {
             var length = this.length();
-            final ArrayCursor<T> cursor = cursor();
+            var cursor = cursor();
             for (int i=0; i<length; ++i) {
                 cursor.moveTo(i);
                 if (predicate.test(cursor)) {
@@ -543,7 +543,7 @@ public abstract class ArrayBase<T> implements Array<T> {
             return Optional.empty();
         } else {
             var length = this.length();
-            final ArrayCursor<T> cursor = cursor();
+            var cursor = cursor();
             for (int i=length-1; i>=0; --i) {
                 cursor.moveTo(i);
                 if (predicate.test(cursor)) {
@@ -1331,6 +1331,16 @@ public abstract class ArrayBase<T> implements Array<T> {
         @Override
         public boolean isEqualTo(T value) {
             return ArrayBase.this.isEqualTo(index, value);
+        }
+
+        @Override()
+        public String toString() {
+            if (index < 0 || index >= ArrayBase.this.length()) {
+                return "ArrayValue(null)";
+            } else {
+                var value = getValue();
+                return String.format("ArrayValue(%s, %s)", index, value);
+            }
         }
     }
 

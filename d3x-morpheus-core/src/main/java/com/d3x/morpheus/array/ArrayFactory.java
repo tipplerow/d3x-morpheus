@@ -151,9 +151,9 @@ public abstract class ArrayFactory {
     @SuppressWarnings("unchecked")
     private static <T> Class<T> resolveType(Object values) {
         var length = java.lang.reflect.Array.getLength(values);
-        final Class<T> componentType = (Class<T>)values.getClass().getComponentType();
+        var componentType = (Class<T>)values.getClass().getComponentType();
         if (length == 1 && componentType == Object.class) {
-            final Object entry = java.lang.reflect.Array.get(values, 0);
+            var entry = java.lang.reflect.Array.get(values, 0);
             return entry != null ? (Class<T>)entry.getClass() : (Class<T>)Object.class;
         } else {
             return componentType;
