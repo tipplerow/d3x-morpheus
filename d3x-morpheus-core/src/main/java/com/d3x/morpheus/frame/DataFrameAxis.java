@@ -295,6 +295,14 @@ public interface DataFrameAxis<X,Y,R,C,V extends DataFrameVector,T extends DataF
     DataFrame<R,C> select(Predicate<V> predicate);
 
     /**
+     * Returns a DataFrame view containing records from start ordinal plus length
+     * @param start     the starting ordinal for records to select
+     * @param length    the number of records to include from start position
+     * @return          the <code>DataFrame</code> view
+     */
+    DataFrame<R,C> select(int start, int length);
+
+    /**
      * Sorts the DataFrame along this axis based on the keys in ascending/descending order
      * @param ascending     true for ascending order, false for descending
      * @return              the sorted DataFrame

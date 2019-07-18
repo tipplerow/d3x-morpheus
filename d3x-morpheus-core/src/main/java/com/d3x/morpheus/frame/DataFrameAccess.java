@@ -29,7 +29,7 @@ public interface DataFrameAccess<R,C> {
      * Returns the value for the row and column key coordinates provided
      * @param rowKey    the row key coordinate
      * @param colKey    the column key coordinate
-     * @return          the value for coordinates
+     * @return          the value for coordinates, false if no match for keys
      */
     boolean getBoolean(R rowKey, C colKey);
 
@@ -45,7 +45,7 @@ public interface DataFrameAccess<R,C> {
      * Returns the value for the row and column key coordinates provided
      * @param rowKey    the row key coordinate
      * @param colKey    the column key coordinate
-     * @return          the value for coordinates
+     * @return          the value for coordinates, 0 if no match for keys
      */
     int getInt(R rowKey, C colKey);
 
@@ -61,7 +61,7 @@ public interface DataFrameAccess<R,C> {
      * Returns the value for the row and column key coordinates provided
      * @param rowKey    the row key coordinate
      * @param colKey    the column key coordinate
-     * @return          the value for coordinates
+     * @return          the value for coordinates, 0L if no match for keys
      */
     long getLong(R rowKey, C colKey);
 
@@ -77,7 +77,7 @@ public interface DataFrameAccess<R,C> {
      * Returns the value for the row and column key coordinates provided
      * @param rowKey    the row key coordinate
      * @param colKey    the column key coordinate
-     * @return          the value for coordinates
+     * @return          the value for coordinates, NaN if no match for keys
      */
     double getDouble(R rowKey, C colKey);
 
@@ -93,7 +93,7 @@ public interface DataFrameAccess<R,C> {
      * Returns the value for the row and column key coordinates provided
      * @param rowKey    the row key coordinate
      * @param colKey    the column key coordinate
-     * @return          the value for coordinates
+     * @return          the value for coordinates, null if no match for keys
      */
     <T> T getValue(R rowKey, C colKey);
 

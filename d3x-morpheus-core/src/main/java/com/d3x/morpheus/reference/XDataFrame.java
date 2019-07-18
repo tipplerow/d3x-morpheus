@@ -950,7 +950,7 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
     public final boolean getBoolean(R rowKey, C colKey) {
         var row = data.rowCoordinate(rowKey);
         var col = data.colCoordinate(colKey);
-        return data.booleanAt(row, col);
+        return row >= 0 && col >= 0 && data.booleanAt(row, col);
     }
 
     @Override
@@ -964,7 +964,7 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
     public final int getInt(R rowKey, C colKey) {
         var row = data.rowCoordinate(rowKey);
         var col = data.colCoordinate(colKey);
-        return data.intAt(row, col);
+        return row < 0 || col < 0 ? 0 : data.intAt(row, col);
     }
 
     @Override
@@ -978,7 +978,7 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
     public final long getLong(R rowKey, C colKey) {
         var row = data.rowCoordinate(rowKey);
         var col = data.colCoordinate(colKey);
-        return data.longAt(row, col);
+        return row < 0 || col < 0 ? 0L : data.longAt(row, col);
     }
 
     @Override
@@ -992,7 +992,7 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
     public final double getDouble(R rowKey, C colKey) {
         var row = data.rowCoordinate(rowKey);
         var col = data.colCoordinate(colKey);
-        return data.doubleAt(row, col);
+        return row < 0 || col < 0 ? Double.NaN : data.doubleAt(row, col);
     }
 
     @Override
@@ -1006,7 +1006,7 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
     public final <T> T getValue(R rowKey, C colKey) {
         var row = data.rowCoordinate(rowKey);
         var col = data.colCoordinate(colKey);
-        return data.valueAt(row, col);
+        return row < 0 || col < 0 ? null : data.valueAt(row, col);
     }
 
     @Override
@@ -1018,8 +1018,8 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
 
     @Override
     public final boolean setBoolean(R rowKey, C colKey, boolean value) {
-        var row = data.rowCoordinate(rowKey);
-        var col = data.colCoordinate(colKey);
+        var row = data.rowCoordinateOrFail(rowKey);
+        var col = data.colCoordinateOrFail(colKey);
         return data.booleanAt(row, col, value);
     }
 
@@ -1032,8 +1032,8 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
 
     @Override
     public final int setInt(R rowKey, C colKey, int value) {
-        var row = data.rowCoordinate(rowKey);
-        var col = data.colCoordinate(colKey);
+        var row = data.rowCoordinateOrFail(rowKey);
+        var col = data.colCoordinateOrFail(colKey);
         return data.intAt(row, col, value);
     }
 
@@ -1046,8 +1046,8 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
 
     @Override
     public final long setLong(R rowKey, C colKey, long value) {
-        var row = data.rowCoordinate(rowKey);
-        var col = data.colCoordinate(colKey);
+        var row = data.rowCoordinateOrFail(rowKey);
+        var col = data.colCoordinateOrFail(colKey);
         return data.longAt(row, col, value);
     }
 
@@ -1060,8 +1060,8 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
 
     @Override
     public final double setDouble(R rowKey, C colKey, double value) {
-        var row = data.rowCoordinate(rowKey);
-        var col = data.colCoordinate(colKey);
+        var row = data.rowCoordinateOrFail(rowKey);
+        var col = data.colCoordinateOrFail(colKey);
         return data.doubleAt(row, col, value);
     }
 
@@ -1074,8 +1074,8 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
 
     @Override
     public final <T> T setValue(R rowKey, C colKey, T value) {
-        var row = data.rowCoordinate(rowKey);
-        var col = data.colCoordinate(colKey);
+        var row = data.rowCoordinateOrFail(rowKey);
+        var col = data.colCoordinateOrFail(colKey);
         return data.valueAt(row, col, value);
     }
 

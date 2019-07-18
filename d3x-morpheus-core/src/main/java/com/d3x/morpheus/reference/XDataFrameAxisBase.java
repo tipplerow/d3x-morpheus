@@ -30,6 +30,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import com.d3x.core.util.Collect;
 import com.d3x.morpheus.array.Array;
 import com.d3x.morpheus.array.ArrayBuilder;
 import com.d3x.morpheus.frame.DataFrame;
@@ -40,6 +41,7 @@ import com.d3x.morpheus.frame.DataFrameOptions;
 import com.d3x.morpheus.frame.DataFrameRow;
 import com.d3x.morpheus.frame.DataFrameVector;
 import com.d3x.morpheus.index.Index;
+import com.d3x.morpheus.range.Range;
 import com.d3x.morpheus.util.Asserts;
 import com.d3x.morpheus.util.Parallel;
 import com.d3x.morpheus.util.Tuple;
@@ -103,12 +105,14 @@ abstract class XDataFrameAxisBase<X,Y,R,C,V extends DataFrameVector<?,?,R,C,?>,T
     @SuppressWarnings("unchecked")
     private DataFrame<R,C> createFilter(XDataFrame<R,C> frame, Iterable<X> keys) {
         if (axisType.isRow()) {
-            var newRowKeys = frame.rowKeys().filter((Iterable<R>)keys);
+            var matches = Collect.asList(keys, this::contains);
+            var newRowKeys = frame.rowKeys().filter((Iterable<R>)matches);
             var newColKeys = frame.colKeys().copy(true);
             return frame.filter(newRowKeys, newColKeys);
         } else {
+            var matches = Collect.asList(keys, this::contains);
             var newRowKeys = frame.rowKeys().copy(true);
-            var newColKeys = frame.colKeys().filter((Iterable<C>)keys);
+            var newColKeys = frame.colKeys().filter((Iterable<C>)matches);
             return frame.filter(newRowKeys, newColKeys);
         }
     }
@@ -257,25 +261,29 @@ abstract class XDataFrameAxisBase<X,Y,R,C,V extends DataFrameVector<?,?,R,C,?>,T
 
     @Override
     public final Iterator<V> iterator() {
-        var vector = createVector(frame, 0);
-        return new Iterator<>() {
-            private int ordinal;
-            @Override
-            public final boolean hasNext() {
-                return ordinal < count();
-            }
-            @Override
-            @SuppressWarnings("unchecked")
-            public final V next() {
-                if (vector instanceof XDataFrameRow) {
-                    var row = (XDataFrameRow)vector;
-                    return (V)row.atOrdinal(ordinal++);
-                } else {
-                    var column = (XDataFrameColumn)vector;
-                    return (V)column.atOrdinal(ordinal++);
+        if (isEmpty()) {
+            return Collections.emptyIterator();
+        } else {
+            var vector = createVector(frame, 0);
+            return new Iterator<>() {
+                private int ordinal;
+                @Override
+                public final boolean hasNext() {
+                    return ordinal < count();
                 }
-            }
-        };
+                @Override
+                @SuppressWarnings("unchecked")
+                public final V next() {
+                    if (vector instanceof XDataFrameRow) {
+                        var row = (XDataFrameRow)vector;
+                        return (V)row.atOrdinal(ordinal++);
+                    } else {
+                        var column = (XDataFrameColumn)vector;
+                        return (V)column.atOrdinal(ordinal++);
+                    }
+                }
+            };
+        }
     }
 
 
@@ -381,6 +389,7 @@ abstract class XDataFrameAxisBase<X,Y,R,C,V extends DataFrameVector<?,?,R,C,?>,T
 
 
     @Override
+    @Parallel
     public final DataFrame<R,C> select(Iterable<X> keys) {
         return createFilter(frame, keys);
     }
@@ -389,20 +398,34 @@ abstract class XDataFrameAxisBase<X,Y,R,C,V extends DataFrameVector<?,?,R,C,?>,T
     @Override
     @Parallel
     public final DataFrame<R,C> select(Predicate<V> predicate) {
-        if (parallel) {
+        if (isEmpty()) {
+            return frame;
+        } else if (parallel) {
             var count = count();
-            final Select select = new Select(0, count-1, predicate);
-            final Array<X> keys = ForkJoinPool.commonPool().invoke(select);
+            var select = new Select(0, count-1, predicate);
+            var keys = ForkJoinPool.commonPool().invoke(select);
             return createFilter(frame, keys);
         } else {
             var count = count();
             if (count == 0) {
                 return createFilter(frame, Collections.emptyList());
             } else {
-                final Select select = new Select(0, count-1, predicate);
-                final Array<X> keys = select.compute();
+                var select = new Select(0, count-1, predicate);
+                var keys = select.compute();
                 return createFilter(frame, keys);
             }
+        }
+    }
+
+
+    @Override
+    public final DataFrame<R,C> select(int start, int length) {
+        if (isEmpty()) {
+            return DataFrame.empty();
+        } else {
+            var last = Math.min(start + length-1, count()-1);
+            var keys = Range.of(start, last+1).map(this::key);
+            return createFilter(frame, keys);
         }
     }
 

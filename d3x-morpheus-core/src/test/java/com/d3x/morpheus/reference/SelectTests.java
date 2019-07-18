@@ -167,4 +167,41 @@ public class SelectTests {
     }
 
 
+
+    @Test()
+    public void selectByRowOrdinals() {
+        var rows = Range.of(0, 100).map(i -> "R" + i);
+        var cols = Range.of(0, 10).map(i -> "C" + i);
+        var frame = DataFrame.ofDoubles(rows, cols, v -> Math.random());
+        var select1 = frame.rows().select(5, 6);
+        select1.out().print();
+        Assert.assertEquals(select1.rowCount(), 6);
+        Assert.assertEquals(select1.colCount(), frame.colCount());
+        Assert.assertEquals(select1.rows().key(0), "R5");
+        Assert.assertEquals(select1.rows().key(5), "R10");
+
+        var select2 = frame.rows().select(5, 1000);
+        Assert.assertEquals(select2.rowCount(), 95);
+
+    }
+
+
+    @Test()
+    public void selectByColOrdinals() {
+        var rows = Range.of(0, 100).map(i -> "R" + i);
+        var cols = Range.of(0, 20).map(i -> "C" + i);
+        var frame = DataFrame.ofDoubles(rows, cols, v -> Math.random());
+        var select1 = frame.cols().select(5, 6);
+        select1.out().print();
+        Assert.assertEquals(select1.rowCount(), frame.rowCount());
+        Assert.assertEquals(select1.colCount(), 6);
+        Assert.assertEquals(select1.cols().key(0), "C5");
+        Assert.assertEquals(select1.cols().key(5), "C10");
+
+        var select2 = frame.cols().select(5, 1000);
+        Assert.assertEquals(select2.colCount(), 15);
+    }
+
+
+
 }

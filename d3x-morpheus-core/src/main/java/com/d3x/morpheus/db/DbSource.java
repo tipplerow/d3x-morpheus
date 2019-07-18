@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2018 D3X Systems - All Rights Reserved
+ * Copyright (C) 2018-2019 D3X Systems - All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,23 +15,27 @@
  */
 package com.d3x.morpheus.db;
 
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.time.Duration;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
+import com.d3x.morpheus.array.Array;
 import com.d3x.morpheus.array.ArrayBuilder;
 import com.d3x.morpheus.array.ArrayType;
 import com.d3x.morpheus.frame.DataFrame;
 import com.d3x.morpheus.frame.DataFrameException;
 import com.d3x.morpheus.index.Index;
+import com.d3x.morpheus.range.Range;
 import com.d3x.morpheus.util.IO;
-import com.d3x.morpheus.util.Try;
-import com.d3x.morpheus.util.sql.SQL;
 import com.d3x.morpheus.util.sql.SQLExtractor;
 import com.d3x.morpheus.util.sql.SQLPlatform;
 import com.d3x.morpheus.util.sql.SQLType;
@@ -50,27 +54,31 @@ public class DbSource {
     private Connection connection;
 
     /**
-     * Constructor
-     * @param dataSource    the data source to get connection
+     * Returns a DataFrame loaded from the underlying database using the options provided
+     * @param configurator  the options configurator
+     * @param <R>           the row key type
+     * @return              the resulting frame
+     * @throws DataFrameException   if fails to load data frame
      */
-    public DbSource(DataSource dataSource) {
-        this.connection = Try.call(dataSource::getConnection);
-    }
-
-    public <R> DataFrame<R,String> read(Consumer<DbSourceOptions<R>> configurator) throws DataFrameException {
-        try {
-            var options = new DbSourceOptions<R>();
-            configurator.accept(options);
-            this.connection.setAutoCommit(options.isAutoCommit());
-            this.connection.setReadOnly(options.isReadOnly());
-            var fetchSize = options.getFetchSize();
-            var sql = SQL.of(options.getSql(), options.getParameters().toArray());
-            return sql.executeQuery(connection, fetchSize, rs -> read(rs, options));
-        } catch (SQLException ex) {
-            throw new DataFrameException("Failed to load data from db: " + ex.getMessage(), ex);
-
-        } finally {
-            IO.close(connection);
+    public <R> DataFrame<R,String> apply(Consumer<Options> configurator) throws DataFrameException {
+        var options = new Options();
+        configurator.accept(options);
+        var sql = options.getSql();
+        if (sql == null) {
+            throw new IllegalArgumentException("No SQL specified in options, call setSql()");
+        } else {
+            try {
+                var stmt = connection.prepareStatement(sql);
+                stmt.setMaxRows(options.getMaxRows());
+                stmt.setQueryTimeout((int)options.getQueryTimeout().toSeconds());
+                stmt.setFetchSize(options.getFetchSize());
+                var rs = stmt.executeQuery();
+                return read(rs, options);
+            } catch (SQLException ex) {
+                throw new DataFrameException("Failed to load data from db: " + ex.getMessage(), ex);
+            } finally {
+                IO.close(connection);
+            }
         }
     }
 
@@ -83,32 +91,43 @@ public class DbSource {
      * @throws DataFrameException if data frame construction from result set fails
      */
     @SuppressWarnings("unchecked")
-    private <R> DataFrame<R,String> read(ResultSet resultSet, DbSourceOptions<R> options) throws DataFrameException {
+    private <R> DataFrame<R,String> read(ResultSet resultSet, Options options) throws DataFrameException {
         try {
-            var rowCapacity = options.getRowCapacity();
             var platform = getPlatform(resultSet);
             var metaData = resultSet.getMetaData();
-            var columnList = getColumnInfo(metaData, platform, options);
-            var rowKeyMapper = options.getRowKeyMapper();
+            var columns = getColumns(metaData, platform, options);
             if (!resultSet.next()) {
                 var rowKeys = (Index<R>)Index.empty();
-                return createFrame(rowKeys, columnList, options);
+                return createFrame(rowKeys, columns, options);
             } else {
-                var rowKey = rowKeyMapper.apply(resultSet);
-                var rowKeyType = (Class<R>) rowKey.getClass();
-                var rowKeyBuilder = ArrayBuilder.of(rowCapacity, rowKeyType);
-                while (true) {
-                    rowKey = rowKeyMapper.apply(resultSet);
-                    rowKeyBuilder.append(rowKey);
-                    for (ColumnInfo colInfo : columnList) {
-                        colInfo.apply(resultSet);
+                var counter = 1;
+                var t1 = System.currentTimeMillis();
+                for (ColumnInfo column : columns) {
+                    column.apply(resultSet);
+                }
+                while (resultSet.next()) {
+                    for (ColumnInfo column : columns) {
+                        column.apply(resultSet);
                     }
-                    if (!resultSet.next()) {
-                        break;
+                    if (++counter % options.getLogRowCount() == 0) {
+                        var time = System.currentTimeMillis() - t1;
+                        IO.println("Extracted " + counter + " rows in " + time + " millis");
                     }
                 }
-                var rowKeys = rowKeyBuilder.toArray();
-                return createFrame(rowKeys, columnList, options);
+                if (options.getRowIndexColumnName() == null) {
+                    var rowKeys = (Array<R>)Range.of(0, counter).toArray();
+                    return createFrame(rowKeys, columns, options);
+                } else {
+                    var name = options.getRowIndexColumnName();
+                    var column = columns.stream().filter(v -> v.name.equalsIgnoreCase(name)).findFirst().orElse(null);
+                    if (column == null) {
+                        throw new IllegalArgumentException("No column matches row index column name: " + name);
+                    } else {
+                        var rowKeys = (Array<R>)column.array.toArray();
+                        var data = columns.stream().filter(v -> !v.name.equalsIgnoreCase(name)).collect(Collectors.toList());
+                        return createFrame(rowKeys, data, options);
+                    }
+                }
             }
         } catch (DataFrameException ex) {
             throw ex;
@@ -142,7 +161,7 @@ public class DbSource {
      * @param columnList    the column list
      * @return              the newly created DataFrame
      */
-    private <R> DataFrame<R,String> createFrame(Iterable<R> rowKeys, List<ColumnInfo> columnList, DbSourceOptions<R> options) {
+    private <R> DataFrame<R,String> createFrame(Iterable<R> rowKeys, List<ColumnInfo> columnList, Options options) {
         var colMapper = options.getColKeyMapper();
         return DataFrame.of(rowKeys, String.class, columns -> {
             for (ColumnInfo colInfo : columnList) {
@@ -163,7 +182,7 @@ public class DbSource {
      * @return              the array of column information
      * @throws SQLException if there is a database access error
      */
-    private <R> List<ColumnInfo> getColumnInfo(ResultSetMetaData metaData, SQLPlatform platform, DbSourceOptions<R> options) throws SQLException {
+    private List<ColumnInfo> getColumns(ResultSetMetaData metaData, SQLPlatform platform, Options options) throws SQLException {
         var rowCapacity = options.getRowCapacity();
         var columnCount = metaData.getColumnCount();
         var columnInfoList = new ArrayList<ColumnInfo>(columnCount);
@@ -175,8 +194,8 @@ public class DbSource {
                 var typeCode = metaData.getColumnType(colIndex);
                 var typeName = metaData.getColumnTypeName(colIndex);
                 var sqlType = typeResolver.getType(typeCode, typeName);
-                var extractor = options.getExtractor(colName, SQLExtractor.with(sqlType.typeClass(), platform));
-                columnInfoList.add(new ColumnInfo(i, colIndex, colName, rowCapacity, extractor));
+                var extractor = SQLExtractor.with(sqlType.typeClass(), platform);
+                columnInfoList.add(new ColumnInfo(colIndex, colName, rowCapacity, extractor));
             }
         }
         return columnInfoList;
@@ -205,29 +224,25 @@ public class DbSource {
     private class ColumnInfo {
 
         private int index;
-        private int ordinal;
         private String name;
         private Class<?> type;
         private ArrayType typeCode;
         private SQLExtractor extractor;
-        private ArrayBuilder<Object> array;
+        private ArrayBuilder<?> array;
 
 
         /**
          * Constructor
-         * @param ordinal   the DataFrame column ordinal
          * @param index     the JDBC column index
          * @param name      the JDBC column name
          * @param capacity  the initial capacity for column
          */
-        @SuppressWarnings("unchecked")
-        ColumnInfo(int ordinal, int index, String name, int capacity, SQLExtractor extractor) {
+        ColumnInfo(int index, String name, int capacity, SQLExtractor extractor) {
             this.index = index;
-            this.ordinal = ordinal;
             this.name = name;
             this.type = extractor.getDataType();
             this.typeCode = ArrayType.of(type);
-            this.array = (ArrayBuilder<Object>)ArrayBuilder.of(capacity, type);
+            this.array = ArrayBuilder.of(capacity, type);
             this.extractor = extractor;
         }
 
@@ -249,6 +264,29 @@ public class DbSource {
             }
         }
     }
+
+
+    /**
+     * The options for this source
+     */
+    @lombok.Data()
+    public static class Options {
+
+        private String sql;
+        private int maxRows;
+        private int fetchSize = 100;
+        private int rowCapacity = 1000;
+        private int logRowCount = Integer.MAX_VALUE;
+        private boolean readOnly = false;
+        private boolean autoCommit = true;
+        private String rowIndexColumnName;
+        private Duration queryTimeout = Duration.ofSeconds(0);
+        private List<Object> parameters = new ArrayList<>();
+        private Set<String> excludeColumnSet = new HashSet<>();
+        private Function<String,String> colKeyMapper = v -> v;
+
+    }
+
 
 
 }

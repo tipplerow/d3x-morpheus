@@ -273,8 +273,8 @@ class XDataFrameColumn<R,C> extends XDataFrameVector<C,R,R,C,DataFrameColumn<R,C
 
     @Override
     public boolean isNull(R key) {
-        var rowCoord = data.rowCoordinate(key);
-        var colCoord = data.colCoordinate(colKey);
+        var rowCoord = data.rowCoordinateOrFail(key);
+        var colCoord = data.colCoordinateOrFail(colKey);
         return data.isNullAt(rowCoord, colCoord);
     }
 
@@ -282,7 +282,7 @@ class XDataFrameColumn<R,C> extends XDataFrameVector<C,R,R,C,DataFrameColumn<R,C
     @Override
     public boolean isNullAt(int ordinal) {
         var rowCoord = data.rowCoordinateAt(ordinal);
-        var colCoord = data.colCoordinate(colKey);
+        var colCoord = data.colCoordinateOrFail(colKey);
         return data.isNullAt(rowCoord, colCoord);
     }
 
@@ -385,7 +385,7 @@ class XDataFrameColumn<R,C> extends XDataFrameVector<C,R,R,C,DataFrameColumn<R,C
 
     @Override
     public final boolean getBoolean(R key) {
-        final int rowIndex = data.rowCoordinate(key);
+        final int rowIndex = data.rowCoordinateOrFail(key);
         return data.booleanAt(rowIndex, colIndex);
     }
 
@@ -397,7 +397,7 @@ class XDataFrameColumn<R,C> extends XDataFrameVector<C,R,R,C,DataFrameColumn<R,C
 
     @Override
     public final int getInt(R key) {
-        final int rowIndex = data.rowCoordinate(key);
+        final int rowIndex = data.rowCoordinateOrFail(key);
         return data.intAt(rowIndex, colIndex);
     }
 
@@ -409,7 +409,7 @@ class XDataFrameColumn<R,C> extends XDataFrameVector<C,R,R,C,DataFrameColumn<R,C
 
     @Override
     public final long getLong(R key) {
-        final int rowIndex = data.rowCoordinate(key);
+        final int rowIndex = data.rowCoordinateOrFail(key);
         return data.longAt(rowIndex, colIndex);
     }
 
@@ -421,7 +421,7 @@ class XDataFrameColumn<R,C> extends XDataFrameVector<C,R,R,C,DataFrameColumn<R,C
 
     @Override
     public final double getDouble(R key) {
-        final int rowIndex = data.rowCoordinate(key);
+        final int rowIndex = data.rowCoordinateOrFail(key);
         return data.doubleAt(rowIndex, colIndex);
     }
 
@@ -433,7 +433,7 @@ class XDataFrameColumn<R,C> extends XDataFrameVector<C,R,R,C,DataFrameColumn<R,C
 
     @Override
     public final <V> V getValue(R key) {
-        final int rowIndex = data.rowCoordinate(key);
+        final int rowIndex = data.rowCoordinateOrFail(key);
         return data.valueAt(rowIndex, colIndex);
     }
 
@@ -451,7 +451,7 @@ class XDataFrameColumn<R,C> extends XDataFrameVector<C,R,R,C,DataFrameColumn<R,C
 
     @Override
     public final boolean setBoolean(R key, boolean value) {
-        final int rowIndex = data.rowCoordinate(key);
+        final int rowIndex = data.rowCoordinateOrFail(key);
         return data.booleanAt(rowIndex, colIndex, value);
     }
 
@@ -463,7 +463,7 @@ class XDataFrameColumn<R,C> extends XDataFrameVector<C,R,R,C,DataFrameColumn<R,C
 
     @Override
     public final int setInt(R key, int value) {
-        final int rowIndex = data.rowCoordinate(key);
+        final int rowIndex = data.rowCoordinateOrFail(key);
         return data.intAt(rowIndex, colIndex, value);
     }
 
@@ -475,7 +475,7 @@ class XDataFrameColumn<R,C> extends XDataFrameVector<C,R,R,C,DataFrameColumn<R,C
 
     @Override
     public final long setLong(R key, long value) {
-        final int rowIndex = data.rowCoordinate(key);
+        final int rowIndex = data.rowCoordinateOrFail(key);
         return data.longAt(rowIndex, colIndex, value);
     }
 
@@ -487,7 +487,7 @@ class XDataFrameColumn<R,C> extends XDataFrameVector<C,R,R,C,DataFrameColumn<R,C
 
     @Override
     public final double setDouble(R key, double value) {
-        final int rowIndex = data.rowCoordinate(key);
+        final int rowIndex = data.rowCoordinateOrFail(key);
         return data.doubleAt(rowIndex, colIndex, value);
     }
 
@@ -499,7 +499,7 @@ class XDataFrameColumn<R,C> extends XDataFrameVector<C,R,R,C,DataFrameColumn<R,C
 
     @Override
     public final <V> V setValue(R key, V value) {
-        final int rowIndex = data.rowCoordinate(key);
+        final int rowIndex = data.rowCoordinateOrFail(key);
         return data.valueAt(rowIndex, colIndex, value);
     }
 

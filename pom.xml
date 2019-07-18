@@ -5,13 +5,12 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.d3xsystems</groupId>
     <artifactId>d3x-morpheus</artifactId>
-    <version>1.0.21</version>
+    <version>1.0.22</version>
     <packaging>pom</packaging>
 
     <modules>
         <module>d3x-morpheus-core/pom.xml</module>
         <module>d3x-morpheus-viz/pom.xml</module>
-        <module>d3x-morpheus-db/pom.xml</module>
         <module>d3x-morpheus-excel/pom.xml</module>
         <module>d3x-morpheus-json/pom.xml</module>
         <module>d3x-morpheus-quandl/pom.xml</module>
@@ -66,7 +65,7 @@
 
     <properties>
         <jdk.version>11</jdk.version>
-        <d3x.core.version>1.0.81</d3x.core.version>
+        <d3x.core.version>1.0.82</d3x.core.version>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2018 D3X Systems - All Rights Reserved
+ * Copyright (C) 2018-2019 D3X Systems - All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package com.d3x.morpheus.db;
 
+import javax.sql.DataSource;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
@@ -26,20 +27,17 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
-import javax.sql.DataSource;
 
+import com.d3x.morpheus.frame.DataFrame;
+import com.d3x.morpheus.range.Range;
 import com.d3x.morpheus.util.IO;
+import com.d3x.morpheus.util.functions.Function1;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-
-import com.d3x.morpheus.frame.DataFrame;
-import com.d3x.morpheus.range.Range;
-import com.d3x.morpheus.util.functions.Function1;
 
 /**
  * A unit test for database access
@@ -159,9 +157,9 @@ public class DbTests {
 
 
     @Test(dataProvider="databases", dependsOnMethods="testWriteProcessLog")
-    public void testProcessLog1(String dbName) {
-        var source = new DbSource(dataSourceMap.get(dbName));
-        var frame = source.read(options -> {
+    public void testProcessLog1(String dbName) throws Exception {
+        var conn = dataSourceMap.get(dbName).getConnection();
+        var frame = DataFrame.read(conn).apply(options -> {
             options.setSql("select * from ProcessLog");
             options.setColKeyMapper(v -> {
                 switch (v.toLowerCase()) {
@@ -185,10 +183,11 @@ public class DbTests {
 
 
     @Test(dataProvider="databases", dependsOnMethods="testEtfWrite")
-    public void testEtfRead(String dbName) {
-        var source = new DbSource(dataSourceMap.get(dbName));
-        final DataFrame<String,String> frame = source.read(options -> {
+    public void testEtfRead(String dbName) throws Exception {
+        var conn = dataSourceMap.get(dbName).getConnection();
+        var frame = DataFrame.read(conn).<String>apply(options -> {
             options.setSql("select Ticker, Fund_Name, Issuer, AUM, P_E from ETF");
+            options.setRowIndexColumnName("Ticker");
             options.setColKeyMapper(v -> {
                 switch (v.toLowerCase()) {
                     case "ticker":      return "Ticker";
@@ -200,8 +199,9 @@ public class DbTests {
                 }
             });
         });
-        Assert.assertEquals(frame.colCount(), 5);
-        Assert.assertTrue(frame.cols().containsAll(Arrays.asList("Ticker", "Fund Name", "Issuer", "AUM", "P/E")));
+        frame.out().print();
+        Assert.assertEquals(frame.colCount(), 4);
+        Assert.assertTrue(frame.cols().containsAll(Arrays.asList("Fund Name", "Issuer", "AUM", "P/E")));
         Assert.assertEquals(frame.rowCount(), 1685);
         Assert.assertTrue(frame.rows().containsAll(Arrays.asList("SPY", "QQQ", "IWD")));
         Assert.assertTrue(frame.col("Issuer").toValueStream().anyMatch("BlackRock"::equals));
@@ -259,7 +259,7 @@ public class DbTests {
 
 
     @Test(dataProvider = "databases")
-    public void testWriteFollowedByRead(String dbName) {
+    public void testWriteFollowedByRead(String dbName) throws Exception {
         var frame1 = createRandomFrame(10);
         var sink = new DbSink(dataSourceMap.get(dbName));
         sink.write(frame1, options -> {
@@ -268,12 +268,10 @@ public class DbTests {
             options.setAutoIncrementColumnName("RecordId");
         });
 
-        var counter = new AtomicInteger();
-        var source = new DbSource(dataSourceMap.get(dbName));
-        final DataFrame<Integer,String> frame2 = source.read(options -> {
+        var conn = dataSourceMap.get(dbName).getConnection();
+        var frame2 = DataFrame.read(conn).apply(options -> {
             options.setSql("select * from RandomTable");
             options.setExcludeColumnSet(Set.of("RecordId"));
-            options.setRowKeyMapper(rs -> counter.incrementAndGet());
         });
 
         frame1.out().print();

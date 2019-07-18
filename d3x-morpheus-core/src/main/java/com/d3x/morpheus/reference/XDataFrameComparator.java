@@ -213,8 +213,8 @@ abstract class XDataFrameComparator implements IntComparator {
             @Override
             @SuppressWarnings("unchecked")
             final int compareValues(int index1, int index2) {
-                final Comparable v1 = (Comparable)array.getValue(index1);
-                final Comparable v2 = (Comparable)array.getValue(index2);
+                var v1 = (Comparable)array.getValue(index1);
+                var v2 = (Comparable)array.getValue(index2);
                 if (v1 != null && v2 != null) {
                     return multiplier * v1.compareTo(v2);
                 } else if (v1 == null && v2 == null) {
@@ -321,7 +321,7 @@ abstract class XDataFrameComparator implements IntComparator {
         @SuppressWarnings("unchecked")
         public final IntComparator copy() {
             try {
-                final RowVectorComparator clone = (RowVectorComparator)super.clone();
+                var clone = (RowVectorComparator)super.clone();
                 clone.frame = this.frame;
                 clone.index = this.index;
                 clone.comparator = this.comparator;
@@ -374,7 +374,7 @@ abstract class XDataFrameComparator implements IntComparator {
         @SuppressWarnings("unchecked")
         public final IntComparator copy() {
             try {
-                final ColVectorComparator clone = (ColVectorComparator)super.clone();
+                var clone = (ColVectorComparator)super.clone();
                 clone.frame = this.frame;
                 clone.index = this.index;
                 clone.comparator = this.comparator;

@@ -315,7 +315,7 @@ class XDataFrameRows<R,C> extends XDataFrameAxisBase<R,C,R,C,DataFrameRow<R,C>,D
     @Override
     public final boolean getBoolean(R rowKey, int colOrdinal) {
         var data = frame().content();
-        var rowIndex = data.rowCoordinate(rowKey);
+        var rowIndex = data.rowCoordinateOrFail(rowKey);
         var colIndex = data.colCoordinateAt(colOrdinal);
         return data.booleanAt(rowIndex, colIndex);
     }
@@ -324,14 +324,14 @@ class XDataFrameRows<R,C> extends XDataFrameAxisBase<R,C,R,C,DataFrameRow<R,C>,D
     public final boolean getBooleanAt(int rowOrdinal, C colKey) {
         var data = frame().content();
         var rowIndex = data.rowCoordinateAt(rowOrdinal);
-        var colIndex = data.colCoordinate(colKey);
+        var colIndex = data.colCoordinateOrFail(colKey);
         return data.booleanAt(rowIndex, colIndex);
     }
 
     @Override
     public final int getInt(R rowKey, int colOrdinal) {
         var data = frame().content();
-        var rowIndex = data.rowCoordinate(rowKey);
+        var rowIndex = data.rowCoordinateOrFail(rowKey);
         var colIndex = data.colCoordinateAt(colOrdinal);
         return data.intAt(rowIndex, colIndex);
     }
@@ -340,14 +340,14 @@ class XDataFrameRows<R,C> extends XDataFrameAxisBase<R,C,R,C,DataFrameRow<R,C>,D
     public final int getIntAt(int rowOrdinal, C colKey) {
         var data = frame().content();
         var rowIndex = data.rowCoordinateAt(rowOrdinal);
-        var colIndex = data.colCoordinate(colKey);
+        var colIndex = data.colCoordinateOrFail(colKey);
         return data.intAt(rowIndex, colIndex);
     }
 
     @Override
     public final long getLong(R rowKey, int colOrdinal) {
         var data = frame().content();
-        var rowIndex = data.rowCoordinate(rowKey);
+        var rowIndex = data.rowCoordinateOrFail(rowKey);
         var colIndex = data.colCoordinateAt(colOrdinal);
         return data.longAt(rowIndex, colIndex);
     }
@@ -356,14 +356,14 @@ class XDataFrameRows<R,C> extends XDataFrameAxisBase<R,C,R,C,DataFrameRow<R,C>,D
     public final long getLongAt(int rowOrdinal, C colKey) {
         var data = frame().content();
         var rowIndex = data.rowCoordinateAt(rowOrdinal);
-        var colIndex = data.colCoordinate(colKey);
+        var colIndex = data.colCoordinateOrFail(colKey);
         return data.longAt(rowIndex, colIndex);
     }
 
     @Override
     public final double getDouble(R rowKey, int colOrdinal) {
         var data = frame().content();
-        var rowIndex = data.rowCoordinate(rowKey);
+        var rowIndex = data.rowCoordinateOrFail(rowKey);
         var colIndex = data.colCoordinateAt(colOrdinal);
         return data.doubleAt(rowIndex, colIndex);
     }
@@ -372,14 +372,14 @@ class XDataFrameRows<R,C> extends XDataFrameAxisBase<R,C,R,C,DataFrameRow<R,C>,D
     public final double getDoubleAt(int rowOrdinal, C colKey) {
         var data = frame().content();
         var rowIndex = data.rowCoordinateAt(rowOrdinal);
-        var colIndex = data.colCoordinate(colKey);
+        var colIndex = data.colCoordinateOrFail(colKey);
         return data.doubleAt(rowIndex, colIndex);
     }
 
     @Override
     public final <V> V getValue(R rowKey, int colOrdinal) {
         var data = frame().content();
-        var rowIndex = data.rowCoordinate(rowKey);
+        var rowIndex = data.rowCoordinateOrFail(rowKey);
         var colIndex = data.colCoordinateAt(colOrdinal);
         return data.valueAt(rowIndex, colIndex);
     }
@@ -388,14 +388,14 @@ class XDataFrameRows<R,C> extends XDataFrameAxisBase<R,C,R,C,DataFrameRow<R,C>,D
     public final <V> V getValueAt(int rowOrdinal, C colKey) {
         var data = frame().content();
         var rowIndex = data.rowCoordinateAt(rowOrdinal);
-        var colIndex = data.colCoordinate(colKey);
+        var colIndex = data.colCoordinateOrFail(colKey);
         return data.valueAt(rowIndex, colIndex);
     }
 
     @Override
     public final boolean setBoolean(R rowKey, int colOrdinal, boolean value) {
         var data = frame().content();
-        var rowIndex = data.rowCoordinate(rowKey);
+        var rowIndex = data.rowCoordinateOrFail(rowKey);
         var colIndex = data.colCoordinateAt(colOrdinal);
         return data.booleanAt(rowIndex, colIndex, value);
     }
@@ -404,14 +404,14 @@ class XDataFrameRows<R,C> extends XDataFrameAxisBase<R,C,R,C,DataFrameRow<R,C>,D
     public final boolean setBooleanAt(int rowOrdinal, C colKey, boolean value) {
         var data = frame().content();
         var rowIndex = data.rowCoordinateAt(rowOrdinal);
-        var colIndex = data.colCoordinate(colKey);
+        var colIndex = data.colCoordinateOrFail(colKey);
         return data.booleanAt(rowIndex, colIndex, value);
     }
 
     @Override
     public final int setInt(R rowKey, int colOrdinal, int value) {
         var data = frame().content();
-        var rowIndex = data.rowCoordinate(rowKey);
+        var rowIndex = data.rowCoordinateOrFail(rowKey);
         var colIndex = data.colCoordinateAt(colOrdinal);
         return data.intAt(rowIndex, colIndex, value);
     }
@@ -420,14 +420,14 @@ class XDataFrameRows<R,C> extends XDataFrameAxisBase<R,C,R,C,DataFrameRow<R,C>,D
     public final int setIntAt(int rowOrdinal, C colKey, int value) {
         var data = frame().content();
         var rowIndex = data.rowCoordinateAt(rowOrdinal);
-        var colIndex = data.colCoordinate(colKey);
+        var colIndex = data.colCoordinateOrFail(colKey);
         return data.intAt(rowIndex, colIndex, value);
     }
 
     @Override
     public final long setLong(R rowKey, int colOrdinal, long value) {
         var data = frame().content();
-        var rowIndex = data.rowCoordinate(rowKey);
+        var rowIndex = data.rowCoordinateOrFail(rowKey);
         var colIndex = data.colCoordinateAt(colOrdinal);
         return data.longAt(rowIndex, colIndex, value);
     }
@@ -436,14 +436,14 @@ class XDataFrameRows<R,C> extends XDataFrameAxisBase<R,C,R,C,DataFrameRow<R,C>,D
     public final long setLongAt(int rowOrdinal, C colKey, long value) {
         var data = frame().content();
         var rowIndex = data.rowCoordinateAt(rowOrdinal);
-        var colIndex = data.colCoordinate(colKey);
+        var colIndex = data.colCoordinateOrFail(colKey);
         return data.longAt(rowIndex, colIndex, value);
     }
 
     @Override
     public final double setDouble(R rowKey, int colOrdinal, double value) {
         var data = frame().content();
-        var rowIndex = data.rowCoordinate(rowKey);
+        var rowIndex = data.rowCoordinateOrFail(rowKey);
         var colIndex = data.colCoordinateAt(colOrdinal);
         return data.doubleAt(rowIndex, colIndex, value);
     }
@@ -452,14 +452,14 @@ class XDataFrameRows<R,C> extends XDataFrameAxisBase<R,C,R,C,DataFrameRow<R,C>,D
     public final double setDoubleAt(int rowOrdinal, C colKey, double value) {
         var data = frame().content();
         var rowIndex = data.rowCoordinateAt(rowOrdinal);
-        var colIndex = data.colCoordinate(colKey);
+        var colIndex = data.colCoordinateOrFail(colKey);
         return data.doubleAt(rowIndex, colIndex, value);
     }
 
     @Override
     public final <V> V setValue(R rowKey, int colOrdinal, V value) {
         var data = frame().content();
-        var rowIndex = data.rowCoordinate(rowKey);
+        var rowIndex = data.rowCoordinateOrFail(rowKey);
         var colIndex = data.colCoordinateAt(colOrdinal);
         return data.valueAt(rowIndex, colIndex, value);
     }
@@ -468,7 +468,7 @@ class XDataFrameRows<R,C> extends XDataFrameAxisBase<R,C,R,C,DataFrameRow<R,C>,D
     public final <V> V setValueAt(int rowOrdinal, C colKey, V value) {
         var data = frame().content();
         var rowIndex = data.rowCoordinateAt(rowOrdinal);
-        var colIndex = data.colCoordinate(colKey);
+        var colIndex = data.colCoordinateOrFail(colKey);
         return data.valueAt(rowIndex, colIndex, value);
     }
 }
