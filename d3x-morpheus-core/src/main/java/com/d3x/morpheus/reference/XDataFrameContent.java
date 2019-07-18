@@ -201,10 +201,30 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
     /**
      * Returns the in-memory row coordinate for row key
      * @param rowKey    the row key
+     * @return          the in-memory row coordinate, -1 if no match
+     */
+    final int rowCoordinate(R rowKey) throws DataFrameException {
+        return rowKeys.getCoordinate(rowKey);
+    }
+
+
+    /**
+     * Returns the in-memory column coordinate for column key
+     * @param colKey    the column key
+     * @return          the in-memory column coordinate, -1 if no match
+     */
+    final int colCoordinate(C colKey) throws DataFrameException {
+        return colKeys.getCoordinate(colKey);
+    }
+
+
+    /**
+     * Returns the in-memory row coordinate for row key
+     * @param rowKey    the row key
      * @return          the in-memory row coordinate
      * @throws DataFrameException   if no match for row key
      */
-    final int rowCoordinate(R rowKey) throws DataFrameException {
+    final int rowCoordinateOrFail(R rowKey) throws DataFrameException {
         var coord = rowKeys.getCoordinate(rowKey);
         if (coord >= 0) {
             return coord;
@@ -235,7 +255,7 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
      * @return          the in-memory column coordinate
      * @throws DataFrameException   if no match for column key
      */
-    final int colCoordinate(C colKey) throws DataFrameException {
+    final int colCoordinateOrFail(C colKey) throws DataFrameException {
         var coord = colKeys.getCoordinate(colKey);
         if (coord >= 0) {
             return coord;
@@ -702,20 +722,25 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
      * @return          the array of row data
      */
     private Array<?> getRowArray(R rowKey) {
-        var type = rowType(rowKey);
-        var array = Array.of(type, colKeys.size());
         var rowIndex = rowKeys.getCoordinate(rowKey);
-        switch (ArrayType.of(type)) {
-            case BOOLEAN:           return array.applyBooleans(v -> booleanAt(rowIndex, colCoordinateAt(v.index())));
-            case INTEGER:           return array.applyInts(v -> intAt(rowIndex, colCoordinateAt(v.index())));
-            case LONG:              return array.applyLongs(v -> longAt(rowIndex, colCoordinateAt(v.index())));
-            case DOUBLE:            return array.applyDoubles(v -> doubleAt(rowIndex, colCoordinateAt(v.index())));
-            case DATE:              return array.applyLongs(v -> longAt(rowIndex, colCoordinateAt(v.index())));
-            case INSTANT:           return array.applyLongs(v -> longAt(rowIndex, colCoordinateAt(v.index())));
-            case LOCAL_DATE:        return array.applyLongs(v -> longAt(rowIndex, colCoordinateAt(v.index())));
-            case LOCAL_TIME:        return array.applyLongs(v -> longAt(rowIndex, colCoordinateAt(v.index())));
-            case LOCAL_DATETIME:    return array.applyLongs(v -> longAt(rowIndex, colCoordinateAt(v.index())));
-            default:                return array.applyValues(v -> valueAt(rowIndex, colCoordinateAt(v.index())));
+        if (!isColumnStore()) {
+            return data.get(rowIndex);
+        } else {
+            var type = rowType(rowKey);
+            var array = ArrayBuilder.of(colKeys.capacity(), type);
+            switch (ArrayType.of(type)) {
+                case BOOLEAN:           colKeys.indexes().forEach(i -> array.setBoolean(i, booleanAt(rowIndex, i)));    break;
+                case INTEGER:           colKeys.indexes().forEach(i -> array.setInt(i, intAt(rowIndex, i)));            break;
+                case LONG:              colKeys.indexes().forEach(i -> array.setLong(i, longAt(rowIndex, i)));          break;
+                case DOUBLE:            colKeys.indexes().forEach(i -> array.setDouble(i, doubleAt(rowIndex, i)));      break;
+                case DATE:              colKeys.indexes().forEach(i -> array.setLong(i, longAt(rowIndex, i)));          break;
+                case INSTANT:           colKeys.indexes().forEach(i -> array.setLong(i, longAt(rowIndex, i)));          break;
+                case LOCAL_DATE:        colKeys.indexes().forEach(i -> array.setLong(i, longAt(rowIndex, i)));          break;
+                case LOCAL_TIME:        colKeys.indexes().forEach(i -> array.setLong(i, longAt(rowIndex, i)));          break;
+                case LOCAL_DATETIME:    colKeys.indexes().forEach(i -> array.setLong(i, longAt(rowIndex, i)));          break;
+                default:                colKeys.indexes().forEach(i -> array.setValue(i, valueAt(rowIndex, i)));        break;
+            }
+            return array.toArray();
         }
     }
 
@@ -726,20 +751,25 @@ class XDataFrameContent<R,C> implements Serializable, Cloneable {
      * @return          the array of column data
      */
     private Array<?> getColArray(C colKey) {
-        var type = colType(colKey);
-        var array = Array.of(type, rowKeys.size());
         var colIndex = colKeys.getCoordinate(colKey);
-        switch (ArrayType.of(type)) {
-            case BOOLEAN:           return array.applyBooleans(v -> booleanAt(rowCoordinateAt(v.index()), colIndex));
-            case INTEGER:           return array.applyInts(v -> intAt(rowCoordinateAt(v.index()), colIndex));
-            case LONG:              return array.applyLongs(v -> longAt(rowCoordinateAt(v.index()), colIndex));
-            case DOUBLE:            return array.applyDoubles(v -> doubleAt(rowCoordinateAt(v.index()), colIndex));
-            case DATE:              return array.applyLongs(v -> longAt(rowCoordinateAt(v.index()), colIndex));
-            case INSTANT:           return array.applyLongs(v -> longAt(rowCoordinateAt(v.index()), colIndex));
-            case LOCAL_DATE:        return array.applyLongs(v -> longAt(rowCoordinateAt(v.index()), colIndex));
-            case LOCAL_TIME:        return array.applyLongs(v -> longAt(rowCoordinateAt(v.index()), colIndex));
-            case LOCAL_DATETIME:    return array.applyLongs(v -> longAt(rowCoordinateAt(v.index()), colIndex));
-            default:                return array.applyValues(v -> valueAt(rowCoordinateAt(v.index()), colIndex));
+        if (isColumnStore()) {
+            return data.get(colIndex);
+        } else {
+            var type = colType(colKey);
+            var array = ArrayBuilder.of(rowKeys.capacity(), type);
+            switch (ArrayType.of(type)) {
+                case BOOLEAN:           rowKeys.indexes().forEach(i -> array.setBoolean(i, booleanAt(i, colIndex)));    break;
+                case INTEGER:           rowKeys.indexes().forEach(i -> array.setInt(i, intAt(i, colIndex)));            break;
+                case LONG:              rowKeys.indexes().forEach(i -> array.setLong(i, longAt(i, colIndex)));          break;
+                case DOUBLE:            rowKeys.indexes().forEach(i -> array.setDouble(i, doubleAt(i, colIndex)));      break;
+                case DATE:              rowKeys.indexes().forEach(i -> array.setLong(i, longAt(i, colIndex)));          break;
+                case INSTANT:           rowKeys.indexes().forEach(i -> array.setLong(i, longAt(i, colIndex)));          break;
+                case LOCAL_DATE:        rowKeys.indexes().forEach(i -> array.setLong(i, longAt(i, colIndex)));          break;
+                case LOCAL_TIME:        rowKeys.indexes().forEach(i -> array.setLong(i, longAt(i, colIndex)));          break;
+                case LOCAL_DATETIME:    rowKeys.indexes().forEach(i -> array.setLong(i, longAt(i, colIndex)));          break;
+                default:                rowKeys.indexes().forEach(i -> array.setValue(i, valueAt(i, colIndex)));        break;
+            }
+            return array.toArray();
         }
     }
 

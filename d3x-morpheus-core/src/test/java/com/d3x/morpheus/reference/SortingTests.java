@@ -670,4 +670,75 @@ public class SortingTests {
     }
 
 
+    @Test()
+    public void sortFilter1() {
+        var rows = Range.of(0, 1000).map(i -> "R" + i);
+        var cols = Range.of(0, 10).map(i -> "C" + i);
+        var frame = DataFrame.ofDoubles(rows, cols, v -> Math.random());
+        var filter = frame.rows().select("R0", "R20", "R44", "R89", "R150");
+        var sorted = filter.rows().sort(true, "C2");
+        var cursor = sorted.cursor().col("C2");
+        sorted.out().print();
+        for (int i=1; i<sorted.rowCount(); ++i) {
+            var v1 = cursor.rowAt(i-1).getDouble();
+            var v2 = cursor.rowAt(i).getDouble();
+            Assert.assertEquals(Double.compare(v1, v2), -1);
+        }
+    }
+
+
+    @Test()
+    public void sortFilter2() {
+        var rows = Range.of(0, 1000).map(i -> "R" + i);
+        var cols = Range.of(0, 100).map(i -> "C" + i);
+        var frame = DataFrame.ofDoubles(rows, cols, v -> Math.random());
+        var filter = frame.cols().select("C0", "C20", "C44", "C89", "C99");
+        var sorted = filter.cols().sort(true, "R2");
+        var cursor = sorted.cursor().row("R2");
+        sorted.out().print();
+        for (int i=1; i<sorted.colCount(); ++i) {
+            var v1 = cursor.colAt(i-1).getDouble();
+            var v2 = cursor.colAt(i).getDouble();
+            Assert.assertEquals(Double.compare(v1, v2), -1);
+        }
+    }
+
+
+
+    @Test()
+    public void sortFilterTranspose1() {
+        var rows = Range.of(0, 100).map(i -> "R" + i);
+        var cols = Range.of(0, 100).map(i -> "C" + i);
+        var frame = DataFrame.ofDoubles(rows, cols, v -> Math.random()).transpose();
+        var filter = frame.rows().select("C0", "C20", "C44", "C89", "C99");
+        var sorted = filter.rows().sort(true, "R2");
+        var cursor = sorted.cursor().col("R2");
+        sorted.out().print();
+        for (int i=1; i<sorted.rowCount(); ++i) {
+            var v1 = cursor.rowAt(i-1).getDouble();
+            var v2 = cursor.rowAt(i).getDouble();
+            Assert.assertEquals(Double.compare(v1, v2), -1);
+        }
+    }
+
+
+
+    @Test()
+    public void sortFilterTranspose2() {
+        var rows = Range.of(0, 100).map(i -> "R" + i);
+        var cols = Range.of(0, 100).map(i -> "C" + i);
+        var frame = DataFrame.ofDoubles(rows, cols, v -> Math.random()).transpose();
+        var filter = frame.cols().select("R0", "R20", "R44", "R89", "R99");
+        var sorted = filter.cols().sort(true, "C2");
+        var cursor = sorted.cursor().row("C2");
+        sorted.out().print();
+        for (int i=1; i<sorted.colCount(); ++i) {
+            var v1 = cursor.colAt(i-1).getDouble();
+            var v2 = cursor.colAt(i).getDouble();
+            Assert.assertEquals(Double.compare(v1, v2), -1);
+        }
+    }
+
+
+
 }
