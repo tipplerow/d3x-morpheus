@@ -15,6 +15,7 @@
  */
 package com.d3x.morpheus.wb;
 
+import java.io.File;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -55,16 +56,19 @@ public class WBIndicatorTest {
 
     @Test()
     public void testC02() {
-        var expected = DataFrame.read("/indicators/EN.ATM.CO2E.PC.csv").csv(LocalDate.class, options -> {
+        var path = "/indicators/EN.ATM.CO2E.PC.csv";
+        var expected = DataFrame.read(path).csv(LocalDate.class, options -> {
             options.setRowKeyColumnIndex(0);
         });
-        final DataFrame<LocalDate,String> actual = source.read(options -> {
+        var actual = source.read(options -> {
             options.setBatchSize(1000);
             options.setIndicator("EN.ATM.CO2E.PC");
             options.setStartDate(LocalDate.of(2000, 1, 1));
             options.setEndDate(LocalDate.of(2013, 1, 1));
             options.setCountries("JP", "US", "DE", "IT", "GB", "FR", "CA", "CN");
         });
+
+        //actual.write().csv(new File("EN.ATM.CO2E.PC.csv")).apply();
 
         expected.out().print(100);
         actual.out().print(100);
