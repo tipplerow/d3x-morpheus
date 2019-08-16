@@ -24,8 +24,10 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.ParameterizedType;
 import java.net.URL;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.ToDoubleFunction;
 import java.util.stream.DoubleStream;
 import java.util.stream.Stream;
 
@@ -217,6 +219,51 @@ public interface DoubleSeries<K> extends DataSeries<K,Double> {
             IO.close(writer);
         }
     }
+
+
+    /**
+     * Returns a newly created double series based on the args
+     * @param keyType   the key type
+     * @param consumer  the consumer to receive builder
+     * @param <K>       the series type
+     * @return          the resulting series
+     */
+    static <K> DoubleSeries<K> of(Class<K> keyType, Consumer<DoubleSeriesBuilder<K>> consumer) {
+        var builder = DoubleSeries.builder(keyType);
+        consumer.accept(builder);
+        return builder.build();
+    }
+
+
+    /**
+     * Returns a newly created double series based on the args
+     * @param keyType   the key type
+     * @param keys      the input keys
+     * @param values    the value generating function
+     * @param <K>       the series type
+     * @return          newly created double series
+     */
+    static <K> DoubleSeries<K> of(Class<K> keyType, Stream<K> keys, ToDoubleFunction<K> values) {
+        var builder = DoubleSeries.builder(keyType);
+        keys.forEach(key -> builder.putDouble(key, values.applyAsDouble(key)));
+        return builder.build();
+    }
+
+
+    /**
+     * Returns a newly created double series based on the args
+     * @param keyType   the key type
+     * @param keys      the input keys
+     * @param values    the value generating function
+     * @param <K>       the key type
+     * @return          newly created double series
+     */
+    static <K> DoubleSeries<K> of(Class<K> keyType, Iterable<K> keys, ToDoubleFunction<K> values) {
+        var builder = DoubleSeries.builder(keyType);
+        keys.forEach(key -> builder.putDouble(key, values.applyAsDouble(key)));
+        return builder.build();
+    }
+
 
 
     /**
