@@ -59,7 +59,7 @@ class SparseArrayWithIntCoding<T> extends ArrayBase<T> {
      * @param defaultValue  the default value for array
      * @param coding        the coding for this array
      */
-    SparseArrayWithIntCoding(int length, double fillPct, T defaultValue, IntCoding<T> coding) {
+    SparseArrayWithIntCoding(int length, float fillPct, T defaultValue, IntCoding<T> coding) {
         super(coding.getType(), ArrayStyle.SPARSE, false);
         this.length = length;
         this.coding = coding;
@@ -130,7 +130,7 @@ class SparseArrayWithIntCoding<T> extends ArrayBase<T> {
 
     @Override()
     public final Array<T> copy(int[] indexes) {
-        var fillPct = (double)codes.size() / length();
+        var fillPct = (float)codes.size() / length();
         var clone = new SparseArrayWithIntCoding<T>(indexes.length, fillPct, defaultValue, coding);
         for (int i = 0; i < indexes.length; ++i) {
             var code = getInt(indexes[i]);
@@ -142,7 +142,7 @@ class SparseArrayWithIntCoding<T> extends ArrayBase<T> {
 
     @Override
     public Array<T> copy(Array<Integer> indexes) {
-        var fillPct = (double)codes.size() / length();
+        var fillPct = (float)codes.size() / length();
         var clone = new SparseArrayWithIntCoding<T>(indexes.length(), fillPct, defaultValue, coding);
         for (int i = 0; i < indexes.length(); ++i) {
             var code = getInt(indexes.getInt(i));
@@ -155,7 +155,7 @@ class SparseArrayWithIntCoding<T> extends ArrayBase<T> {
     @Override()
     public final Array<T> copy(int start, int end) {
         var length = end - start;
-        var fillPct = (double)codes.size() / length();
+        var fillPct = (float)codes.size() / length();
         var clone = new SparseArrayWithIntCoding<T>(length, fillPct, defaultValue, coding);
         for (int i=0; i<length; ++i) {
             var code = getInt(start+i);

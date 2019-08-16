@@ -80,7 +80,7 @@ class SparseArrayOfZonedDateTimes extends ArrayBase<ZonedDateTime> {
      * @param length    the length for this array
      * @param fillPct   the fill percent for array (0.2 implies 20% filled)
      */
-    SparseArrayOfZonedDateTimes(int length, double fillPct, ZonedDateTime defaultValue) {
+    SparseArrayOfZonedDateTimes(int length, float fillPct, ZonedDateTime defaultValue) {
         super(ZonedDateTime.class, ArrayStyle.SPARSE, false);
         this.length = length;
         this.defaultValue = defaultValue;
@@ -152,7 +152,7 @@ class SparseArrayOfZonedDateTimes extends ArrayBase<ZonedDateTime> {
 
     @Override()
     public final Array<ZonedDateTime> copy(int[] indexes) {
-        var fillPct = (double)values.size() / length();
+        var fillPct = (float)values.size() / length();
         var clone = new SparseArrayOfZonedDateTimes(indexes.length, fillPct, defaultValue);
         for (int i = 0; i < indexes.length; ++i) {
             var value = getLong(indexes[i]);
@@ -167,7 +167,7 @@ class SparseArrayOfZonedDateTimes extends ArrayBase<ZonedDateTime> {
 
     @Override
     public Array<ZonedDateTime> copy(Array<Integer> indexes) {
-        var fillPct = (double)values.size() / length();
+        var fillPct = (float)values.size() / length();
         var clone = new SparseArrayOfZonedDateTimes(indexes.length(), fillPct, defaultValue);
         for (int i = 0; i < indexes.length(); ++i) {
             var value = getLong(indexes.getInt(i));
@@ -183,7 +183,7 @@ class SparseArrayOfZonedDateTimes extends ArrayBase<ZonedDateTime> {
     @Override()
     public final Array<ZonedDateTime> copy(int start, int end) {
         var length = end - start;
-        var fillPct = (double)values.size() / length();
+        var fillPct = (float)values.size() / length();
         var clone = new SparseArrayOfZonedDateTimes(length, fillPct, defaultValue);
         for (int i=0; i<length; ++i) {
             var value = getLong(start+i);

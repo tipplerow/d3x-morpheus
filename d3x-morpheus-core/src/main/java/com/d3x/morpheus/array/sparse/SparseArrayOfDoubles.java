@@ -54,7 +54,7 @@ class SparseArrayOfDoubles extends ArrayBase<Double> {
      * @param fillPct   the fill percent for array (0.2 implies 20% filled)
      * @param defaultValue  the default value for array
      */
-    SparseArrayOfDoubles(int length, double fillPct, Double defaultValue) {
+    SparseArrayOfDoubles(int length, float fillPct, Double defaultValue) {
         super(Double.class, ArrayStyle.SPARSE, false);
         this.length = length;
         this.defaultValue = defaultValue != null ? defaultValue : Double.NaN;
@@ -119,7 +119,7 @@ class SparseArrayOfDoubles extends ArrayBase<Double> {
 
     @Override()
     public final Array<Double> copy(int[] indexes) {
-        var fillPct = (double)values.size() / length();
+        var fillPct = (float)values.size() / length();
         var clone = new SparseArrayOfDoubles(indexes.length, fillPct, defaultValue);
         for (int i = 0; i < indexes.length; ++i) {
             var value = getDouble(indexes[i]);
@@ -131,7 +131,7 @@ class SparseArrayOfDoubles extends ArrayBase<Double> {
 
     @Override
     public Array<Double> copy(Array<Integer> indexes) {
-        var fillPct = (double)values.size() / length();
+        var fillPct = (float)values.size() / length();
         var clone = new SparseArrayOfDoubles(indexes.length(), fillPct, defaultValue);
         for (int i = 0; i < indexes.length(); ++i) {
             var value = getDouble(indexes.getInt(i));
@@ -144,7 +144,7 @@ class SparseArrayOfDoubles extends ArrayBase<Double> {
     @Override()
     public final Array<Double> copy(int start, int end) {
         var length = end - start;
-        var fillPct = (double)values.size() / length();
+        var fillPct = (float)values.size() / length();
         var clone = new SparseArrayOfDoubles(length, fillPct, defaultValue);
         for (int i=0; i<length; ++i) {
             var value = getDouble(start+i);

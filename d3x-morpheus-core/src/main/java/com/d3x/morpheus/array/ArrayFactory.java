@@ -193,6 +193,6 @@ public abstract class ArrayFactory {
          * @param defaultValue  the default value for array
          * @return              the newly created array
          */
-        <T> Array<T> apply(Class<T> type, int length, double fillPct, T defaultValue);
+        <T> Array<T> apply(Class<T> type, int length, float fillPct, T defaultValue);
     }
 }

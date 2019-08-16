@@ -69,13 +69,13 @@ public class SparseArrayConstructor implements ArrayFactory.Constructor {
 
     @Override
     public <T> Array<T> apply(Class<T> type, int length, T defaultValue, String path) {
-        return apply(type, length, 0.2d, defaultValue);
+        return apply(type, length, 0.2f, defaultValue);
     }
 
 
     @Override
     @SuppressWarnings("unchecked")
-    public <T> Array<T> apply(Class<T> type, int length, double fillPct, T defaultValue) {
+    public <T> Array<T> apply(Class<T> type, int length, float fillPct, T defaultValue) {
         if (type.isEnum()) {
             var enumCoding = (IntCoding<T>)IntCoding.ofEnum((Class<Enum>)type);
             return new SparseArrayWithIntCoding<>(length, fillPct, defaultValue, enumCoding);

@@ -766,7 +766,7 @@ public interface Array<T> extends Iterable<T>, Serializable, Cloneable {
      * @param fillPct   the fill percentage between 0..1 (1 for dense array, < 1 for sparse array)
      * @return          the newly created array
      */
-    static <V> Array<V> of(Class<V> type, int length, double fillPct) {
+    static <V> Array<V> of(Class<V> type, int length, float fillPct) {
         return Array.of(type, length, ArrayType.defaultValue(type), fillPct);
     }
 
@@ -778,7 +778,7 @@ public interface Array<T> extends Iterable<T>, Serializable, Cloneable {
      * @param fillPct       the fill percentage between 0..1 (1 for dense array, < 1 for sparse array)
      * @return              the newly created array
      */
-    static <V> Array<V> of(Class<V> type, int length, V defaultValue, double fillPct) {
+    static <V> Array<V> of(Class<V> type, int length, V defaultValue, float fillPct) {
         if (fillPct < 1f) {
             return ArrayFactory.sparse().apply(type, length, fillPct, defaultValue);
         } else {
@@ -814,7 +814,7 @@ public interface Array<T> extends Iterable<T>, Serializable, Cloneable {
      * @return              the newly created array
      */
     @SuppressWarnings("unchecked")
-    static <V> Array<V> ofObjects(int length, double fillPct) {
+    static <V> Array<V> ofObjects(int length, float fillPct) {
         return of((Class<V>)Object.class, length, fillPct);
     }
 
@@ -826,7 +826,7 @@ public interface Array<T> extends Iterable<T>, Serializable, Cloneable {
      * @return              the newly created array
      */
     @SuppressWarnings("unchecked")
-    static <V> Array<V> ofObjects(int length, V defaultValue, double fillPct) {
+    static <V> Array<V> ofObjects(int length, V defaultValue, float fillPct) {
         return Array.<V>of((Class<V>)Object.class, length, defaultValue, fillPct);
     }
 

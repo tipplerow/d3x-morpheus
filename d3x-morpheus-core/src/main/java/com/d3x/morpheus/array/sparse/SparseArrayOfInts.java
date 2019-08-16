@@ -54,7 +54,7 @@ class SparseArrayOfInts extends ArrayBase<Integer> {
      * @param fillPct   the fill percent for array (0.2 implies 20% filled)
      * @param defaultValue  the default value for array
      */
-    SparseArrayOfInts(int length, double fillPct, Integer defaultValue) {
+    SparseArrayOfInts(int length, float fillPct, Integer defaultValue) {
         super(Integer.class, ArrayStyle.SPARSE, false);
         this.length = length;
         this.defaultValue = defaultValue != null ? defaultValue : 0;
@@ -119,7 +119,7 @@ class SparseArrayOfInts extends ArrayBase<Integer> {
 
     @Override()
     public final Array<Integer> copy(int[] indexes) {
-        var fillPct = (double)values.size() / length();
+        var fillPct = (float)values.size() / length();
         var clone = new SparseArrayOfInts(indexes.length, fillPct, defaultValue);
         for (int i = 0; i < indexes.length; ++i) {
             var value = getInt(indexes[i]);
@@ -131,7 +131,7 @@ class SparseArrayOfInts extends ArrayBase<Integer> {
 
     @Override
     public Array<Integer> copy(Array<Integer> indexes) {
-        var fillPct = (double)values.size() / length();
+        var fillPct = (float)values.size() / length();
         var clone = new SparseArrayOfInts(indexes.length(), fillPct, defaultValue);
         for (int i = 0; i < indexes.length(); ++i) {
             var value = getInt(indexes.getInt(i));
@@ -144,7 +144,7 @@ class SparseArrayOfInts extends ArrayBase<Integer> {
     @Override()
     public final Array<Integer> copy(int start, int end) {
         var length = end - start;
-        var fillPct = (double)values.size() / length();
+        var fillPct = (float)values.size() / length();
         var clone = new SparseArrayOfInts(length, fillPct, defaultValue);
         for (int i=0; i<length; ++i) {
             var value = getInt(start+i);
