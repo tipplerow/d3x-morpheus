@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.d3xsystems</groupId>
     <artifactId>d3x-morpheus</artifactId>
-    <version>1.0.23</version>
+    <version>1.0.24</version>
     <packaging>pom</packaging>
 
     <modules>
@@ -65,7 +65,7 @@
 
     <properties>
         <jdk.version>11</jdk.version>
-        <d3x.core.version>1.0.83</d3x.core.version>
+        <d3x.core.version>[1.0.0,2.0.0)</d3x.core.version>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
