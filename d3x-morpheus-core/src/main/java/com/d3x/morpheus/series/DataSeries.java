@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.lang.reflect.ParameterizedType;
 import java.net.URL;
+import java.util.function.ToDoubleFunction;
 import java.util.stream.Stream;
 
 import com.d3x.core.util.Generic;
@@ -135,6 +136,18 @@ public interface DataSeries<K,V> extends Cloneable {
      */
     default Option<K> lastKey() {
         return isEmpty() ? Option.empty() : Option.of(getKey(size()-1));
+    }
+
+    /**
+     * Maps this data series to a double series
+     * @param mapper    the mapper function
+     * @return          the resulting series
+     */
+    default DoubleSeries<K> mapToDoubles(ToDoubleFunction<K> mapper) {
+        var keyClass = keyClass();
+        var mapped = DoubleSeries.builder(keyClass).capacity(this.size());
+        this.keys().forEach(v -> mapped.putDouble(v, mapper.applyAsDouble(v)));
+        return mapped.build();
     }
 
 

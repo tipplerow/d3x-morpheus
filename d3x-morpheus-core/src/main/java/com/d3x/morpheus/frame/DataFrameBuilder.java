@@ -39,12 +39,15 @@ import com.d3x.morpheus.index.IndexException;
  */
 public class DataFrameBuilder<R,C> {
 
+    private static final int DEFAULT_ROW_CAPACITY = 1000;
+    private static final int DEFAULT_COL_CAPACITY = 100;
+
     private Lock lock;
     private Class<R> rowType;
     private Class<C> colType;
     private Index<R> rowKeys;
-    private int rowCapacity = 1000;
-    private Map<C,Double> fillPercentMap;
+    private int rowCapacity = DEFAULT_ROW_CAPACITY;
+    private Map<C,Float> fillPercentMap;
     private Map<C,ArrayBuilder<?>> arrayMap;
 
 
@@ -94,7 +97,7 @@ public class DataFrameBuilder<R,C> {
      * @param fillPct   the column fill percent which must be > 0 and <= 1 (1 implies dense array, < 1 implies sparse array)
      * @return          this builder
      */
-    public final DataFrameBuilder<R,C> fillPct(@lombok.NonNull C colKey, double fillPct) {
+    public final DataFrameBuilder<R,C> fillPct(@lombok.NonNull C colKey, float fillPct) {
         if (fillPct < 0 || fillPct > 1) {
             throw new IllegalStateException("Invalid fill percent for " + colKey + ", must be > 0 and <= 1, not " + fillPct);
         } else {
@@ -111,13 +114,38 @@ public class DataFrameBuilder<R,C> {
      * @return              this builder
      */
     public final DataFrameBuilder<R,C> capacity(int rowCapacity, int colCapacity) {
-        if (rowKeys != null) {
-            return this;
-        } else {
-            this.rowCapacity = Math.max(rowCapacity, 10);
-            this.rowKeys = Index.of(rowType, this.rowCapacity);
-            this.arrayMap = new LinkedHashMap<>(Math.max(colCapacity, 10));
-            return this;
+        try {
+            this.acquireLock();
+            this.rowCapacity(rowCapacity);
+            if (arrayMap != null) {
+                return this;
+            } else {
+                this.arrayMap = new LinkedHashMap<>(Math.max(colCapacity, 10));
+                return this;
+            }
+        } finally {
+            this.releaseLock();
+        }
+    }
+
+
+    /**
+     * Sets the row capacity for this builder if not already set
+     * @param rowCapacity   the initial row capacity
+     * @return              this builder
+     */
+    public final DataFrameBuilder<R,C> rowCapacity(int rowCapacity) {
+        try {
+            this.acquireLock();
+            if (rowKeys != null) {
+                return this;
+            } else {
+                this.rowCapacity = Math.max(rowCapacity, 10);
+                this.rowKeys = Index.of(rowType, this.rowCapacity);
+                return this;
+            }
+        } finally {
+            this.releaseLock();
         }
     }
 
@@ -209,7 +237,7 @@ public class DataFrameBuilder<R,C> {
         if (array != null) {
             return (ArrayBuilder<T>)array;
         } else {
-            var fillPct = fillPercentMap.getOrDefault(colKey, 1d);
+            var fillPct = fillPercentMap.getOrDefault(colKey, 1f);
             array = ArrayBuilder.of(rowCapacity, fillPct);
             this.arrayMap.put(colKey, array);
             return (ArrayBuilder<T>)array;
@@ -284,6 +312,43 @@ public class DataFrameBuilder<R,C> {
             return this;
         }
     }
+
+
+    /**
+     * Adds all rows to this builder
+     * @param rowKeys   the row keys to add
+     * @return          this builder
+     */
+    public DataFrameBuilder<R,C> addRows(Iterable<R> rowKeys) {
+        try {
+            this.acquireLock();
+            this.rowCapacity(DEFAULT_ROW_CAPACITY);
+            rowKeys.forEach(this::putRow);
+            return this;
+        } finally {
+            this.releaseLock();
+        }
+    }
+
+
+    /**
+     * Adds a column to this builder for the data type
+     * @param colKey    the column key to add
+     * @param dataType  the data type
+     * @return          this builder
+     */
+    public DataFrameBuilder<R,C> addColumn(C colKey, Class<?> dataType) {
+        this.acquireLock();
+        this.capacity(DEFAULT_ROW_CAPACITY, DEFAULT_COL_CAPACITY);
+        var array = arrayMap.get(colKey);
+        if (array == null) {
+            var fillPct = fillPercentMap.getOrDefault(colKey, 1f);
+            array = ArrayBuilder.of(rowCapacity, dataType, null, fillPct);
+            this.arrayMap.put(colKey, array);
+        }
+        return this;
+    }
+
 
 
     /**

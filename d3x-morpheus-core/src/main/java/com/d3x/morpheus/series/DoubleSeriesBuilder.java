@@ -33,6 +33,7 @@ import gnu.trove.map.TObjectDoubleMap;
 import gnu.trove.map.hash.TIntDoubleHashMap;
 import gnu.trove.map.hash.TLongDoubleHashMap;
 import gnu.trove.map.hash.TObjectDoubleHashMap;
+import lombok.NonNull;
 
 /**
  * An interface to a Builder for DoubleSeries
@@ -65,6 +66,15 @@ public interface DoubleSeriesBuilder<K> extends DataSeriesBuilder<K,Double> {
      * @return          this builder
      */
     DoubleSeriesBuilder<K> putDouble(@lombok.NonNull K key, double value);
+
+    /**
+     * Adds the value to the existing value for key, or simply puts value if no existing value
+     * @param key       the entry key
+     * @param value     the entry value
+     * @return          this builder
+     */
+    DoubleSeriesBuilder<K> plusDouble(@lombok.NonNull K key, double value);
+
 
 
     @Override
@@ -131,6 +141,21 @@ public interface DoubleSeriesBuilder<K> extends DataSeriesBuilder<K,Double> {
             this.values.put(key, value);
             return this;
         }
+
+        @Override
+        public DoubleSeriesBuilder<K> plusDouble(@NonNull K key, double value) {
+            this.capacity(100);
+            if (!values.containsKey(key)) {
+                return putDouble(key ,value);
+            } else if (!Double.isNaN(value)) {
+                var existing = values.get(key);
+                var v1 = Double.isNaN(existing) ? 0d : existing;
+                this.values.put(key, v1 + value);
+                return this;
+            } else {
+                return this;
+            }
+        }
     }
 
 
@@ -181,6 +206,22 @@ public interface DoubleSeriesBuilder<K> extends DataSeriesBuilder<K,Double> {
             this.values.put(coding.getCode(key), value);
             return this;
         }
+
+        @Override
+        public DoubleSeriesBuilder<K> plusDouble(@NonNull K key, double value) {
+            this.capacity(100);
+            var code = coding.getCode(key);
+            if (!values.containsKey(code)) {
+                return putDouble(key ,value);
+            } else if (!Double.isNaN(value)) {
+                var existing = values.get(code);
+                var v1 = Double.isNaN(existing) ? 0d : existing;
+                this.values.put(code, v1 + value);
+                return this;
+            } else {
+                return this;
+            }
+        }
     }
 
 
@@ -230,6 +271,22 @@ public interface DoubleSeriesBuilder<K> extends DataSeriesBuilder<K,Double> {
             this.keys.append(key);
             this.values.put(coding.getCode(key), value);
             return this;
+        }
+
+        @Override
+        public DoubleSeriesBuilder<K> plusDouble(@NonNull K key, double value) {
+            this.capacity(100);
+            var code = coding.getCode(key);
+            if (!values.containsKey(code)) {
+                return putDouble(key ,value);
+            } else if (!Double.isNaN(value)) {
+                var existing = values.get(code);
+                var v1 = Double.isNaN(existing) ? 0d : existing;
+                this.values.put(code, v1 + value);
+                return this;
+            } else {
+                return this;
+            }
         }
     }
 

@@ -159,55 +159,63 @@ public class DbTests {
     @Test(dataProvider="databases", dependsOnMethods="testWriteProcessLog")
     public void testProcessLog1(String dbName) throws Exception {
         var conn = dataSourceMap.get(dbName).getConnection();
-        var frame = DataFrame.read(conn).apply(options -> {
-            options.setSql("select * from ProcessLog");
-            options.setColKeyMapper(v -> {
-                switch (v.toLowerCase()) {
-                    case "node":                    return "Node";
-                    case "executablepath":          return "ExecutablePath";
-                    case "terminationdate":         return "TerminationDate";
-                    case "minimumworkingsetsize":   return "MinimumWorkingSetSize";
-                    default:                        return v;
-                }
+        try {
+            var resultSet = conn.createStatement().executeQuery("select * from ProcessLog");
+            var frame = DataFrame.read(resultSet).apply(options -> {
+                options.setColKeyMapper(v -> {
+                    switch (v.toLowerCase()) {
+                        case "node":                    return "Node";
+                        case "executablepath":          return "ExecutablePath";
+                        case "terminationdate":         return "TerminationDate";
+                        case "minimumworkingsetsize":   return "MinimumWorkingSetSize";
+                        default:                        return v;
+                    }
+                });
             });
-        });
-        Assert.assertEquals(frame.colCount(), 46);
-        Assert.assertTrue(frame.cols().containsAll(Arrays.asList("Node", "ExecutablePath", "TerminationDate", "MinimumWorkingSetSize")));
-        Assert.assertEquals(frame.rowCount(), 43);
-        Assert.assertTrue(frame.rows().containsAll(Arrays.asList(1, 2, 3)));
-        Assert.assertTrue(frame.col("ExecutablePath").toValueStream().anyMatch("C:\\Windows\\system32\\taskhost.exe"::equals));
-        Assert.assertEquals(frame.col("TerminationDate").dataClass(), LocalDate.class);
-        Assert.assertEquals(frame.col("MinimumWorkingSetSize").dataClass(), Double.class);
-        frame.out().print();
+            Assert.assertEquals(frame.colCount(), 46);
+            Assert.assertTrue(frame.cols().containsAll(Arrays.asList("Node", "ExecutablePath", "TerminationDate", "MinimumWorkingSetSize")));
+            Assert.assertEquals(frame.rowCount(), 43);
+            Assert.assertTrue(frame.rows().containsAll(Arrays.asList(1, 2, 3)));
+            Assert.assertTrue(frame.col("ExecutablePath").toValueStream().anyMatch("C:\\Windows\\system32\\taskhost.exe"::equals));
+            Assert.assertEquals(frame.col("TerminationDate").dataClass(), LocalDate.class);
+            Assert.assertEquals(frame.col("MinimumWorkingSetSize").dataClass(), Double.class);
+            frame.out().print();
+        } finally {
+            IO.close(conn);
+        }
     }
 
 
     @Test(dataProvider="databases", dependsOnMethods="testEtfWrite")
     public void testEtfRead(String dbName) throws Exception {
         var conn = dataSourceMap.get(dbName).getConnection();
-        var frame = DataFrame.read(conn).<String>apply(options -> {
-            options.setSql("select Ticker, Fund_Name, Issuer, AUM, P_E from ETF");
-            options.setRowIndexColumnName("Ticker");
-            options.setColKeyMapper(v -> {
-                switch (v.toLowerCase()) {
-                    case "ticker":      return "Ticker";
-                    case "fund_name":   return "Fund Name";
-                    case "issuer":      return "Issuer";
-                    case "aum":         return "AUM";
-                    case "p_e":         return "P/E";
-                    default:            return v;
-                }
+        try {
+            var resultSet = conn.createStatement().executeQuery("select Ticker, Fund_Name, Issuer, AUM, P_E from ETF");
+            var frame = DataFrame.read(resultSet).<String>apply(options -> {
+                options.setRowIndexColumnName("Ticker");
+                options.setColKeyMapper(v -> {
+                    switch (v.toLowerCase()) {
+                        case "ticker":      return "Ticker";
+                        case "fund_name":   return "Fund Name";
+                        case "issuer":      return "Issuer";
+                        case "aum":         return "AUM";
+                        case "p_e":         return "P/E";
+                        default:            return v;
+                    }
+                });
             });
-        });
-        frame.out().print();
-        Assert.assertEquals(frame.colCount(), 4);
-        Assert.assertTrue(frame.cols().containsAll(Arrays.asList("Fund Name", "Issuer", "AUM", "P/E")));
-        Assert.assertEquals(frame.rowCount(), 1685);
-        Assert.assertTrue(frame.rows().containsAll(Arrays.asList("SPY", "QQQ", "IWD")));
-        Assert.assertTrue(frame.col("Issuer").toValueStream().anyMatch("BlackRock"::equals));
-        Assert.assertEquals(frame.col("Issuer").dataClass(), String.class);
-        Assert.assertEquals(frame.col("P/E").dataClass(), Double.class);
-        frame.out().print();
+            frame.out().print();
+            Assert.assertEquals(frame.colCount(), 4);
+            Assert.assertTrue(frame.cols().containsAll(Arrays.asList("Fund Name", "Issuer", "AUM", "P/E")));
+            Assert.assertEquals(frame.rowCount(), 1685);
+            Assert.assertTrue(frame.rows().containsAll(Arrays.asList("SPY", "QQQ", "IWD")));
+            Assert.assertTrue(frame.col("Issuer").toValueStream().anyMatch("BlackRock"::equals));
+            Assert.assertEquals(frame.col("Issuer").dataClass(), String.class);
+            Assert.assertEquals(frame.col("P/E").dataClass(), Double.class);
+            frame.out().print();
+        } finally {
+            IO.close(conn);
+        }
     }
 
 
@@ -269,13 +277,17 @@ public class DbTests {
         });
 
         var conn = dataSourceMap.get(dbName).getConnection();
-        var frame2 = DataFrame.read(conn).apply(options -> {
-            options.setSql("select * from RandomTable");
-            options.setExcludeColumnSet(Set.of("RecordId"));
-        });
+        try {
+            var resultSet = conn.createStatement().executeQuery("select * from RandomTable");
+            var frame2 = DataFrame.read(resultSet).apply(options -> {
+                options.setExcludeColumnSet(Set.of("RecordId"));
+            });
 
-        frame1.out().print();
-        frame2.out().print();
+            frame1.out().print();
+            frame2.out().print();
+        } finally {
+            IO.close(conn);
+        }
     }
 
 

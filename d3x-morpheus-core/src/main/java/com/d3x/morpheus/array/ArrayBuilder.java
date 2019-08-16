@@ -31,7 +31,7 @@ public class ArrayBuilder<T> {
 
     private int capacity;
     private int index = 0;
-    private double fillPct;
+    private float fillPct;
     private Class<T> type;
     private Array<T> array;
     private ArrayType dataType;
@@ -45,7 +45,7 @@ public class ArrayBuilder<T> {
      * @param fillPct       the array fill percent which must be > 0 and <= 1 (1 implies dense array, < 1 implies sparse array)
      */
     @SuppressWarnings("unchecked")
-    private ArrayBuilder(int capacity, Class<T> type, T defaultValue, double fillPct) {
+    private ArrayBuilder(int capacity, Class<T> type, T defaultValue, float fillPct) {
         Asserts.check(fillPct > 0f, "The load factor mus be > 0 and <= 1");
         Asserts.check(fillPct <= 1f, "The load factor mus be > 0 and <= 1");
         this.fillPct = fillPct;
@@ -81,7 +81,7 @@ public class ArrayBuilder<T> {
      * @param <T>               the array element dataType
      * @return                  the newly created builder
      */
-    public static <T> ArrayBuilder<T> of(int initialLength, double fillPct) {
+    public static <T> ArrayBuilder<T> of(int initialLength, float fillPct) {
         return new ArrayBuilder<>(initialLength, null, null, fillPct);
     }
 
@@ -114,12 +114,12 @@ public class ArrayBuilder<T> {
      * @param initialLength     the initial capacity for builder
      * @param type              the dataType for array elements
      * @param defaultValue      the default value for the array (null allowed, even for primitive types)
-     * @param loadFactor        the array load factor which must be > 0 and <= 1 (1 implies dense array, < 1 implies spare array)
+     * @param fillPct           the array fill percent which must be > 0 and <= 1 (1 implies dense array, < 1 implies sparse array)
      * @param <T>               the array element dataType
      * @return                  the newly created builder
      */
-    public static <T> ArrayBuilder<T> of(int initialLength, Class<T> type, T defaultValue, float loadFactor) {
-        return new ArrayBuilder<>(initialLength, type, defaultValue, loadFactor);
+    public static <T> ArrayBuilder<T> of(int initialLength, Class<T> type, T defaultValue, float fillPct) {
+        return new ArrayBuilder<>(initialLength, type, defaultValue, fillPct);
     }
 
 
@@ -310,8 +310,9 @@ public class ArrayBuilder<T> {
     public final void plusDouble(int index, double value) {
         this.checkType((Class<T>)Double.class);
         this.checkLength(index);
+        var toAdd = Double.isNaN(value) ? 0d : value;
         var existing = array.getDouble(index);
-        var result = Double.isNaN(existing) ? value : existing + value;
+        var result = Double.isNaN(existing) ? value : existing + toAdd;
         this.array.setDouble(index, result);
         this.index = Math.max(this.index, index+1);
     }

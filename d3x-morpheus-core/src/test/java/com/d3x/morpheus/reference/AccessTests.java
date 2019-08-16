@@ -889,6 +889,17 @@ public class AccessTests {
     }
 
 
+    @Test()
+    public void missingKeys() {
+        var frame = TestDataFrames.createMixedRandomFrame(String.class, 10);
+        Assert.assertFalse(frame.getBoolean("X", "Y"));
+        Assert.assertEquals(frame.getInt("X", "Y"), 0);
+        Assert.assertEquals(frame.getLong("X", "Y"), 0L);
+        Assert.assertEquals(frame.getDouble("X", "Y"), Double.NaN);
+        Assert.assertNull(frame.getValue("X", "Y"));
+    }
+
+
 
     static class Coordinate {
 

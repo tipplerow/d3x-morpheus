@@ -67,7 +67,7 @@ public class DenseArrayConstructor implements ArrayFactory.Constructor {
 
 
     @Override
-    public <T> Array<T> apply(Class<T> type, int length, double fillPct, T defaultValue) {
+    public <T> Array<T> apply(Class<T> type, int length, float fillPct, T defaultValue) {
         return apply(type, length, defaultValue, null);
     }
 

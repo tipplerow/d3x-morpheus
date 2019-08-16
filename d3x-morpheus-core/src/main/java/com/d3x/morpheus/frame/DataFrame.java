@@ -19,7 +19,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
-import java.sql.Connection;
 import java.util.Arrays;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -410,6 +409,21 @@ public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperation
 
 
     /**
+     * Returns a new DataFrame builder for row and column key types
+     * @param rowType   the row key type for builder
+     * @param colType   the column key type for builder
+     * @param <R>       the row type
+     * @param <C>       the column type
+     * @return          the newly created builder
+     */
+    static <R,C> DataFrameBuilder<R,C> builder(Class<R> rowType, Class<C> colType, Consumer<DataFrameBuilder<R,C>> consumer) {
+        var builder = new DataFrameBuilder<>(rowType, colType);
+        consumer.accept(builder);
+        return builder;
+    }
+
+
+    /**
      * Returns a reference to the factory that creates new DataFrames
      * @return      the DataFrame factory
      */
@@ -419,12 +433,12 @@ public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperation
 
 
     /**
-     * Returns a DataFrame DB source for the connection arg
-     * @param connection    the db connection for source
-     * @return              the DbSource to load frames from a database
+     * Returns a DataFrame DB source to extract data from SQL ResultSet
+     * @param resultSet     the SQL result set to extract data from
+     * @return              the DbSource to configure result set extraction
      */
-    static DbSource read(Connection connection) {
-        return new DbSource(connection);
+    static DbSource read(java.sql.ResultSet resultSet) {
+        return new DbSource(resultSet);
     }
 
 

@@ -59,7 +59,7 @@ class SparseArrayWithLongCoding<T> extends ArrayBase<T> {
      * @param defaultValue  the default value for array
      * @param coding        the coding for this array
      */
-    SparseArrayWithLongCoding(int length, double fillPct, T defaultValue, LongCoding<T> coding) {
+    SparseArrayWithLongCoding(int length, float fillPct, T defaultValue, LongCoding<T> coding) {
         super(coding.getType(), ArrayStyle.SPARSE, false);
         this.length = length;
         this.coding = coding;
@@ -131,7 +131,7 @@ class SparseArrayWithLongCoding<T> extends ArrayBase<T> {
 
     @Override()
     public final Array<T> copy(int[] indexes) {
-        var fillPct = (double)codes.size() / length();
+        var fillPct = (float)codes.size() / length();
         var clone = new SparseArrayWithLongCoding<T>(indexes.length, fillPct, defaultValue, coding);
         for (int i = 0; i < indexes.length; ++i) {
             var code = getLong(indexes[i]);
@@ -143,7 +143,7 @@ class SparseArrayWithLongCoding<T> extends ArrayBase<T> {
 
     @Override
     public Array<T> copy(Array<Integer> indexes) {
-        var fillPct = (double)codes.size() / length();
+        var fillPct = (float)codes.size() / length();
         var clone = new SparseArrayWithLongCoding<T>(indexes.length(), fillPct, defaultValue, coding);
         for (int i = 0; i < indexes.length(); ++i) {
             var code = getLong(indexes.getInt(i));
@@ -156,7 +156,7 @@ class SparseArrayWithLongCoding<T> extends ArrayBase<T> {
     @Override()
     public final Array<T> copy(int start, int end) {
         var length = end - start;
-        var fillPct = (double)codes.size() / length();
+        var fillPct = (float)codes.size() / length();
         var clone = new SparseArrayWithLongCoding<T>(length, fillPct, defaultValue, coding);
         for (int i=0; i<length; ++i) {
             var code = getLong(start+i);

@@ -52,7 +52,7 @@ class SparseArrayOfObjects<T> extends ArrayBase<T> {
      * @param fillPct   the fill percent for array (0.2 implies 20% filled)
      * @param defaultValue  the default value
      */
-    SparseArrayOfObjects(Class<T> type, int length, double fillPct, T defaultValue) {
+    SparseArrayOfObjects(Class<T> type, int length, float fillPct, T defaultValue) {
         super(type, ArrayStyle.SPARSE, false);
         this.length = length;
         this.defaultValue = defaultValue;
@@ -117,7 +117,7 @@ class SparseArrayOfObjects<T> extends ArrayBase<T> {
 
     @Override()
     public final Array<T> copy(int[] indexes) {
-        var fillPct = (double)values.size() / length();
+        var fillPct = (float)values.size() / length();
         var clone = new SparseArrayOfObjects<T>(type(), indexes.length, fillPct, defaultValue);
         for (int i = 0; i < indexes.length; ++i) {
             var value = getValue(indexes[i]);
@@ -129,7 +129,7 @@ class SparseArrayOfObjects<T> extends ArrayBase<T> {
 
     @Override
     public Array<T> copy(Array<Integer> indexes) {
-        var fillPct = (double)values.size() / length();
+        var fillPct = (float)values.size() / length();
         var clone = new SparseArrayOfObjects<T>(type(), indexes.length(), fillPct, defaultValue);
         for (int i = 0; i < indexes.length(); ++i) {
             var value = getValue(indexes.getInt(i));
@@ -142,7 +142,7 @@ class SparseArrayOfObjects<T> extends ArrayBase<T> {
     @Override()
     public final Array<T> copy(int start, int end) {
         var length = end - start;
-        var fillPct = (double)values.size() / length();
+        var fillPct = (float)values.size() / length();
         var clone = new SparseArrayOfObjects<T>(type(), length, fillPct, defaultValue);
         for (int i=0; i<length; ++i) {
             var value = getValue(start+i);

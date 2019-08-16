@@ -15,12 +15,11 @@
  */
 package com.d3x.morpheus.db;
 
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -50,55 +49,58 @@ import com.d3x.morpheus.util.sql.SQLType;
 @lombok.AllArgsConstructor()
 public class DbSource {
 
-    @lombok.NonNull
-    private Connection connection;
+    @lombok.NonNull() @lombok.Getter()
+    private ResultSet resultSet;
+
 
     /**
-     * Returns a DataFrame loaded from the underlying database using the options provided
-     * @param configurator  the options configurator
-     * @param <R>           the row key type
-     * @return              the resulting frame
-     * @throws DataFrameException   if fails to load data frame
+     * Reads all data from the sql ResultSet into a Morpheus DataFrame
+     * @return  the newly created DataFrame
+     * @throws DataFrameException if data frame construction from result set fails
      */
-    public <R> DataFrame<R,String> apply(Consumer<Options> configurator) throws DataFrameException {
-        var options = new Options();
-        configurator.accept(options);
-        var sql = options.getSql();
-        if (sql == null) {
-            throw new IllegalArgumentException("No SQL specified in options, call setSql()");
-        } else {
-            try {
-                var stmt = connection.prepareStatement(sql);
-                stmt.setMaxRows(options.getMaxRows());
-                stmt.setQueryTimeout((int)options.getQueryTimeout().toSeconds());
-                stmt.setFetchSize(options.getFetchSize());
-                var rs = stmt.executeQuery();
-                return read(rs, options);
-            } catch (SQLException ex) {
-                throw new DataFrameException("Failed to load data from db: " + ex.getMessage(), ex);
-            } finally {
-                IO.close(connection);
-            }
-        }
+    public DataFrame<Integer,String> apply() throws DataFrameException {
+        return apply(o -> {
+            o.setRowCapacity(1000);
+            o.setColKeyMapper(v -> v);
+            o.setExcludeColumnSet(Collections.emptySet());
+            o.setRowIndexColumnName(null);
+        });
     }
 
 
     /**
      * Reads all data from the sql ResultSet into a Morpheus DataFrame
-     * @param resultSet     the result set to extract data from
-     * @param options       the request descriptor
+     * @param rowKeyColumnName  the result set column name to use as the row index
+     * @return                  the newly created DataFrame
+     * @throws DataFrameException if data frame construction from result set fails
+     */
+    public <R> DataFrame<R,String> apply(String rowKeyColumnName) throws DataFrameException {
+        return apply(o -> {
+            o.setRowCapacity(1000);
+            o.setColKeyMapper(v -> v);
+            o.setExcludeColumnSet(Collections.emptySet());
+            o.setRowIndexColumnName(rowKeyColumnName);
+        });
+    }
+
+
+    /**
+     * Reads all data from the sql ResultSet into a Morpheus DataFrame
+     * @param configurator  the options configurator
      * @return              the newly created DataFrame
      * @throws DataFrameException if data frame construction from result set fails
      */
     @SuppressWarnings("unchecked")
-    private <R> DataFrame<R,String> read(ResultSet resultSet, Options options) throws DataFrameException {
+    public <R> DataFrame<R,String> apply(Consumer<Options> configurator) throws DataFrameException {
         try {
             var platform = getPlatform(resultSet);
             var metaData = resultSet.getMetaData();
+            var options = new Options();
+            configurator.accept(options);
             var columns = getColumns(metaData, platform, options);
             if (!resultSet.next()) {
                 var rowKeys = (Index<R>)Index.empty();
-                return createFrame(rowKeys, columns, options);
+                return createFrame(rowKeys, columns, options.getColKeyMapper());
             } else {
                 var counter = 1;
                 var t1 = System.currentTimeMillis();
@@ -116,7 +118,7 @@ public class DbSource {
                 }
                 if (options.getRowIndexColumnName() == null) {
                     var rowKeys = (Array<R>)Range.of(0, counter).toArray();
-                    return createFrame(rowKeys, columns, options);
+                    return createFrame(rowKeys, columns, options.getColKeyMapper());
                 } else {
                     var name = options.getRowIndexColumnName();
                     var column = columns.stream().filter(v -> v.name.equalsIgnoreCase(name)).findFirst().orElse(null);
@@ -125,7 +127,7 @@ public class DbSource {
                     } else {
                         var rowKeys = (Array<R>)column.array.toArray();
                         var data = columns.stream().filter(v -> !v.name.equalsIgnoreCase(name)).collect(Collectors.toList());
-                        return createFrame(rowKeys, data, options);
+                        return createFrame(rowKeys, data, options.getColKeyMapper());
                     }
                 }
             }
@@ -159,10 +161,10 @@ public class DbSource {
      * Returns a newly created DataFrame from the arguments specified
      * @param rowKeys       the row keys
      * @param columnList    the column list
+     * @param colMapper     the column name mapper
      * @return              the newly created DataFrame
      */
-    private <R> DataFrame<R,String> createFrame(Iterable<R> rowKeys, List<ColumnInfo> columnList, Options options) {
-        var colMapper = options.getColKeyMapper();
+    private <R> DataFrame<R,String> createFrame(Iterable<R> rowKeys, List<ColumnInfo> columnList, Function<String,String> colMapper) {
         return DataFrame.of(rowKeys, String.class, columns -> {
             for (ColumnInfo colInfo : columnList) {
                 var colName = colInfo.name;
@@ -266,27 +268,13 @@ public class DbSource {
     }
 
 
-    /**
-     * The options for this source
-     */
     @lombok.Data()
     public static class Options {
-
-        private String sql;
-        private int maxRows;
-        private int fetchSize = 100;
         private int rowCapacity = 1000;
         private int logRowCount = Integer.MAX_VALUE;
-        private boolean readOnly = false;
-        private boolean autoCommit = true;
         private String rowIndexColumnName;
-        private Duration queryTimeout = Duration.ofSeconds(0);
-        private List<Object> parameters = new ArrayList<>();
         private Set<String> excludeColumnSet = new HashSet<>();
         private Function<String,String> colKeyMapper = v -> v;
-
     }
-
-
 
 }
