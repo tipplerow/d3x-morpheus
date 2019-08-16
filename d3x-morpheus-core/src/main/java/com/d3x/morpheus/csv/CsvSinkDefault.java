@@ -60,7 +60,7 @@ public class CsvSinkDefault<R,C> implements CsvSink<R,C> {
             }
             var rowKeyType = frame.rows().keyClass();
             var cursor = frame.cursor();
-            var rowKeyPrinter = Optional.ofNullable(options.getRowKeyPrinter()).orElse(formats.getPrinterOrFail(rowKeyType));
+            var rowKeyPrinter = Optional.ofNullable(options.getRowKeyPrinter()).orElse(formats.getPrinterOrFail(rowKeyType, Object.class));
             var colPrinters = frame.cols().stream().map(c -> formats.getPrinterOrFail(c.key(), c.dataClass())).collect(Collectors.toList());
             for (int i = 0; i < frame.rowCount(); ++i) {
                 var row = new StringBuilder();
@@ -118,7 +118,7 @@ public class CsvSinkDefault<R,C> implements CsvSink<R,C> {
                 header.append(options.getSeparator());
             }
             var formats = options.getFormats();
-            var printer = formats.getPrinterOrFail(frame.cols().keyClass());
+            var printer = formats.getPrinterOrFail(frame.cols().keyClass(), Object.class);
             for (int i = 0; i<frame.colCount(); ++i) {
                 var column = frame.cols().key(i);
                 header.append(printer.apply(column));
