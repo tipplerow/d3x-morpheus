@@ -42,9 +42,12 @@ public class DataFrameBuilder<R,C> {
     private static final int DEFAULT_ROW_CAPACITY = 1000;
     private static final int DEFAULT_COL_CAPACITY = 100;
 
-    private Lock lock;
+    @lombok.Getter
     private Class<R> rowType;
+    @lombok.Getter
     private Class<C> colType;
+
+    private Lock lock;
     private Index<R> rowKeys;
     private int rowCapacity = DEFAULT_ROW_CAPACITY;
     private Map<C,Float> fillPercentMap;

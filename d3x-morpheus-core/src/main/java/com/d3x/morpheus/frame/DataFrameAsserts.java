@@ -119,11 +119,27 @@ public class DataFrameAsserts {
         expected.cols().forEach(column -> {
             DataFrameColumn<R,C> other = actual.col(column.key());
             column.forEachValue(v -> {
-                final R rowKey = v.rowKey();
-                final C colKey = v.colKey();
-                final Object expectedValue = v.getValue();
-                final Object actualValue = other.getValue(rowKey);
-                Asserts.assertEquals(actualValue, expectedValue, "The DataFrame values match at (" + rowKey + "," + colKey + ")");
+                var rowKey = v.rowKey();
+                var colKey = v.colKey();
+                var expectedValue = v.getValue();
+                var actualValue = other.getValue(rowKey);
+                if (expectedValue != null && actualValue != null) {
+                    final Class type1 = expectedValue.getClass();
+                    final Class type2 = actualValue.getClass();
+                    Asserts.assertEquals(type2, type1, "The DataFrame value types match at (" + rowKey + "," + colKey + ")");
+                    if (type1.equals(Double.class)) {
+                        final double v1 = ((Number)expectedValue).doubleValue();
+                        final double v2 = ((Number)actualValue).doubleValue();
+                        if (!Double.isNaN(v1) || !Double.isNaN(v2)) {
+                            final double delta = Math.max(0.00000001, Math.min(Math.abs(v1), Math.abs(v2)) * 0.00000001);
+                            Asserts.assertEquals(v2, v1, delta, "The DataFrame doubles match at (" + rowKey + "," + colKey + ")");
+                        }
+                    } else {
+                        Asserts.assertEquals(actualValue, expectedValue, "The DataFrame values match at (" + rowKey + "," + colKey + ")");
+                    }
+                } else {
+                    Asserts.assertEquals(actualValue, expectedValue, "The DataFrame values match at (" + rowKey + "," + colKey + ")");
+                }
             });
         });
     }
