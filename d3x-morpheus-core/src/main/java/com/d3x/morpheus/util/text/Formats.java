@@ -73,8 +73,8 @@ public class Formats {
      * NOTE THAT THE ORDER IN WHICH THESE ARE REGISTERED MATTERS SOMEWHAT (MORE SPECIFIC TO LESS SPECIFIC)
      */
     private void registerParsers() {
-        this.setParser(double.class, Parser.ofDouble("0.0000####;-0.0000####", 1).withNullChecker(nullCheck));
-        this.setParser(Double.class, Parser.ofDouble("0.0000####;-0.0000####", 1).withNullChecker(nullCheck));
+        this.setParser(double.class, Parser.ofDouble("0.000000########;-0.000000########", 1).withNullChecker(nullCheck));
+        this.setParser(Double.class, Parser.ofDouble("0.000000########;-0.000000########", 1).withNullChecker(nullCheck));
         this.setParser(boolean.class, Parser.ofBoolean().withNullChecker(nullCheck));
         this.setParser(Boolean.class, Parser.ofBoolean().withNullChecker(nullCheck));
         this.setParser(int.class, Parser.ofInteger().withNullChecker(nullCheck));
@@ -106,8 +106,8 @@ public class Formats {
         this.setPrinter(Integer.class, Printer.ofInt().withNullValue(nullValue));
         this.setPrinter(long.class, Printer.ofLong().withNullValue(nullValue));
         this.setPrinter(Long.class, Printer.ofLong().withNullValue(nullValue));
-        this.setPrinter(double.class, Printer.ofDouble("0.0000####;-0.0000####").withNullValue(nullValue));
-        this.setPrinter(Double.class, Printer.ofDouble("0.0000####;-0.0000####").withNullValue(nullValue));
+        this.setPrinter(double.class, Printer.ofDouble("0.000000########;-0.000000########").withNullValue(nullValue));
+        this.setPrinter(Double.class, Printer.ofDouble("0.000000########;-0.000000########").withNullValue(nullValue));
         this.setPrinter(LocalDate.class, Printer.ofLocalDate(DateTimeFormatter.ISO_DATE).withNullValue(nullValue));
         this.setPrinter(LocalTime.class, Printer.ofLocalTime(DateTimeFormatter.ISO_TIME).withNullValue(nullValue));
         this.setPrinter(LocalDateTime.class, Printer.ofLocalDateTime(DateTimeFormatter.ISO_DATE_TIME).withNullValue(nullValue));
