@@ -68,7 +68,7 @@ public class TupleTests {
         assertEquals(value1.item(0), Integer.valueOf(1));
         assertEquals(value1.item(1), "Two");
         assertEquals(value1.item(2), "Three");
-        assertEquals(value1.item(3), 5d);
+        assertEquals((Number)value1.item(3), 5d);
     }
 
     @Test()

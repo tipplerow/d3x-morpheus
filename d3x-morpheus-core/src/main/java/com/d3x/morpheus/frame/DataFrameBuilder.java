@@ -269,6 +269,17 @@ public class DataFrameBuilder<R,C> {
 
 
     /**
+     * Returns true if the builder contains the row and column
+     * @param rowKey        the row key
+     * @param colKey        the column key
+     * @return
+     */
+    public boolean contains(R rowKey, C colKey) {
+        return hasRow(rowKey) && hasColumn(colKey);
+    }
+
+
+    /**
      * Makes this builder thread safe
      * @return  this builder
      */

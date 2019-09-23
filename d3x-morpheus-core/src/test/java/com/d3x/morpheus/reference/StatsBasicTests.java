@@ -139,8 +139,8 @@ public class StatsBasicTests {
         final DataFrame<Integer,String> source = loadSourceData();
         final DataFrame<Integer,StatType> expectedRowStats = loadExpectedRowStats(StatType.MAX);
         final DataFrame<String,StatType> expectedColStats = loadExpectedColStats(StatType.MAX).transpose();
-        source.rows().forEach(row -> Assert.assertEquals(row.stats().max(), expectedRowStats.getDoubleAt(row.ordinal(), 0)));
-        source.cols().forEach(column -> Assert.assertEquals(column.stats().max(), expectedColStats.getDoubleAt(column.ordinal(), 0)));
+        source.rows().forEach(row -> Assert.assertEquals(row.stats().max().doubleValue(), expectedRowStats.getDoubleAt(row.ordinal(), 0)));
+        source.cols().forEach(column -> Assert.assertEquals(column.stats().max().doubleValue(), expectedColStats.getDoubleAt(column.ordinal(), 0)));
         if (parallel) {
             final DataFrame<Integer,StatType> rowStats = source.rows().parallel().stats().max();
             final DataFrame<String,StatType> colStats = source.cols().parallel().stats().max();
