@@ -253,7 +253,7 @@ public class AccessTests {
                 Assert.assertEquals(v1, v12, "V1 matches v12");
                 Assert.assertEquals(v1, v13, "V1 matches v13");
                 Assert.assertEquals(v1, v14, "V1 matches v14");
-                Assert.assertEquals(v1, valueMap.get(coordinate), "V1 matches apply value");
+                Assert.assertEquals(v1, valueMap.get(coordinate).doubleValue(), "V1 matches apply value");
             }
         }
     }

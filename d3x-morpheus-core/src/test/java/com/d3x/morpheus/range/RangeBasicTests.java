@@ -189,8 +189,8 @@ public class RangeBasicTests {
         Assert.assertEquals(array.length(), expectedLength);
         Assert.assertEquals(array.typeCode(), ArrayType.DOUBLE);
         Assert.assertTrue(!array.style().isSparse());
-        Assert.assertEquals(range.start(), start, "The range start");
-        Assert.assertEquals(range.end(), end, "The range end");
+        Assert.assertEquals(range.start().doubleValue(), start, "The range start");
+        Assert.assertEquals(range.end().doubleValue(), end, "The range end");
         for (int i=0; i<array.length(); ++i) {
             final double actual = array.getDouble(i);
             final double expected = ascend ? start + i * step : start - i * step;

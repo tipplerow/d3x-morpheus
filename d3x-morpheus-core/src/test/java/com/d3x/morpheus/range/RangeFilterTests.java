@@ -197,8 +197,8 @@ public class RangeFilterTests {
         Assert.assertTrue(array.length() > 0, "There are elements in the array");
         Assert.assertEquals(array.typeCode(), ArrayType.DOUBLE);
         Assert.assertTrue(!array.style().isSparse());
-        Assert.assertEquals(range.start(), start, "The range start");
-        Assert.assertEquals(range.end(), end, "The range end");
+        Assert.assertEquals(range.start().doubleValue(), start, "The range start");
+        Assert.assertEquals(range.end().doubleValue(), end, "The range end");
         int index = 0;
         double value = first;
         while (ascend ? value < last : value > last) {
