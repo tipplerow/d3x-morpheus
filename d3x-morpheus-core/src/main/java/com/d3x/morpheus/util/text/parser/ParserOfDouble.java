@@ -18,6 +18,7 @@ package com.d3x.morpheus.util.text.parser;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.ToDoubleFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -36,7 +37,7 @@ class ParserOfDouble extends Parser<Double> {
 
     private static final Set<Pattern> patternSet = new HashSet<>();
 
-    private Function<String,Number> handler;
+    private ToDoubleFunction<String> handler;
 
     /*
      * Static initializer
@@ -51,7 +52,7 @@ class ParserOfDouble extends Parser<Double> {
      * @param nullChecker   the null checker function
      * @param handler       the handler for this parser, which may be null in order to use pattern matching
      */
-    ParserOfDouble(ToBooleanFunction<String> nullChecker, Function<String,Number> handler) {
+    ParserOfDouble(ToBooleanFunction<String> nullChecker, ToDoubleFunction<String> handler) {
         super(FunctionStyle.DOUBLE, Double.class, nullChecker);
         this.handler = handler;
     }
@@ -63,15 +64,16 @@ class ParserOfDouble extends Parser<Double> {
 
     @Override
     public final boolean isSupported(String value) {
-        if (!getNullChecker().applyAsBoolean(value)) {
-            for (Pattern pattern : patternSet) {
-                final Matcher matcher = pattern.matcher(value);
-                if (matcher.reset(value).matches()) {
-                    return true;
-                }
+        try {
+            if (getNullChecker().applyAsBoolean(value)) {
+                return false;
+            } else {
+                applyAsDouble(value);
+                return true;
             }
+        } catch (Exception ex) {
+            return false;
         }
-        return false;
     }
 
     @Override
@@ -81,11 +83,10 @@ class ParserOfDouble extends Parser<Double> {
                 return Double.NaN;
             } else {
                 if (handler != null) {
-                    final Number number = handler.apply(value);
-                    return number instanceof Double ? ((Double)number) : number.doubleValue();
+                    return handler.applyAsDouble(value);
                 } else {
                     for (Pattern pattern : patternSet) {
-                        final Matcher matcher = pattern.matcher(value);
+                        var matcher = pattern.matcher(value);
                         if (matcher.reset(value).matches()) {
                             return Double.parseDouble(value);
                         }

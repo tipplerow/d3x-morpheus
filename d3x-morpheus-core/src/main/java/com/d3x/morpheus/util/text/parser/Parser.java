@@ -27,6 +27,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.function.Function;
@@ -106,7 +107,18 @@ public abstract class Parser<T> extends Function1<String,T> {
      * @param value     the value to check if can be parsed by this parser
      * @return          true if the value can be parsed
      */
-    public abstract boolean isSupported(String value);
+    public boolean isSupported(String value) {
+        try {
+            if (getNullChecker().applyAsBoolean(value)) {
+                return false;
+            } else {
+                apply(value);
+                return true;
+            }
+        } catch (Exception ex) {
+            return false;
+        }
+    }
 
 
     /**
@@ -123,7 +135,7 @@ public abstract class Parser<T> extends Function1<String,T> {
      * @return          the newly created parser
      */
     public static Parser<Boolean> forBoolean(ToBooleanFunction<String> function) {
-        return new Parser<Boolean>(FunctionStyle.BOOLEAN, Boolean.class, v -> v == null) {
+        return new Parser<>(FunctionStyle.BOOLEAN, Boolean.class, Objects::isNull) {
             @Override
             public final boolean applyAsBoolean(String value) {
                 return value != null && function.applyAsBoolean(value);
@@ -131,10 +143,6 @@ public abstract class Parser<T> extends Function1<String,T> {
             @Override
             public Parser<Boolean> optimize(String value) {
                 return this;
-            }
-            @Override
-            public final boolean isSupported(String value) {
-                return false;
             }
         };
     }
@@ -145,7 +153,7 @@ public abstract class Parser<T> extends Function1<String,T> {
      * @return          the newly created parser
      */
     public static Parser<Integer> forInt(ToIntFunction<String> function) {
-        return new Parser<Integer>(FunctionStyle.INTEGER, Integer.class, v -> v == null) {
+        return new Parser<>(FunctionStyle.INTEGER, Integer.class, Objects::isNull) {
             @Override
             public final int applyAsInt(String value) {
                 return value != null ? function.applyAsInt(value) : 0;
@@ -153,10 +161,6 @@ public abstract class Parser<T> extends Function1<String,T> {
             @Override
             public Parser<Integer> optimize(String value) {
                 return this;
-            }
-            @Override
-            public final boolean isSupported(String value) {
-                return false;
             }
         };
     }
@@ -167,7 +171,7 @@ public abstract class Parser<T> extends Function1<String,T> {
      * @return          the newly created parser
      */
     public static Parser<Long> forLong(ToLongFunction<String> function) {
-        return new Parser<Long>(FunctionStyle.LONG, Long.class, v -> v == null) {
+        return new Parser<>(FunctionStyle.LONG, Long.class, Objects::isNull) {
             @Override
             public final long applyAsLong(String value) {
                 return value != null ? function.applyAsLong(value) : 0L;
@@ -175,10 +179,6 @@ public abstract class Parser<T> extends Function1<String,T> {
             @Override
             public Parser<Long> optimize(String value) {
                 return this;
-            }
-            @Override
-            public final boolean isSupported(String value) {
-                return false;
             }
         };
     }
@@ -189,7 +189,7 @@ public abstract class Parser<T> extends Function1<String,T> {
      * @return          the newly created parser
      */
     public static Parser<Double> forDouble(ToDoubleFunction<String> function) {
-        return new Parser<Double>(FunctionStyle.DOUBLE, Double.class, v -> v == null) {
+        return new Parser<>(FunctionStyle.DOUBLE, Double.class, Objects::isNull) {
             @Override
             public final double applyAsDouble(String value) {
                 return value != null ? function.applyAsDouble(value) : Double.NaN;
@@ -197,10 +197,6 @@ public abstract class Parser<T> extends Function1<String,T> {
             @Override
             public Parser<Double> optimize(String value) {
                 return this;
-            }
-            @Override
-            public final boolean isSupported(String value) {
-                return false;
             }
         };
     }
@@ -213,7 +209,7 @@ public abstract class Parser<T> extends Function1<String,T> {
      * @return          the newly created parser
      */
     public static <O> Parser<O> forObject(Class<O> type, Function<String,O> function) {
-        return new Parser<O>(FunctionStyle.OBJECT, type, v -> v == null) {
+        return new Parser<>(FunctionStyle.OBJECT, type, Objects::isNull) {
             @Override
             public final O apply(String value) {
                 return value != null ? function.apply(value) : null;
@@ -221,10 +217,6 @@ public abstract class Parser<T> extends Function1<String,T> {
             @Override
             public Parser<O> optimize(String value) {
                 return this;
-            }
-            @Override
-            public final boolean isSupported(String value) {
-                return false;
             }
         };
     }
@@ -271,7 +263,7 @@ public abstract class Parser<T> extends Function1<String,T> {
         final DecimalFormat decimalFormat = createDecimalFormat(pattern, multiplier);
         return new ParserOfDouble(defaultNullCheck, value -> {
             try {
-                return decimalFormat.parse(value);
+                return decimalFormat.parse(value).doubleValue();
             } catch (Exception ex) {
                 throw new FormatException("Failed to parse value into double: " + value, ex);
             }

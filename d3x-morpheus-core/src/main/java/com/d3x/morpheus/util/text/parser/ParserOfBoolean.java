@@ -44,7 +44,7 @@ class ParserOfBoolean extends Parser<Boolean> {
 
     @Override
     public final boolean isSupported(String value) {
-        return !getNullChecker().applyAsBoolean(value) && (trueSet.contains(value) || falseSet.contains(value));
+        return !getNullChecker().applyAsBoolean(value) && (trueSet.contains(lower(value)) || falseSet.contains(lower(value)));
     }
 
     @Override
@@ -55,9 +55,18 @@ class ParserOfBoolean extends Parser<Boolean> {
     @Override
     public final boolean applyAsBoolean(String value) {
         try {
-            return !getNullChecker().applyAsBoolean(value) && trueSet.contains(value);
+            return !getNullChecker().applyAsBoolean(value) && trueSet.contains(lower(value));
         } catch (Exception ex) {
             throw new FormatException("Failed to parse value into Boolean: " + value, ex);
         }
+    }
+
+    /**
+     * Returns lower case version of value or null if value is null
+     * @param value the value to convert to lower case
+     * @return      the lower case value
+     */
+    private static String lower(String value) {
+        return value != null ? value.toLowerCase() : null;
     }
 }
