@@ -325,6 +325,17 @@ public interface DataSeriesBuilder<K,V> {
             return valueClass;
         }
 
+        @Override
+        public boolean isNull(K key) {
+            return getValue(key) == null;
+        }
+
+        @Override
+        public boolean isNullAt(int index) {
+            return getValueAt(index) == null;
+        }
+
+
         @SuppressWarnings("unchecked")
         public DataSeries<K,V> sequential() {
             try {

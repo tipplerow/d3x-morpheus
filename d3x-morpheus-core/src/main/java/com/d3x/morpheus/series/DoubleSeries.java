@@ -71,6 +71,16 @@ public interface DoubleSeries<K> extends DataSeries<K,Double> {
         return Double.class;
     }
 
+    @Override
+    default boolean isNull(K key) {
+        return Double.isNaN(getDouble(key));
+    }
+
+    @Override
+    default boolean isNullAt(int index) {
+        return Double.isNaN(getDoubleAt(index));
+    }
+
     /**
      * Returns a sequential version of this series
      * @return      the sequential series
@@ -370,6 +380,14 @@ public interface DoubleSeries<K> extends DataSeries<K,Double> {
             }
             @Override
             public boolean contains(K key) {
+                return false;
+            }
+            @Override
+            public boolean isNull(K key) {
+                return false;
+            }
+            @Override
+            public boolean isNullAt(int index) {
                 return false;
             }
             @Override

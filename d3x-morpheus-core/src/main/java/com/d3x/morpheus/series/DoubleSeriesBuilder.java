@@ -324,6 +324,16 @@ public interface DoubleSeriesBuilder<K> extends DataSeriesBuilder<K,Double> {
         }
 
         @Override
+        public boolean isNull(K key) {
+            return Double.isNaN(getDouble(key));
+        }
+
+        @Override
+        public boolean isNullAt(int index) {
+            return Double.isNaN(getDoubleAt(index));
+        }
+
+        @Override
         @SuppressWarnings("unchecked")
         public DoubleSeries<K> sequential() {
             try {

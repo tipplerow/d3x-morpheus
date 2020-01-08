@@ -76,6 +76,20 @@ public interface DataSeries<K,V> extends Cloneable {
     boolean contains(K key);
 
     /**
+     * Returns true if series value is null for key
+     * @param key   the key to match
+     * @return      true if value is null
+     */
+    boolean isNull(K key);
+
+    /**
+     * Returns true if series value is null for index
+     * @param index the index of key
+     * @return      true if value is null
+     */
+    boolean isNullAt(int index);
+
+    /**
      * Returns the value for the key
      * @param key   the key to match
      * @return      the value or null if no match

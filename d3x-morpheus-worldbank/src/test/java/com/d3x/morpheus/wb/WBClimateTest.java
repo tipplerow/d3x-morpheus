@@ -47,7 +47,7 @@ public class WBClimateTest {
     }
 
 
-    @Test(dataProvider = "countries")
+    @Test(dataProvider = "countries", enabled = false)
     public void testSingleModelTemperatureQuery(String isoCode) {
         for (WBClimate.GCM gcm : WBClimate.GCM.values()) {
             final DataFrame<WBClimateKey,Month> frame = source.read(options -> {
@@ -67,7 +67,7 @@ public class WBClimateTest {
     }
 
 
-    @Test(dataProvider = "countries")
+    @Test(dataProvider = "countries", enabled = false)
     public void testSingleModelPrecipitationQuery(String isoCode) {
         for (WBClimate.GCM gcm : WBClimate.GCM.values()) {
             final DataFrame<WBClimateKey,Month> frame = source.read(options -> {
@@ -87,7 +87,7 @@ public class WBClimateTest {
     }
 
 
-    @Test(dataProvider = "countries")
+    @Test(dataProvider = "countries", enabled = false)
     public void testAllModels(String isoCode) {
         final DataFrame<WBClimateKey,Month> frame = source.read(options -> {
             options.setVariable(WBClimate.Variable.PRECIPITATION);
@@ -102,7 +102,7 @@ public class WBClimateTest {
     }
 
 
-    @Test(dataProvider = "countries")
+    @Test(dataProvider = "countries", enabled = false)
     public void testEmissionModel(String isoCode) {
         for (WBClimate.SRES sres : WBClimate.SRES.values()) {
             final DataFrame<WBClimateKey,Month> frame = source.read(options -> {
