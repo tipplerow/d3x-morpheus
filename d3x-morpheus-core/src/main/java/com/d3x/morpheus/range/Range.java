@@ -147,29 +147,8 @@ public interface Range<T> extends Iterable<T> {
      */
     @SuppressWarnings("unchecked")
     default Array<T> toArray() {
-        final long sizeEstimate = estimateSize();
-        final Class<T> type = (Class<T>)start().getClass();
-        if (type == Integer.class) {
-            return toArray(sizeEstimate > 5000000);
-        } else if (type == Long.class) {
-            return toArray(sizeEstimate > 5000000);
-        } else if (type == Double.class) {
-            return toArray(sizeEstimate > 5000000);
-        } else if (type == Date.class) {
-            return toArray(sizeEstimate > 1000000);
-        } else if (type == Instant.class) {
-            return toArray(sizeEstimate > 1000000);
-        } else if (type == LocalDate.class) {
-            return toArray(sizeEstimate > 1000000);
-        } else if (type == LocalTime.class) {
-            return toArray(sizeEstimate > 1000000);
-        } else if (type == LocalDateTime.class) {
-            return toArray(sizeEstimate > 1000000);
-        } else if (type == ZonedDateTime.class) {
-            return toArray(sizeEstimate > 500000);
-        } else {
-            return toArray(sizeEstimate > 1000000);
-        }
+        var sizeEstimate = estimateSize();
+        return toArray(sizeEstimate > 5000000);
     }
 
     /**
