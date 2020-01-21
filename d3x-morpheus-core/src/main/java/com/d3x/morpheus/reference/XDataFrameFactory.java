@@ -63,7 +63,7 @@ public class XDataFrameFactory extends DataFrameFactory {
     @Override
     @SuppressWarnings("unchecked")
     public <R,C> DataFrame<R,C> empty() {
-        return new XDataFrame<>(Index.of((Class<R>)Object.class, 10000), Index.of((Class<C>)Object.class, 10), Object.class, false);
+        return new XDataFrame<>(Index.of((Class<R>)Object.class, 10), Index.of((Class<C>)Object.class, 10), Object.class, false);
     }
 
 
