@@ -52,7 +52,6 @@ import com.univocity.parsers.csv.CsvParserSettings;
  *
  * @author  Xavier Witdouck
  */
-@lombok.extern.slf4j.Slf4j()
 @lombok.AllArgsConstructor()
 public class CsvSourceDefault implements CsvSource {
 
@@ -186,8 +185,7 @@ public class CsvSourceDefault implements CsvSource {
                     var buffer = options.getReadBatchSize();
                     var capacity = options.getRowCapacity();
                     var parser = options.getParser(colName).orElse(null);
-                    if (parser==null){
-                        log.info("getting parser by column index:"+colIndex);
+                    if (parser == null){
                         parser = options.getFormats().getParser(colIndex);
                     }
                     var column = new CsvColumn(colName, colIndex, capacity, buffer, formats, parser);
