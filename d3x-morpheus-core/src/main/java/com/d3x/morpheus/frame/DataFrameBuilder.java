@@ -15,11 +15,11 @@
  */
 package com.d3x.morpheus.frame;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import com.d3x.morpheus.array.ArrayBuilder;
@@ -42,15 +42,22 @@ public class DataFrameBuilder<R,C> {
     private static final int DEFAULT_ROW_CAPACITY = 1000;
     private static final int DEFAULT_COL_CAPACITY = 100;
 
+    /** The row key type for frame */
     @lombok.Getter
     private Class<R> rowType;
+    /** The column key type for frame */
     @lombok.Getter
     private Class<C> colType;
+    /** The function to provide the load factor for columns */
+    @lombok.Setter @lombok.NonNull
+    private Function<C,Float> loadFactor = c -> 1f;
+    /** The function to provide the default value for columns */
+    @lombok.Setter @lombok.NonNull
+    private Function<C,Object> defaultValue = c -> null;
 
     private Lock lock;
     private Index<R> rowKeys;
     private int rowCapacity = DEFAULT_ROW_CAPACITY;
-    private Map<C,Float> fillPercentMap;
     private Map<C,ArrayBuilder<?>> arrayMap;
 
 
@@ -64,7 +71,6 @@ public class DataFrameBuilder<R,C> {
         @lombok.NonNull  Class<C> colType) {
         this.rowType = rowType;
         this.colType = colType;
-        this.fillPercentMap = new HashMap<>();
     }
 
 
@@ -91,22 +97,6 @@ public class DataFrameBuilder<R,C> {
                 columns.add(key, array);
             });
         });
-    }
-
-
-    /**
-     * Sets the fill percent for column for when sparse data frame required
-     * @param colKey    the column key
-     * @param fillPct   the column fill percent which must be > 0 and <= 1 (1 implies dense array, < 1 implies sparse array)
-     * @return          this builder
-     */
-    public final DataFrameBuilder<R,C> fillPct(@lombok.NonNull C colKey, float fillPct) {
-        if (fillPct < 0 || fillPct > 1) {
-            throw new IllegalStateException("Invalid fill percent for " + colKey + ", must be > 0 and <= 1, not " + fillPct);
-        } else {
-            this.fillPercentMap.put(colKey, fillPct);
-            return this;
-        }
     }
 
 
@@ -240,10 +230,22 @@ public class DataFrameBuilder<R,C> {
         if (array != null) {
             return (ArrayBuilder<T>)array;
         } else {
-            var fillPct = fillPercentMap.getOrDefault(colKey, 1f);
-            array = ArrayBuilder.of(rowCapacity, fillPct);
-            this.arrayMap.put(colKey, array);
-            return (ArrayBuilder<T>)array;
+            var loadFactor = this.loadFactor.apply(colKey);
+            if (loadFactor < 0 || loadFactor > 1) {
+                throw new IllegalStateException("Invalid load factor for " + colKey + ", must be > 0 and <= 1, not " + loadFactor);
+            } else {
+                var defaultValue = (T)this.defaultValue.apply(colKey);
+                if (defaultValue == null) {
+                    array = ArrayBuilder.of(rowCapacity, loadFactor);
+                    this.arrayMap.put(colKey, array);
+                    return (ArrayBuilder<T>)array;
+                } else {
+                    var dataType = (Class<T>)defaultValue.getClass();
+                    array = ArrayBuilder.of(rowCapacity, dataType, defaultValue, loadFactor);
+                    this.arrayMap.put(colKey, array);
+                    return (ArrayBuilder<T>)array;
+                }
+            }
         }
     }
 
@@ -351,14 +353,20 @@ public class DataFrameBuilder<R,C> {
      * @param dataType  the data type
      * @return          this builder
      */
-    public DataFrameBuilder<R,C> addColumn(C colKey, Class<?> dataType) {
+    @SuppressWarnings("unchecked")
+    public <T> DataFrameBuilder<R,C> addColumn(C colKey, Class<T> dataType) {
         this.acquireLock();
         this.capacity(DEFAULT_ROW_CAPACITY, DEFAULT_COL_CAPACITY);
         var array = arrayMap.get(colKey);
         if (array == null) {
-            var fillPct = fillPercentMap.getOrDefault(colKey, 1f);
-            array = ArrayBuilder.of(rowCapacity, dataType, null, fillPct);
-            this.arrayMap.put(colKey, array);
+            var loadFactor = this.loadFactor.apply(colKey);
+            if (loadFactor < 0 || loadFactor > 1) {
+                throw new IllegalStateException("Invalid load factor for " + colKey + ", must be > 0 and <= 1, not " + loadFactor);
+            } else {
+                var defaultValue = (T)this.defaultValue.apply(colKey);
+                array = ArrayBuilder.of(rowCapacity, dataType, defaultValue, loadFactor);
+                this.arrayMap.put(colKey, array);
+            }
         }
         return this;
     }
