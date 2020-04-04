@@ -24,6 +24,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -315,6 +316,8 @@ public class SQLExtractor implements Cloneable {
 
     private static class DateExtractor extends SQLExtractor {
 
+        private Calendar calendar = Calendar.getInstance();
+
         /**
          * Constructor
          */
@@ -325,12 +328,14 @@ public class SQLExtractor implements Cloneable {
         @Override
         @SuppressWarnings("unchecked")
         public <V> V getValue(ResultSet rs, int colIndex) throws SQLException {
-            return (V)rs.getDate(colIndex);
+            return (V)rs.getDate(colIndex, calendar);
         }
     }
 
 
     private static class TimeExtractor extends SQLExtractor {
+
+        private Calendar calendar = Calendar.getInstance();
 
         /**
          * Constructor
@@ -342,12 +347,14 @@ public class SQLExtractor implements Cloneable {
         @Override
         @SuppressWarnings("unchecked")
         public <V> V getValue(ResultSet rs, int colIndex) throws SQLException {
-            return (V)rs.getTime(colIndex);
+            return (V)rs.getTime(colIndex, calendar);
         }
     }
 
 
     private static class TimestampExtractor extends SQLExtractor {
+
+        private Calendar calendar = Calendar.getInstance();
 
         /**
          * Constructor
@@ -359,7 +366,7 @@ public class SQLExtractor implements Cloneable {
         @Override
         @SuppressWarnings("unchecked")
         public <V> V getValue(ResultSet rs, int colIndex) throws SQLException {
-            return (V)rs.getTimestamp(colIndex);
+            return (V)rs.getTimestamp(colIndex, calendar);
         }
     }
 
@@ -367,6 +374,7 @@ public class SQLExtractor implements Cloneable {
     private static class LocalDateExtractor extends SQLExtractor {
 
         private ZoneId GMT = ZoneId.of("GMT");
+        private Calendar calendar = Calendar.getInstance();
 
         /**
          * Constructor
@@ -379,7 +387,7 @@ public class SQLExtractor implements Cloneable {
         @SuppressWarnings("unchecked")
         public <V> V getValue(ResultSet rs, int colIndex) throws SQLException {
             if (getPlatform() == SQLPlatform.SQLITE) {
-                final String value = rs.getString(colIndex);
+                var value = rs.getString(colIndex);
                 if (value == null) {
                     return null;
                 } else if (value.matches("\\d+")) {
@@ -388,7 +396,7 @@ public class SQLExtractor implements Cloneable {
                     return (V)LocalDate.parse(value);
                 }
             } else {
-                final java.sql.Date date = rs.getDate(colIndex);
+                var date = rs.getDate(colIndex, calendar);
                 return date != null ? (V)date.toLocalDate() : null;
             }
         }
@@ -396,6 +404,8 @@ public class SQLExtractor implements Cloneable {
 
 
     private static class LocalTimeExtractor extends SQLExtractor {
+
+        private Calendar calendar = Calendar.getInstance();
 
         /**
          * Constructor
@@ -407,13 +417,15 @@ public class SQLExtractor implements Cloneable {
         @Override
         @SuppressWarnings("unchecked")
         public <V> V getValue(ResultSet rs, int colIndex) throws SQLException {
-            final Time time = rs.getTime(colIndex);
+            final Time time = rs.getTime(colIndex, calendar);
             return time != null ? (V)time.toLocalTime() : null;
         }
     }
 
 
     private static class LocalDateTimeExtractor extends SQLExtractor {
+
+        private Calendar calendar = Calendar.getInstance();
 
         /**
          * Constructor
@@ -425,7 +437,7 @@ public class SQLExtractor implements Cloneable {
         @Override
         @SuppressWarnings("unchecked")
         public <V> V getValue(ResultSet rs, int colIndex) throws SQLException {
-            final Timestamp timestamp = rs.getTimestamp(colIndex);
+            final Timestamp timestamp = rs.getTimestamp(colIndex, calendar);
             return timestamp != null ? (V)timestamp.toLocalDateTime() : null;
         }
     }

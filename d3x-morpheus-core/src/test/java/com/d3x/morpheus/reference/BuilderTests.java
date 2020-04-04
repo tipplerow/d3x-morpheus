@@ -87,7 +87,7 @@ public class BuilderTests {
     @Test(dataProvider="denseOrSparse")
     public void ints(boolean sparse) {
         var builder = DataFrame.builder(String.class, String.class).capacity(100, 100);
-        if (sparse) IntStream.range(0, 5).forEach(i -> builder.fillPct("C" + i, 0.2f));
+        if (sparse) builder.setLoadFactor(c -> 0.2f);
         var frame = builder
             .putInt("R0", "C0", 5)
             .putInt("R1", "C1", 10)
@@ -127,7 +127,7 @@ public class BuilderTests {
     @Test(dataProvider="denseOrSparse")
     public void longs(boolean sparse) {
         var builder = DataFrame.builder(String.class, String.class).capacity(100, 100);
-        if (sparse) IntStream.range(0, 5).forEach(i -> builder.fillPct("C" + i, 0.2f));
+        if (sparse) builder.setLoadFactor(c -> 0.2f);
         var frame = builder
             .putLong("R0", "C0", 5L)
             .putLong("R1", "C1", 10L)
@@ -168,7 +168,7 @@ public class BuilderTests {
     @Test(dataProvider="denseOrSparse")
     public void doubles(boolean sparse) {
         var builder = DataFrame.builder(String.class, String.class).capacity(100, 100);
-        if (sparse) IntStream.range(0, 5).forEach(i -> builder.fillPct("C" + i, 0.2f));
+        if (sparse) builder.setLoadFactor(v -> 0.2f);
         var frame = builder
             .putDouble("R0", "C0", 1.1)
             .putDouble("R1", "C1", 2.2)
@@ -208,7 +208,7 @@ public class BuilderTests {
     @Test(dataProvider="denseOrSparse")
     public void strings(boolean sparse) {
         var builder = DataFrame.builder(String.class, String.class).capacity(100, 100);
-        if (sparse) IntStream.range(0, 5).forEach(i -> builder.fillPct("C" + i, 0.2f));
+        if (sparse) builder.setLoadFactor(v -> 0.2f);
         var frame = builder
             .putValue("R0", "C0", "1.1")
             .putValue("R1", "C1", "2.2")
