@@ -131,6 +131,17 @@ public class ArrayBuilder<T> {
         return dataType != null ? dataType : ArrayType.OBJECT;
     }
 
+
+    /**
+     * Returns true if the entry at index is null
+     * @param index     the array index
+     * @return          true if entry is null at index
+     */
+    public boolean isNull(int index) {
+        return array == null || array.isNull(index);
+    }
+
+
     /**
      * Adds an entry to array being built
      * @param value the value to add

@@ -26,6 +26,7 @@ import java.util.Calendar;
 import java.util.Currency;
 import java.util.Date;
 import java.util.Random;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
@@ -614,5 +615,14 @@ public class ArrayBuilderTests {
         Assert.assertEquals(result.length(),2);
         Assert.assertEquals(result.getDouble(0), 10d, 0.0000001d);
         Assert.assertEquals(result.getDouble(1), 30d, 0.0000001d);
+    }
+
+
+    @Test(dataProvider = "types")
+    public void isNull(Class<?> type) {
+        if (!Set.of(Boolean.class, Integer.class, Long.class).contains(type)) {
+            var builder = ArrayBuilder.of(100, type);
+            Assert.assertTrue(IntStream.range(0, 100).allMatch(builder::isNull));
+        }
     }
 }
