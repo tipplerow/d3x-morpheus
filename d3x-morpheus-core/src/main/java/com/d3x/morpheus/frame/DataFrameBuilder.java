@@ -282,6 +282,23 @@ public class DataFrameBuilder<R,C> {
 
 
     /**
+     * Returns true if the value at coordinates is null
+     * @param rowKey    the row key
+     * @param colKey    the column key
+     * @return          true if value is null
+     */
+    public boolean isNull(R rowKey, C colKey) {
+        var array = arrayMap.get(colKey);
+        if (array == null) {
+            return true;
+        } else {
+            var rowIndex = rowKeys.getCoordinate(rowKey);
+            return rowIndex < 0 || array.isNull(rowIndex);
+        }
+    }
+
+
+    /**
      * Makes this builder thread safe
      * @return  this builder
      */

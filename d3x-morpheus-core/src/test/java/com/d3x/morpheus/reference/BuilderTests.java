@@ -15,6 +15,7 @@
  */
 package com.d3x.morpheus.reference;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -372,6 +373,20 @@ public class BuilderTests {
         Assert.assertEquals(frame.getDouble("R0", "C0"), 10d, 0.000001d);
         Assert.assertEquals(frame.getDouble("R1", "C1"), 70d, 0.000001d);
         Assert.assertEquals(frame.getDouble("R2", "C2"), 30d, 0.000001d);
+    }
+
+
+    @Test()
+    public void isNull() {
+        var frame = DataFrame.builder(String.class, String.class);
+        frame.capacity(100, 100);
+        frame.addColumn("C1", double.class);
+        frame.addColumn("C2", LocalDate.class);
+        frame.addColumn("C3", String.class);
+        IntStream.range(0, 20).forEach(i -> frame.putDouble("R" + i, "C1", Double.NaN));
+        Assert.assertTrue(IntStream.range(0, 20).allMatch(i -> frame.isNull("R" + i, "C1")));
+        Assert.assertTrue(IntStream.range(0, 20).allMatch(i -> frame.isNull("R" + i, "C2")));
+        Assert.assertTrue(IntStream.range(0, 20).allMatch(i -> frame.isNull("R" + i, "C3")));
     }
 
 
