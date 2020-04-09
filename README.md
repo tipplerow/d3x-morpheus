@@ -283,48 +283,48 @@ see the section on visualization [here](https://www.d3xsystems.com/morpheus/char
 
 <table width="100%" border="0">
     <tr style="background-color:white;">
-        <td style="background-color:white;"><img class="chart img-fluid" src="/morpheus-docs/docs/images/morpheus/gallery/chart-1.png"/></td>
-        <td style="background-color:white;"><img class="chart img-fluid" src="/morpheus-docs/docs/images/morpheus/gallery/chart-2.png"/></td>
+        <td style="background-color:white;"><img class="chart img-fluid" src="/d3x-morpheus-docs/docs/images/morpheus/gallery/chart-1.png"/></td>
+        <td style="background-color:white;"><img class="chart img-fluid" src="/d3x-morpheus-docs/docs/images/morpheus/gallery/chart-2.png"/></td>
     </tr>
     <tr style="background-color:white;">
-        <td style="background-color:white;"><img class="chart img-fluid" src="/morpheus-docs/docs/images/morpheus/gallery/chart-3.png"/></td>
-        <td style="background-color:white;"><img class="chart img-fluid" src="/morpheus-docs/docs/images/morpheus/gallery/chart-4.png"/></td>
+        <td style="background-color:white;"><img class="chart img-fluid" src="/d3x-morpheus-docs/docs/images/morpheus/gallery/chart-3.png"/></td>
+        <td style="background-color:white;"><img class="chart img-fluid" src="/d3x-morpheus-docs/docs/images/morpheus/gallery/chart-4.png"/></td>
     </tr>
     <tr style="background-color:white;">
-        <td style="background-color:white;"><img class="chart img-fluid" src="/morpheus-docs/docs/images/morpheus/gallery/chart-5.png"/></td>
-        <td style="background-color:white;"><img class="chart img-fluid" src="/morpheus-docs/docs/images/morpheus/gallery/chart-6.png"/></td>
+        <td style="background-color:white;"><img class="chart img-fluid" src="/d3x-morpheus-docs/docs/images/morpheus/gallery/chart-5.png"/></td>
+        <td style="background-color:white;"><img class="chart img-fluid" src="/d3x-morpheus-docs/docs/images/morpheus/gallery/chart-6.png"/></td>
     </tr>
     <tr style="background-color:white;">
-        <td style="background-color:white;"><img class="chart img-fluid" src="/morpheus-docs/docs/images/morpheus/gallery/chart-7.png"/></td>
-        <td style="background-color:white;"><img class="chart img-fluid" src="/morpheus-docs/docs/images/morpheus/gallery/chart-8.png"/></td>
+        <td style="background-color:white;"><img class="chart img-fluid" src="/d3x-morpheus-docs/docs/images/morpheus/gallery/chart-7.png"/></td>
+        <td style="background-color:white;"><img class="chart img-fluid" src="/d3x-morpheus-docs/docs/images/morpheus/gallery/chart-8.png"/></td>
     </tr>
     <tr style="background-color:white;">
-        <td style="background-color:white;"><img class="chart img-fluid" src="/morpheus-docs/docs/images/morpheus/gallery/chart-9.png"/></td>
-        <td style="background-color:white;"><img class="chart img-fluid" src="/morpheus-docs/docs/images/morpheus/gallery/chart-10.png"/></td>
+        <td style="background-color:white;"><img class="chart img-fluid" src="/d3x-morpheus-docs/docs/images/morpheus/gallery/chart-9.png"/></td>
+        <td style="background-color:white;"><img class="chart img-fluid" src="/d3x-morpheus-docs/docs/images/morpheus/gallery/chart-10.png"/></td>
     </tr>
     <tr style="background-color:white;">
-        <td style="background-color:white;"><img class="chart img-fluid" src="/morpheus-docs/docs/images/morpheus/gallery/chart-11.png"/></td>
-        <td style="background-color:white;"><img class="chart img-fluid" src="/morpheus-docs/docs/images/morpheus/gallery/chart-12.png"/></td>
+        <td style="background-color:white;"><img class="chart img-fluid" src="/d3x-morpheus-docs/docs/images/morpheus/gallery/chart-11.png"/></td>
+        <td style="background-color:white;"><img class="chart img-fluid" src="/d3x-morpheus-docs/docs/images/morpheus/gallery/chart-12.png"/></td>
     </tr>
     <tr style="background-color:white;">
-        <td style="background-color:white;"><img class="chart img-fluid" src="/morpheus-docs/docs/images/morpheus/gallery/chart-13.png"/></td>
-        <td style="background-color:white;"><img class="chart img-fluid" src="/morpheus-docs/docs/images/morpheus/gallery/chart-14.png"/></td>
+        <td style="background-color:white;"><img class="chart img-fluid" src="/d3x-morpheus-docs/docs/images/morpheus/gallery/chart-13.png"/></td>
+        <td style="background-color:white;"><img class="chart img-fluid" src="/d3x-morpheus-docs/docs/images/morpheus/gallery/chart-14.png"/></td>
     </tr>
     <tr style="background-color:white;">
-        <td style="background-color:white;"><img class="chart img-fluid" src="/morpheus-docs/docs/images/morpheus/gallery/chart-15.png"/></td>
-        <td style="background-color:white;"><img class="chart img-fluid" src="/morpheus-docs/docs/images/morpheus/gallery/chart-16.png"/></td>
+        <td style="background-color:white;"><img class="chart img-fluid" src="/d3x-morpheus-docs/docs/images/morpheus/gallery/chart-15.png"/></td>
+        <td style="background-color:white;"><img class="chart img-fluid" src="/d3x-morpheus-docs/docs/images/morpheus/gallery/chart-16.png"/></td>
     </tr>
     <tr style="background-color:white;">
-        <td style="background-color:white;"><img class="chart img-fluid" src="/morpheus-docs/docs/images/morpheus/gallery/chart-17.png"/></td>
-        <td style="background-color:white;"><img class="chart img-fluid" src="/morpheus-docs/docs/images/morpheus/gallery/chart-18.png"/></td>
+        <td style="background-color:white;"><img class="chart img-fluid" src="/d3x-morpheus-docs/docs/images/morpheus/gallery/chart-17.png"/></td>
+        <td style="background-color:white;"><img class="chart img-fluid" src="/d3x-morpheus-docs/docs/images/morpheus/gallery/chart-18.png"/></td>
     </tr>
     <tr style="background-color:white;">
-        <td style="background-color:white;"><img class="chart img-fluid" src="/morpheus-docs/docs/images/morpheus/gallery/chart-19.png"/></td>
-        <td style="background-color:white;"><img class="chart img-fluid" src="/morpheus-docs/docs/images/morpheus/gallery/chart-20.png"/></td>
+        <td style="background-color:white;"><img class="chart img-fluid" src="/d3x-morpheus-docs/docs/images/morpheus/gallery/chart-19.png"/></td>
+        <td style="background-color:white;"><img class="chart img-fluid" src="/d3x-morpheus-docs/docs/images/morpheus/gallery/chart-20.png"/></td>
     </tr>
     <tr style="background-color:white;">
-        <td style="background-color:white;"><img class="chart img-fluid" src="/morpheus-docs/docs/images/morpheus/gallery/chart-21.png"/></td>
-        <td style="background-color:white;"><img class="chart img-fluid" src="/morpheus-docs/docs/images/morpheus/gallery/chart-22.png"/></td>
+        <td style="background-color:white;"><img class="chart img-fluid" src="/d3x-morpheus-docs/docs/images/morpheus/gallery/chart-21.png"/></td>
+        <td style="background-color:white;"><img class="chart img-fluid" src="/d3x-morpheus-docs/docs/images/morpheus/gallery/chart-22.png"/></td>
     </tr>
 </table>
 
@@ -344,7 +344,7 @@ The core library that contains Morpheus Arrays, DataFrames and other key interfa
 <dependency>
     <groupId>com.d3xsystems</groupId>
     <artifactId>d3x-morpheus-core</artifactId>
-    <version>1.0.5</version>
+    <version>1.0.31</version>
 </dependency>
 ```
 
@@ -357,7 +357,7 @@ An adapter to load Excel spreadsheets into a Morpheus DataFrame
 <dependency>
     <groupId>com.d3xsystems</groupId>
     <artifactId>d3x-morpheus-excel</artifactId>
-    <version>1.0.5</version>
+    <version>1.0.31</version>
 </dependency>
 ```
 
@@ -370,7 +370,7 @@ An adapter to read and write Morpheus DataFrames in an efficient JSON format lev
 <dependency>
     <groupId>com.d3xsystems</groupId>
     <artifactId>d3x-morpheus-json</artifactId>
-    <version>1.0.5</version>
+    <version>1.0.31</version>
 </dependency>
 ```
 
@@ -383,7 +383,7 @@ An adapter to read and write Morpheus DataFrames against a SQL data store.
 <dependency>
     <groupId>com.d3xsystems</groupId>
     <artifactId>d3x-morpheus-db</artifactId>
-    <version>1.0.5</version>
+    <version>1.0.31</version>
 </dependency>
 ```
 
@@ -396,7 +396,7 @@ A library of components to display Morpheus `DataFrames` in charts and tables.
 <dependency>
     <groupId>com.d3xsystems</groupId>
     <artifactId>d3x-morpheus-viz</artifactId>
-    <version>1.0.5</version>
+    <version>1.0.31</version>
 </dependency>
 ```
 
@@ -409,7 +409,7 @@ An adapter to load data from [Quandl](http://www.quandl.com) into a Morpheus Dat
 <dependency>
     <groupId>com.d3xsystems</groupId>
     <artifactId>d3x-morpheus-quandl</artifactId>
-    <version>1.0.5</version>
+    <version>1.0.31</version>
 </dependency>
 ```
 
@@ -422,7 +422,7 @@ An adapter to load data from the [Worldbank](https://data.worldbank.org/) into a
 <dependency>
     <groupId>com.d3xsystems</groupId>
     <artifactId>d3x-morpheus-worldbank</artifactId>
-    <version>1.0.5</version>
+    <version>1.0.31</version>
 </dependency>
 ```
 
