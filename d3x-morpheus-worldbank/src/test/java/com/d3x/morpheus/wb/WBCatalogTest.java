@@ -34,7 +34,7 @@ import org.testng.annotations.Test;
 public class WBCatalogTest {
 
 
-    @Test()
+    @Test(enabled = false)
     public void testCatalog() {
         final WBCatalog catalog = WBCatalog.getCatalog();
         Assert.assertTrue(catalog.getItems().size() > 200, "There are at least 200 items in the catalog");

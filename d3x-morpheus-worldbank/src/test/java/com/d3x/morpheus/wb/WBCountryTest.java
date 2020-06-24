@@ -40,7 +40,7 @@ public class WBCountryTest {
     private WBCountrySource source = new WBCountrySource();
 
 
-    @Test
+    @Test(enabled = false)
     public void testList() {
         final List<WBCountry> countries = WBCountry.getCountries();
         final Map<String,WBCountry> countryMap1 = countries.stream().collect(Collectors.toMap(WBCountry::getId, c -> c));
@@ -82,7 +82,7 @@ public class WBCountryTest {
     }
 
 
-    @Test
+    @Test(enabled = false)
     public void testDataFrame() {
         final DataFrame<String,WBCountry.Field> frame = source.read(o -> o.setUseIsoCode(true));
         final List<WBCountry> countries = WBCountry.getCountries();
