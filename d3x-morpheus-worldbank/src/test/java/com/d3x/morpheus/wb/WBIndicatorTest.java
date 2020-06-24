@@ -15,7 +15,6 @@
  */
 package com.d3x.morpheus.wb;
 
-import java.io.File;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -44,7 +43,7 @@ public class WBIndicatorTest {
     private WBIndicatorSource source = new WBIndicatorSource();
 
 
-    @Test()
+    @Test(enabled = false)
     public void testLoadIndicators() {
         final List<WBIndicator> indicators = WBIndicator.getIndicators();
         final Map<String,WBIndicator> indicatorMap = new HashMap<>(indicators.size());
@@ -54,7 +53,7 @@ public class WBIndicatorTest {
     }
 
 
-    @Test()
+    @Test(enabled = false)
     public void testC02() {
         var path = "/indicators/EN.ATM.CO2E.PC.csv";
         var expected = DataFrame.read(path).csv(LocalDate.class, options -> {
