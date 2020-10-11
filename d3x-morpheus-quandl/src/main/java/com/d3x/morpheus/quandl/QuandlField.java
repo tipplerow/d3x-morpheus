@@ -47,7 +47,8 @@ public enum QuandlField {
     DATABASE_ID(int.class),
     COLUMN_NAMES(List.class),
     FAVOURITE(boolean.class),
-    URL_NAME(String.class);
+    URL_NAME(String.class),
+    EXCLUSIVE(Boolean.class);
 
     public static final Map<String,QuandlField> fieldMap = new HashMap<>();
 
@@ -69,6 +70,7 @@ public enum QuandlField {
         fieldMap.put("image", QuandlField.IMAGE_URL);
         fieldMap.put("favorite", QuandlField.FAVOURITE);
         fieldMap.put("url_name", QuandlField.URL_NAME);
+        fieldMap.put("exclusive", QuandlField.EXCLUSIVE);
     }
 
 

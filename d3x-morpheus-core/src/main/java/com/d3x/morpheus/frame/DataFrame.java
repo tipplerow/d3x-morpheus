@@ -627,6 +627,26 @@ public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperation
         return DataFrame.factory().concatColumns(frames.iterator());
     }
 
+
+    /**
+     * Returns a DataFrame initialized from a consumers actions on a builder
+     * @param rowType   the row key type
+     * @param colType   the column key type
+     * @param consumer  the consumer to affect builder
+     * @param <R>       the row type
+     * @param <C>       the column type
+     * @return          the newly created DataFrame
+     */
+    static <R,C> DataFrame<R,C> of(
+        @lombok.NonNull Class<R> rowType,
+        @lombok.NonNull Class<C> colType,
+        @lombok.NonNull Consumer<DataFrameBuilder<R,C>> consumer) {
+        var builder = DataFrame.builder(rowType, colType);
+        consumer.accept(builder);
+        return builder.build();
+    }
+
+
     /**
      * Returns an empty DataFrame with the row and column types specified
      * @param rowType   the row key type
