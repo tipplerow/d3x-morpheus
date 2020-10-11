@@ -44,10 +44,10 @@ public class DataFrameBuilder<R,C> {
 
     /** The row key type for frame */
     @lombok.Getter
-    private Class<R> rowType;
+    private final Class<R> rowType;
     /** The column key type for frame */
     @lombok.Getter
-    private Class<C> colType;
+    private final Class<C> colType;
     /** The function to provide the load factor for columns */
     @lombok.Setter @lombok.NonNull
     private Function<C,Float> loadFactor = c -> 1f;

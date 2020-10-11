@@ -22,6 +22,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -56,15 +57,12 @@ import com.univocity.parsers.csv.CsvParserSettings;
 public class CsvSourceDefault implements CsvSource {
 
     @lombok.NonNull
-    private Resource resource;
+    private final Resource resource;
 
 
     @Override
-    @SuppressWarnings("unchecked")
     public DataFrame<Integer,String> read() throws DataFrameException {
-        return read(Integer.class, o -> {
-            o.setHeader(true);
-        });
+        return read(Integer.class, o -> o.setHeader(true));
     }
 
     @Override
@@ -101,7 +99,7 @@ public class CsvSourceDefault implements CsvSource {
                 httpRequest.setUrl(url);
                 httpRequest.setResponseHandler(response -> {
                     try (InputStream stream = response.getStream()) {
-                        final DataFrame<R,String> frame = parse(rowType, options, stream);
+                        var frame = parse(rowType, options, stream);
                         return Optional.ofNullable(frame);
                     } catch (IOException ex) {
                         throw new RuntimeException("Failed to load DataFrame from csv: " + url, ex);
@@ -202,8 +200,13 @@ public class CsvSourceDefault implements CsvSource {
 
         @Override
         public void processEnded(ParsingContext context) {
-            this.columns.forEach(CsvColumn::flush);
-            this.endTime = System.currentTimeMillis();
+            if (this.columns == null) {
+                this.columns = Collections.emptyList();
+                this.endTime = System.currentTimeMillis();
+            } else {
+                this.columns.forEach(CsvColumn::flush);
+                this.endTime = System.currentTimeMillis();
+            }
         }
 
 
@@ -238,7 +241,9 @@ public class CsvSourceDefault implements CsvSource {
         @SuppressWarnings("unchecked")
         private DataFrame<R,String> build() {
             try {
-                if (options.getRowKeyColumnName() != null) {
+                if (rowCounter == 0) {
+                    return DataFrame.empty();
+                } else if (options.getRowKeyColumnName() != null) {
                     var rowKeyColumn = options.getRowKeyColumnName();
                     var rowColumn = columns.stream().filter(v -> v.name.equals(rowKeyColumn)).findFirst().orElse(null);
                     if (rowColumn == null) throw new DataFrameException("No column in content matching: " + rowKeyColumn);

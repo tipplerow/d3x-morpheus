@@ -94,9 +94,16 @@ public class QuandlSource {
 
     /**
      * Constructor
+     */
+    public QuandlSource() {
+        this(System.getProperty("quandl.api.key"));
+    }
+
+    /**
+     * Constructor
      * @param apiKey    the Quandl API token
      */
-    public QuandlSource(String apiKey) {
+    public QuandlSource(@lombok.NonNull String apiKey) {
         this("https://www.quandl.com", apiKey);
     }
 
@@ -165,7 +172,7 @@ public class QuandlSource {
             final int pageSize = 100;
             final List<DataFrame<Integer,String>> frameList = new ArrayList<>();
             for (int i=0; i<maxPages; ++i) {
-                final URL url = createUrl("/api/v3/databases.csv", "page=" + i + "&per_page=" + pageSize);
+                var url = createUrl("/api/v3/databases.csv", "page=" + i + "&per_page=" + pageSize);
                 System.out.println("Calling: " + url);
                 var frame = DataFrame.read(url).csv(Integer.class, options -> {
                     options.setRowKeyColumnName("id");
@@ -665,6 +672,17 @@ public class QuandlSource {
                 throw new IllegalArgumentException("Unsupported temporal type: " + type);
             }
         }
+    }
+
+
+
+    public static void main(String[] args) {
+        var source = new QuandlSource("krRKRyHnU8KcHaXtvyhK");
+        var data = source.getTimeSeries(o -> {
+            o.setDatabase("YC");
+            o.setDataset("BEL");
+        });
+        data.out().print();
     }
 
 }

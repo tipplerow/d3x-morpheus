@@ -48,7 +48,7 @@ import static com.d3x.morpheus.quandl.QuandlField.START_DATE;
  */
 public class QuandlTests {
 
-    private QuandlSource source = new QuandlSource("NSXspMMxn41-Y-9w_hw_");
+    private final QuandlSource source = new QuandlSource();
 
     @DataProvider(name="wiki")
     public Object[][] wiki() {
@@ -90,11 +90,11 @@ public class QuandlTests {
     }
 
     @Test()
-    public void testDatabaseListing() {
-        final DataFrame<Integer, QuandlField> frame = source.getDatabases();
+    public void databases() {
+        var frame = source.getDatabases();
         frame.out().print();
         Assert.assertTrue(frame.rowCount() > 0);
-        Assert.assertEquals(frame.colCount(), 9);
+        Assert.assertEquals(frame.colCount(), 10);
         Assert.assertTrue(frame.cols().containsAll(Arrays.asList(NAME, DESCRIPTION, DATABASE_CODE, DATASET_COUNT, DOWNLOADS, PREMIUM, IMAGE_URL)));
         Assert.assertEquals(frame.cols().type(NAME), String.class);
         Assert.assertEquals(frame.cols().type(DESCRIPTION), String.class);
@@ -107,8 +107,8 @@ public class QuandlTests {
 
 
     @Test()
-    public void testDatasetListing() {
-        final String databaseCode = "WIKI";
+    public void datasets() {
+        final String databaseCode = "FED";
         final DataFrame<String,QuandlField> frame = source.getDatasets(databaseCode);
         frame.out().print();
         Assert.assertTrue(frame.rowCount() > 0);
@@ -124,7 +124,7 @@ public class QuandlTests {
 
 
     @Test()
-    public void testDatasetSearch() {
+    public void search() {
         final DataFrame<Integer,QuandlField> frame = source.search("crude oil");
         frame.out().print();
         Assert.assertTrue(frame.rowCount() > 0);
@@ -143,7 +143,7 @@ public class QuandlTests {
 
 
     @Test(dataProvider = "metadata1")
-    public void testDatabaseMetaData(String database) {
+    public void metadata1(String database) {
         final QuandlDatabaseInfo metaData = source.getMetaData(database);
         IO.println(metaData);
         Assert.assertNotNull(metaData, "Meta-data is not null");
@@ -157,7 +157,7 @@ public class QuandlTests {
 
 
     @Test(dataProvider = "metadata2")
-    public void testDatasetMetaData(String database, String dataset) {
+    public void metadata2(String database, String dataset) {
         final QuandlDatasetInfo metaData = source.getMetaData(database, dataset);
         IO.println(metaData);
         Assert.assertNotNull(metaData, "Meta-data is not null");
@@ -177,7 +177,7 @@ public class QuandlTests {
 
 
     @Test(dataProvider = "wiki")
-    public void testTimeSeriesQuery(String dataset, int expectedColCount) {
+    public void series(String dataset, int expectedColCount) {
         final DataFrame<LocalDate,String> frame = source.getTimeSeries(options -> {
             options.setDatabase("WIKI");
             options.setDataset(dataset);
@@ -202,7 +202,7 @@ public class QuandlTests {
 
 
     @Test()
-    public void testDataTableQuery() {
+    public void table() {
         final DataFrame<Integer,String> frame = source.getDataTable(options -> {
             options.setDatabase("FXCM");
             options.setDataset("H1");
@@ -213,7 +213,7 @@ public class QuandlTests {
         Assert.assertEquals(frame.colCount(), 12);
         Assert.assertEquals(frame.cols().type("symbol"), String.class);
         Assert.assertEquals(frame.cols().type("date"), LocalDate.class);
-        Assert.assertEquals(frame.cols().type("hour"), Integer.class);
+        Assert.assertEquals(frame.cols().type("hour"), Double.class);
         Assert.assertEquals(frame.cols().type("openbid"), Double.class);
         Assert.assertEquals(frame.cols().type("highbid"), Double.class);
         Assert.assertEquals(frame.cols().type("lowbid"), Double.class);
@@ -222,7 +222,7 @@ public class QuandlTests {
         Assert.assertEquals(frame.cols().type("highask"), Double.class);
         Assert.assertEquals(frame.cols().type("lowask"), Double.class);
         Assert.assertEquals(frame.cols().type("closeask"), Double.class);
-        Assert.assertEquals(frame.cols().type("totalticks"), Integer.class);
+        Assert.assertEquals(frame.cols().type("totalticks"), Double.class);
         Assert.assertEquals(frame.col("openbid").count(DataFrameValue::isNull), 0);
         Assert.assertTrue(frame.col("totalticks").stats().sum() > 0d);
     }
