@@ -161,7 +161,7 @@ public class RangeSplitTests {
     public void testSplitZonedDateTimes(boolean ascending) {
         final Duration step = Duration.ofSeconds(1);
         final ZonedDateTime start = ZonedDateTime.of(2014, 1, 1, 14, 15, 20, 0, ZoneId.systemDefault());
-        final ZonedDateTime end = start.plusSeconds(10000000 * (ascending ? 1 : -1));
+        final ZonedDateTime end = start.plusYears(5 * (ascending ? 1 : -1));
         final Range<ZonedDateTime> range = Range.of(start, end, step);
         final List<Range<ZonedDateTime>> segments = range.split();
         Assert.assertTrue(segments.size() > 1, "There are multiple segments");
