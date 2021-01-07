@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.d3xsystems</groupId>
     <artifactId>d3x-morpheus</artifactId>
-    <version>1.0.34</version>
+    <version>1.0.36</version>
     <packaging>pom</packaging>
 
     <modules>
@@ -15,7 +15,7 @@
         <module>d3x-morpheus-json/pom.xml</module>
         <module>d3x-morpheus-quandl/pom.xml</module>
         <module>d3x-morpheus-worldbank/pom.xml</module>
-        <module>d3x-morpheus-avro/pom.xml</module>
+        <!--module>d3x-morpheus-avro/pom.xml</module-->
         <!--module>d3x-morpheus-docs/pom.xml</module-->
     </modules>
 
@@ -76,15 +76,40 @@
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
-            <version>[6.13.1,7.0.0)</version>
+            <version>[7.3.0,8.0.0)</version>
             <scope>test</scope>
+            <exclusions>
+                <exclusion> <!-- Excluded due to CVE -->
+                    <groupId>junit</groupId>
+                    <artifactId>junit</artifactId>
+                </exclusion>
+                <exclusion> <!-- Excluded due to CVE -->
+                    <groupId>org.yaml</groupId>
+                    <artifactId>snakeyaml</artifactId>
+                </exclusion>
+                <exclusion> <!-- Excluded due to CVE -->
+                    <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>1.27</version>
         </dependency>
 
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.12</version>
-            <scope>provided</scope>
+            <version>[1.18.12,2.0.0)</version>
         </dependency>
 
     </dependencies>
@@ -173,6 +198,20 @@
         <pluginManagement>
 
             <plugins>
+
+                <plugin>
+                    <groupId>org.sonatype.ossindex.maven</groupId>
+                    <artifactId>ossindex-maven-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <id>audit-dependencies</id>
+                            <phase>validate</phase>
+                            <goals>
+                                <goal>audit</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
 
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -280,6 +319,12 @@
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>2.22.1</version>
                     <configuration>
+                        <systemProperties>
+                            <property>
+                                <name>testng.dtd.http</name>
+                                <value>true</value>
+                            </property>
+                        </systemProperties>
                         <redirectTestOutputToFile>false</redirectTestOutputToFile>
                         <suiteXmlFiles>
                             <suiteXmlFile>testng.xml</suiteXmlFile>
