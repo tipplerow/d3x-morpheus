@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.d3xsystems</groupId>
     <artifactId>d3x-morpheus</artifactId>
-    <version>1.0.36</version>
+    <version>1.0.37</version>
     <packaging>pom</packaging>
 
     <modules>
@@ -45,14 +45,16 @@
     </scm>
 
     <distributionManagement>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
         <repository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+            <id>central</id>
+            <name>d3xsystems-artifactory-primary-0-releases</name>
+            <url>https://d3xsystems.jfrog.io/artifactory/d3x-release</url>
         </repository>
+        <snapshotRepository>
+            <id>snapshots</id>
+            <name>d3xsystems-artifactory-primary-0-snapshots</name>
+            <url>https://d3xsystems.jfrog.io/artifactory/d3x-release</url>
+        </snapshotRepository>
     </distributionManagement>
 
     <licenses>
@@ -76,7 +78,7 @@
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
-            <version>[7.3.0,8.0.0)</version>
+            <version>[7.3.0,7.4.0)</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion> <!-- Excluded due to CVE -->
@@ -109,7 +111,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>[1.18.12,2.0.0)</version>
+            <version>[1.18.12,1.19.0)</version>
         </dependency>
 
     </dependencies>
