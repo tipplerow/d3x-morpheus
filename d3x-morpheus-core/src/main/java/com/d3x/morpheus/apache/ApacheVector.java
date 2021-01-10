@@ -78,7 +78,7 @@ public final class ApacheVector<R, C> extends AbstractRealVector {
      * @return a RealVector view of the specified column.
      *
      * @throws DataFrameException unless the data frame contains the specified column
-     * and the column contains numeric values.
+     * and the column contains double precision values.
      */
     public static <R, C> ApacheVector<R, C> wrap(DataFrame<R, C> frame, C colKey) {
         return wrap(frame, colKey, frame.rows().keyList());
@@ -96,7 +96,7 @@ public final class ApacheVector<R, C> extends AbstractRealVector {
      * @return a RealVector view of the specified column and rows.
      *
      * @throws DataFrameException unless the data frame contains the specified column
-     * and rows and the column contains numeric values.
+     * and rows and the column contains double precision values.
      */
     public static <R, C> ApacheVector<R, C> wrap(DataFrame<R, C> frame, C colKey, List<R> rowKeys) {
         return new ApacheVector<>(frame, colKey, rowKeys);
