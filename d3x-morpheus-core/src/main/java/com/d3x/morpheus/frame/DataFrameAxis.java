@@ -15,6 +15,7 @@
  */
 package com.d3x.morpheus.frame;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -25,6 +26,7 @@ import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
 import java.util.function.ToIntFunction;
 import java.util.function.ToLongFunction;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -102,6 +104,15 @@ public interface DataFrameAxis<X,Y,R,C,V extends DataFrameVector,T extends DataF
      * @return  array of keys for this dimension
      */
     Array<X> keyArray();
+
+    /**
+     * Returns the row or column keys in a new ArrayList.
+     *
+     * @return the row or column keys in a new ArrayList.
+     */
+    default List<X> keyList() {
+        return keys().collect(Collectors.toCollection(ArrayList::new));
+    }
 
     /**
      * Returns a stream of the row or column ordinals for this axis.
@@ -421,5 +432,4 @@ public interface DataFrameAxis<X,Y,R,C,V extends DataFrameVector,T extends DataF
      * @return          the updated DataFrame
      */
     <T> DataFrame<R,C> applyValues(X key, Function<DataFrameValue<R,C>,T> function);
-
 }
