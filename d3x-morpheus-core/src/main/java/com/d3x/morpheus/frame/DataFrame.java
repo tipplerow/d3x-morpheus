@@ -394,6 +394,184 @@ public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperation
         return new DataFrameBuilder<>(this);
     }
 
+    /**
+     * Determines whether this DataFrame contains a particular column.
+     *
+     * @param colKey the key of the column in question.
+     *
+     * @return {@code true} iff this DataFrame contains a column with the specified key.
+     */
+    default boolean containsColumn(C colKey) {
+        return cols().contains(colKey);
+    }
+
+    /**
+     * Determines whether this DataFrame contains particular columns.
+     *
+     * @param colKeys the keys of the columns in question.
+     *
+     * @return {@code true} iff this DataFrame contains a column for every key in the input list.
+     */
+    default boolean containsColumns(Iterable<C> colKeys) {
+        for (C colKey : colKeys) {
+            if (!containsColumn(colKey))
+                return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Determines whether this DataFrame contains a particular row.
+     *
+     * @param rowKey the key of the row in question.
+     *
+     * @return {@code true} iff this DataFrame contains a row with the specified key.
+     */
+    default boolean containsRow(R rowKey) {
+        return rows().contains(rowKey);
+    }
+
+    /**
+     * Determines whether this DataFrame contains particular rows.
+     *
+     * @param rowKeys the keys of the rows in question.
+     *
+     * @return {@code true} iff this DataFrame contains a row for every key in the input list.
+     */
+    default boolean containsRows(Iterable<R> rowKeys) {
+        for (R rowKey : rowKeys) {
+            if (!containsRow(rowKey))
+                return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Ensures that this DataFrame contains a particular column.
+     *
+     * @param colKey the required column key.
+     *
+     * @throws DataFrameException unless this DataFrame contains a column with the specified key.
+     */
+    default void requireColumn(C colKey) {
+        if (!containsColumn(colKey))
+            throw new DataFrameException("Missing column [%s].", colKey);
+    }
+
+    /**
+     * Ensures that this DataFrame contains particular columns.
+     *
+     * @param colKeys the required column keys.
+     *
+     * @throws DataFrameException unless this DataFrame contains a column for each specified key.
+     */
+    default void requireColumns(Iterable<C> colKeys) {
+        for (C colKey : colKeys)
+            requireColumn(colKey);
+    }
+
+    /**
+     * Ensures that this DataFrame contains a particular column and that column
+     * contains data of a particular type.
+     *
+     * @param colKey the required column key.
+     * @param class_ the required data type.
+     *
+     * @throws DataFrameException unless this DataFrame contains a column with the
+     * specified key and that column contains double data of the specified type.
+     */
+    default void requireColumnClass(C colKey, Class<?> class_) {
+        requireColumn(colKey);
+
+        Class<?> actual = cols().type(colKey);
+        Class<?> expected = class_;
+
+        if (!actual.equals(expected))
+            throw new DataFrameException(
+                    "Column [%s] contains data of type [%s], not [%s] as required.",
+                    colKey, actual.getSimpleName(), expected.getSimpleName());
+    }
+
+    /**
+     * Ensures that this DataFrame contains a particular column and that column
+     * contains double precision data.
+     *
+     * @param colKey the required double precision column key.
+     *
+     * @throws DataFrameException unless this DataFrame contains a column with the
+     * specified key and that column contains double precision data.
+     */
+    default void requireDoubleColumn(C colKey) {
+        requireColumnClass(colKey, Double.class);
+    }
+
+    /**
+     * Ensures that this DataFrame contains particular columns and those columns
+     * contain double precision data.
+     *
+     * @param colKeys the required double precision column keys.
+     *
+     * @throws DataFrameException unless this DataFrame contains a column for each
+     * specified key and each column contains double precision data.
+     */
+    default void requireDoubleColumns(Iterable<C> colKeys) {
+        for (C colKey : colKeys)
+            requireDoubleColumn(colKey);
+    }
+
+    /**
+     * Ensures that this DataFrame contains a particular column and that column contains numeric data.
+     *
+     * @param colKey the required numeric column key.
+     *
+     * @throws DataFrameException unless this DataFrame contains a column with the specified key and
+     * that column contains numeric data.
+     */
+    default void requireNumericColumn(C colKey) {
+        requireColumn(colKey);
+
+        if (!col(colKey).isNumeric())
+            throw new DataFrameException("Column [%s] contains non-numeric data.", colKey);
+    }
+
+    /**
+     * Ensures that this DataFrame contains particular columns and those columns contain numeric data.
+     *
+     * @param colKeys the required column keys.
+     *
+     * @throws DataFrameException unless this DataFrame contains a column for each specified key and
+     * each column contains numeric data.
+     */
+    default void requireNumericColumns(Iterable<C> colKeys) {
+        for (C colKey : colKeys)
+            requireNumericColumn(colKey);
+    }
+
+    /**
+     * Ensures that this DataFrame contains a particular row.
+     *
+     * @param rowKey the required row key.
+     *
+     * @throws DataFrameException unless this DataFrame contains a row with the specified key.
+     */
+    default void requireRow(R rowKey) {
+        if (!containsRow(rowKey))
+            throw new DataFrameException("Missing row [%s].", rowKey);
+    }
+
+   /**
+     * Ensures that this DataFrame contains particular rows.
+     *
+     * @param rowKeys the required row keys.
+     *
+     * @throws DataFrameException unless this DataFrame contains a row for each specified key.
+     */
+    default void requireRows(Iterable<R> rowKeys) {
+        for (R rowKey : rowKeys)
+            requireRow(rowKey);
+    }
 
     /**
      * Returns a new DataFrame builder for row and column key types
