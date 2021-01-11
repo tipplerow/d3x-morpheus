@@ -29,6 +29,54 @@ public class DoubleComparatorTest {
     private final double smallPos = +1.0E-06;
 
     @Test
+    public void testEqualsArray() {
+        double[] x1 = new double[] { 1.0, 2.0, 3.0 };
+        double[] x2 = new double[] { 1.0 + 1.0E-14, 2.0 + 1.0E-14, 3.0 + 1.0E-14 };
+        double[] x3 = new double[] { 1.0, 2.0, 4.0 };
+        double[] x4 = new double[] { 1.0, 2.0 };
+        double[] x5 = new double[] { 1.0, 2.0, 3.0, 4.0 };
+
+        assertTrue(fixed2.equals(x1, x2));
+        assertFalse(fixed2.equals(x1, x3));
+        assertFalse(fixed2.equals(x1, x4));
+        assertFalse(fixed2.equals(x1, x5));
+    }
+
+    @Test
+    public void testEqualsMatrix() {
+        double[][] x1 = new double[][] {
+                { 1.0, 2.0, 3.0 },
+                { 4.0, 5.0, 6.0 }
+        };
+
+        double[][] x2 = new double[][] {
+                { 1.0 + 1.0E-14, 2.0 + 1.0E-14, 3.0 + 1.0E-14 },
+                { 4.0 + 1.0E-14, 5.0 + 1.0E-14, 6.0 + 1.0E-14 }
+        };
+
+        double[][] x3 = new double[][] {
+                { 1.0, 2.0, 3.0 },
+                { 4.0, 5.0, 7.0 }
+        };
+
+        double[][] x4 = new double[][] {
+                { 1.0, 2.0, 3.0, 4.0 },
+                { 4.0, 5.0, 6.0 }
+        };
+
+        double[][] x5 = new double[][] {
+                { 1.0, 2.0 },
+                { 3.0, 4.0 },
+                { 5.0, 6.0 }
+        };
+
+        assertTrue(fixed2.equals(x1, x2));
+        assertFalse(fixed2.equals(x1, x3));
+        assertFalse(fixed2.equals(x1, x4));
+        assertFalse(fixed2.equals(x1, x5));
+    }
+
+    @Test
     public void testFixedCompare() {
         // The exact value...
         double x = 4.0 / 3.0;
@@ -93,6 +141,25 @@ public class DoubleComparatorTest {
         assertTrue(fixed2.isZero(tinyNeg));
         assertFalse(fixed2.isZero(smallNeg));
         assertFalse(fixed2.isZero(-1.0));
+    }
+
+    @Test
+    public void testisNonZero() {
+        assertTrue(fixed1.isNonZero(1.0));
+        assertFalse(fixed1.isNonZero(smallPos));
+        assertFalse(fixed1.isNonZero(tinyPos));
+        assertFalse(fixed1.isNonZero(0.0));
+        assertFalse(fixed1.isNonZero(tinyNeg));
+        assertFalse(fixed1.isNonZero(smallNeg));
+        assertTrue(fixed1.isNonZero(-1.0));
+
+        assertTrue(fixed2.isNonZero(1.0));
+        assertTrue(fixed2.isNonZero(smallPos));
+        assertFalse(fixed2.isNonZero(tinyPos));
+        assertFalse(fixed2.isNonZero(0.0));
+        assertFalse(fixed2.isNonZero(tinyNeg));
+        assertTrue(fixed2.isNonZero(smallNeg));
+        assertTrue(fixed2.isNonZero(-1.0));
     }
 
     @Test

@@ -88,6 +88,48 @@ public interface DoubleComparator extends Comparator<Double> {
     }
 
     /**
+     * Tests two double precision arrays for (near) equality.
+     *
+     * @param x the first array to compare.
+     * @param y the second array to compare.
+     *
+     * @return {@code true} iff the arrays have equal length and this
+     * comparator determines that all corresponding elements are equal.
+     */
+    default boolean equals(double[] x, double[] y) {
+        if (x.length != y.length)
+            return false;
+
+        for (int i = 0; i < x.length; i++) {
+            if (!equals(x[i], y[i]))
+                return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Tests two double precision matrices for (near) equality.
+     *
+     * @param x the first matrix to compare.
+     * @param y the second matrix to compare.
+     *
+     * @return {@code true} iff the matrices have equal dimensions and this
+     * comparator determines that all corresponding elements are equal.
+     */
+    default boolean equals(double[][] x, double[][] y) {
+        if (x.length != y.length)
+            return false;
+
+        for (int i = 0; i < x.length; i++) {
+            if (!equals(x[i], y[i]))
+                return false;
+        }
+
+        return true;
+    }
+
+    /**
      * Determines whether a double precision value is negative (by an
      * amount greater than the tolerance of this comparator).
      *
