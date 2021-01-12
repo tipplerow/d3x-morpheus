@@ -110,4 +110,28 @@ public class DataFrameTest extends DataFrameTestBase {
     public void testRequiredRowAbsent() {
         intFrame.requireRow("col1");
     }
+
+    @Test
+    public void testGetMatrix1() {
+        double[][] actual = doubleFrame.getDoubleMatrix();
+        double[][] expected = new double[][] {
+                { 11.0, 12.0, 13.0 },
+                { 21.0, 22.0, 23.0 }
+        };
+
+        assertTrue(comparator.equals(actual, expected));
+    }
+
+    @Test
+    public void testGetMatrix2() {
+        double[][] actual =
+                doubleFrame.getDoubleMatrix(List.of("row2", "row1"), List.of("col3", "col1", "col2"));
+
+        double[][] expected = new double[][] {
+                { 23.0, 21.0, 22.0 },
+                { 13.0, 11.0, 12.0 }
+        };
+
+        assertTrue(comparator.equals(actual, expected));
+    }
 }

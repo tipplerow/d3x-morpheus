@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -571,6 +572,38 @@ public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperation
     default void requireRows(Iterable<R> rowKeys) {
         for (R rowKey : rowKeys)
             requireRow(rowKey);
+    }
+
+    /**
+     * Returns the double precision data in this frame in a two-dimensional array.
+     *
+     * @return the double precision data in this frame in a two-dimensional array.
+     */
+    default double[][] getDoubleMatrix() {
+        double[][] matrixData = new double[rowCount()][];
+
+        for (int irow = 0; irow < rowCount(); irow++)
+            matrixData[irow] = rowAt(irow).getDoubleArray();
+
+        return matrixData;
+    }
+
+    /**
+     * Returns particular double precision data from this frame in a two-dimensional array.
+     *
+     * @param rowKeys the keys of the rows to extract.
+     * @param colKeys the keys of the columns to extract.
+     *
+     * @return the double precision elements from the specified rows and columns in
+     * a two-dimensional array.
+     */
+    default double[][] getDoubleMatrix(List<R> rowKeys, List<C> colKeys) {
+        double[][] matrixData = new double[rowKeys.size()][];
+
+        for (int irow = 0; irow < rowKeys.size(); irow++)
+            matrixData[irow] = row(rowKeys.get(irow)).getDoubleArray(colKeys);
+
+        return matrixData;
     }
 
     /**
