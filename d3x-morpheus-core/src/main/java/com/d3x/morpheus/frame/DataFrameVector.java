@@ -16,6 +16,7 @@
 package com.d3x.morpheus.frame;
 
 import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.DoubleStream;
@@ -348,6 +349,36 @@ public interface DataFrameVector<X,Y,R,C,Z> extends DataFrameOperations<R,C,Z>, 
      * @return      the value for key
      */
     double getDoubleAt(int ordinal);
+
+    /**
+     * Returns the double precision values in this vector in a bare Java array.
+     *
+     * @return the double precision values in this vector in a bare Java array.
+     */
+    default double[] getDoubleArray() {
+        double[] values = new double[size()];
+
+        for (int ordinal = 0; ordinal < values.length; ordinal++)
+            values[ordinal] = getDoubleAt(ordinal);
+
+        return values;
+    }
+
+    /**
+     * Selects double precisions values by key into a bare Java array.
+     *
+     * @param keys the keys of the desired values.
+     *
+     * @return an array having {@code array[k]} equal to {@code getDouble(keys.get(k))}.
+     */
+    default double[] getDoubleArray(List<Y> keys) {
+        double[] values = new double[keys.size()];
+
+        for (int index = 0; index < values.length; index++)
+            values[index] = getDouble(keys.get(index));
+
+        return values;
+    }
 
     /**
      * Returns the value in this vector for the key specified
