@@ -25,37 +25,9 @@ import com.d3x.morpheus.frame.DataFrameException;
 import org.testng.annotations.Test;
 import static org.testng.Assert.*;
 
-public class ApacheVectorTest {
-    private final DataFrame<String, String> finalFrame = newFrame();
-
+public class ApacheVectorTest extends ApacheTestBase {
     private final ApacheVector<String, String> finalCol2 = ApacheVector.wrap(finalFrame, "col2");
     private final ApacheVector<String, String> finalCol4 = ApacheVector.wrap(finalFrame, "col4");
-
-    private static final List<String> rowKeys = List.of("row1", "row2", "row3");
-    private static final List<String> colKeys = List.of("col1", "col2", "col3", "col4");
-
-    private static final double TOLERANCE = 1.0E-12;
-
-    private static DataFrame<String, String> newFrame() {
-        DataFrame<String, String> frame = DataFrame.ofDoubles(rowKeys, colKeys);
-
-        frame.setDouble("row1", "col1", 11.0);
-        frame.setDouble("row1", "col2", 12.0);
-        frame.setDouble("row1", "col3", 13.0);
-        frame.setDouble("row1", "col4", 14.0);
-
-        frame.setDouble("row2", "col1", 21.0);
-        frame.setDouble("row2", "col2", 22.0);
-        frame.setDouble("row2", "col3", 23.0);
-        frame.setDouble("row2", "col4", 24.0);
-
-        frame.setDouble("row3", "col1", 31.0);
-        frame.setDouble("row3", "col2", 32.0);
-        frame.setDouble("row3", "col3", 33.0);
-        frame.setDouble("row3", "col4", 34.0);
-
-        return frame;
-    }
 
     @Test
     public void testColumnKey() {
