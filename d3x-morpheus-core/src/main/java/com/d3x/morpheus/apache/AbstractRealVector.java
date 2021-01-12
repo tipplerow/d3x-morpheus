@@ -15,6 +15,8 @@
  */
 package com.d3x.morpheus.apache;
 
+import java.util.Arrays;
+
 import org.apache.commons.math3.exception.DimensionMismatchException;
 import org.apache.commons.math3.exception.NotPositiveException;
 import org.apache.commons.math3.exception.OutOfRangeException;
@@ -22,8 +24,6 @@ import org.apache.commons.math3.linear.ArrayRealVector;
 import org.apache.commons.math3.linear.RealVector;
 
 import com.d3x.morpheus.util.DoubleComparator;
-
-import java.util.Arrays;
 
 /**
  * Provides a partial implementation of the abstract methods in {@code RealVector}

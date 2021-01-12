@@ -29,6 +29,12 @@ import com.d3x.morpheus.frame.DataFrameException;
  * Provides an adapter to present columns in Morpheus DataFrames as RealVectors in the
  * Apache Commons Math library.
  *
+ * <p>Note that the ApacheVector maintains a reference to the DataFrame from
+ * which it was created, so changes to the ApacheVector (via {@code setEntry})
+ * are reflected in the DataFrame, and changes in the DataFrame are reflected
+ * in the ApacheVector.</p>
+ *
+ *
  * @param <R> the runtime type for the DataFrame row keys.
  * @param <C> the runtime type for the DataFrame column keys.
  *
