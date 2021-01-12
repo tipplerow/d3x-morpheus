@@ -15,7 +15,6 @@
  */
 package com.d3x.morpheus.frame;
 
-import java.util.List;
 import java.util.RandomAccess;
 
 import org.testng.annotations.Test;
@@ -24,15 +23,11 @@ import static org.testng.Assert.*;
 /**
  * Tests default methods implemented in the DataFrameAxis interface.
  */
-public class DataFrameAxisTest {
-    private static final List<String> rowKeys = List.of("row1", "row2");
-    private static final List<String> colKeys = List.of("col1", "col2", "col3");
-    private static final DataFrame<String, String> frame = DataFrame.ofDoubles(rowKeys, colKeys);
-
+public class DataFrameAxisTest extends DataFrameTestBase {
     @Test
     public void testKeyListContents() {
-        assertEquals(frame.rows().keyList(), rowKeys);
-        assertEquals(frame.cols().keyList(), colKeys);
+        assertEquals(intFrame.rows().keyList(), rowKeys);
+        assertEquals(doubleFrame.cols().keyList(), colKeys);
     }
 
     @Test
@@ -40,7 +35,7 @@ public class DataFrameAxisTest {
         //
         // Ensure efficient indexing...
         //
-        assertTrue(frame.rows().keyList() instanceof RandomAccess);
-        assertTrue(frame.cols().keyList() instanceof RandomAccess);
+        assertTrue(intFrame.rows().keyList() instanceof RandomAccess);
+        assertTrue(doubleFrame.cols().keyList() instanceof RandomAccess);
     }
 }
