@@ -32,6 +32,20 @@ public interface Statistic1 extends Statistic {
     long add(double value);
 
     /**
+     * Adds new values to the sample for this statistic.
+     *
+     * @param values the values to add.
+     *
+     * @return the sample size after adding the values.
+     */
+    default long add(double[] values) {
+        for (double value : values)
+            add(value);
+
+        return getN();
+    }
+
+    /**
      * Returns a copy of this statistic
      * @return  a copy of this object
      */
@@ -43,6 +57,19 @@ public interface Statistic1 extends Statistic {
      */
     Statistic1 reset();
 
+    /**
+     * Computes a univariate statistic over a given sample.
+     *
+     * @param stat      the statistic type
+     * @param sample    the sample of values
+     *
+     * @return          the value of the statistic for the given sample.
+     */
+    static double compute(Statistic1 stat, double... sample) {
+        stat.reset();
+        stat.add(sample);
+        return stat.getValue();
+    }
 
     /**
      * Convenience function to compute a univariate statistic on some sample
