@@ -15,6 +15,8 @@
  */
 package com.d3x.morpheus.stats;
 
+import java.util.function.Supplier;
+
 /**
  * An interface that defines an incremental calculation of a uni-variate statistic.
  *
@@ -69,6 +71,18 @@ public interface Statistic1 extends Statistic {
         stat.reset();
         stat.add(sample);
         return stat.getValue();
+    }
+
+    /**
+     * Computes a univariate statistic over a given sample.
+     *
+     * @param stat      a supplier of the statistic type
+     * @param sample    the sample of values
+     *
+     * @return          the value of the statistic for the given sample.
+     */
+    static double compute(Supplier<Statistic1> stat, double... sample) {
+        return compute(stat.get(), sample);
     }
 
     /**
