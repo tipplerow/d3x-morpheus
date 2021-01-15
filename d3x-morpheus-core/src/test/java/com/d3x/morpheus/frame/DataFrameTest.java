@@ -184,4 +184,38 @@ public class DataFrameTest extends DataFrameTestBase {
         assertDoubleFrame(rowFrame0, List.of(rowKey), colKeys, rowData0);
         assertDoubleFrame(rowFrame1, List.of(rowKey), colKeys, rowData1);
     }
+
+    @Test
+    public void testZeros() {
+        DataFrame<String,String> frame = DataFrame.zeros(rowKeys, colKeys);
+
+        double[][] expected = new double[][] {
+                { 0.0, 0.0, 0.0 },
+                { 0.0, 0.0, 0.0 }
+        };
+
+        assertDoubleFrame(frame, rowKeys, colKeys, expected);
+    }
+
+    @Test
+    public void testPatchyUpdate() {
+        DataFrame<String,String> frame = DataFrame.zeros(rowKeys, colKeys);
+
+        DataFrame<String,String> row1 = DataFrame.ofDoubles("row1", List.of("col1", "col2"));
+        row1.setDouble("row1", "col1", 11.0);
+        row1.setDouble("row1", "col2", 12.0);
+
+        DataFrame<String,String> row2 = DataFrame.ofDoubles("row2", List.of("col2", "col3"));
+        row2.setDouble("row2", "col2", 22.0);
+        row2.setDouble("row2", "col3", 23.0);
+
+        frame = frame.update(List.of(row1, row2), false, false);
+
+        double[][] expected = new double[][] {
+                { 11.0, 12.0,  0.0 },
+                {  0.0, 22.0, 23.0 }
+        };
+
+        assertDoubleFrame(frame, rowKeys, colKeys, expected);
+    }
 }

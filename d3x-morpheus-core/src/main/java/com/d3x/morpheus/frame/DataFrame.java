@@ -289,6 +289,22 @@ public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperation
     DataFrame<R,C> update(DataFrame<R,C> update, boolean addRows, boolean addColumns);
 
     /**
+     * Updates data in this frame based on update frames provided
+     * @param updates       the DataFrames with updates to apply to this frame
+     * @param addRows       if true, add any missing row keys from the update
+     * @param addColumns    if true, add any missing column keys from the update
+     * @return              the updated DataFrame
+     */
+    default DataFrame<R,C> update(Iterable<DataFrame<R,C>> updates, boolean addRows, boolean addColumns) {
+        DataFrame<R,C> updated = this;
+
+        for (var update : updates)
+            updated = updated.update(update, addRows, addColumns);
+
+        return updated;
+    }
+
+    /**
      * Returns a <code>DataFrame</code> filter that includes a subset of rows and columns
      * @param rowKeys   the row key selection
      * @param colKeys   the column key selection
@@ -1303,5 +1319,19 @@ public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperation
      */
     static <R,C> DataFrame<R,C> zerosRow(R rowKey, Iterable<C> colKeys) {
         return DataFrame.ofDoubles(rowKey, colKeys).applyDoubles(x -> 0.0);
+    }
+
+    /**
+     * Returns a DataFrame with every element set to 0.0.
+     *
+     * @param <R>     the row key type.
+     * @param <C>     the column key type.
+     * @param rowKeys the row key for the frame.
+     * @param colKeys the column keys for the frame.
+     *
+     * @return a DataFrame with every element set to 0.0.
+     */
+    static <R,C> DataFrame<R,C> zeros(Iterable<R> rowKeys, Iterable<C> colKeys) {
+        return DataFrame.ofDoubles(rowKeys, colKeys, x -> 0.0);
     }
 }
