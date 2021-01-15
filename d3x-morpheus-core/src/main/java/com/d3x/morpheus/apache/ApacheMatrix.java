@@ -82,7 +82,7 @@ public final class ApacheMatrix<R, C> extends AbstractRealMatrix {
      * double precision values.
      */
     public static <R, C> ApacheMatrix<R, C> wrap(DataFrame<R, C> frame) {
-        return wrap(frame, frame.rows().keyList(), frame.cols().keyList());
+        return wrap(frame, frame.listRowKeys(), frame.listColumnKeys());
     }
 
     /**

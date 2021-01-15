@@ -112,6 +112,16 @@ public class DataFrameTest extends DataFrameTestBase {
     }
 
     @Test
+    public void testListRowKeys() {
+        assertEquals(intFrame.listRowKeys(), rowKeys);
+    }
+
+    @Test
+    public void testListColumnKeys() {
+        assertEquals(intFrame.listColumnKeys(), colKeys);
+    }
+
+    @Test
     public void testGetMatrix1() {
         double[][] actual = doubleFrame.getDoubleMatrix();
         double[][] expected = new double[][] {

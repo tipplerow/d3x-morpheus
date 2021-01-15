@@ -411,7 +411,7 @@ public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperation
      *
      * @param colKeys the keys of the columns in question.
      *
-     * @return {@code true} iff this DataFrame contains a column for every key in the input list.
+     * @return {@code true} iff this DataFrame contains a column for every key.
      */
     default boolean containsColumns(Iterable<C> colKeys) {
         for (C colKey : colKeys) {
@@ -438,7 +438,7 @@ public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperation
      *
      * @param rowKeys the keys of the rows in question.
      *
-     * @return {@code true} iff this DataFrame contains a row for every key in the input list.
+     * @return {@code true} iff this DataFrame contains a row for every key.
      */
     default boolean containsRows(Iterable<R> rowKeys) {
         for (R rowKey : rowKeys) {
@@ -447,6 +447,24 @@ public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperation
         }
 
         return true;
+    }
+
+    /**
+     * Returns a list of the row keys for this DataFrame.
+     *
+     * @return a list of the row keys for this DataFrame.
+     */
+    default List<R> listRowKeys() {
+        return rows().keyList();
+    }
+
+    /**
+     * Returns a list of the column keys for this DataFrame.
+     *
+     * @return a list of the column keys for this DataFrame.
+     */
+    default List<C> listColumnKeys() {
+        return cols().keyList();
     }
 
     /**

@@ -87,7 +87,7 @@ public final class ApacheVector<R, C> extends AbstractRealVector {
      * and the column contains double precision values.
      */
     public static <R, C> ApacheVector<R, C> wrap(DataFrame<R, C> frame, C colKey) {
-        return wrap(frame, colKey, frame.rows().keyList());
+        return wrap(frame, colKey, frame.listRowKeys());
     }
 
     /**
