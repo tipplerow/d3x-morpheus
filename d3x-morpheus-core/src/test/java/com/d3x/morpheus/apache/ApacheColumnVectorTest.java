@@ -25,9 +25,9 @@ import com.d3x.morpheus.frame.DataFrameException;
 import org.testng.annotations.Test;
 import static org.testng.Assert.*;
 
-public class ApacheVectorTest extends ApacheTestBase {
-    private final ApacheVector<String, String> finalCol2 = ApacheVector.wrap(finalFrame, "col2");
-    private final ApacheVector<String, String> finalCol4 = ApacheVector.wrap(finalFrame, "col4");
+public class ApacheColumnVectorTest extends ApacheTestBase {
+    private final ApacheColumnVector<String, String> finalCol2 = ApacheColumnVector.wrap(finalFrame, "col2");
+    private final ApacheColumnVector<String, String> finalCol4 = ApacheColumnVector.wrap(finalFrame, "col4");
 
     @Test
     public void testColumnKey() {
@@ -37,18 +37,18 @@ public class ApacheVectorTest extends ApacheTestBase {
 
     @Test(expectedExceptions = DataFrameException.class)
     public void testColumnKeyMissing() {
-        ApacheVector.wrap(finalFrame, "row2");
+        ApacheColumnVector.wrap(finalFrame, "row2");
     }
 
     @Test
     public void testRowKeys() {
         assertEquals(finalCol2.getRowKeys(), rowKeys);
-        assertEquals(ApacheVector.wrap(finalFrame, "col4", List.of("row3", "row1")).getRowKeys(), List.of("row3", "row1"));
+        assertEquals(ApacheColumnVector.wrap(finalFrame, "col4", List.of("row3", "row1")).getRowKeys(), List.of("row3", "row1"));
     }
 
     @Test(expectedExceptions = DataFrameException.class)
     public void testRowKeysMissing() {
-        ApacheVector.wrap(finalFrame, "col2", List.of("row1", "col3"));
+        ApacheColumnVector.wrap(finalFrame, "col2", List.of("row1", "col3"));
     }
 
     @Test(expectedExceptions = UnsupportedOperationException.class)
@@ -94,7 +94,7 @@ public class ApacheVectorTest extends ApacheTestBase {
         assertEquals(finalCol4.getEntry(2), 34.0, TOLERANCE);
 
         // Test a subset of the rows, in different order...
-        ApacheVector<String, String> vec = ApacheVector.wrap(finalFrame, "col4", List.of("row3", "row1"));
+        ApacheColumnVector<String, String> vec = ApacheColumnVector.wrap(finalFrame, "col4", List.of("row3", "row1"));
 
         assertEquals(vec.getEntry(0), 34.0, TOLERANCE);
         assertEquals(vec.getEntry(1), 14.0, TOLERANCE);
@@ -103,8 +103,8 @@ public class ApacheVectorTest extends ApacheTestBase {
     @Test
     public void testGetDimension() {
         assertEquals(finalCol2.getDimension(), 3);
-        assertEquals(ApacheVector.wrap(finalFrame, "col4", List.of("row3")).getDimension(), 1);
-        assertEquals(ApacheVector.wrap(finalFrame, "col4", List.of("row3", "row1")).getDimension(), 2);
+        assertEquals(ApacheColumnVector.wrap(finalFrame, "col4", List.of("row3")).getDimension(), 1);
+        assertEquals(ApacheColumnVector.wrap(finalFrame, "col4", List.of("row3", "row1")).getDimension(), 2);
     }
 
     @Test
@@ -114,10 +114,10 @@ public class ApacheVectorTest extends ApacheTestBase {
         //
         DataFrame<String, String> localFrame = newFrame();
 
-        ApacheVector<String, String> col1 = ApacheVector.wrap(localFrame, "col1");
-        ApacheVector<String, String> col3 = ApacheVector.wrap(localFrame, "col3", List.of("row3", "row2"));
+        ApacheColumnVector<String, String> col1 = ApacheColumnVector.wrap(localFrame, "col1");
+        ApacheColumnVector<String, String> col3 = ApacheColumnVector.wrap(localFrame, "col3", List.of("row3", "row2"));
 
-        // Ensure that the entry assignment changes BOTH the ApacheVector AND the underlying DataFrame...
+        // Ensure that the entry assignment changes BOTH the ApacheColumnVector AND the underlying DataFrame...
         assertEquals(col1.getEntry(0), 11.0, TOLERANCE);
         assertEquals(col1.getEntry(1), 21.0, TOLERANCE);
         assertEquals(col1.getEntry(2), 31.0, TOLERANCE);
