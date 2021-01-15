@@ -19,6 +19,8 @@ import java.util.List;
 
 import com.d3x.morpheus.util.DoubleComparator;
 
+import static org.testng.Assert.*;
+
 /**
  * Provides common data for tests in the {@code com.d3x.morpheus.frame} package.
  */
@@ -55,5 +57,26 @@ public abstract class DataFrameTestBase {
         frame.setDouble("row2", "col3", 23.0);
 
         return frame;
+    }
+
+    protected static <R,C> void assertDoubleFrame(DataFrame<R,C> actual,
+                                                  List<R> expectedRows,
+                                                  List<C> expectedCols,
+                                                  double[][] expectedValues) {
+        assertEquals(actual.rowCount(), expectedRows.size());
+        assertEquals(actual.colCount(), expectedCols.size());
+
+        assertEquals(actual.rows().keyList(), expectedRows);
+        assertEquals(actual.cols().keyList(), expectedCols);
+
+        /*
+        System.out.println(java.util.Arrays.toString(actual.getDoubleMatrix()[0]));
+        System.out.println(java.util.Arrays.toString(actual.getDoubleMatrix()[1]));
+        System.out.println(java.util.Arrays.toString(actual.getDoubleMatrix()[2]));
+        System.out.println(java.util.Arrays.toString(expectedValues[0]));
+        System.out.println(java.util.Arrays.toString(expectedValues[1]));
+        System.out.println(java.util.Arrays.toString(expectedValues[2]));
+         */
+        assertTrue(comparator.equals(actual.getDoubleMatrix(), expectedValues));
     }
 }

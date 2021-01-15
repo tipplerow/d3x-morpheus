@@ -134,4 +134,44 @@ public class DataFrameTest extends DataFrameTestBase {
 
         assertTrue(comparator.equals(actual, expected));
     }
+
+    @Test
+    public void testOnesColumn() {
+        var colKey = "col1";
+        var colKeys = List.of("col1", "col2", "col3");
+
+        var rowKey = "row1";
+        var rowKeys = List.of("row1", "row2", "row3");
+
+        var colData0 = new double[][] {
+                { 0.0 },
+                { 0.0 },
+                { 0.0 }
+        };
+
+        var colData1 = new double[][] {
+                { 1.0 },
+                { 1.0 },
+                { 1.0 }
+        };
+
+        var rowData0 = new double[][] {
+                { 0.0, 0.0, 0.0 }
+        };
+
+        var rowData1 = new double[][] {
+                { 1.0, 1.0, 1.0 }
+        };
+
+        var colFrame0 = DataFrame.zerosColumn(rowKeys, colKey);
+        var colFrame1 = DataFrame.onesColumn(rowKeys, colKey);
+
+        var rowFrame0 = DataFrame.zerosRow(rowKey, colKeys);
+        var rowFrame1 = DataFrame.onesRow(rowKey, colKeys);
+
+        assertDoubleFrame(colFrame0, rowKeys, List.of(colKey), colData0);
+        assertDoubleFrame(colFrame1, rowKeys, List.of(colKey), colData1);
+        assertDoubleFrame(rowFrame0, List.of(rowKey), colKeys, rowData0);
+        assertDoubleFrame(rowFrame1, List.of(rowKey), colKeys, rowData1);
+    }
 }

@@ -1230,4 +1230,60 @@ public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperation
             throw new DataFrameException("Failed to initialize DataFrame from image input stream", ex);
         }
     }
+
+    /**
+     * Returns a single-column DataFrame with every row set to 1.0.
+     *
+     * @param <R>     the row key type.
+     * @param <C>     the column key type.
+     * @param rowKeys the row keys for the frame.
+     * @param colKey  the column key for the frame.
+     *
+     * @return a single-column DataFrame with every row set to 1.0.
+     */
+    static <R,C> DataFrame<R,C> onesColumn(Iterable<R> rowKeys, C colKey) {
+        return DataFrame.ofDoubles(rowKeys, colKey).applyDoubles(x -> 1.0);
+    }
+
+    /**
+     * Returns a single-row DataFrame with every column set to 1.0.
+     *
+     * @param <R>     the row key type.
+     * @param <C>     the column key type.
+     * @param rowKey  the row key for the frame.
+     * @param colKeys the column keys for the frame.
+     *
+     * @return a single-column DataFrame with every column set to 1.0.
+     */
+    static <R,C> DataFrame<R,C> onesRow(R rowKey, Iterable<C> colKeys) {
+        return DataFrame.ofDoubles(rowKey, colKeys).applyDoubles(x -> 1.0);
+    }
+
+    /**
+     * Returns a single-column DataFrame with every row set to 0.0.
+     *
+     * @param <R>     the row key type.
+     * @param <C>     the column key type.
+     * @param rowKeys the row keys for the frame.
+     * @param colKey  the column key for the frame.
+     *
+     * @return a single-column DataFrame with every row set to 0.0.
+     */
+    static <R,C> DataFrame<R,C> zerosColumn(Iterable<R> rowKeys, C colKey) {
+        return DataFrame.ofDoubles(rowKeys, colKey).applyDoubles(x -> 0.0);
+    }
+
+    /**
+     * Returns a single-column DataFrame with every column set to 0.0.
+     *
+     * @param <R>     the row key type.
+     * @param <C>     the column key type.
+     * @param rowKey  the row key for the frame.
+     * @param colKeys the column keys for the frame.
+     *
+     * @return a single-column DataFrame with every column set to 0.0.
+     */
+    static <R,C> DataFrame<R,C> zerosRow(R rowKey, Iterable<C> colKeys) {
+        return DataFrame.ofDoubles(rowKey, colKeys).applyDoubles(x -> 0.0);
+    }
 }
