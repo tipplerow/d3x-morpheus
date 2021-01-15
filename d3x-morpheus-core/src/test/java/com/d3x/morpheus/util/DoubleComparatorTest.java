@@ -281,4 +281,10 @@ public class DoubleComparatorTest {
         assertEquals(cmp.compare(Double.POSITIVE_INFINITY, 0.0), 1);
         assertEquals(cmp.compare(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY), 0);
     }
+
+    @Test
+    public void testEpsilon() {
+        // The machine tolerance should be something like 2.2E-16...
+        assertTrue(DoubleComparator.FIXED_DEFAULT.epsilon() < 1.0E-15);
+    }
 }

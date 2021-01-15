@@ -74,6 +74,16 @@ public interface DoubleComparator extends Comparator<Double> {
     }
 
     /**
+     * Returns the <em>machine tolerance</em>: the smallest reasonable
+     * tolerance for comparing floating point values of order one.
+     *
+     * @return the machine tolerance.
+     */
+    default double epsilon() {
+        return Math.ulp(1.0d);
+    }
+
+    /**
      * Tests two double precision values for (near) equality.
      *
      * @param x the first value to compare.
