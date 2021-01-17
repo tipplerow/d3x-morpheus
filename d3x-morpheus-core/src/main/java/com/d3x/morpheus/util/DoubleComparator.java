@@ -79,7 +79,7 @@ public interface DoubleComparator extends Comparator<Double> {
      *
      * @return the machine tolerance.
      */
-    default double epsilon() {
+    static double epsilon() {
         return Math.ulp(1.0d);
     }
 

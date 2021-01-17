@@ -285,6 +285,6 @@ public class DoubleComparatorTest {
     @Test
     public void testEpsilon() {
         // The machine tolerance should be something like 2.2E-16...
-        assertTrue(DoubleComparator.FIXED_DEFAULT.epsilon() < 1.0E-15);
+        assertTrue(DoubleComparator.epsilon() < 1.0E-15);
     }
 }
