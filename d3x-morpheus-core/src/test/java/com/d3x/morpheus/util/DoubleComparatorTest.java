@@ -15,6 +15,12 @@
  */
 package com.d3x.morpheus.util;
 
+import org.apache.commons.math3.linear.Array2DRowRealMatrix;
+import org.apache.commons.math3.linear.ArrayRealVector;
+import org.apache.commons.math3.linear.BlockRealMatrix;
+import org.apache.commons.math3.linear.RealMatrix;
+import org.apache.commons.math3.linear.RealVector;
+
 import org.testng.annotations.Test;
 import static org.testng.Assert.*;
 
@@ -40,6 +46,17 @@ public class DoubleComparatorTest {
         assertFalse(fixed2.equals(x1, x3));
         assertFalse(fixed2.equals(x1, x4));
         assertFalse(fixed2.equals(x1, x5));
+
+        RealVector v1 = new ArrayRealVector(x1);
+        RealVector v2 = new ArrayRealVector(x2);
+        RealVector v3 = new ArrayRealVector(x3);
+        RealVector v4 = new ArrayRealVector(x4);
+        RealVector v5 = new ArrayRealVector(x5);
+
+        assertTrue(fixed2.equals(v1, v2));
+        assertFalse(fixed2.equals(v1, v3));
+        assertFalse(fixed2.equals(v1, v4));
+        assertFalse(fixed2.equals(v1, v5));
     }
 
     @Test
@@ -74,6 +91,15 @@ public class DoubleComparatorTest {
         assertFalse(fixed2.equals(x1, x3));
         assertFalse(fixed2.equals(x1, x4));
         assertFalse(fixed2.equals(x1, x5));
+
+        RealMatrix m1 = new BlockRealMatrix(x1);
+        RealMatrix m2 = new Array2DRowRealMatrix(x2);
+        RealMatrix m3 = new BlockRealMatrix(x3);
+        RealMatrix m5 = new BlockRealMatrix(x5);
+
+        assertTrue(fixed2.equals(m1, m2));
+        assertFalse(fixed2.equals(m1, m3));
+        assertFalse(fixed2.equals(m1, m5));
     }
 
     @Test

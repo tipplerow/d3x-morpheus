@@ -17,6 +17,9 @@ package com.d3x.morpheus.util;
 
 import java.util.Comparator;
 
+import org.apache.commons.math3.linear.RealMatrix;
+import org.apache.commons.math3.linear.RealVector;
+
 /**
  * Defines an interface for comparing double precision values while
  * allowing for a finite tolerance, which may be expressed in absolute
@@ -134,6 +137,53 @@ public interface DoubleComparator extends Comparator<Double> {
         for (int i = 0; i < x.length; i++) {
             if (!equals(x[i], y[i]))
                 return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Tests two RealVectors for (near) equality.
+     *
+     * @param x the first vector to compare.
+     * @param y the second vector to compare.
+     *
+     * @return {@code true} iff the vectors have equal length and this
+     * comparator determines that all corresponding elements are equal.
+     */
+    default boolean equals(RealVector x, RealVector y) {
+        if (x.getDimension() != y.getDimension())
+            return false;
+
+        for (int i = 0; i < x.getDimension(); i++) {
+            if (!equals(x.getEntry(i), y.getEntry(i)))
+                return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Tests two RealMatrix objects for (near) equality.
+     *
+     * @param x the first matrix to compare.
+     * @param y the second matrix to compare.
+     *
+     * @return {@code true} iff the matrices have equal dimensions and this
+     * comparator determines that all corresponding elements are equal.
+     */
+    default boolean equals(RealMatrix x, RealMatrix y) {
+        if (x.getRowDimension() != y.getRowDimension())
+            return false;
+
+        if (x.getColumnDimension() != y.getColumnDimension())
+            return false;
+
+        for (int i = 0; i < x.getRowDimension(); i++) {
+            for (int j = 0; j < x.getColumnDimension(); j++) {
+                if (!equals(x.getEntry(i, j), y.getEntry(i, j)))
+                    return false;
+            }
         }
 
         return true;
