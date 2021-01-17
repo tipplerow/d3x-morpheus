@@ -530,6 +530,20 @@ public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperation
     }
 
     /**
+     * Ensures that this DataFrame contains a certain number of columns.
+     *
+     * @param expected the required number of columns.
+     *
+     * @throws DataFrameException unless this DataFrame contains the specified number of columns.
+     */
+    default void requireColumnCount(int expected) {
+        int actual = colCount();
+
+        if (actual != expected)
+            throw new DataFrameException("Expected [%d] columns but found [%d].", expected, actual);
+    }
+
+    /**
      * Ensures that this DataFrame contains a particular column and that column
      * contains double precision data.
      *
@@ -606,6 +620,20 @@ public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperation
     default void requireRows(Iterable<R> rowKeys) {
         for (R rowKey : rowKeys)
             requireRow(rowKey);
+    }
+
+    /**
+     * Ensures that this DataFrame contains a certain number of rows.
+     *
+     * @param expected the required number of rows.
+     *
+     * @throws DataFrameException unless this DataFrame contains the specified number of rows.
+     */
+    default void requireRowCount(int expected) {
+        int actual = rowCount();
+
+        if (actual != expected)
+            throw new DataFrameException("Expected [%d] rows but found [%d].", expected, actual);
     }
 
     /**
