@@ -16,6 +16,7 @@
 package com.d3x.morpheus.apache;
 
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
+import org.apache.commons.math3.linear.BlockRealMatrix;
 import org.apache.commons.math3.linear.DiagonalMatrix;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.RealVector;
@@ -50,7 +51,7 @@ public final class SVDSolver {
     private double threshold;
 
     // The machine tolerance...
-    private static final double epsilon = DoubleComparator.FIXED_DEFAULT.epsilon();
+    private static final double epsilon = DoubleComparator.epsilon();
 
     private SVDSolver(RealMatrix matrixA) {
         this.svd = new SingularValueDecomposition(matrixA);
@@ -65,6 +66,18 @@ public final class SVDSolver {
     private static void validateThreshold(double threshold) {
         if (!Double.isNaN(threshold) && threshold < epsilon)
             throw new D3xException("The singular value threshold must be larger than the machine tolerance.");
+    }
+
+    /**
+     * Creates an SVD solver for a system of linear equations using a default
+     * singular value threshold.
+     *
+     * @param matrixA the matrix of coefficients in the linear system.
+     *
+     * @return an SVD solver for the specified linear system.
+     */
+    public static SVDSolver build(double[][] matrixA) {
+        return build(new BlockRealMatrix(matrixA));
     }
 
     /**
@@ -100,6 +113,34 @@ public final class SVDSolver {
         double wmax = Max.of(svd.getSingularValues());
 
         return 0.5 * Math.sqrt(M + N + 1.0) * wmax * epsilon;
+    }
+
+    /**
+     * Computes the error vector {@code A * x - b} for the solution to a linear system.
+     *
+     * @param A the {@code M x N} design matrix for the system.
+     * @param x the {@code N x 1} solution vector for the system.
+     * @param b the {@coee M x 1} observation (right-hand side) vector for the system.
+
+     * @return the error vector {@code A * x - b}.
+     */
+    public static RealVector computeResidual(RealMatrix A, RealVector x, RealVector b) {
+        return A.operate(x).subtract(b);
+    }
+
+    /**
+     * Computes the residual sum of squares for the solution to a linear system: the
+     * sum of the squared values in the residual vector.
+     *
+     * @param A the {@code M x N} design matrix for the system.
+     * @param x the {@code N x 1} solution vector for the system.
+     * @param b the {@coee M x 1} observation (right-hand side) vector for the system.
+
+     * @return the residual sum of squares for the solution to a linear system.
+     */
+    public static double computeRSS(RealMatrix A, RealVector x, RealVector b) {
+        double rssNorm = computeResidual(A, x, b).getNorm();
+        return rssNorm * rssNorm;
     }
 
     /**
@@ -182,6 +223,22 @@ public final class SVDSolver {
         }
 
         return inverse;
+    }
+
+    /**
+     * Computes the solution vector {@code x} of the linear system {@code A * x = b}
+     *  for a given right-hand side vector {@code b}.
+     *
+     * @param vectorB the vector of right-hand side values.
+     *
+     * @return the solution of the linear system for the specified right-hand side.
+     *
+     * @throws RuntimeException unless the length of the input vector matches the
+     * row dimension of the coefficient matrix.
+     */
+    public double[] solve(double[] vectorB) {
+        RealMatrix matrixB = new Array2DRowRealMatrix(vectorB);
+        return solve(matrixB).getColumnVector(0).toArray();
     }
 
     /**
