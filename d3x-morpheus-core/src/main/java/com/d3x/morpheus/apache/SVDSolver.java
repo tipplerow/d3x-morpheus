@@ -63,11 +63,6 @@ public final class SVDSolver {
         validateThreshold(this.threshold);
     }
 
-    private static void validateThreshold(double threshold) {
-        if (!Double.isNaN(threshold) && threshold < epsilon)
-            throw new D3xException("The singular value threshold must be larger than the machine tolerance.");
-    }
-
     /**
      * Creates an SVD solver for a system of linear equations using a default
      * singular value threshold.
@@ -113,6 +108,22 @@ public final class SVDSolver {
         double wmax = Max.of(svd.getSingularValues());
 
         return 0.5 * Math.sqrt(M + N + 1.0) * wmax * epsilon;
+    }
+
+    /**
+     * Validates a singular value threshold.
+     *
+     * @param threshold the threshold to validate.
+     *
+     * @throws RuntimeException unless the input threshold is finite and greater than
+     * the machine tolerance.
+     */
+    public static void validateThreshold(double threshold) {
+        if (!Double.isFinite(threshold))
+            throw new D3xException("The singular value threshold must be finite.");
+
+        if (threshold < epsilon)
+            throw new D3xException("The singular value threshold must be larger than the machine tolerance.");
     }
 
     /**
