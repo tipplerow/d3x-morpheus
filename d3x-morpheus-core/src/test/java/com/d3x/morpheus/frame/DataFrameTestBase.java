@@ -31,7 +31,7 @@ public abstract class DataFrameTestBase {
     protected static final List<String> rowKeys = List.of("row1", "row2");
     protected static final List<String> colKeys = List.of("col1", "col2", "col3");
 
-    protected static final DoubleComparator comparator = DoubleComparator.FIXED_DEFAULT;
+    protected static final DoubleComparator comparator = DoubleComparator.DEFAULT;
 
     protected static DataFrame<String, String> newIntFrame() {
         DataFrame<String, String> frame = DataFrame.ofInts(rowKeys, colKeys);

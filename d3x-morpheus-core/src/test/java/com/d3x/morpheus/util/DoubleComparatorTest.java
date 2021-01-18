@@ -380,7 +380,7 @@ public class DoubleComparatorTest {
 
     @Test
     public void testNaN() {
-        DoubleComparator cmp = DoubleComparator.FIXED_DEFAULT;
+        DoubleComparator cmp = DoubleComparator.DEFAULT;
 
         // The IEEE standard defines NaN as greater than all other
         // floating point values and equal to itself.
@@ -392,7 +392,7 @@ public class DoubleComparatorTest {
 
     @Test
     public void testInfinity() {
-        DoubleComparator cmp = DoubleComparator.FIXED_DEFAULT;
+        DoubleComparator cmp = DoubleComparator.DEFAULT;
 
         assertEquals(cmp.compare(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY), 0);
         assertEquals(cmp.compare(Double.NEGATIVE_INFINITY, 0.0), -1);

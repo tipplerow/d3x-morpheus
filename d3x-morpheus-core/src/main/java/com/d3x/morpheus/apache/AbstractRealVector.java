@@ -66,7 +66,7 @@ public abstract class AbstractRealVector extends RealVector {
      * of the default DoubleComparator.
      */
     public boolean equalsArray(double... values) {
-        return equalsArray(values, DoubleComparator.FIXED_DEFAULT);
+        return equalsArray(values, DoubleComparator.DEFAULT);
     }
 
     /**
@@ -95,7 +95,7 @@ public abstract class AbstractRealVector extends RealVector {
      * of the default DoubleComparator.
      */
     public boolean equalsVector(RealVector that) {
-        return equalsVector(that, DoubleComparator.FIXED_DEFAULT);
+        return equalsVector(that, DoubleComparator.DEFAULT);
     }
 
     /**

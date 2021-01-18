@@ -27,7 +27,7 @@ public class ApacheTestBase {
     protected static final List<String> colKeys = List.of("col1", "col2", "col3", "col4");
 
     protected static final double TOLERANCE = 1.0E-12;
-    protected static final DoubleComparator comparator = DoubleComparator.FIXED_DEFAULT;
+    protected static final DoubleComparator comparator = DoubleComparator.DEFAULT;
 
     protected static final double[][] finalData =
         new double[][] {

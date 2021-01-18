@@ -114,7 +114,7 @@ public final class ApacheMatrix<R, C> extends AbstractRealMatrix {
      * default DoubleComparator.
      */
     public boolean equalsData(double[][] values) {
-        return equalsData(values, DoubleComparator.FIXED_DEFAULT);
+        return equalsData(values, DoubleComparator.DEFAULT);
     }
 
     /**
@@ -143,7 +143,7 @@ public final class ApacheMatrix<R, C> extends AbstractRealMatrix {
      * default DoubleComparator.
      */
     public boolean equalsMatrix(RealMatrix that) {
-        return equalsMatrix(that, DoubleComparator.FIXED_DEFAULT);
+        return equalsMatrix(that, DoubleComparator.DEFAULT);
     }
 
     /**
