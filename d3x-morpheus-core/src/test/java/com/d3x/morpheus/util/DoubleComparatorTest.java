@@ -28,6 +28,9 @@ public class DoubleComparatorTest {
     private final DoubleComparator fixed1 = DoubleComparator.fixed(0.0001);
     private final DoubleComparator fixed2 = DoubleComparator.FIXED_DEFAULT;
 
+    private final DoubleComparator relative1 = DoubleComparator.relative(0.0001);
+    private final DoubleComparator relative2 = DoubleComparator.RELATIVE_DEFAULT;
+
     private final double tinyNeg = -1.0E-14;
     private final double tinyPos = +1.0E-14;
 
@@ -148,6 +151,98 @@ public class DoubleComparatorTest {
         assertFalse(fixed2.equals(x, z1));
         assertFalse(fixed2.equals(x, z2));
         assertTrue(fixed2.equals(x, z3));
+    }
+
+    @Test
+    public void testRelativeCompare() {
+        // The exact value...
+        double x = 4.0 / 3.0;
+
+        // Values less than x...
+        double y1 = 1.333;
+        double y2 = 1.33333;
+        double y3 = 1.33333333333333;
+
+        // Values greater than x...
+        double z1 = 1.334;
+        double z2 = 1.33334;
+        double z3 = 1.33333333333334;
+
+        assertTrue(relative1.compare(x, y1) > 0);
+        assertTrue(relative1.compare(x, y2) == 0);
+        assertTrue(relative1.compare(x, y3) == 0);
+
+        assertTrue(relative2.compare(x, y1) > 0);
+        assertTrue(relative2.compare(x, y2) > 0);
+        assertTrue(relative2.compare(x, y3) == 0);
+
+        assertTrue(relative1.compare(x, z1) < 0);
+        assertTrue(relative1.compare(x, z2) == 0);
+        assertTrue(relative1.compare(x, z3) == 0);
+
+        assertTrue(relative2.compare(x, z1) < 0);
+        assertTrue(relative2.compare(x, z2) < 0);
+        assertTrue(relative2.compare(x, z3) == 0);
+
+        assertFalse(relative1.equals(x, y1));
+        assertTrue(relative1.equals(x, y2));
+        assertTrue(relative1.equals(x, y3));
+
+        assertFalse(relative2.equals(x, y1));
+        assertFalse(relative2.equals(x, y2));
+        assertTrue(relative2.equals(x, y3));
+
+        assertFalse(relative1.equals(x, z1));
+        assertTrue(relative1.equals(x, z2));
+        assertTrue(relative1.equals(x, z3));
+
+        assertFalse(relative2.equals(x, z1));
+        assertFalse(relative2.equals(x, z2));
+        assertTrue(relative2.equals(x, z3));
+
+        double rescale = 1.0E+12;
+
+        x *= rescale;
+
+        y1 *= rescale;
+        y2 *= rescale;
+        y3 *= rescale;
+
+        z1 *= rescale;
+        z2 *= rescale;
+        z3 *= rescale;
+
+        assertTrue(relative1.compare(x, y1) > 0);
+        assertTrue(relative1.compare(x, y2) == 0);
+        assertTrue(relative1.compare(x, y3) == 0);
+
+        assertTrue(relative2.compare(x, y1) > 0);
+        assertTrue(relative2.compare(x, y2) > 0);
+        assertTrue(relative2.compare(x, y3) == 0);
+
+        assertTrue(relative1.compare(x, z1) < 0);
+        assertTrue(relative1.compare(x, z2) == 0);
+        assertTrue(relative1.compare(x, z3) == 0);
+
+        assertTrue(relative2.compare(x, z1) < 0);
+        assertTrue(relative2.compare(x, z2) < 0);
+        assertTrue(relative2.compare(x, z3) == 0);
+
+        assertFalse(relative1.equals(x, y1));
+        assertTrue(relative1.equals(x, y2));
+        assertTrue(relative1.equals(x, y3));
+
+        assertFalse(relative2.equals(x, y1));
+        assertFalse(relative2.equals(x, y2));
+        assertTrue(relative2.equals(x, y3));
+
+        assertFalse(relative1.equals(x, z1));
+        assertTrue(relative1.equals(x, z2));
+        assertTrue(relative1.equals(x, z3));
+
+        assertFalse(relative2.equals(x, z1));
+        assertFalse(relative2.equals(x, z2));
+        assertTrue(relative2.equals(x, z3));
     }
 
     @Test

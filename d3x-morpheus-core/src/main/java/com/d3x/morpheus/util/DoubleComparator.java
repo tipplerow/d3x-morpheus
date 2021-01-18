@@ -29,6 +29,19 @@ import org.apache.commons.math3.linear.RealVector;
  */
 public interface DoubleComparator extends Comparator<Double> {
     /**
+     * Compares two finite double precision values, allowing for the
+     * tolerance of this comparator.
+     *
+     * @param x the first value to compare.
+     * @param y the second value to compare.
+     *
+     * @return an integer less than, equal to, or greater than zero
+     * according to whether {@code x} is considered to be less than,
+     * equal to, or greater than {@code y} by this comparator.
+     */
+    int compareFinite(double x, double y);
+
+    /**
      * Compares two double precision values, allowing for the finite
      * tolerance of this comparator.
      *
@@ -39,23 +52,17 @@ public interface DoubleComparator extends Comparator<Double> {
      * according to whether {@code x} is considered to be less than,
      * equal to, or greater than {@code y} by this comparator.
      */
-    int compare(double x, double y);
-
-    /**
-     * Returns a comparator with the default fixed tolerance (suitable
-     * for most situations unless the values being compared are extreme
-     * in magnitude).
-     */
-    DoubleComparator FIXED_DEFAULT = FixedDoubleComparator.DEFAULT;
-
-    /**
-     * Returns a comparator with a fixed tolerance, independent of the
-     * magnitudes of the values being compared.
-     *
-     * @param tolerance the fixed tolerance for the comparator.
-     */
-    static DoubleComparator fixed(double tolerance) {
-        return FixedDoubleComparator.withTolerance(tolerance);
+    default int compare(double x, double y) {
+        //
+        // The IEEE standard specifies that NaN is greater than any other
+        // floating point value, including positive infinity.  The Double
+        // class implements that standard in its compare() method and also
+        // properly handles comparisons of infinite values.
+        //
+        if (Double.isFinite(x) && Double.isFinite(y))
+            return compareFinite(x, y);
+        else
+            return Double.compare(x, y);
     }
 
     /**
@@ -74,6 +81,44 @@ public interface DoubleComparator extends Comparator<Double> {
     @Override
     default int compare(@lombok.NonNull Double x, @lombok.NonNull Double y) {
         return compare(x.doubleValue(), y.doubleValue());
+    }
+
+    /**
+     * A comparator that should be suitable for most situations.
+     */
+    DoubleComparator DEFAULT = RelativeDoubleComparator.DEFAULT;
+
+    /**
+     * A comparator with the default fixed tolerance (suitable for
+     * many situations unless the values being compared are extreme
+     * in magnitude).
+     */
+    DoubleComparator FIXED_DEFAULT = FixedDoubleComparator.DEFAULT;
+
+    /**
+     * A relative value comparator with the default tolerance factor
+     * (suitable for most situations).
+     */
+    DoubleComparator RELATIVE_DEFAULT = RelativeDoubleComparator.DEFAULT;
+
+    /**
+     * Returns a comparator with a fixed tolerance, independent of the
+     * magnitudes of the values being compared.
+     *
+     * @param tolerance the fixed tolerance for the comparator.
+     */
+    static DoubleComparator fixed(double tolerance) {
+        return FixedDoubleComparator.withTolerance(tolerance);
+    }
+
+    /**
+     * Returns a comparator with a relative tolerance, which is a function
+     * of the magnitudes of the values being compared.
+     *
+     * @param toleranceFactor the relative tolerance factor for the comparator.
+     */
+    static DoubleComparator relative(double toleranceFactor) {
+        return RelativeDoubleComparator.withToleranceFactor(toleranceFactor);
     }
 
     /**

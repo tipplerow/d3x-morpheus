@@ -60,21 +60,18 @@ public final class FixedDoubleComparator implements DoubleComparator {
         return new FixedDoubleComparator(tolerance);
     }
 
-    @Override
-    public int compare(double x, double y) {
-        //
-        // The IEEE standard specifies that NaN is greater than any other
-        // floating point value, including positive infinity.  The Double
-        // class implements that standard in its compare() method and also
-        // properly handles comparisons of infinite values.
-        //
-        if (Double.isFinite(x) && Double.isFinite(y))
-            return compareFinite(x, y);
-        else
-            return Double.compare(x, y);
-    }
-
-    private int compareFinite(double x, double y) {
+    /**
+     * Compares two finite double precision values with an absolute tolerance.
+     *
+     * @param x          the first value to compare.
+     * @param y          the second value to compare.
+     * @param tolerance  the absolute comparison tolerance.
+     *
+     * @return an integer less than zero if {@code x < y - tolerance},
+     * an integer greater than zero if {@code x > y + tolerance}, or
+     * zero otherwise ({@code |x - y| <= tolerance}).
+     */
+    public static int compareFinite(double x, double y, double tolerance) {
         double diff = x - y;
 
         if (diff < -tolerance)
@@ -83,5 +80,10 @@ public final class FixedDoubleComparator implements DoubleComparator {
             return 1;
         else
             return 0;
+    }
+
+    @Override
+    public int compareFinite(double x, double y) {
+        return compareFinite(x, y, tolerance);
     }
 }
