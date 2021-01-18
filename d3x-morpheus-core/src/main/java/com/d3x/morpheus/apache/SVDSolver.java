@@ -131,7 +131,7 @@ public final class SVDSolver {
      *
      * @param A the {@code M x N} design matrix for the system.
      * @param x the {@code N x 1} solution vector for the system.
-     * @param b the {@coee M x 1} observation (right-hand side) vector for the system.
+     * @param b the {@code M x 1} observation (right-hand side) vector for the system.
 
      * @return the error vector {@code A * x - b}.
      */
@@ -145,13 +145,73 @@ public final class SVDSolver {
      *
      * @param A the {@code M x N} design matrix for the system.
      * @param x the {@code N x 1} solution vector for the system.
-     * @param b the {@coee M x 1} observation (right-hand side) vector for the system.
+     * @param b the {@code M x 1} observation (right-hand side) vector for the system.
 
      * @return the residual sum of squares for the solution to a linear system.
      */
     public static double computeRSS(RealMatrix A, RealVector x, RealVector b) {
         double rssNorm = computeResidual(A, x, b).getNorm();
         return rssNorm * rssNorm;
+    }
+
+    /**
+     * Tests the solution to a square linear system.
+     *
+     * @param A the {@code N x N} design matrix for the system.
+     * @param x the {@code N x 1} solution vector for the system.
+     * @param b the {@code N x 1} observation (right-hand side) vector for the system.
+     *
+     * @return {@code true} if {@code A} is a square design matrix and the specified
+     * solution vector {@code x} is the true solution for the linear system.
+     */
+    public static boolean isExactSolution(RealMatrix A, RealVector x, RealVector b) {
+        if (A.isSquare())
+            return DoubleComparator.DEFAULT.equals(A.operate(x), b);
+        else
+            return false;
+    }
+
+    /**
+     * Tests the least-squares solution to an overdetermined linear system by searching
+     * for nearby solution vectors with a smaller residual sum of squares.
+     *
+     * @param A the {@code M x N} design matrix for the system, with {@code M > N}.
+     * @param x the {@code N x 1} solution vector for the system.
+     * @param b the {@code M x 1} observation (right-hand side) vector for the system.
+     *
+     * @return {@code true} if the specified solution vector {@code x} is the true
+     * least-squares solution for the linear system.
+     */
+    public static boolean isLeastSquaresSolution(RealMatrix A, RealVector x, RealVector b) {
+        //
+        // If the vector "x" is the true least-squares solution, then any
+        // changes to it will produce a larger residual sum of squares...
+        //
+        double minRSS = computeRSS(A, x, b);
+        RealVector testX = x.copy();
+
+        for (int index = 0; index < x.getDimension(); index++) {
+            //
+            // Increase and decrease this element by one percent and
+            // examine the residual sum of squares...
+            //
+            double xi = x.getEntry(index);
+            double dx = 0.01 * xi;
+
+            testX.setEntry(index, xi + dx);
+
+            if (computeRSS(A, testX, b) < minRSS)
+                return false;
+
+            testX.setEntry(index, xi - dx);
+
+            if (computeRSS(A, testX, b) < minRSS)
+                return false;
+
+            testX.setEntry(index, xi);
+        }
+
+        return true;
     }
 
     /**

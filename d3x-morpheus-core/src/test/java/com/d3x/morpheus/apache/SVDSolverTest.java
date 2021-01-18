@@ -22,8 +22,6 @@ import org.apache.commons.math3.linear.BlockRealMatrix;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.RealVector;
 
-import com.d3x.morpheus.util.DoubleComparator;
-
 import org.testng.annotations.Test;
 import static org.testng.Assert.*;
 
@@ -45,7 +43,7 @@ public class SVDSolverTest {
         RealVector b = new ArrayRealVector(datab);
 
         RealVector x = SVDSolver.build(A).solve(b);
-        assertTrue(SVDSolver.computeRSS(A, x, b) < DoubleComparator.epsilon());
+        assertTrue(SVDSolver.isExactSolution(A, x, b));
 
         assertEquals(x.getEntry(0), -3.991750, 0.000001);
         assertEquals(x.getEntry(1),  4.691809, 0.000001);
@@ -68,7 +66,7 @@ public class SVDSolverTest {
         }
 
         RealVector x = SVDSolver.build(A).solve(b);
-        assertTrue(SVDSolver.computeRSS(A, x, b) < DoubleComparator.epsilon());
+        assertTrue(SVDSolver.isExactSolution(A, x, b));
     }
 
     @Test
@@ -96,6 +94,11 @@ public class SVDSolverTest {
         assertEquals(b[0], b0,0.01);
         assertEquals(b[1], b1,0.01);
         assertEquals(b[2], b2,0.01);
+
+        assertTrue(SVDSolver.isLeastSquaresSolution(
+                new BlockRealMatrix(A),
+                new ArrayRealVector(b),
+                new ArrayRealVector(y)));
     }
 
     @Test
@@ -114,17 +117,6 @@ public class SVDSolverTest {
         }
 
         RealVector x = SVDSolver.build(A).solve(b);
-        double minRSS = SVDSolver.computeRSS(A, x, b);
-
-        // The vector "x" should be the least-squares solution,
-        // so any changes to it should produce an error vector
-        // with a larger norm...
-        for (int test = 0; test < 1000; test++) {
-            int index = random.nextInt(x.getDimension());
-            double delta = 0.01 * random.nextDouble();
-            x.addToEntry(index, delta);
-            assertTrue(SVDSolver.computeRSS(A, x, b) > minRSS);
-            x.addToEntry(index, -delta);
-        }
+        assertTrue(SVDSolver.isLeastSquaresSolution(A, x, b));
     }
 }
