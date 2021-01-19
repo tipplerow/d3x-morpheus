@@ -15,6 +15,8 @@
  */
 package com.d3x.morpheus.stats;
 
+import org.apache.commons.math3.linear.RealVector;
+
 /**
  * A Statistic implementation that supports incremental calculation of a sample min
  *
@@ -32,6 +34,28 @@ public class Min implements Statistic1 {
      */
     public Min() {
         super();
+    }
+
+    /**
+     * Finds the minimum value in a sample.
+     *
+     * @param sample the values in the sample.
+     *
+     * @return the minimum value in the sample.
+     */
+    public static double of(double... sample) {
+        return Statistic1.compute(new Min(), sample);
+    }
+
+    /**
+     * Finds the minimum value in a sample.
+     *
+     * @param sample the values in the sample.
+     *
+     * @return the minimum value in the sample.
+     */
+    public static double of(RealVector sample) {
+        return Statistic1.compute(new Min(), sample);
     }
 
     @Override

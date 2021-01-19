@@ -20,20 +20,20 @@ import com.d3x.morpheus.apache.ApacheRealVector;
 import org.testng.annotations.Test;
 import static org.testng.Assert.*;
 
-public class SumTest {
+public class MinTest {
     private static final double TOLERANCE = 1.0E-12;
 
     @Test
     public void testOfArray() {
-        assertEquals(Sum.of(), 0.0, TOLERANCE);
-        assertEquals(Sum.of(1.0), 1.0, TOLERANCE);
-        assertEquals(Sum.of(1.0, 2.0, 3.0, 4.0), 10.0, TOLERANCE);
+        assertTrue(Double.isNaN(Min.of()));
+        assertEquals(Min.of(1.0), 1.0, TOLERANCE);
+        assertEquals(Min.of(1.0, 4.0, -3.0, 2.0), -3.0, TOLERANCE);
     }
 
     @Test
     public void testOfVector() {
-        assertEquals(Sum.of(ApacheRealVector.of()), 0.0, TOLERANCE);
-        assertEquals(Sum.of(ApacheRealVector.of(1.0)), 1.0, TOLERANCE);
-        assertEquals(Sum.of(ApacheRealVector.of(1.0, 2.0, 3.0, 4.0)), 10.0, TOLERANCE);
+        assertTrue(Double.isNaN(Min.of(ApacheRealVector.of())));
+        assertEquals(Min.of(ApacheRealVector.of(1.0)), 1.0, TOLERANCE);
+        assertEquals(Min.of(ApacheRealVector.of(1.0, -4.0, 33.0, 4.0)), -4.0, TOLERANCE);
     }
 }

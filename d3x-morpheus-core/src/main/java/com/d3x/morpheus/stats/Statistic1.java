@@ -17,6 +17,8 @@ package com.d3x.morpheus.stats;
 
 import java.util.function.Supplier;
 
+import org.apache.commons.math3.linear.RealVector;
+
 /**
  * An interface that defines an incremental calculation of a uni-variate statistic.
  *
@@ -48,6 +50,20 @@ public interface Statistic1 extends Statistic {
     }
 
     /**
+     * Adds new values to the sample for this statistic.
+     *
+     * @param values the values to add.
+     *
+     * @return the sample size after adding the values.
+     */
+    default long add(RealVector values) {
+        for (int index = 0; index < values.getDimension(); index++)
+            add(values.getEntry(index));
+
+        return getN();
+    }
+
+    /**
      * Returns a copy of this statistic
      * @return  a copy of this object
      */
@@ -68,6 +84,20 @@ public interface Statistic1 extends Statistic {
      * @return          the value of the statistic for the given sample.
      */
     static double compute(Statistic1 stat, double... sample) {
+        stat.reset();
+        stat.add(sample);
+        return stat.getValue();
+    }
+
+    /**
+     * Computes a univariate statistic over a given sample.
+     *
+     * @param stat      the statistic type
+     * @param sample    the sample of values
+     *
+     * @return          the value of the statistic for the given sample.
+     */
+    static double compute(Statistic1 stat, RealVector sample) {
         stat.reset();
         stat.add(sample);
         return stat.getValue();
