@@ -69,14 +69,16 @@ public abstract class DataFrameTestBase {
         assertEquals(actual.rows().keyList(), expectedRows);
         assertEquals(actual.cols().keyList(), expectedCols);
 
-        /*
-        System.out.println(java.util.Arrays.toString(actual.getDoubleMatrix()[0]));
-        System.out.println(java.util.Arrays.toString(actual.getDoubleMatrix()[1]));
-        System.out.println(java.util.Arrays.toString(actual.getDoubleMatrix()[2]));
-        System.out.println(java.util.Arrays.toString(expectedValues[0]));
-        System.out.println(java.util.Arrays.toString(expectedValues[1]));
-        System.out.println(java.util.Arrays.toString(expectedValues[2]));
-         */
         assertTrue(comparator.equals(actual.getDoubleMatrix(), expectedValues));
+
+        for (int i = 0; i < actual.rowCount(); i++) {
+            for (int j = 0; j < actual.colCount(); j++) {
+                R rowKey = expectedRows.get(i);
+                C colKey = expectedCols.get(j);
+
+                assertTrue(comparator.equals(actual.getDoubleAt(i, j), expectedValues[i][j]));
+                assertTrue(comparator.equals(actual.getDouble(rowKey, colKey), expectedValues[i][j]));
+            }
+        }
     }
 }

@@ -17,6 +17,8 @@ package com.d3x.morpheus.frame;
 
 import java.util.List;
 
+import org.apache.commons.math3.linear.ArrayRealVector;
+import org.apache.commons.math3.linear.RealVector;
 import org.testng.annotations.Test;
 import static org.testng.Assert.*;
 
@@ -217,5 +219,33 @@ public class DataFrameTest extends DataFrameTestBase {
         };
 
         assertDoubleFrame(frame, rowKeys, colKeys, expected);
+    }
+
+    @Test
+    public void testColumnFrame() {
+        String colKey = "col1";
+        List<String> rowKeys = List.of("row1", "row2", "row3");
+        double[] rowArray = new double[] { 1.0, 2.0, 3.0 };
+        RealVector rowValues = new ArrayRealVector(rowArray);
+
+        DataFrame<String, String> frame1 = DataFrame.ofDoubles(rowKeys, colKey, rowArray);
+        assertDoubleFrame(frame1, rowKeys, List.of(colKey), new double[][] {{ 1.0 }, { 2.0 }, { 3.0 }});
+
+        DataFrame<String, String> frame2 = DataFrame.ofDoubles(rowKeys, colKey, rowValues);
+        assertDoubleFrame(frame2, rowKeys, List.of(colKey), new double[][] {{ 1.0 }, { 2.0 }, { 3.0 }});
+    }
+
+    @Test
+    public void testRowFrame() {
+        String rowKey = "row1";
+        List<String> colKeys = List.of("col1", "col2", "col3");
+        double[] colArray = new double[] { 1.0, 2.0, 3.0 };
+        RealVector colValues = new ArrayRealVector(colArray);
+
+        DataFrame<String, String> frame1 = DataFrame.ofDoubles(rowKey, colKeys, colArray);
+        assertDoubleFrame(frame1, List.of(rowKey), colKeys, new double[][] {{ 1.0, 2.0, 3.0 }});
+
+        DataFrame<String, String> frame2 = DataFrame.ofDoubles(rowKey, colKeys, colValues);
+        assertDoubleFrame(frame2, List.of(rowKey), colKeys, new double[][] {{ 1.0, 2.0, 3.0 }});
     }
 }

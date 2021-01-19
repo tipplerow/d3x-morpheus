@@ -31,6 +31,8 @@ import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
 
+import org.apache.commons.math3.linear.RealVector;
+
 import com.d3x.morpheus.db.DbSource;
 import com.d3x.morpheus.index.Index;
 import com.d3x.morpheus.range.Range;
@@ -1033,6 +1035,46 @@ public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperation
     }
 
     /**
+     * Returns a newly created DataFrame with 1 row optimized to hold primitive doubles
+     * @param rowKey    the row key for frame
+     * @param colKeys   the column index for frame
+     * @param values    a vector of values to assign
+     * @param <R>       the row key type
+     * @param <C>       the column key type
+     * @return          the newly created DataFrame
+     * @throws          DataFrameException if the number of keys and values disagrees
+     */
+    static <R,C> DataFrame<R,C> ofDoubles(R rowKey, Iterable<C> colKeys, double[] values) {
+        DataFrame<R,C> frame = ofDoubles(rowKey, colKeys);
+
+        if (frame.colCount() != values.length)
+            throw new DataFrameException("Key/value length mismatch.");
+
+        frame.applyDoubles(cursor -> values[cursor.colOrdinal()]);
+        return frame;
+    }
+
+    /**
+     * Returns a newly created DataFrame with 1 row optimized to hold primitive doubles
+     * @param rowKey    the row key for frame
+     * @param colKeys   the column index for frame
+     * @param values    a vector of values to assign
+     * @param <R>       the row key type
+     * @param <C>       the column key type
+     * @return          the newly created DataFrame
+     * @throws          DataFrameException if the number of keys and values disagrees
+     */
+    static <R,C> DataFrame<R,C> ofDoubles(R rowKey, Iterable<C> colKeys, RealVector values) {
+        DataFrame<R,C> frame = ofDoubles(rowKey, colKeys);
+
+        if (frame.colCount() != values.getDimension())
+            throw new DataFrameException("Key/value length mismatch.");
+
+        frame.applyDoubles(cursor -> values.getEntry(cursor.colOrdinal()));
+        return frame;
+    }
+
+    /**
      * Returns a newly created DataFrame with 1 row optimized to hold any object
      * @param rowKey    the row key for frame
      * @param colKeys   the column keys for frame
@@ -1090,6 +1132,46 @@ public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperation
      */
     static <R,C> DataFrame<R,C> ofDoubles(Iterable<R> rowKeys, C colKey) {
         return DataFrame.factory().from(rowKeys, Index.singleton(colKey), Double.class);
+    }
+
+    /**
+     * Returns a newly created DataFrame with 1 column optimized to hold primitive doubles
+     * @param rowKeys   the row keys for frame
+     * @param colKey    the column key for frame
+     * @param values    the vector values to assign
+     * @param <R>       the row key type
+     * @param <C>       the column key type
+     * @return          the newly created DataFrame
+     * @throws          DataFrameException if the number of keys and values disagrees
+     */
+    static <R,C> DataFrame<R,C> ofDoubles(Iterable<R> rowKeys, C colKey, double[] values) {
+        DataFrame<R,C> frame = ofDoubles(rowKeys, colKey);
+
+        if (frame.rowCount() != values.length)
+            throw new DataFrameException("Key/value length mismatch.");
+
+        frame.applyDoubles(cursor -> values[cursor.rowOrdinal()]);
+        return frame;
+    }
+
+    /**
+     * Returns a newly created DataFrame with 1 column optimized to hold primitive doubles
+     * @param rowKeys   the row keys for frame
+     * @param colKey    the column key for frame
+     * @param values    the vector values to assign
+     * @param <R>       the row key type
+     * @param <C>       the column key type
+     * @return          the newly created DataFrame
+     * @throws          DataFrameException if the number of keys and values disagrees
+     */
+    static <R,C> DataFrame<R,C> ofDoubles(Iterable<R> rowKeys, C colKey, RealVector values) {
+        DataFrame<R,C> frame = ofDoubles(rowKeys, colKey);
+
+        if (frame.rowCount() != values.getDimension())
+            throw new DataFrameException("Key/value length mismatch.");
+
+        frame.applyDoubles(cursor -> values.getEntry(cursor.rowOrdinal()));
+        return frame;
     }
 
     /**
