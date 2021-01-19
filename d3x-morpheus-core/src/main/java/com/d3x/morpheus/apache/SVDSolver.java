@@ -127,6 +127,18 @@ public final class SVDSolver {
     }
 
     /**
+     * Computes the fitted or predicted values {@code A * x} for a linear system.
+     *
+     * @param A the {@code M x N} design matrix for the system.
+     * @param x the {@code N x 1} solution vector for the system.
+
+     * @return the fitted values, {@code A * x}.
+     */
+    public static RealVector computeFittedValues(RealMatrix A, RealVector x) {
+        return A.operate(x);
+    }
+
+    /**
      * Computes the error vector {@code A * x - b} for the solution to a linear system.
      *
      * @param A the {@code M x N} design matrix for the system.
@@ -136,7 +148,7 @@ public final class SVDSolver {
      * @return the error vector {@code A * x - b}.
      */
     public static RealVector computeResidual(RealMatrix A, RealVector x, RealVector b) {
-        return A.operate(x).subtract(b);
+        return computeFittedValues(A, x).subtract(b);
     }
 
     /**
