@@ -33,7 +33,18 @@ import com.d3x.morpheus.util.DoubleComparator;
  *
  * @author  Scott Shaffer
  */
-public abstract class AbstractRealVector extends RealVector {
+public abstract class ApacheRealVector extends RealVector {
+    /**
+     * Returns a RealVector view of a bare double array.
+     *
+     * @param values the array to view as a RealVector.
+     *
+     * @return a RealVector view of the given array.
+     */
+    public static RealVector of(double... values) {
+        return new ArrayRealVector(values);
+    }
+
     /**
      * Returns a new vector with the same underlying storage type (dense or sparse) as this vector.
      *

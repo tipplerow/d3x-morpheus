@@ -42,7 +42,7 @@ import com.d3x.morpheus.frame.DataFrameException;
  *
  * @author  Scott Shaffer
  */
-public final class ApacheColumnVector<R, C> extends AbstractRealVector {
+public final class ApacheColumnVector<R, C> extends ApacheRealVector {
     /** The key of the DataFrame column mapped to this vector. */
     @lombok.NonNull @lombok.Getter
     private final C colKey;
