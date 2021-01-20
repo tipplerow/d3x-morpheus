@@ -18,7 +18,9 @@ package com.d3x.morpheus.frame;
 import java.util.List;
 
 import org.apache.commons.math3.linear.ArrayRealVector;
+import org.apache.commons.math3.linear.BlockRealMatrix;
 import org.apache.commons.math3.linear.RealVector;
+
 import org.testng.annotations.Test;
 import static org.testng.Assert.*;
 
@@ -247,5 +249,19 @@ public class DataFrameTest extends DataFrameTestBase {
 
         DataFrame<String, String> frame2 = DataFrame.ofDoubles(rowKey, colKeys, colValues);
         assertDoubleFrame(frame2, List.of(rowKey), colKeys, new double[][] {{ 1.0, 2.0, 3.0 }});
+    }
+
+    @Test
+    public void testMatrixFrame() {
+        List<String> rowKeys = List.of("row1", "row2");
+        List<String> colKeys = List.of("col1", "col2", "col3");
+
+        double[][] values = new double[][] {
+                { 11.0, 12.0, 13.0 },
+                { 21.0, 22.0, 23.0 }
+        };
+
+        DataFrame<String, String> frame = DataFrame.ofDoubles(rowKeys, colKeys, new BlockRealMatrix(values));
+        assertDoubleFrame(frame, rowKeys, colKeys, values);
     }
 }

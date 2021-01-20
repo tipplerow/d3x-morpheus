@@ -31,6 +31,7 @@ import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
 
+import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.RealVector;
 
 import com.d3x.morpheus.db.DbSource;
@@ -1232,6 +1233,31 @@ public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperation
      */
     static <R,C> DataFrame<R,C> ofDoubles(Iterable<R> rowKeys, Iterable<C> colKeys) {
         return DataFrame.factory().from(rowKeys, colKeys, Double.class);
+    }
+
+    /**
+     * Returns a newly created DataFrame with values assigned from an Apache RealMatrix.
+     *
+     * @param rowKeys   the row keys for frame
+     * @param colKeys   the column keys for frame
+     * @param values    the matrix of values to assign
+     * @param <R>       the row key type
+     * @param <C>       the column key type
+     * @return          the newly created DataFrame
+     *
+     * @throws DataFrameException unless the matrix dimensions match those of the row and column keys.
+     */
+    static <R,C> DataFrame<R,C> ofDoubles(Iterable<R> rowKeys, Iterable<C> colKeys, RealMatrix values) {
+        DataFrame<R,C> frame = ofDoubles(rowKeys, colKeys);
+
+        if (frame.rowCount() != values.getRowDimension())
+            throw new DataFrameException("Row dimension mismatch.");
+
+        if (frame.colCount() != values.getColumnDimension())
+            throw new DataFrameException("Column dimension mismatch.");
+
+        frame.applyDoubles(cursor -> values.getEntry(cursor.rowOrdinal(), cursor.colOrdinal()));
+        return frame;
     }
 
     /**
