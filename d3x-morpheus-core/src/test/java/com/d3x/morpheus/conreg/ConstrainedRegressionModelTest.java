@@ -20,35 +20,23 @@ import java.util.List;
 import java.util.Set;
 
 import com.d3x.morpheus.frame.DataFrame;
-import com.d3x.morpheus.util.DoubleComparator;
 
 import org.testng.annotations.Test;
 import static org.testng.Assert.*;
 
-public class ConstrainedRegressionModelTest {
-    private static final String weight = "w";
-    private static final String regressand = "y";
-    private static final List<String> descriptors = List.of("x0", "x1", "x2", "x3");
-    private static final List<String> categories = List.of("Ford", "GM", "Chrysler");
-
-    private static final DoubleComparator comparator = DoubleComparator.DEFAULT;
-
-    private static ConstrainedRegressionModel<String> buildBasicModel() {
-        return ConstrainedRegressionModel.build(regressand, descriptors);
-    }
-
+public class ConstrainedRegressionModelTest extends ConstrainedRegressionTestBase {
     @Test
-    public void testBasicModel() {
-        ConstrainedRegressionModel<String> model = buildBasicModel();
+    public void testUnconstrainedModel() {
+        ConstrainedRegressionModel<String> model = buildUnconstrainedModel();
 
-        assertFalse(model.containsConstraint("con1"));
-        assertFalse(model.containsConstraint("make"));
+        assertFalse(model.containsConstraint(descriptorConstraintName));
+        assertFalse(model.containsConstraint(categoryName));
 
-        assertTrue(model.containsRegressor("x0"));
-        assertTrue(model.containsRegressor("x1"));
-        assertTrue(model.containsRegressor("x2"));
-        assertTrue(model.containsRegressor("x3"));
-        assertFalse(model.containsRegressor("y"));
+        assertTrue(model.containsRegressor(descriptors.get(0)));
+        assertTrue(model.containsRegressor(descriptors.get(1)));
+        assertTrue(model.containsRegressor(descriptors.get(2)));
+        assertTrue(model.containsRegressor(descriptors.get(3)));
+        assertFalse(model.containsRegressor(weight));
         assertFalse(model.containsRegressor("x4"));
 
         assertEquals(model.countConstraints(), 0);
@@ -69,7 +57,7 @@ public class ConstrainedRegressionModelTest {
     public void testConstraints() {
         List<String> regressors = new ArrayList<>();
         regressors.addAll(descriptors);
-        regressors.addAll(categories);
+        regressors.addAll(categoryColumns);
 
         ConstrainedRegressionModel<String> model =
                 ConstrainedRegressionModel.build(regressand, regressors);
@@ -96,7 +84,7 @@ public class ConstrainedRegressionModelTest {
         assertTrue(comparator.equals(model.getConstraintValues().toArray(), new double[] { 4.0 }));
         assertTrue(comparator.equals(model.getConstraintMatrix().getData(), new double[][] {{ 0.0, 1.0, 2.0, 3.0, 0.0, 0.0, 0.0 }} ));
 
-        model = model.addCategory("make", Set.copyOf(categories));
+        model = model.addCategory("make", Set.copyOf(categoryColumns));
 
         assertTrue(model.containsConstraint("con1"));
         assertTrue(model.containsConstraint("make"));
@@ -112,12 +100,12 @@ public class ConstrainedRegressionModelTest {
 
     @Test
     public void testWithWeight() {
-        ConstrainedRegressionModel<String> model = buildBasicModel();
+        ConstrainedRegressionModel<String> model = buildUnconstrainedModel();
 
         assertNull(model.getWeight());
         assertFalse(model.hasWeights());
 
-        model = model.withWeight(weight);
+        model.withWeight(weight);
 
         assertEquals(model.getWeight(), weight);
         assertTrue(model.hasWeights());
