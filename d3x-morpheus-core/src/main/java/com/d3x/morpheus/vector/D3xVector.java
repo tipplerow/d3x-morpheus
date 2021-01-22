@@ -16,6 +16,8 @@
 package com.d3x.morpheus.vector;
 
 import java.util.Arrays;
+
+import com.d3x.core.lang.D3xException;
 import com.d3x.morpheus.util.DoubleComparator;
 
 /**
@@ -33,7 +35,7 @@ public interface D3xVector {
      *
      * @param index the index of the element to return.
      *
-     * @return the value of an element at the specified location.
+     * @return the value of the element at the specified location.
      *
      * @throws RuntimeException if the index is out of bounds.
      */
@@ -117,6 +119,29 @@ public interface D3xVector {
             result.set(index, x);
 
         return result;
+    }
+
+    /**
+     * Ensures that a vector length is non-negative.
+     *
+     * @param length the length to validate.
+     *
+     * @throws RuntimeException if the length is negative.
+     */
+    static void validateLength(int length) {
+        if (length < 0)
+            throw new D3xException("Length [%d] is negative.", length);
+    }
+
+    /**
+     * Creates a mutable vector view over a bare array.
+     *
+     * @param values the values to be viewed.
+     *
+     * @return a mutable vector view over the specified array.
+     */
+    static D3xVector wrap(double[] values) {
+        return ApacheDenseVector.wrap(values);
     }
 
     /**
@@ -209,6 +234,17 @@ public interface D3xVector {
     }
 
     /**
+     * Determines if this vector has the same length as another vector.
+     *
+     * @param that the vector to compare to this.
+     *
+     * @return {@code true} iff the input vector has the same length as this vector.
+     */
+    default boolean isCongruent(D3xVector that) {
+        return this.length() == that.length();
+    }
+
+    /**
      * Returns a string representation of this vector.
      *
      * @return a string representation of this vector.
@@ -240,5 +276,18 @@ public interface D3xVector {
             array[index] = get(index);
 
         return array;
+    }
+
+    /**
+     * Ensures that this vector has the same length as another vector.
+     *
+     * @param that the vector to validate.
+     *
+     * @throws RuntimeException unless the specified vector has the same length as
+     * this vector.
+     */
+    default void validateCongruent(D3xVector that) {
+        if (!isCongruent(that))
+            throw new D3xException("Vector length mismatch: [%d != %d].", this.length(), that.length());
     }
 }

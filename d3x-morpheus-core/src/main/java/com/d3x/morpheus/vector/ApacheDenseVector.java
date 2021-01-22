@@ -87,7 +87,18 @@ public final class ApacheDenseVector extends ApacheVector {
      * @throws RuntimeException if the length is negative.
      */
     public static ApacheDenseVector ofLength(int length) {
-        return new ApacheDenseVector(new double[length], true, false);
+        return wrap(new double[length]);
+    }
+
+    /**
+     * Creates a mutable vector view over a bare array.
+     *
+     * @param values the values to be viewed.
+     *
+     * @return a mutable vector view over the specified array.
+     */
+    public static ApacheDenseVector wrap(double[] values) {
+        return new ApacheDenseVector(values, true, false);
     }
 
     @Override

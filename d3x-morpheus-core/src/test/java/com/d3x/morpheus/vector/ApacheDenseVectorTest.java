@@ -101,4 +101,28 @@ public class ApacheDenseVectorTest {
         assertEquals(vector.get(1), 22.0, TOLERANCE);
         assertEquals(vector.get(2), 33.0, TOLERANCE);
     }
+
+    @Test
+    public void testWrap() {
+        double[] array = new double[] { 1.0, 2.0, 3.0 };
+        ApacheDenseVector vector = ApacheDenseVector.wrap(array);
+
+        assertEquals(vector.length(), 3);
+        assertEquals(vector.get(0), 1.0, TOLERANCE);
+        assertEquals(vector.get(1), 2.0, TOLERANCE);
+        assertEquals(vector.get(2), 3.0, TOLERANCE);
+
+        vector.set(0, 11.0);
+        vector.set(1, 22.0);
+        vector.set(2, 33.0);
+
+        // The original array is also changed...
+        assertEquals(array[0], 11.0, TOLERANCE);
+        assertEquals(array[1], 22.0, TOLERANCE);
+        assertEquals(array[2], 33.0, TOLERANCE);
+
+        assertEquals(vector.get(0), 11.0, TOLERANCE);
+        assertEquals(vector.get(1), 22.0, TOLERANCE);
+        assertEquals(vector.get(2), 33.0, TOLERANCE);
+    }
 }
