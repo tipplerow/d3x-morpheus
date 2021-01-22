@@ -16,8 +16,13 @@
 package com.d3x.morpheus.vector;
 
 import java.util.Arrays;
+import java.util.List;
 
 import com.d3x.core.lang.D3xException;
+import com.d3x.morpheus.frame.DataFrame;
+import com.d3x.morpheus.frame.DataFrameColumn;
+import com.d3x.morpheus.frame.DataFrameException;
+import com.d3x.morpheus.frame.DataFrameRow;
 import com.d3x.morpheus.util.DoubleComparator;
 
 /**
@@ -64,61 +69,148 @@ public interface D3xVector {
     D3xVector like(int length);
 
     /**
-     * Creates a new mutable vector by copying values from a bare array.
+     * Creates a new vector by copying values from a bare array.
      *
      * @param values the values to be copied.
      *
-     * @return a new mutable vector containing a copy of the specified array.
+     * @return a new vector containing a copy of the specified array.
      */
     static D3xVector copyOf(double... values) {
         return ApacheDenseVector.copyOf(values);
     }
 
     /**
-     * Creates an <em>immutable</em> vector view over a bare array.
+     * Creates a new vector by copying values from a column in a Morpheus
+     * DataFrame.
      *
-     * @param values the values to be viewed.
+     * @param frame  the source DataFrame.
+     * @param colKey the key of the column to copy.
      *
-     * @return an <em>immutable</em> vector view over the specified array.
+     * @return a new vector containing a copy of the specified column in
+     * the given frame (in row order).
+     *
+     * @throws DataFrameException unless the frame contains the specified
+     * column.
      */
-    static D3xVector of(double... values) {
-        return ApacheDenseVector.of(values);
+    static <R,C> D3xVector copyColumn(DataFrame<R,C> frame, C colKey) {
+        return copyColumn(frame, frame.listRowKeys(), colKey);
     }
 
     /**
-     * Creates a new mutable vector of a fixed length with all elements
+     * Creates a new vector by copying selected rows from a column in a
+     * Morpheus DataFrame.
+     *
+     * @param frame   the source DataFrame.
+     * @param rowKeys the keys of the rows to copy.
+     * @param colKey  the key of the column to copy.
+     *
+     * @return a new vector containing a copy of the specified values in
+     * the given frame.
+     *
+     * @throws DataFrameException unless the frame contains the specified
+     * column and rows.
+     */
+    static <R,C> D3xVector copyColumn(DataFrame<R,C> frame, List<R> rowKeys, C colKey) {
+        frame.requireRows(rowKeys);
+        frame.requireDoubleColumn(colKey);
+
+        D3xVector vector = dense(rowKeys.size());
+        DataFrameColumn<R,C> column = frame.col(colKey);
+
+        for (int i = 0; i < rowKeys.size(); ++i)
+            vector.set(i, column.getDouble(rowKeys.get(i)));
+
+        return vector;
+    }
+
+    /**
+     * Creates a new vector by copying values from a row in a Morpheus
+     * DataFrame.
+     *
+     * @param frame  the source DataFrame.
+     * @param rowKey the key of the row to copy.
+     *
+     * @return a new vector containing a copy of the specified row in
+     * the given frame (in column order).
+     *
+     * @throws DataFrameException unless the frame contains the specified
+     * row.
+     */
+    static <R,C> D3xVector copyRow(DataFrame<R,C> frame, R rowKey) {
+        return copyRow(frame, rowKey, frame.listColumnKeys());
+    }
+
+    /**
+     * Creates a new vector by copying selected columns from a row in a
+     * Morpheus DataFrame.
+     *
+     * @param frame   the source DataFrame.
+     * @param rowKey  the key of the row to copy.
+     * @param colKeys the keys of the columns to copy.
+     *
+     * @return a new vector containing a copy of the specified values in
+     * the given frame.
+     *
+     * @throws DataFrameException unless the frame contains the specified
+     * row and columns.
+     */
+    static <R,C> D3xVector copyRow(DataFrame<R,C> frame, R rowKey, List<C> colKeys) {
+        frame.requireRow(rowKey);
+        frame.requireDoubleColumns(colKeys);
+
+        D3xVector vector = dense(colKeys.size());
+        DataFrameRow<R,C> row = frame.row(rowKey);
+
+        for (int j = 0; j < colKeys.size(); ++j)
+            vector.set(j, row.getDouble(colKeys.get(j)));
+
+        return vector;
+    }
+
+    /**
+     * Creates a new vector with dense physical storage and all elements
      * initialized to zero.
      *
-     * @param length the fixed length of the vector.
+     * @param length the length of the vector.
      *
-     * @return a new mutable vector of the specified length with all elements
-     * initialized to zero.
+     * @return a new vector of the specified length with dense physical
+     * storage and all elements initialized to zero.
      *
      * @throws RuntimeException if the length is negative.
      */
-    static D3xVector ofLength(int length) {
+    static D3xVector dense(int length) {
         return ApacheDenseVector.ofLength(length);
     }
 
     /**
-     * Like the {@code R} function {@code rep(x, n)}, creates a new mutable vector
+     * Like the {@code R} function {@code rep(x, n)}, creates a new vector
      * containing the value {@code x} replicated {@code n} times.
      *
      * @param x the value to replicate.
      * @param n the number of times to replicate.
      *
-     * @return a new mutable vector of length {@code n} with each element assigned
+     * @return a new vector of length {@code n} with each element assigned
      * the value {@code x}.
      *
      * @throws RuntimeException if {@code n < 0}.
      */
     static D3xVector rep(double x, int n) {
-        D3xVector result = ofLength(n);
+        return ApacheDenseVector.rep(x, n);
+    }
 
-        for (int index = 0; index < n; ++index)
-            result.set(index, x);
-
-        return result;
+    /**
+     * Creates a new vector with sparse physical storage and all elements
+     * initialized to zero.
+     *
+     * @param length the length of the vector.
+     *
+     * @return a new vector of the specified length with sparse physical
+     * storage and all elements initialized to zero.
+     *
+     * @throws RuntimeException if the length is negative.
+     */
+    static D3xVector sparse(int length) {
+        return ApacheSparseVector.ofLength(length);
     }
 
     /**

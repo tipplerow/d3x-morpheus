@@ -15,90 +15,98 @@
  */
 package com.d3x.morpheus.vector;
 
-import java.util.Arrays;
-import com.d3x.core.lang.D3xException;
+import org.apache.commons.math3.linear.ArrayRealVector;
 
 /**
- * Provides an Apache RealVector backed by a {@code double[]} array with
- * explicit control over data ownership and mutability.
+ * Extends the Apache ArrayRealVector class to implement the D3xVector interface
+ * and to add explicit control over data ownership.
  *
  * @author  Scott Shaffer
  */
-public final class ApacheDenseVector extends ApacheVector {
-    private final boolean mutable;
-    private final double[] values;
+public final class ApacheDenseVector extends ArrayRealVector implements D3xVector {
+    private ApacheDenseVector(int length, double fill) {
+        super(length, fill);
+    }
 
-    private ApacheDenseVector(double[] values, boolean mutable, boolean copy) {
-        this.mutable = mutable;
-
-        if (copy)
-            this.values = Arrays.copyOf(values, values.length);
-        else
-            this.values = values;
+    private ApacheDenseVector(double[] values, boolean copy) {
+        super(values, copy);
     }
 
     /**
-     * Creates a new mutable vector by copying values from a bare array.
+     * Creates a new vector by copying values from a bare array.
      *
      * @param values the values to be copied.
      *
-     * @return a new mutable vector containing a copy of the specified array.
+     * @return a new vector containing a copy of the specified array.
      */
     public static ApacheDenseVector copyOf(double... values) {
-        return new ApacheDenseVector(values, true, true);
+        return new ApacheDenseVector(values, true);
     }
 
     /**
-     * Creates a new mutable vector by copying values from another vector.
+     * Creates a new vector by copying values from another vector.
      *
      * @param vector the vector to be copied.
      *
-     * @return a new mutable vector containing a copy of the specified vector.
+     * @return a new vector containing a copy of the specified vector.
      */
     public static ApacheDenseVector copyOf(D3xVector vector) {
         ApacheDenseVector copy = ofLength(vector.length());
 
         for (int index = 0; index < vector.length(); ++index)
-            copy.set(index, vector.get(index));
+            copy.setEntry(index, vector.get(index));
 
         return copy;
     }
 
     /**
-     * Creates an <em>immutable</em> vector view over a bare array.
-     *
-     * @param values the values to be viewed.
-     *
-     * @return an <em>immutable</em> vector view over the specified array.
-     */
-    public static ApacheDenseVector of(double... values) {
-        return new ApacheDenseVector(values, false, false);
-    }
-
-    /**
-     * Creates a new mutable vector of a fixed length with all elements
-     * initialized to zero.
+     * Creates a new vector with fixed length and all elements initialized to zero.
      *
      * @param length the fixed length of the vector.
      *
-     * @return a new mutable vector of the specified length with all elements
-     * initialized to zero.
+     * @return a new vector of the specified length with all elements initialized to zero.
      *
      * @throws RuntimeException if the length is negative.
      */
     public static ApacheDenseVector ofLength(int length) {
-        return wrap(new double[length]);
+        return new ApacheDenseVector(length, 0.0);
     }
 
     /**
-     * Creates a mutable vector view over a bare array.
+     * Like the {@code R} function {@code rep(x, n)}, creates a new mutable vector
+     * containing the value {@code x} replicated {@code n} times.
+     *
+     * @param x the value to replicate.
+     * @param n the number of times to replicate.
+     *
+     * @return a new mutable vector of length {@code n} with each element assigned
+     * the value {@code x}.
+     *
+     * @throws RuntimeException if {@code n < 0}.
+     */
+    public static ApacheDenseVector rep(double x, int n) {
+        return new ApacheDenseVector(n, x);
+    }
+
+    /**
+     * Creates a vector view over a bare array.
      *
      * @param values the values to be viewed.
      *
-     * @return a mutable vector view over the specified array.
+     * @return a vector view over the specified array.
      */
-    public static ApacheDenseVector wrap(double[] values) {
-        return new ApacheDenseVector(values, true, false);
+    public static ApacheDenseVector wrap(double... values) {
+        return new ApacheDenseVector(values, false);
+    }
+
+    @Override
+    public double get(int index) {
+        return getEntry(index);
+    }
+
+    @Override
+    public int length() {
+        return getDimension();
     }
 
     @Override
@@ -107,25 +115,7 @@ public final class ApacheDenseVector extends ApacheVector {
     }
 
     @Override
-    public int getDimension() {
-        return values.length;
-    }
-
-    @Override
-    public double getEntry(int index) {
-        return values[index];
-    }
-
-    @Override
-    public void setEntry(int index, double value) {
-        if (mutable)
-            values[index] = value;
-        else
-            throw new D3xException("Cannot change an immutable ApacheDenseVector.");
-    }
-
-    @Override
-    public double[] toArray() {
-        return Arrays.copyOf(values, values.length);
+    public void set(int index, double value) {
+        setEntry(index, value);
     }
 }

@@ -15,16 +15,48 @@
  */
 package com.d3x.morpheus.vector;
 
+import java.util.List;
+import com.d3x.morpheus.frame.DataFrame;
+
 import org.testng.annotations.Test;
 import static org.testng.Assert.*;
 
-public class ApacheDenseVectorTest {
+public class D3xVectorTest {
     private static final double TOLERANCE = 1.0E-12;
+    private final DataFrame<String, String> dataFrame = newFrame();
+
+    /** Row keys for the DataFrame created by {@code newFrame()}. */
+    public static final List<String> rowKeys = List.of("row1", "row2", "row3");
+
+    /** Column keys for the DataFrame created by {@code newFrame()}. */
+    public static final List<String> colKeys = List.of("col1", "col2", "col3", "col4");
+
+    /** Elements for the DataFrame created by {@code newFrame()}. */
+    public static final double[][] finalData =
+            new double[][] {
+                    { 11.0, 12.0, 13.0, 14.0 },
+                    { 21.0, 22.0, 23.0, 24.0 },
+                    { 31.0, 32.0, 33.0, 34.0 } };
+
+    /**
+     * Creates a new DataFrame for standardized testing.
+     *
+     * @return a new DataFrame with standardized keys and data.
+     */
+    public static DataFrame<String, String> newFrame() {
+        DataFrame<String, String> frame = DataFrame.ofDoubles(rowKeys, colKeys);
+
+        for (int irow = 0; irow < frame.rowCount(); irow++)
+            for (int jcol = 0; jcol < frame.colCount(); jcol++)
+                frame.setDoubleAt(irow, jcol, finalData[irow][jcol]);
+
+        return frame;
+    }
 
     @Test
     public void testCopyOfArray() {
         double[] array = new double[] { 1.0, 2.0, 3.0 };
-        ApacheDenseVector vector = ApacheDenseVector.copyOf(array);
+        D3xVector vector = D3xVector.copyOf(array);
 
         assertEquals(vector.length(), 3);
         assertEquals(vector.get(0), 1.0, TOLERANCE);
@@ -46,9 +78,41 @@ public class ApacheDenseVectorTest {
     }
 
     @Test
-    public void testCopyOfVector() {
-        ApacheDenseVector orig = ApacheDenseVector.copyOf(1.0, 2.0, 3.0);
-        ApacheDenseVector copy = ApacheDenseVector.copyOf(orig);
+    public void testCopyColumn() {
+        assertTrue(D3xVector.copyColumn(dataFrame, "col2").equalsArray(12.0, 22.0, 32.0));
+        assertTrue(D3xVector.copyColumn(dataFrame, List.of("row3", "row1"), "col4").equalsArray(34.0, 14.0));
+    }
+
+    @Test(expectedExceptions = RuntimeException.class)
+    public void testCopyColumnInvalid1() {
+        D3xVector.copyColumn(dataFrame, "row1");
+    }
+
+    @Test(expectedExceptions = RuntimeException.class)
+    public void testCopyColumnInvalid2() {
+        D3xVector.copyColumn(dataFrame, List.of("col3", "col4"), "col1");
+    }
+
+    @Test
+    public void testCopyRow() {
+        assertTrue(D3xVector.copyRow(dataFrame, "row2").equalsArray(21.0, 22.0, 23.0, 24.0));
+        assertTrue(D3xVector.copyRow(dataFrame, "row3", List.of("col4", "col1")).equalsArray(34.0, 31.0));
+    }
+
+    @Test(expectedExceptions = RuntimeException.class)
+    public void testCopyRowInvalid1() {
+        D3xVector.copyRow(dataFrame, "col1");
+    }
+
+    @Test(expectedExceptions = RuntimeException.class)
+    public void testCopyRowInvalid2() {
+        D3xVector.copyRow(dataFrame, "row1", List.of("row5", "row6"));
+    }
+
+    @Test
+    public void testCopyOfSelf() {
+        D3xVector orig = D3xVector.copyOf(1.0, 2.0, 3.0);
+        D3xVector copy = orig.copyOf();
 
         assertEquals(copy.length(), 3);
         assertEquals(copy.get(0), 1.0, TOLERANCE);
@@ -70,24 +134,27 @@ public class ApacheDenseVectorTest {
     }
 
     @Test
-    public void testOfGet() {
-        ApacheDenseVector vector = ApacheDenseVector.of(1.0, 2.0, 3.0);
+    public void testDense() {
+        D3xVector vector = D3xVector.dense(3);
         assertEquals(vector.length(), 3);
-        assertEquals(vector.get(0), 1.0, TOLERANCE);
-        assertEquals(vector.get(1), 2.0, TOLERANCE);
-        assertEquals(vector.get(2), 3.0, TOLERANCE);
-    }
 
-    @Test(expectedExceptions = RuntimeException.class)
-    public void testOfSet() {
-        ApacheDenseVector vector = ApacheDenseVector.of(1.0, 2.0, 3.0);
+        assertEquals(vector.get(0), 0.0, TOLERANCE);
+        assertEquals(vector.get(1), 0.0, TOLERANCE);
+        assertEquals(vector.get(2), 0.0, TOLERANCE);
+
         vector.set(0, 11.0);
+        vector.set(1, 22.0);
+        vector.set(2, 33.0);
+
+        assertEquals(vector.get(0), 11.0, TOLERANCE);
+        assertEquals(vector.get(1), 22.0, TOLERANCE);
+        assertEquals(vector.get(2), 33.0, TOLERANCE);
     }
 
     @Test
-    public void testOfLength() {
-        ApacheDenseVector vector = ApacheDenseVector.ofLength(3);
-        assertEquals(vector.length(), 3);
+    public void testSparse() {
+        D3xVector vector = D3xVector.sparse(1000);
+        assertEquals(vector.length(), 1000);
 
         assertEquals(vector.get(0), 0.0, TOLERANCE);
         assertEquals(vector.get(1), 0.0, TOLERANCE);
@@ -105,7 +172,7 @@ public class ApacheDenseVectorTest {
     @Test
     public void testWrap() {
         double[] array = new double[] { 1.0, 2.0, 3.0 };
-        ApacheDenseVector vector = ApacheDenseVector.wrap(array);
+        D3xVector vector = D3xVector.wrap(array);
 
         assertEquals(vector.length(), 3);
         assertEquals(vector.get(0), 1.0, TOLERANCE);
@@ -126,3 +193,4 @@ public class ApacheDenseVectorTest {
         assertEquals(vector.get(2), 33.0, TOLERANCE);
     }
 }
+
