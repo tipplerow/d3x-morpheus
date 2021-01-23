@@ -17,6 +17,7 @@ package com.d3x.morpheus.matrix;
 
 import java.util.List;
 import com.d3x.morpheus.frame.DataFrame;
+import com.d3x.morpheus.vector.D3xVector;
 import com.d3x.morpheus.vector.D3xVectorTest;
 
 import org.testng.annotations.Test;
@@ -101,7 +102,7 @@ public class D3xMatrixTest {
     @Test
     public void testCopyOfSelf() {
         D3xMatrix orig = D3xMatrix.copyOf(testArray);
-        D3xMatrix copy = orig.copyOf();
+        D3xMatrix copy = orig.copyThis();
 
         assertEquals(copy.nrow(), 2);
         assertEquals(copy.ncol(), 3);
@@ -202,6 +203,78 @@ public class D3xMatrixTest {
         assertEquals(matrix.get(1, 0), 210.0, TOLERANCE);
         assertEquals(matrix.get(1, 1), 220.0, TOLERANCE);
         assertEquals(matrix.get(1, 2), 230.0, TOLERANCE);
+    }
+
+    @Test
+    public void testTimesMatrix() {
+        double[][] arrayA = new double[][] {
+                {  1.0,  0.0, -2.0,  5.0 },
+                { -3.0,  4.0,  8.0, -1.0 },
+                {  2.0,  7.0, -1.0,  9.0 }
+        };
+
+        double[][] arrayB = new double[][] {
+                { -3.0,  0.0 },
+                {  1.0,  3.0 },
+                { -4.0,  1.0 },
+                {  8.0, -6.0 }
+        };
+
+        double[][] arrayAB = new double[][] {
+                {  45.0, -32.0 },
+                { -27.0,  26.0 },
+                {  77.0, -34.0 }
+        };
+
+        D3xMatrix A = D3xMatrix.wrap(arrayA);
+        D3xMatrix B = D3xMatrix.wrap(arrayB);
+
+        assertTrue(A.times(B).equalsArray(arrayAB));
+    }
+
+    @Test(expectedExceptions = RuntimeException.class)
+    public void testTimesMatrixIncongruent() {
+        D3xMatrix.dense(4, 5).times(D3xMatrix.dense(4, 5));
+    }
+
+    @Test
+    public void testTimesVector() {
+        double[][] arrayA = new double[][] {
+                {  1.0,  0.0, -2.0,  5.0 },
+                { -3.0,  4.0,  8.0, -1.0 },
+                {  2.0,  7.0, -1.0,  9.0 }
+        };
+
+        double[] arrayX = new double[] { 1.0, 2.0, 3.0, 4.0 };
+        double[] arrayAX = new double[] { 15.0, 25.0, 49.0 };
+
+        D3xMatrix A = D3xMatrix.wrap(arrayA);
+        D3xVector x = D3xVector.wrap(arrayX);
+
+        assertTrue(A.times(x).equalsArray(arrayAX));
+    }
+
+    @Test(expectedExceptions = RuntimeException.class)
+    public void testTimesVectorIncongruent() {
+        D3xMatrix.dense(4, 5).times(D3xVector.dense(4));
+    }
+
+    @Test
+    public void testTranspose() {
+        double[][] arrayA = new double[][] {
+                {  1.0,  0.0, -2.0,  5.0 },
+                { -3.0,  4.0,  8.0, -1.0 },
+                {  2.0,  7.0, -1.0,  9.0 }
+        };
+
+        double[][] arrayAT = new double[][] {
+                {  1.0, -3.0,  2.0 },
+                {  0.0,  4.0,  7.0 },
+                { -2.0,  8.0, -1.0 },
+                {  5.0, -1.0,  9.0 }
+        };
+
+        assertTrue(D3xMatrix.wrap(arrayA).transpose().equalsArray(arrayAT));
     }
 
     @Test

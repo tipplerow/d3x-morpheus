@@ -21,6 +21,7 @@ import com.d3x.core.lang.D3xException;
 import com.d3x.morpheus.frame.DataFrame;
 import com.d3x.morpheus.frame.DataFrameException;
 import com.d3x.morpheus.util.DoubleComparator;
+import com.d3x.morpheus.vector.D3xVector;
 
 /**
  * Represents a matrix of {@code double} values with fixed row and column
@@ -63,6 +64,16 @@ public interface D3xMatrix {
     void set(int row, int col, double value);
 
     /**
+     * Returns a deep copy of this matrix.
+     *
+     * <p>Note that this method cannot be named simply {@code copy()}, because
+     * that would duplicate the same method from the Apache RealMatrix class.</p>
+     *
+     * @return a deep copy of this matrix.
+     */
+    D3xMatrix copyThis();
+
+    /**
      * Returns a new matrix with the same concrete type as this matrix.
      *
      * @param nrow the number of rows in the new matrix.
@@ -74,6 +85,34 @@ public interface D3xMatrix {
      * @throws RuntimeException if either dimension is negative.
      */
     D3xMatrix like(int nrow, int ncol);
+
+    /**
+     * Returns the product {@code Ax} of this matrix {@code A} and a
+     * vector {@code x}.
+     *
+     * @param x the vector factor.
+     *
+     * @return the product {@code Ax} of this matrix {@code A} and the
+     * input vector {@code x}.
+     *
+     * @throws RuntimeException unless the length of the input vector
+     * matches the column dimension of this matrix.
+     */
+    D3xVector times(D3xVector x);
+
+    /**
+     * Returns the product {@code AB} of this matrix {@code A} and another
+     * matrix {@code B}.
+     *
+     * @param B the right matrix factor.
+     *
+     * @return the product {@code AB} of this matrix {@code A} and the
+     * input matrix {@code B}.
+     *
+     * @throws RuntimeException unless the row dimension of the input
+     * matrix matches the column dimension of this matrix.
+     */
+    D3xMatrix times(D3xMatrix B);
 
     /**
      * Returns the transpose of this matrix; this matrix is unchanged.
@@ -192,6 +231,19 @@ public interface D3xMatrix {
     }
 
     /**
+     * Creates a new matrix with storage only for diagonal elements and
+     * initializes those elements.
+     *
+     * @param diagonals the diagonal values to assign.
+     *
+     * @return a new matrix with storage for only diagonal elements with
+     * those elements assigned by the input vector.
+     */
+    static D3xMatrix diagonal(D3xVector diagonals) {
+        return ApacheMatrix.diagonal(diagonals);
+    }
+
+    /**
      * Similar to the {@code R} function {@code rep(x, n)}, creates a new mutable
      * matrix containing the value {@code x} replicated {@code n} times.
      *
@@ -268,21 +320,39 @@ public interface D3xMatrix {
     }
 
     /**
-     * Returns a deep copy of this matrix.
-     *
-     * <p>Note that this method cannot be named simply {@code copy()}, because
-     * that would duplicate the same method from the Apache RealMatrix class.</p>
-     *
-     * @return a deep copy of this matrix.
+     * Returns the elements of this matrix in a vector having row-major order.
+     * @return the elements of this matrix in a vector having row-major order.
      */
-    default D3xMatrix copyOf() {
-        D3xMatrix copy = like();
+    default D3xVector byrow() {
+        int elementIndex = 0;
+        D3xVector elementVector = D3xVector.dense(size());
 
-        for (int i = 0; i < nrow(); ++i)
-            for (int j = 0; j < ncol(); ++j)
-                copy.set(i, j, this.get(i, j));
+        for (int i = 0; i < nrow(); ++i) {
+            for (int j = 0; j < ncol(); ++j) {
+                elementVector.set(elementIndex, get(i, j));
+                ++elementIndex;
+            }
+        }
 
-        return copy;
+        return elementVector;
+    }
+
+    /**
+     * Returns the elements of this matrix in a vector having column-major order.
+     * @return the elements of this matrix in a vector having column-major order.
+     */
+    default D3xVector bycol() {
+        int elementIndex = 0;
+        D3xVector elementVector = D3xVector.dense(size());
+
+        for (int j = 0; j < ncol(); ++j) {
+            for (int i = 0; i < nrow(); ++i) {
+                elementVector.set(elementIndex, get(i, j));
+                ++elementIndex;
+            }
+        }
+
+        return elementVector;
     }
 
     /**
@@ -369,6 +439,47 @@ public interface D3xMatrix {
     }
 
     /**
+     * Returns a copy of the diagonal elements in this matrix.
+     * @return a copy of the diagonal elements in this matrix.
+     * @throws RuntimeException unless this is a square matrix.
+     */
+    default D3xVector getDiagonal() {
+        if (!isSquare())
+            throw new D3xException("Non-square matrix.");
+
+        D3xVector diagonal = D3xVector.dense(nrow());
+
+        for (int i = 0; i < nrow(); i++)
+            diagonal.set(i, get(i, i));
+
+        return diagonal;
+    }
+
+    /**
+     * Returns a string representation of this matrix that can be cut-and-pasted
+     * into an {@code R} session.
+     *
+     * @return a string representation of this matrix that can be cut-and-pasted
+     * into an {@code R} session.
+     */
+    default String formatR() {
+        D3xVector elements = byrow();
+        StringBuilder builder = new StringBuilder();
+        builder.append(String.format("matrix(nrow = %d, ncol = %d, byrow = TRUE, data = c(", nrow(), ncol()));
+
+        if (elements.length() > 0)
+            builder.append(elements.get(0));
+
+        for (int index = 1; index < elements.length(); ++index) {
+            builder.append(", ");
+            builder.append(elements.get(index));
+        }
+
+        builder.append("))");
+        return builder.toString();
+    }
+
+    /**
      * Determines if this matrix has the same shape as another matrix.
      *
      * @param that the matrix to compare to this.
@@ -377,6 +488,15 @@ public interface D3xMatrix {
      */
     default boolean isCongruent(D3xMatrix that) {
         return this.nrow() == that.nrow() && this.ncol() == that.ncol();
+    }
+
+    /**
+     * Identifies square matrices.
+     *
+     * @return {@code true} iff this matrix is square.
+     */
+    default boolean isSquare() {
+        return nrow() == ncol();
     }
 
     /**
@@ -399,9 +519,11 @@ public interface D3xMatrix {
     }
 
     /**
-     * Returns the elements of this matrix in a new array, which must not contain
-     * a reference to the underlying data in this matrix.  Subsequent changes to
-     * the returned array must not change the contents of this matrix.
+     * Copies the elements of this matrix into a new array, which does not contain
+     * a reference to the underlying data in this matrix.
+     *
+     * <p>Changes to the returned array will not be reflected in this matrix, and
+     * changes to this matrix will not be reflected in the returned array.</p>
      *
      * @return the elements of this matrix in a new array.
      */

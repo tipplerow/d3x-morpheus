@@ -15,6 +15,8 @@
  */
 package com.d3x.morpheus.matrix;
 
+import com.d3x.morpheus.vector.D3xVector;
+
 import lombok.NonNull;
 
 import org.apache.commons.math3.linear.AbstractRealMatrix;
@@ -82,6 +84,19 @@ public final class ApacheMatrix extends AbstractRealMatrix implements D3xMatrix 
     }
 
     /**
+     * Returns a new matrix with storage only for diagonal elements and
+     * initializes those elements.
+     *
+     * @param diagonals the diagonal values to assign.
+     *
+     * @return a new matrix with storage for only diagonal elements with
+     * those elements assigned by the input vector.
+     */
+    public static ApacheMatrix diagonal(D3xVector diagonals) {
+        return wrap(new DiagonalMatrix(diagonals.toArray()));
+    }
+
+    /**
      * Returns a new matrix with sparse physical storage and all elements
      * initialized to zero.
      *
@@ -119,16 +134,29 @@ public final class ApacheMatrix extends AbstractRealMatrix implements D3xMatrix 
         return new ApacheMatrix(matrix);
     }
 
-    /**
-     * Returns the underlying matrix implementation.
-     * @return the underlying matrix implementation.
-     */
-    public RealMatrix impl() {
-        return impl;
+    private static RealMatrix asRealMatrix(D3xMatrix matrix) {
+        //
+        // Finds the best RealMatrix implementation to use when operating on
+        // generic D3xMatrix instances.
+        //
+        if (matrix instanceof ApacheMatrix)
+            return ((ApacheMatrix) matrix).impl;
+
+        if (matrix instanceof RealMatrix)
+            return (RealMatrix) matrix;
+
+        // The BlockRealMatrix is designed to be cache-friendly and to provide
+        // the best performance for multiplication and transposition...
+        return new BlockRealMatrix(matrix.toArray());
     }
 
     @Override
     public ApacheMatrix copy() {
+        return new ApacheMatrix(impl.copy());
+    }
+
+    @Override
+    public ApacheMatrix copyThis() {
         return new ApacheMatrix(impl.copy());
     }
 
@@ -183,27 +211,18 @@ public final class ApacheMatrix extends AbstractRealMatrix implements D3xMatrix 
     }
 
     @Override
+    public D3xVector times(D3xVector x) {
+        return D3xVector.wrap(impl.operate(x.toArray()));
+    }
+
+    @Override
+    public ApacheMatrix times(D3xMatrix B) {
+        return wrap(this.impl.multiply(asRealMatrix(B)));
+    }
+
+    @Override
     public ApacheMatrix transpose() {
         return wrap(impl.transpose());
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof D3xMatrix)
-            return equalsMatrix((D3xMatrix) obj);
-        else if (obj instanceof RealMatrix)
-            return equalsArray(((RealMatrix) obj).getData());
-        else
-            return false;
-    }
-
-    @Override
-    public int hashCode() {
-        //
-        // As containers of floating-point values which are subject to
-        // round-off error, matrix objects should not be used as hash keys...
-        //
-        return System.identityHashCode(this);
     }
 
     @Override
