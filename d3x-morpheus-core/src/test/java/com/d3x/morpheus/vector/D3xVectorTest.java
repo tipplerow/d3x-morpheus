@@ -54,6 +54,78 @@ public class D3xVectorTest {
     }
 
     @Test
+    public void testCombine() {
+        double c1 = 3.0;
+        double c2 = 2.0;
+
+        double[] arr1 = new double[] {   1.0,   2.0,   3.0 };
+        double[] arr2 = new double[] { 100.0, 200.0, 300.0 };
+        double[] arr3 = new double[] { 203.0, 406.0, 609.0 };
+
+        D3xVector vec1 = D3xVector.copyOf(arr1);
+        D3xVector vec2 = D3xVector.copyOf(arr2);
+        D3xVector vec3 = vec1.combine(c1, c2, vec2);
+
+        assertNotSame(vec3, vec1);
+        assertTrue(vec1.equalsArray(arr1));
+        assertTrue(vec2.equalsArray(arr2));
+        assertTrue(vec3.equalsArray(arr3));
+
+        D3xVector vec4 = vec1.combineInPlace(c1, c2, vec2);
+
+        assertSame(vec4, vec1);
+        assertTrue(vec1.equalsArray(arr3));
+        assertTrue(vec2.equalsArray(arr2));
+        assertTrue(vec4.equalsArray(arr3));
+    }
+
+    @Test
+    public void testMinus() {
+        double[] arr1 = new double[] { 10.0, 20.0, 30.0 };
+        double[] arr2 = new double[] {  1.0,  2.0,  3.0 };
+        double[] arr3 = new double[] {  9.0, 18.0, 27.0 };
+
+        D3xVector vec1 = D3xVector.copyOf(arr1);
+        D3xVector vec2 = D3xVector.copyOf(arr2);
+        D3xVector vec3 = vec1.minus(vec2);
+
+        assertNotSame(vec3, vec1);
+        assertTrue(vec1.equalsArray(arr1));
+        assertTrue(vec2.equalsArray(arr2));
+        assertTrue(vec3.equalsArray(arr3));
+
+        D3xVector vec4 = vec1.subtractInPlace(vec2);
+
+        assertSame(vec4, vec1);
+        assertTrue(vec1.equalsArray(arr3));
+        assertTrue(vec2.equalsArray(arr2));
+        assertTrue(vec4.equalsArray(arr3));
+    }
+
+    @Test
+    public void testPlus() {
+        double[] arr1 = new double[] {  1.0,  2.0,  3.0 };
+        double[] arr2 = new double[] { 10.0, 20.0, 30.0 };
+        double[] arr3 = new double[] { 11.0, 22.0, 33.0 };
+
+        D3xVector vec1 = D3xVector.copyOf(arr1);
+        D3xVector vec2 = D3xVector.copyOf(arr2);
+        D3xVector vec3 = vec1.plus(vec2);
+
+        assertNotSame(vec3, vec1);
+        assertTrue(vec1.equalsArray(arr1));
+        assertTrue(vec2.equalsArray(arr2));
+        assertTrue(vec3.equalsArray(arr3));
+
+        D3xVector vec4 = vec1.addInPlace(vec2);
+
+        assertSame(vec4, vec1);
+        assertTrue(vec1.equalsArray(arr3));
+        assertTrue(vec2.equalsArray(arr2));
+        assertTrue(vec4.equalsArray(arr3));
+    }
+
+    @Test
     public void testCopyOfArray() {
         double[] array = new double[] { 1.0, 2.0, 3.0 };
         D3xVector vector = D3xVector.copyOf(array);
@@ -112,7 +184,7 @@ public class D3xVectorTest {
     @Test
     public void testCopyOfSelf() {
         D3xVector orig = D3xVector.copyOf(1.0, 2.0, 3.0);
-        D3xVector copy = orig.copyOf();
+        D3xVector copy = orig.copyThis();
 
         assertEquals(copy.length(), 3);
         assertEquals(copy.get(0), 1.0, TOLERANCE);

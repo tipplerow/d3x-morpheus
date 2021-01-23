@@ -26,7 +26,9 @@ import com.d3x.morpheus.frame.DataFrameRow;
 import com.d3x.morpheus.util.DoubleComparator;
 
 /**
- * Represents a fixed-length vector of {@code double} values.
+ * Represents a fixed-length vector of {@code double} values, provides static
+ * factory methods with explicit control over data ownership, and provides
+ * reference implementations of standard operations from linear algebra.
  */
 public interface D3xVector {
     /**
@@ -57,6 +59,16 @@ public interface D3xVector {
     void set(int index, double value);
 
     /**
+     * Returns a deep copy of this vector.
+     *
+     * <p>Note that this method cannot be named simply {@code copy()}, because
+     * that would duplicate the same method from the Apache RealVector class.</p>
+     *
+     * @return a deep copy of this vector.
+     */
+    D3xVector copyThis();
+
+    /**
      * Returns a new vector with the same concrete type as this vector.
      *
      * @param length the desired length of the new vector.
@@ -67,6 +79,115 @@ public interface D3xVector {
      * @throws RuntimeException if the length is negative.
      */
     D3xVector like(int length);
+
+    /**
+     * Forms a linear combination of this vector and another vector and
+     * returns the result in a new vector; this vector is unchanged.
+     *
+     * <p>Implementations should override this default method when a more
+     * efficient algorithm is available for the underlying storage.</p>
+     *
+     * @param a the coefficient to multiply this vector.
+     * @param b the coefficient to multiply the input vector.
+     * @param v the vector to combine with this vector.
+     *
+     * @return the linear combination {@code a * this + b * v} in a new
+     * vector object.
+     *
+     * @throws RuntimeException unless the input vector has the same length
+     * as this vector.
+     */
+    default D3xVector combine(double a, double b, D3xVector v) {
+        return copyThis().combineInPlace(a, b, v);
+    }
+
+    /**
+     * Forms a linear combination of this vector and another vector and
+     * stores the result in this vector.
+     *
+     * <p>Implementations should override this default method when a more
+     * efficient algorithm is available for the underlying storage.</p>
+     *
+     * @param a the coefficient to multiply this vector.
+     * @param b the coefficient to multiply the input vector.
+     * @param v the vector to combine with this vector.
+     *
+     * @return this vector, for operator chaining, with elements updated
+     * as {@code a * this + b * v}.
+     *
+     * @throws RuntimeException unless the input vector has the same length
+     * as this vector.
+     */
+    default D3xVector combineInPlace(double a, double b, D3xVector v) {
+        validateCongruent(v);
+
+        for (int index = 0; index < length(); ++index)
+            this.set(index, a * this.get(index) + b * v.get(index));
+
+        return this;
+    }
+
+    /**
+     * Returns the sum of this vector and another in a new vector; this
+     * vector is unchanged.
+     *
+     * @param addend the vector to add to this vector.
+     *
+     * @return a new vector containing the sum of this vector and the
+     * specified addend.
+     *
+     * @throws RuntimeException unless the addend has the same length
+     * as this vector.
+     */
+    default D3xVector plus(D3xVector addend) {
+        return combine(1.0, 1.0, addend);
+    }
+
+    /**
+     * Adds another vector to this vector and modifies the elements of
+     * this vector in place.
+     *
+     * @param addend the vector to add to this vector.
+     *
+     * @return this vector, for operator chaining.
+     *
+     * @throws RuntimeException unless the addend has the same length
+     * as this vector.
+     */
+    default D3xVector addInPlace(D3xVector addend) {
+        return combineInPlace(1.0, 1.0, addend);
+    }
+
+    /**
+     * Returns the difference of this vector and another in a new vector;
+     * this vector is unchanged.
+     *
+     * @param subtrahend the vector to subtract from this vector.
+     *
+     * @return a new vector containing the difference of this vector and
+     * the specified subtrahend.
+     *
+     * @throws RuntimeException unless the subtrahend has the same length
+     * as this vector.
+     */
+    default D3xVector minus(D3xVector subtrahend) {
+        return combine(1.0, -1.0, subtrahend);
+    }
+
+    /**
+     * Subtracts another vector from this vector and modifies the elements
+     * of this vector in place.
+     *
+     * @param subtrahend the vector to subtract from this vector.
+     *
+     * @return this vector, for operator chaining.
+     *
+     * @throws RuntimeException unless the subtrahend has the same length
+     * as this vector.
+     */
+    default D3xVector subtractInPlace(D3xVector subtrahend) {
+        return combineInPlace(1.0, -1.0, subtrahend);
+    }
 
     /**
      * Creates a new vector by copying values from a bare array.
@@ -226,7 +347,9 @@ public interface D3xVector {
     }
 
     /**
-     * Creates a mutable vector view over a bare array.
+     * Creates a mutable vector view over a bare array (a shallow copy).
+     * Changes to this vector will be reflected in the input array, and
+     * changes to the array will be reflected in this vector.
      *
      * @param values the values to be viewed.
      *
@@ -234,23 +357,6 @@ public interface D3xVector {
      */
     static D3xVector wrap(double[] values) {
         return ApacheDenseVector.wrap(values);
-    }
-
-    /**
-     * Returns a deep copy of this vector.
-     *
-     * <p>Note that this method cannot be named simply {@code copy()}, because
-     * that would duplicate the same method from the Apache RealVector class.</p>
-     *
-     * @return a deep copy of this vector.
-     */
-    default D3xVector copyOf() {
-        D3xVector copy = like();
-
-        for (int index = 0; index < length(); ++index)
-            copy.set(index, this.get(index));
-
-        return copy;
     }
 
     /**

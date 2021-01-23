@@ -15,7 +15,12 @@
  */
 package com.d3x.morpheus.vector;
 
+import com.d3x.morpheus.util.DoubleComparator;
 import org.apache.commons.math3.linear.OpenMapRealVector;
+import org.apache.commons.math3.linear.RealVector;
+import org.apache.commons.math3.linear.SparseRealVector;
+
+import java.util.Iterator;
 
 /**
  * Extends the Apache OpenMapRealVector class to implement the D3xVector interface.
@@ -25,6 +30,10 @@ import org.apache.commons.math3.linear.OpenMapRealVector;
 public final class ApacheSparseVector extends OpenMapRealVector implements D3xVector {
     private ApacheSparseVector(int length) {
         super(length);
+    }
+
+    private ApacheSparseVector(OpenMapRealVector vector) {
+        super(vector);
     }
 
     /**
@@ -38,6 +47,33 @@ public final class ApacheSparseVector extends OpenMapRealVector implements D3xVe
      */
     public static ApacheSparseVector ofLength(int length) {
         return new ApacheSparseVector(length);
+    }
+
+    @Override
+    public D3xVector combineInPlace(double a, double b, D3xVector v) {
+        if (v instanceof SparseRealVector)
+            return combineSparseInPlace(a, b, (SparseRealVector) v);
+        else
+            return D3xVector.super.combineInPlace(a, b, v);
+    }
+
+    private D3xVector combineSparseInPlace(double a, double b, SparseRealVector v) {
+        if (!DoubleComparator.DEFAULT.equals(a, 1.0))
+            mapMultiplyToSelf(a);
+
+        Iterator<RealVector.Entry> vIterator = v.sparseIterator();
+
+        while (vIterator.hasNext()) {
+            RealVector.Entry vEntry = vIterator.next();
+            addToEntry(vEntry.getIndex(), b * vEntry.getValue());
+        }
+
+        return this;
+    }
+
+    @Override
+    public ApacheSparseVector copyThis() {
+        return new ApacheSparseVector(this);
     }
 
     @Override

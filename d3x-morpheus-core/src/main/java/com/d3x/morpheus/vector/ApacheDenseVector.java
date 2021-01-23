@@ -32,6 +32,10 @@ public final class ApacheDenseVector extends ArrayRealVector implements D3xVecto
         super(values, copy);
     }
 
+    private ApacheDenseVector(ArrayRealVector vector, boolean deepCopy) {
+        super(vector, deepCopy);
+    }
+
     /**
      * Creates a new vector by copying values from a bare array.
      *
@@ -97,6 +101,27 @@ public final class ApacheDenseVector extends ArrayRealVector implements D3xVecto
      */
     public static ApacheDenseVector wrap(double... values) {
         return new ApacheDenseVector(values, false);
+    }
+
+    @Override
+    public D3xVector combine(double a, double b, D3xVector v) {
+        if (v instanceof ArrayRealVector)
+            return new ApacheDenseVector(combine(a, b, (ArrayRealVector) v), false);
+        else
+            return D3xVector.super.combineInPlace(a, b, v);
+    }
+
+    @Override
+    public D3xVector combineInPlace(double a, double b, D3xVector v) {
+        if (v instanceof ArrayRealVector)
+            return (D3xVector) combineToSelf(a, b, (ArrayRealVector) v);
+        else
+            return D3xVector.super.combineInPlace(a, b, v);
+    }
+
+    @Override
+    public ApacheDenseVector copyThis() {
+        return new ApacheDenseVector(this, true);
     }
 
     @Override
