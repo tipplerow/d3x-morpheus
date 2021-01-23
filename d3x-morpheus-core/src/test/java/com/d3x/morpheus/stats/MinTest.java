@@ -15,7 +15,7 @@
  */
 package com.d3x.morpheus.stats;
 
-import com.d3x.morpheus.apache.ApacheRealVector;
+import com.d3x.morpheus.vector.D3xVector;
 
 import org.testng.annotations.Test;
 import static org.testng.Assert.*;
@@ -32,8 +32,8 @@ public class MinTest {
 
     @Test
     public void testOfVector() {
-        assertTrue(Double.isNaN(Min.of(ApacheRealVector.of())));
-        assertEquals(Min.of(ApacheRealVector.of(1.0)), 1.0, TOLERANCE);
-        assertEquals(Min.of(ApacheRealVector.of(1.0, -4.0, 33.0, 4.0)), -4.0, TOLERANCE);
+        assertTrue(Double.isNaN(Min.of(D3xVector.copyOf())));
+        assertEquals(Min.of(D3xVector.copyOf(1.0)), 1.0, TOLERANCE);
+        assertEquals(Min.of(D3xVector.copyOf(1.0, -4.0, 33.0, 4.0)), -4.0, TOLERANCE);
     }
 }

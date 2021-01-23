@@ -15,7 +15,7 @@
  */
 package com.d3x.morpheus.stats;
 
-import org.apache.commons.math3.linear.RealVector;
+import com.d3x.morpheus.vector.D3xVector;
 
 /**
  * A Statistic implementation that supports incremental calculation of a sample sum
@@ -54,7 +54,7 @@ public class Sum implements Statistic1 {
      *
      * @return the sum of the values in the sample.
      */
-    public static double of(RealVector sample) {
+    public static double of(D3xVector sample) {
         return Statistic1.compute(new Sum(), sample);
     }
 

@@ -15,7 +15,7 @@
  */
 package com.d3x.morpheus.stats;
 
-import com.d3x.morpheus.apache.ApacheRealVector;
+import com.d3x.morpheus.vector.D3xVector;
 
 import org.testng.annotations.Test;
 import static org.testng.Assert.*;
@@ -32,8 +32,8 @@ public class SumTest {
 
     @Test
     public void testOfVector() {
-        assertEquals(Sum.of(ApacheRealVector.of()), 0.0, TOLERANCE);
-        assertEquals(Sum.of(ApacheRealVector.of(1.0)), 1.0, TOLERANCE);
-        assertEquals(Sum.of(ApacheRealVector.of(1.0, 2.0, 3.0, 4.0)), 10.0, TOLERANCE);
+        assertEquals(Sum.of(D3xVector.copyOf()), 0.0, TOLERANCE);
+        assertEquals(Sum.of(D3xVector.copyOf(1.0)), 1.0, TOLERANCE);
+        assertEquals(Sum.of(D3xVector.copyOf(1.0, 2.0, 3.0, 4.0)), 10.0, TOLERANCE);
     }
 }

@@ -184,7 +184,7 @@ public class D3xVectorTest {
     @Test
     public void testCopyOfSelf() {
         D3xVector orig = D3xVector.copyOf(1.0, 2.0, 3.0);
-        D3xVector copy = orig.copyThis();
+        D3xVector copy = orig.copy();
 
         assertEquals(copy.length(), 3);
         assertEquals(copy.get(0), 1.0, TOLERANCE);

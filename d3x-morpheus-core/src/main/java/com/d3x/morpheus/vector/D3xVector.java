@@ -29,6 +29,8 @@ import com.d3x.morpheus.util.DoubleComparator;
  * Represents a fixed-length vector of {@code double} values, provides static
  * factory methods with explicit control over data ownership, and provides
  * reference implementations of standard operations from linear algebra.
+ *
+ * @author Scott Shaffer
  */
 public interface D3xVector {
     /**
@@ -59,17 +61,13 @@ public interface D3xVector {
     void set(int index, double value);
 
     /**
-     * Returns a deep copy of this vector.
-     *
-     * <p>Note that this method cannot be named simply {@code copy()}, because
-     * that would duplicate the same method from the Apache RealVector class.</p>
-     *
+     * Creates a deep copy of this vector.
      * @return a deep copy of this vector.
      */
-    D3xVector copyThis();
+    D3xVector copy();
 
     /**
-     * Returns a new vector with the same concrete type as this vector.
+     * Creates a new vector with the same concrete type as this vector.
      *
      * @param length the desired length of the new vector.
      *
@@ -98,7 +96,7 @@ public interface D3xVector {
      * as this vector.
      */
     default D3xVector combine(double a, double b, D3xVector v) {
-        return copyThis().combineInPlace(a, b, v);
+        return copy().combineInPlace(a, b, v);
     }
 
     /**
@@ -128,8 +126,8 @@ public interface D3xVector {
     }
 
     /**
-     * Returns the sum of this vector and another in a new vector; this
-     * vector is unchanged.
+     * Computes the sum of this vector and another and returns the sum
+     * in a new vector; this vector is unchanged.
      *
      * @param addend the vector to add to this vector.
      *
@@ -159,8 +157,8 @@ public interface D3xVector {
     }
 
     /**
-     * Returns the difference of this vector and another in a new vector;
-     * this vector is unchanged.
+     * Computes the difference of this vector and another and returns the
+     * difference in a new vector; this vector is unchanged.
      *
      * @param subtrahend the vector to subtract from this vector.
      *
@@ -197,7 +195,7 @@ public interface D3xVector {
      * @return a new vector containing a copy of the specified array.
      */
     static D3xVector copyOf(double... values) {
-        return ApacheDenseVector.copyOf(values);
+        return ApacheVector.copyOf(values);
     }
 
     /**
@@ -300,9 +298,8 @@ public interface D3xVector {
      * @throws RuntimeException if the length is negative.
      */
     static D3xVector dense(int length) {
-        return ApacheDenseVector.ofLength(length);
+        return rep(0.0, length);
     }
-
     /**
      * Like the {@code R} function {@code rep(x, n)}, creates a new vector
      * containing the value {@code x} replicated {@code n} times.
@@ -315,8 +312,9 @@ public interface D3xVector {
      *
      * @throws RuntimeException if {@code n < 0}.
      */
+
     static D3xVector rep(double x, int n) {
-        return ApacheDenseVector.rep(x, n);
+        return ApacheVector.rep(x, n);
     }
 
     /**
@@ -331,7 +329,7 @@ public interface D3xVector {
      * @throws RuntimeException if the length is negative.
      */
     static D3xVector sparse(int length) {
-        return ApacheSparseVector.ofLength(length);
+        return ApacheVector.sparse(length);
     }
 
     /**
@@ -355,8 +353,8 @@ public interface D3xVector {
      *
      * @return a mutable vector view over the specified array.
      */
-    static D3xVector wrap(double[] values) {
-        return ApacheDenseVector.wrap(values);
+    static D3xVector wrap(double... values) {
+        return ApacheVector.wrap(values);
     }
 
     /**
@@ -443,7 +441,7 @@ public interface D3xVector {
     }
 
     /**
-     * Returns a string representation of this vector.
+     * Creates a string representation of this vector.
      *
      * @return a string representation of this vector.
      */
@@ -452,8 +450,7 @@ public interface D3xVector {
     }
 
     /**
-     * Returns a new vector with the same length and concrete type as this vector.
-     *
+     * Creates a new vector with the same length and concrete type as this vector.
      * @return a new vector with the same length and concrete type as this vector.
      */
     default D3xVector like() {
@@ -461,9 +458,9 @@ public interface D3xVector {
     }
 
     /**
-     * Returns the elements of this vector in a new array, which must not contain
-     * a reference to the underlying data in this vector.  Subsequent changes to
-     * the returned array must not change the contents of this vector.
+     * Creates a new array with the same contents as this vector. Changes to the
+     * returned array will not be reflected in this vector, and changes to this
+     * vector will not be reflected in the returned array.
      *
      * @return the elements of this vector in a new array.
      */

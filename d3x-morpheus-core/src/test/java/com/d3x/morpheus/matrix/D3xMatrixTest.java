@@ -102,7 +102,7 @@ public class D3xMatrixTest {
     @Test
     public void testCopyOfSelf() {
         D3xMatrix orig = D3xMatrix.copyOf(testArray);
-        D3xMatrix copy = orig.copyThis();
+        D3xMatrix copy = orig.copy();
 
         assertEquals(copy.nrow(), 2);
         assertEquals(copy.ncol(), 3);

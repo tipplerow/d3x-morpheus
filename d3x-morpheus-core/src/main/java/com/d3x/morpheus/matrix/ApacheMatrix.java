@@ -19,7 +19,6 @@ import com.d3x.morpheus.vector.D3xVector;
 
 import lombok.NonNull;
 
-import org.apache.commons.math3.linear.AbstractRealMatrix;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.BlockRealMatrix;
 import org.apache.commons.math3.linear.DiagonalMatrix;
@@ -31,7 +30,7 @@ import org.apache.commons.math3.linear.RealMatrix;
  *
  * @author Scott Shaffer
  */
-public final class ApacheMatrix extends AbstractRealMatrix implements D3xMatrix {
+public final class ApacheMatrix implements D3xMatrix {
     @NonNull private final RealMatrix impl;
 
     private ApacheMatrix(RealMatrix impl) {
@@ -39,18 +38,46 @@ public final class ApacheMatrix extends AbstractRealMatrix implements D3xMatrix 
     }
 
     /**
-     * Returns a new mutable matrix by copying values from a bare array.
+     * Returns a read-only RealMatrix view of a generic D3xMatrix to be used
+     * as the operand in algebraic functions.  Modifying the returned matrix
+     * is not permitted, and the results of doing so are undefined.
+     *
+     * @param matrix the algebraic operand.
+     *
+     * @return a read-only RealMatrix view of the specified operand.
+     */
+    public static RealMatrix asOperand(D3xMatrix matrix) {
+        //
+        // Finds the best RealMatrix implementation to use when operating on
+        // generic D3xMatrix instances.
+        //
+        if (matrix instanceof ApacheMatrix)
+            return ((ApacheMatrix) matrix).impl;
+
+        if (matrix instanceof RealMatrix)
+            return (RealMatrix) matrix;
+
+        return new Array2DRowRealMatrix(matrix.toArray(), false);
+    }
+
+    /**
+     * Creates a new matrix by copying values from a bare array.
      *
      * @param values the values to be copied.
      *
-     * @return a new mutable matrix containing a copy of the specified array.
+     * @return a new matrix containing a copy of the specified array.
      */
     public static ApacheMatrix copyOf(double[][] values) {
+        //
+        // The BlockRealMatrix is more cache-friendly for large matrices,
+        // and has only minimal overhead for small matrices, so we prefer
+        // it to Array2DRowRealMatrix...
+        //
         return wrap(new BlockRealMatrix(values));
     }
 
     /**
-     * Returns a new matrix with dense physical storage and all elements
+     * Creates a new matrix with dense physical storage and all elements
      * initialized to zero.
      *
      * @param nrow the number of matrix rows.
@@ -70,7 +97,7 @@ public final class ApacheMatrix extends AbstractRealMatrix implements D3xMatrix 
     }
 
     /**
-     * Returns a new matrix with storage only for diagonal elements (all
+     * Creates a new matrix with storage only for diagonal elements (all
      * diagonal elements initialized to zero).
      *
      * @param N the length of the diagonal.
@@ -84,7 +111,7 @@ public final class ApacheMatrix extends AbstractRealMatrix implements D3xMatrix 
     }
 
     /**
-     * Returns a new matrix with storage only for diagonal elements and
+     * Creates a new matrix with storage only for diagonal elements and
      * initializes those elements.
      *
      * @param diagonals the diagonal values to assign.
@@ -97,7 +124,7 @@ public final class ApacheMatrix extends AbstractRealMatrix implements D3xMatrix 
     }
 
     /**
-     * Returns a new matrix with sparse physical storage and all elements
+     * Creates a new matrix with sparse physical storage and all elements
      * initialized to zero.
      *
      * @param nrow the number of matrix rows.
@@ -112,7 +139,9 @@ public final class ApacheMatrix extends AbstractRealMatrix implements D3xMatrix 
     }
 
     /**
-     * Returns a new mutable matrix as a wrapper around a bare array.
+     * Creates a mutable matrix view over a bare array (a shallow copy).
+     * Changes to the returned matrix will be reflected in the input
+     * array, and changes to the array will be reflected in the matrix.
      *
      * @param values the values to be wrapped.
      *
@@ -134,54 +163,13 @@ public final class ApacheMatrix extends AbstractRealMatrix implements D3xMatrix 
         return new ApacheMatrix(matrix);
     }
 
-    private static RealMatrix asRealMatrix(D3xMatrix matrix) {
-        //
-        // Finds the best RealMatrix implementation to use when operating on
-        // generic D3xMatrix instances.
-        //
-        if (matrix instanceof ApacheMatrix)
-            return ((ApacheMatrix) matrix).impl;
-
-        if (matrix instanceof RealMatrix)
-            return (RealMatrix) matrix;
-
-        // The BlockRealMatrix is designed to be cache-friendly and to provide
-        // the best performance for multiplication and transposition...
-        return new BlockRealMatrix(matrix.toArray());
-    }
-
     @Override
     public ApacheMatrix copy() {
         return new ApacheMatrix(impl.copy());
     }
 
     @Override
-    public ApacheMatrix copyThis() {
-        return new ApacheMatrix(impl.copy());
-    }
-
-    @Override
-    public ApacheMatrix createMatrix(int nrow, int ncol) {
-        return new ApacheMatrix(impl.createMatrix(nrow, ncol));
-    }
-
-    @Override
-    public int getRowDimension() {
-        return impl.getRowDimension();
-    }
-
-    @Override
-    public int getColumnDimension() {
-        return impl.getColumnDimension();
-    }
-
-    @Override
     public double get(int row, int col) {
-        return impl.getEntry(row, col);
-    }
-
-    @Override
-    public double getEntry(int row, int col) {
         return impl.getEntry(row, col);
     }
 
@@ -202,11 +190,6 @@ public final class ApacheMatrix extends AbstractRealMatrix implements D3xMatrix 
 
     @Override
     public void set(int row, int col, double value) {
-        setEntry(row, col, value);
-    }
-
-    @Override
-    public void setEntry(int row, int col, double value) {
         impl.setEntry(row, col, value);
     }
 
@@ -217,7 +200,7 @@ public final class ApacheMatrix extends AbstractRealMatrix implements D3xMatrix 
 
     @Override
     public ApacheMatrix times(D3xMatrix B) {
-        return wrap(this.impl.multiply(asRealMatrix(B)));
+        return wrap(this.impl.multiply(asOperand(B)));
     }
 
     @Override

@@ -64,17 +64,13 @@ public interface D3xMatrix {
     void set(int row, int col, double value);
 
     /**
-     * Returns a deep copy of this matrix.
-     *
-     * <p>Note that this method cannot be named simply {@code copy()}, because
-     * that would duplicate the same method from the Apache RealMatrix class.</p>
-     *
+     * Creates a deep copy of this matrix.
      * @return a deep copy of this matrix.
      */
-    D3xMatrix copyThis();
+    D3xMatrix copy();
 
     /**
-     * Returns a new matrix with the same concrete type as this matrix.
+     * Creates a new matrix with the same concrete type as this matrix.
      *
      * @param nrow the number of rows in the new matrix.
      * @param ncol the number of columns in the new matrix.
@@ -87,8 +83,8 @@ public interface D3xMatrix {
     D3xMatrix like(int nrow, int ncol);
 
     /**
-     * Returns the product {@code Ax} of this matrix {@code A} and a
-     * vector {@code x}.
+     * Computes the product {@code Ax} of this matrix {@code A} and a
+     * vector {@code x} and returns the result in a new vector.
      *
      * @param x the vector factor.
      *
@@ -101,8 +97,8 @@ public interface D3xMatrix {
     D3xVector times(D3xVector x);
 
     /**
-     * Returns the product {@code AB} of this matrix {@code A} and another
-     * matrix {@code B}.
+     * Computes the product {@code AB} of this matrix {@code A} and another
+     * matrix {@code B} and returns the result in a new matrix.
      *
      * @param B the right matrix factor.
      *
@@ -115,8 +111,7 @@ public interface D3xMatrix {
     D3xMatrix times(D3xMatrix B);
 
     /**
-     * Returns the transpose of this matrix; this matrix is unchanged.
-     *
+     * Creates the transpose of this matrix; this matrix is unchanged.
      * @return the transpose of this matrix.
      */
     D3xMatrix transpose();
@@ -179,7 +174,7 @@ public interface D3xMatrix {
      */
     static <R,C> D3xMatrix copyFrame(DataFrame<R,C> frame, List<R> rowKeys, List<C> colKeys) {
         frame.requireRows(rowKeys);
-        frame.requireDoubleColumns(colKeys);
+        frame.requireNumericColumns(colKeys);
 
         D3xMatrix matrix = dense(rowKeys.size(), colKeys.size());
 
@@ -191,11 +186,11 @@ public interface D3xMatrix {
     }
 
     /**
-     * Creates a new mutable matrix by copying values from a bare array.
+     * Creates a new matrix by copying values from a bare array.
      *
      * @param values the values to be copied.
      *
-     * @return a new mutable matrix containing a copy of the specified array.
+     * @return a new matrix containing a copy of the specified array.
      */
     static D3xMatrix copyOf(double[][] values) {
         return ApacheMatrix.copyOf(values);
@@ -208,7 +203,8 @@ public interface D3xMatrix {
      * @param nrow the number of matrix rows.
      * @param ncol the number of matrix columns.
      *
-     * @return a new matrix with dense physical storage.
+     * @return a new matrix with dense physical storage and all elements
+     * initialized to zero.
      *
      * @throws RuntimeException if either dimension is negative.
      */
@@ -232,7 +228,7 @@ public interface D3xMatrix {
 
     /**
      * Creates a new matrix with storage only for diagonal elements and
-     * initializes those elements.
+     * initializes those elements with a vector of diagonal values.
      *
      * @param diagonals the diagonal values to assign.
      *
@@ -282,17 +278,18 @@ public interface D3xMatrix {
     }
 
     /**
-     * Creates a mutable matrix view over a bare array.
+     * Creates a mutable matrix view over a bare array (a shallow copy).
+     * Changes to the returned matrix will be reflected in the input
+     * array, and changes to the array will be reflected in the matrix.
      *
      * @param values the values to be wrapped.
      *
-     * @return a mutable matrix view using the specified array as
-     * its physical storage.
+     * @return a mutable matrix view using the specified array for its
+     * physical storage.
      */
     static D3xMatrix wrap(double[][] values) {
         return ApacheMatrix.wrap(values);
     }
-
 
     /**
      * Ensures that a matrix dimension is non-negative.
@@ -304,6 +301,19 @@ public interface D3xMatrix {
     static void validateDimension(int dim) {
         if (dim < 0)
             throw new D3xException("Matrix dimension [%d] is negative.", dim);
+    }
+
+    /**
+     * Ensures that a row or column index is valid.
+     *
+     * @param index the row or column index to validate.
+     * @param dimension the row or column dimension in the matrix.
+     *
+     * @throws RuntimeException unless the index is valid.
+     */
+    static void validateIndex(int index, int dimension) {
+        if (index < 0 || index >= dimension)
+            throw new D3xException("Invalid index: [%d] not in range [0, %d).", index, dimension);
     }
 
     /**
@@ -324,13 +334,13 @@ public interface D3xMatrix {
      * @return the elements of this matrix in a vector having row-major order.
      */
     default D3xVector byrow() {
-        int elementIndex = 0;
+        int vectorIndex = 0;
         D3xVector elementVector = D3xVector.dense(size());
 
         for (int i = 0; i < nrow(); ++i) {
             for (int j = 0; j < ncol(); ++j) {
-                elementVector.set(elementIndex, get(i, j));
-                ++elementIndex;
+                elementVector.set(vectorIndex, get(i, j));
+                ++vectorIndex;
             }
         }
 
@@ -342,13 +352,13 @@ public interface D3xMatrix {
      * @return the elements of this matrix in a vector having column-major order.
      */
     default D3xVector bycol() {
-        int elementIndex = 0;
+        int vectorIndex = 0;
         D3xVector elementVector = D3xVector.dense(size());
 
         for (int j = 0; j < ncol(); ++j) {
             for (int i = 0; i < nrow(); ++i) {
-                elementVector.set(elementIndex, get(i, j));
-                ++elementIndex;
+                elementVector.set(vectorIndex, get(i, j));
+                ++vectorIndex;
             }
         }
 
@@ -439,23 +449,6 @@ public interface D3xMatrix {
     }
 
     /**
-     * Returns a copy of the diagonal elements in this matrix.
-     * @return a copy of the diagonal elements in this matrix.
-     * @throws RuntimeException unless this is a square matrix.
-     */
-    default D3xVector getDiagonal() {
-        if (!isSquare())
-            throw new D3xException("Non-square matrix.");
-
-        D3xVector diagonal = D3xVector.dense(nrow());
-
-        for (int i = 0; i < nrow(); i++)
-            diagonal.set(i, get(i, i));
-
-        return diagonal;
-    }
-
-    /**
      * Returns a string representation of this matrix that can be cut-and-pasted
      * into an {@code R} session.
      *
@@ -480,6 +473,61 @@ public interface D3xMatrix {
     }
 
     /**
+     * Creates a copy of the diagonal elements in this matrix.
+     * @return a copy of the diagonal elements in this matrix.
+     * @throws RuntimeException unless this is a square matrix.
+     */
+    default D3xVector getDiagonal() {
+        if (!isSquare())
+            throw new D3xException("Non-square matrix.");
+
+        D3xVector diagonal = D3xVector.dense(nrow());
+
+        for (int i = 0; i < nrow(); i++)
+            diagonal.set(i, get(i, i));
+
+        return diagonal;
+    }
+
+    /**
+     * Copies the elements from a column of this matrix into a new vector.
+     *
+     * @param col the index of the column to copy.
+
+     * @return a new vector with a copy of the contents in the specified column.
+     *
+     * @throws RuntimeException unless the column index is valid.
+     */
+    default D3xVector getColumn(int col) {
+        validateColumnIndex(col);
+        D3xVector vec = D3xVector.dense(nrow());
+
+        for (int row = 0; row < nrow(); ++row)
+            vec.set(row, get(row, col));
+
+        return vec;
+    }
+
+    /**
+     * Copies the elements from a row of this matrix into a new vector.
+     *
+     * @param row the index of the row to copy.
+     *
+     * @return a new vector with a copy of the contents in the specified row.
+     *
+     * @throws RuntimeException unless the row index is valid.
+     */
+    default D3xVector getRow(int row) {
+        validateRowIndex(row);
+        D3xVector vec = D3xVector.dense(ncol());
+
+        for (int col = 0; col < ncol(); ++col)
+            vec.set(col, get(row, col));
+
+        return vec;
+    }
+
+    /**
      * Determines if this matrix has the same shape as another matrix.
      *
      * @param that the matrix to compare to this.
@@ -500,12 +548,43 @@ public interface D3xMatrix {
     }
 
     /**
-     * Returns a new matrix with the same shape and concrete type as this matrix.
-     *
+     * Creates a new matrix with the same shape and concrete type as this matrix.
      * @return a new matrix with the same shape and concrete type as this matrix.
      */
     default D3xMatrix like() {
         return like(nrow(), ncol());
+    }
+
+    /**
+     * Assigns the elements in a column of this matrix to the values of a column vector.
+     *
+     * @param col the index of the column to assign.
+     * @param vec the column vector to assign.
+     *
+     * @throws RuntimeException unless the column index is valid and the length of the
+     * column vector matches the number of rows in this matrix.
+     */
+    default void setColumn(int col, D3xVector vec) {
+        validateColumnVector(col, vec);
+
+        for (int row = 0; row < nrow(); ++row)
+            set(row, col, vec.get(row));
+    }
+
+    /**
+     * Assigns the elements in a row of this matrix to the values of a row vector.
+     *
+     * @param row the index of the row to assign.
+     * @param vec the row vector to assign.
+     *
+     * @throws RuntimeException unless the row index is valid and the length of the
+     * row vector matches the number of columns in this matrix.
+     */
+    default void setRow(int row, D3xVector vec) {
+        validateRowVector(row, vec);
+
+        for (int col = 0; col < ncol(); ++col)
+            set(row, col, vec.get(col));
     }
 
     /**
@@ -540,6 +619,60 @@ public interface D3xMatrix {
         }
 
         return array;
+    }
+
+    /**
+     * Ensures that a column index is valid.
+     *
+     * @param col the index of the column to validate.
+     *
+     * @throws RuntimeException unless the column index is valid.
+     */
+    default void validateColumnIndex(int col) {
+        validateIndex(col, ncol());
+    }
+
+    /**
+     * Ensures that a column vector is valid.
+     *
+     * @param col the index of the column to validate.'
+     * @param vec the column vector to validate.
+     *
+     * @throws RuntimeException unless the column index is valid and the
+     * length of the vector matches the number of rows in this matrix.
+     */
+    default void validateColumnVector(int col, D3xVector vec) {
+        validateColumnIndex(col);
+
+        if (vec.length() != nrow())
+            throw new D3xException("Invalid column vector length.");
+    }
+
+    /**
+     * Ensures that a row index is valid.
+     *
+     * @param row the index of the row to validate.
+     *
+     * @throws RuntimeException unless the row index is valid.
+     */
+    default void validateRowIndex(int row) {
+        validateIndex(row, nrow());
+    }
+
+    /**
+     * Ensures that a row vector is valid.
+     *
+     * @param row the index of the row to validate.'
+     * @param vec the row vector to validate.
+     *
+     * @throws RuntimeException unless the row index is valid and the
+     * length of the vector matches the number of columns in this matrix.
+     */
+    default void validateRowVector(int row, D3xVector vec) {
+        validateRowIndex(row);
+
+        if (vec.length() != ncol())
+            throw new D3xException("Invalid row vector length.");
     }
 
     /**
