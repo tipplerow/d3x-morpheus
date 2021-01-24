@@ -15,11 +15,8 @@
  */
 package com.d3x.morpheus.util;
 
-import org.apache.commons.math3.linear.Array2DRowRealMatrix;
-import org.apache.commons.math3.linear.ArrayRealVector;
-import org.apache.commons.math3.linear.BlockRealMatrix;
-import org.apache.commons.math3.linear.RealMatrix;
-import org.apache.commons.math3.linear.RealVector;
+import com.d3x.morpheus.matrix.D3xMatrix;
+import com.d3x.morpheus.vector.D3xVector;
 
 import org.testng.annotations.Test;
 import static org.testng.Assert.*;
@@ -50,11 +47,11 @@ public class DoubleComparatorTest {
         assertFalse(fixed2.equals(x1, x4));
         assertFalse(fixed2.equals(x1, x5));
 
-        RealVector v1 = new ArrayRealVector(x1);
-        RealVector v2 = new ArrayRealVector(x2);
-        RealVector v3 = new ArrayRealVector(x3);
-        RealVector v4 = new ArrayRealVector(x4);
-        RealVector v5 = new ArrayRealVector(x5);
+        D3xVector v1 = D3xVector.wrap(x1);
+        D3xVector v2 = D3xVector.wrap(x2);
+        D3xVector v3 = D3xVector.wrap(x3);
+        D3xVector v4 = D3xVector.wrap(x4);
+        D3xVector v5 = D3xVector.wrap(x5);
 
         assertTrue(fixed2.equals(v1, v2));
         assertFalse(fixed2.equals(v1, v3));
@@ -95,10 +92,10 @@ public class DoubleComparatorTest {
         assertFalse(fixed2.equals(x1, x4));
         assertFalse(fixed2.equals(x1, x5));
 
-        RealMatrix m1 = new BlockRealMatrix(x1);
-        RealMatrix m2 = new Array2DRowRealMatrix(x2);
-        RealMatrix m3 = new BlockRealMatrix(x3);
-        RealMatrix m5 = new BlockRealMatrix(x5);
+        D3xMatrix m1 = D3xMatrix.wrap(x1);
+        D3xMatrix m2 = D3xMatrix.wrap(x2);
+        D3xMatrix m3 = D3xMatrix.wrap(x3);
+        D3xMatrix m5 = D3xMatrix.wrap(x5);
 
         assertTrue(fixed2.equals(m1, m2));
         assertFalse(fixed2.equals(m1, m3));

@@ -84,6 +84,68 @@ public interface D3xMatrix {
     D3xMatrix like(int nrow, int ncol);
 
     /**
+     * Creates a new matrix with the same shape and concrete type as this matrix.
+     * @return a new matrix with the same shape and concrete type as this matrix.
+     */
+    default D3xMatrix like() {
+        return like(nrow(), ncol());
+    }
+
+    /**
+     * Multiplies each element of this matrix by a scalar factor and modifies
+     * the elements of this matrix in place.
+     *
+     * @param scalar the scalar factor.
+     *
+     * @return this matrix, for operator chaining.
+     */
+    default D3xMatrix multiplyInPlace(double scalar) {
+        for (int i = 0; i < nrow(); ++i)
+            for (int j = 0; j < ncol(); ++j)
+                set(i, j, scalar * get(i, j));
+
+        return this;
+    }
+
+    /**
+     * Assigns a continuous block of elements in this matrix from another matrix.
+     *
+     * @param startRow the first (top-most) row element in the assignment range.
+     * @param startCol the first (left-most) column element in the assignment range.
+     * @param subMatrix the sub-matrix to assign.
+     *
+     * @return this matrix, for operator chaining.
+     *
+     * @throws RuntimeException unless the assignment block is valid.
+     */
+    default D3xMatrix setSubMatrix(int startRow, int startCol, D3xMatrix subMatrix) {
+        validateRowIndex(startRow);
+        validateRowIndex(startRow + subMatrix.nrow() - 1);
+
+        validateColumnIndex(startCol);
+        validateColumnIndex(startCol + subMatrix.ncol() - 1);
+
+        for (int subRowIndex = 0; subRowIndex < subMatrix.nrow(); ++subRowIndex)
+            for (int subColIndex = 0; subColIndex < subMatrix.ncol(); ++subColIndex)
+                set(startRow + subRowIndex, startCol + subColIndex, subMatrix.get(subRowIndex, subColIndex));
+
+        return this;
+    }
+
+    /**
+     * Computes the product {@code cA} of this matrix {@code A} and a
+     * scalar factor {@code c} and returns the result in a new vector.
+     *
+     * @param scalar the scalar factor.
+     *
+     * @return a new matrix containing the product of this matrix and
+     * the input scalar factor.
+     */
+    default D3xMatrix times(double scalar) {
+        return copy().multiplyInPlace(scalar);
+    }
+
+    /**
      * Computes the product {@code Ax} of this matrix {@code A} and a
      * vector {@code x} and returns the result in a new vector.
      *
@@ -238,6 +300,14 @@ public interface D3xMatrix {
      */
     static D3xMatrix diagonal(D3xVector diagonals) {
         return ApacheMatrix.diagonal(diagonals);
+    }
+
+    /**
+     * Returns an empty matrix.
+     * @return an empty matrix.
+     */
+    static D3xMatrix empty() {
+        return ApacheMatrix.EMPTY;
     }
 
     /**
@@ -567,14 +637,6 @@ public interface D3xMatrix {
      */
     default boolean isSquare() {
         return nrow() == ncol();
-    }
-
-    /**
-     * Creates a new matrix with the same shape and concrete type as this matrix.
-     * @return a new matrix with the same shape and concrete type as this matrix.
-     */
-    default D3xMatrix like() {
-        return like(nrow(), ncol());
     }
 
     /**

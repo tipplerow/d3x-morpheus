@@ -15,11 +15,9 @@
  */
 package com.d3x.morpheus.conreg;
 
-import org.apache.commons.math3.linear.RealMatrix;
-import org.apache.commons.math3.linear.RealVector;
-
-import com.d3x.morpheus.apache.ApacheRealVector;
 import com.d3x.morpheus.frame.DataFrame;
+import com.d3x.morpheus.matrix.D3xMatrix;
+import com.d3x.morpheus.vector.D3xVector;
 
 import org.testng.annotations.Test;
 import static org.testng.Assert.*;
@@ -37,10 +35,10 @@ public class ConstrainedRegressionSystemTest extends ConstrainedRegressionTestBa
 
     @Test
     public void testAugmentedMatrix() {
-        RealMatrix actual = system.getAugmentedMatrix();
+        D3xMatrix actual = system.getAugmentedMatrix();
 
-        assertEquals(actual.getRowDimension(), 9);
-        assertEquals(actual.getColumnDimension(), 9);
+        assertEquals(actual.nrow(), 9);
+        assertEquals(actual.ncol(), 9);
 
         // These values have been verified by a separate calculation in R...
         //
@@ -55,64 +53,64 @@ public class ConstrainedRegressionSystemTest extends ConstrainedRegressionTestBa
         //    0     0     0      0     1     1     1     0     0
         //
         double tolerance = 1.0E-12;
-        assertEquals(actual.getEntry(0, 0),   20.0, tolerance);
-        assertEquals(actual.getEntry(0, 2),  174.0, tolerance);
-        assertEquals(actual.getEntry(1, 3), 2712.0, tolerance);
-        assertEquals(actual.getEntry(1, 7),    1.0, tolerance);
-        assertEquals(actual.getEntry(2, 1),  -72.0, tolerance);
-        assertEquals(actual.getEntry(2, 7),    2.0, tolerance);
-        assertEquals(actual.getEntry(3, 6),  253.0, tolerance);
-        assertEquals(actual.getEntry(4, 3), -334.0, tolerance);
-        assertEquals(actual.getEntry(4, 8),    1.0, tolerance);
-        assertEquals(actual.getEntry(5, 0),   11.0, tolerance);
-        assertEquals(actual.getEntry(5, 8),    1.0, tolerance);
-        assertEquals(actual.getEntry(6, 6),    3.0, tolerance);
-        assertEquals(actual.getEntry(6, 8),    1.0, tolerance);
-        assertEquals(actual.getEntry(7, 1),    1.0, tolerance);
-        assertEquals(actual.getEntry(7, 2),    2.0, tolerance);
-        assertEquals(actual.getEntry(8, 4),    1.0, tolerance);
-        assertEquals(actual.getEntry(8, 5),    1.0, tolerance);
-        assertEquals(actual.getEntry(8, 6),    1.0, tolerance);
+        assertEquals(actual.get(0, 0),   20.0, tolerance);
+        assertEquals(actual.get(0, 2),  174.0, tolerance);
+        assertEquals(actual.get(1, 3), 2712.0, tolerance);
+        assertEquals(actual.get(1, 7),    1.0, tolerance);
+        assertEquals(actual.get(2, 1),  -72.0, tolerance);
+        assertEquals(actual.get(2, 7),    2.0, tolerance);
+        assertEquals(actual.get(3, 6),  253.0, tolerance);
+        assertEquals(actual.get(4, 3), -334.0, tolerance);
+        assertEquals(actual.get(4, 8),    1.0, tolerance);
+        assertEquals(actual.get(5, 0),   11.0, tolerance);
+        assertEquals(actual.get(5, 8),    1.0, tolerance);
+        assertEquals(actual.get(6, 6),    3.0, tolerance);
+        assertEquals(actual.get(6, 8),    1.0, tolerance);
+        assertEquals(actual.get(7, 1),    1.0, tolerance);
+        assertEquals(actual.get(7, 2),    2.0, tolerance);
+        assertEquals(actual.get(8, 4),    1.0, tolerance);
+        assertEquals(actual.get(8, 5),    1.0, tolerance);
+        assertEquals(actual.get(8, 6),    1.0, tolerance);
     }
 
     @Test
     public void testAugmentedVector() {
-        RealVector actual = system.getAugmentedVector();
-        assertEquals(actual.getDimension(), 9);
+        D3xVector actual = system.getAugmentedVector();
+        assertEquals(actual.length(), 9);
 
         // These values have been verified by a separate calculation in R...
         double tolerance = 0.0001;
-        assertEquals(actual.getEntry(0),    610.0861, tolerance);
-        assertEquals(actual.getEntry(1),  -2756.0688, tolerance);
-        assertEquals(actual.getEntry(2),   7998.5778, tolerance);
-        assertEquals(actual.getEntry(3), -50048.5164, tolerance);
-        assertEquals(actual.getEntry(4),    558.0238, tolerance);
-        assertEquals(actual.getEntry(5),    136.0556, tolerance);
-        assertEquals(actual.getEntry(6),    -83.9934, tolerance);
-        assertEquals(actual.getEntry(7),      3.0,    tolerance);
-        assertEquals(actual.getEntry(8),      0.0,    tolerance);
+        assertEquals(actual.get(0),    610.0861, tolerance);
+        assertEquals(actual.get(1),  -2756.0688, tolerance);
+        assertEquals(actual.get(2),   7998.5778, tolerance);
+        assertEquals(actual.get(3), -50048.5164, tolerance);
+        assertEquals(actual.get(4),    558.0238, tolerance);
+        assertEquals(actual.get(5),    136.0556, tolerance);
+        assertEquals(actual.get(6),    -83.9934, tolerance);
+        assertEquals(actual.get(7),      3.0,    tolerance);
+        assertEquals(actual.get(8),      0.0,    tolerance);
     }
 
     @Test
     public void testDesignMatrix() {
-        RealMatrix actual = system.getDesignMatrix();
+        D3xMatrix actual = system.getDesignMatrix();
 
-        for (int row = 0; row < actual.getRowDimension(); row++)
-            for (int col = 0; col < actual.getColumnDimension(); col++)
-                assertEquals(actual.getEntry(row, col), frame.getDouble(observationRows.get(row), getRegressors().get(col)));
+        for (int row = 0; row < actual.nrow(); row++)
+            for (int col = 0; col < actual.ncol(); col++)
+                assertEquals(actual.get(row, col), frame.getDouble(observationRows.get(row), getRegressors().get(col)));
     }
 
     @Test
     public void testRegressandVector() {
-        RealVector actual = system.getRegressandVector();
+        D3xVector actual = system.getRegressandVector();
 
-        for (int row = 0; row < actual.getDimension(); row++)
-            assertEquals(actual.getEntry(row), frame.getDouble(observationRows.get(row), regressand), 1.0E-12);
+        for (int row = 0; row < actual.length(); row++)
+            assertEquals(actual.get(row), frame.getDouble(observationRows.get(row), regressand), 1.0E-12);
     }
 
     @Test
     public void testWeightVector() {
         // There are ten non-zero weights, so the weights should be rescaled to sum to 10.0...
-        assertTrue(comparator.equals(system.getWeightVector(), ApacheRealVector.of(0.5, 1.0, 1.5, 2.0, 0.0, 0.5, 1.0, 1.5, 0.5, 1.0, 0.5)));
+        assertTrue(comparator.equals(system.getWeightVector(), D3xVector.wrap(0.5, 1.0, 1.5, 2.0, 0.0, 0.5, 1.0, 1.5, 0.5, 1.0, 0.5)));
     }
 }

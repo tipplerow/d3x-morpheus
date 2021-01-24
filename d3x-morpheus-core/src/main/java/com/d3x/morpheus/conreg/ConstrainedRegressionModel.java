@@ -20,17 +20,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.math3.linear.ArrayRealVector;
-import org.apache.commons.math3.linear.RealMatrix;
-import org.apache.commons.math3.linear.RealVector;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
 
 import com.d3x.core.lang.D3xException;
-import com.d3x.morpheus.apache.ApacheMatrix;
 import com.d3x.morpheus.frame.DataFrame;
+import com.d3x.morpheus.matrix.D3xMatrix;
+import com.d3x.morpheus.vector.D3xVector;
 
 /**
  * Defines a linear regression model that enforces linear equality constraints
@@ -285,13 +282,16 @@ public final class ConstrainedRegressionModel<C> {
      *
      * @return the linear constraint coefficient matrix (the left-hand side terms).
      */
-    public RealMatrix getConstraintMatrix() {
+    public D3xMatrix getConstraintMatrix() {
+        if (constraints.keySet().isEmpty())
+            return D3xMatrix.empty();
+
         DataFrame<String,C> frame = DataFrame.zeros(constraints.keySet(), regressors);
 
         for (Constraint<C> constraint : constraints.values())
             frame = frame.update(constraint.coeffs, false, false);
 
-        return ApacheMatrix.wrap(frame);
+        return D3xMatrix.copyFrame(frame);
     }
 
     /**
@@ -301,12 +301,15 @@ public final class ConstrainedRegressionModel<C> {
      *
      * @return the linear constraint value vector (the right-hand side values).
      */
-    public RealVector getConstraintValues() {
+    public D3xVector getConstraintValues() {
+        if (countConstraints() < 1)
+            return D3xVector.empty();
+
         int index = 0;
-        RealVector values = new ArrayRealVector(countConstraints());
+        D3xVector values = D3xVector.dense(countConstraints());
 
         for (Constraint<C> constraint : constraints.values()) {
-            values.setEntry(index, constraint.value);
+            values.set(index, constraint.value);
             index++;
         }
 

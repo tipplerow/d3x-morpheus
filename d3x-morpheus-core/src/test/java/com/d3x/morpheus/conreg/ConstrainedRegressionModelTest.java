@@ -43,8 +43,8 @@ public class ConstrainedRegressionModelTest extends ConstrainedRegressionTestBas
         assertEquals(model.countRegressors(), 4);
 
         assertEquals(model.getConstraintKeys(), List.of());
-        assertEquals(model.getConstraintValues().getDimension(), 0);
-        assertEquals(model.getConstraintMatrix().getRowDimension(), 0);
+        assertEquals(model.getConstraintValues().length(), 0);
+        assertEquals(model.getConstraintMatrix().nrow(), 0);
 
         assertEquals(model.getRegressand(), regressand);
         assertEquals(model.getRegressors(), descriptors);
@@ -66,8 +66,8 @@ public class ConstrainedRegressionModelTest extends ConstrainedRegressionTestBas
         assertFalse(model.containsConstraint("make"));
         assertEquals(model.countConstraints(), 0);
         assertEquals(model.getConstraintKeys(), List.of());
-        assertEquals(model.getConstraintValues().getDimension(), 0);
-        assertEquals(model.getConstraintMatrix().getRowDimension(), 0);
+        assertEquals(model.getConstraintValues().length(), 0);
+        assertEquals(model.getConstraintMatrix().nrow(), 0);
 
         DataFrame<String, String> con1 = DataFrame.ofDoubles("con1", List.of("x1", "x2", "x3"));
         con1.setDouble("con1", "x1", 1.0);
@@ -82,7 +82,7 @@ public class ConstrainedRegressionModelTest extends ConstrainedRegressionTestBas
         assertEquals(model.getConstraintKeys(), List.of("con1"));
 
         assertTrue(comparator.equals(model.getConstraintValues().toArray(), new double[] { 4.0 }));
-        assertTrue(comparator.equals(model.getConstraintMatrix().getData(), new double[][] {{ 0.0, 1.0, 2.0, 3.0, 0.0, 0.0, 0.0 }} ));
+        assertTrue(comparator.equals(model.getConstraintMatrix().toArray(), new double[][] {{ 0.0, 1.0, 2.0, 3.0, 0.0, 0.0, 0.0 }} ));
 
         model = model.addCategory("make", Set.copyOf(categoryColumns));
 
@@ -92,7 +92,7 @@ public class ConstrainedRegressionModelTest extends ConstrainedRegressionTestBas
         assertEquals(model.getConstraintKeys(), List.of("con1", "make"));
 
         assertTrue(comparator.equals(model.getConstraintValues().toArray(), new double[] { 4.0, 0.0 }));
-        assertTrue(comparator.equals(model.getConstraintMatrix().getData(), new double[][] {
+        assertTrue(comparator.equals(model.getConstraintMatrix().toArray(), new double[][] {
                 { 0.0, 1.0, 2.0, 3.0, 0.0, 0.0, 0.0 },
                 { 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0 }
         }));

@@ -31,15 +31,14 @@ import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
 
-import org.apache.commons.math3.linear.RealMatrix;
-import org.apache.commons.math3.linear.RealVector;
-
 import com.d3x.morpheus.db.DbSource;
 import com.d3x.morpheus.index.Index;
+import com.d3x.morpheus.matrix.D3xMatrix;
 import com.d3x.morpheus.range.Range;
 import com.d3x.morpheus.stats.Stats;
 import com.d3x.morpheus.util.Resource;
 import com.d3x.morpheus.util.functions.ToBooleanFunction;
+import com.d3x.morpheus.vector.D3xVector;
 
 /**
  * The central interface of the Morpheus Library that defines a 2-dimensional data structure called <code>DataFrame</code>
@@ -1065,13 +1064,13 @@ public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperation
      * @return          the newly created DataFrame
      * @throws          DataFrameException if the number of keys and values disagrees
      */
-    static <R,C> DataFrame<R,C> ofDoubles(R rowKey, Iterable<C> colKeys, RealVector values) {
+    static <R,C> DataFrame<R,C> ofDoubles(R rowKey, Iterable<C> colKeys, D3xVector values) {
         DataFrame<R,C> frame = ofDoubles(rowKey, colKeys);
 
-        if (frame.colCount() != values.getDimension())
+        if (frame.colCount() != values.length())
             throw new DataFrameException("Key/value length mismatch.");
 
-        frame.applyDoubles(cursor -> values.getEntry(cursor.colOrdinal()));
+        frame.applyDoubles(cursor -> values.get(cursor.colOrdinal()));
         return frame;
     }
 
@@ -1165,13 +1164,13 @@ public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperation
      * @return          the newly created DataFrame
      * @throws          DataFrameException if the number of keys and values disagrees
      */
-    static <R,C> DataFrame<R,C> ofDoubles(Iterable<R> rowKeys, C colKey, RealVector values) {
+    static <R,C> DataFrame<R,C> ofDoubles(Iterable<R> rowKeys, C colKey, D3xVector values) {
         DataFrame<R,C> frame = ofDoubles(rowKeys, colKey);
 
-        if (frame.rowCount() != values.getDimension())
+        if (frame.rowCount() != values.length())
             throw new DataFrameException("Key/value length mismatch.");
 
-        frame.applyDoubles(cursor -> values.getEntry(cursor.rowOrdinal()));
+        frame.applyDoubles(cursor -> values.get(cursor.rowOrdinal()));
         return frame;
     }
 
@@ -1236,7 +1235,7 @@ public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperation
     }
 
     /**
-     * Returns a newly created DataFrame with values assigned from an Apache RealMatrix.
+     * Returns a newly created DataFrame with values assigned from a matrix.
      *
      * @param rowKeys   the row keys for frame
      * @param colKeys   the column keys for frame
@@ -1247,16 +1246,16 @@ public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperation
      *
      * @throws DataFrameException unless the matrix dimensions match those of the row and column keys.
      */
-    static <R,C> DataFrame<R,C> ofDoubles(Iterable<R> rowKeys, Iterable<C> colKeys, RealMatrix values) {
+    static <R,C> DataFrame<R,C> ofDoubles(Iterable<R> rowKeys, Iterable<C> colKeys, D3xMatrix values) {
         DataFrame<R,C> frame = ofDoubles(rowKeys, colKeys);
 
-        if (frame.rowCount() != values.getRowDimension())
+        if (frame.rowCount() != values.nrow())
             throw new DataFrameException("Row dimension mismatch.");
 
-        if (frame.colCount() != values.getColumnDimension())
+        if (frame.colCount() != values.ncol())
             throw new DataFrameException("Column dimension mismatch.");
 
-        frame.applyDoubles(cursor -> values.getEntry(cursor.rowOrdinal(), cursor.colOrdinal()));
+        frame.applyDoubles(cursor -> values.get(cursor.rowOrdinal(), cursor.colOrdinal()));
         return frame;
     }
 

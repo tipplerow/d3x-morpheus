@@ -17,19 +17,13 @@ package com.d3x.morpheus.conreg;
 
 import java.util.List;
 
-import org.apache.commons.math3.linear.ArrayRealVector;
-import org.apache.commons.math3.linear.BlockRealMatrix;
-import org.apache.commons.math3.linear.DiagonalMatrix;
-import org.apache.commons.math3.linear.RealMatrix;
-import org.apache.commons.math3.linear.RealVector;
-
 import lombok.Getter;
 import lombok.NonNull;
 
 import com.d3x.core.lang.D3xException;
-import com.d3x.morpheus.apache.ApacheColumnVector;
-import com.d3x.morpheus.apache.ApacheMatrix;
 import com.d3x.morpheus.frame.DataFrame;
+import com.d3x.morpheus.matrix.D3xMatrix;
+import com.d3x.morpheus.vector.D3xVector;
 import com.d3x.morpheus.util.DoubleComparator;
 
 /**
@@ -62,18 +56,18 @@ public final class ConstrainedRegressionSystem<R,C> {
      * populated from the underlying regression model and observation sample.
      */
     @Getter @NonNull
-    private final RealMatrix designMatrix;
+    private final D3xMatrix designMatrix;
 
     /**
      * The observation vector {@code b} for the linear regression {@code Ax = b},
      * populated from the underlying regression model and observation sample.
      */
     @Getter @NonNull
-    private final RealVector regressandVector;
+    private final D3xVector regressandVector;
 
     /** The vector of observation weights. */
     @Getter @NonNull
-    private final RealVector weightVector;
+    private final D3xVector weightVector;
 
     /**
      * The matrix of coefficients for the augmented linear system that defines
@@ -94,7 +88,7 @@ public final class ConstrainedRegressionSystem<R,C> {
      * </p>
      */
     @Getter @NonNull
-    private final RealMatrix augmentedMatrix;
+    private final D3xMatrix augmentedMatrix;
 
     /**
      * The right-hand side vector of values for the augmented linear system that
@@ -115,12 +109,12 @@ public final class ConstrainedRegressionSystem<R,C> {
      * </p>
      */
     @Getter @NonNull
-    private final RealVector augmentedVector;
+    private final D3xVector augmentedVector;
 
     // Intermediate quantity required to build the augmented matrix and vector:
     // The transpose of the design matrix (A), multiplied by the diagonal weight
     // matrix (W) and a constant factor of 2.0...
-    private final RealMatrix twoATW;
+    private final D3xMatrix twoATW;
 
     private ConstrainedRegressionSystem(ConstrainedRegressionModel<C> regressionModel, DataFrame<R, C> observationFrame, List<R> observationRows) {
         this.regressionModel  = regressionModel;
@@ -151,22 +145,22 @@ public final class ConstrainedRegressionSystem<R,C> {
             observationFrame.requireColumn(regressionModel.getWeight());
     }
 
-    private RealMatrix buildDesignMatrix() {
-        return ApacheMatrix.wrap(observationFrame, observationRows, regressionModel.getRegressors()).copy();
+    private D3xMatrix buildDesignMatrix() {
+        return D3xMatrix.copyFrame(observationFrame, observationRows, regressionModel.getRegressors());
     }
 
-    private RealVector buildWeightVector() {
+    private D3xVector buildWeightVector() {
         if (!regressionModel.hasWeights())
-            return new ArrayRealVector(observationRows.size(), 1.0);
+            return D3xVector.rep(1.0, observationRows.size());
 
-        RealVector weights = ApacheColumnVector.wrap(observationFrame, regressionModel.getWeight(), observationRows).copy();
+        D3xVector weights = D3xVector.copyColumn(observationFrame, observationRows, regressionModel.getWeight());
 
         // Ensure that weights are non-negative, count the number of positive (non-zero) weights, and compute the total weight...
         int positiveCount = 0;
         double totalWeight = 0.0;
 
-        for (int index = 0; index < weights.getDimension(); index++) {
-            double weight = weights.getEntry(index);
+        for (int index = 0; index < weights.length(); index++) {
+            double weight = weights.get(index);
 
             if (DoubleComparator.DEFAULT.isNegative(weight))
                 throw new D3xException("Regression weight for observation [%s] is negative.", observationRows.get(index));
@@ -178,19 +172,19 @@ public final class ConstrainedRegressionSystem<R,C> {
 
         // The estimation should be more stable if the non-zero weights are of order one,
         // that is, they sum to the total number of non-zero weights...
-        weights.mapMultiplyToSelf(positiveCount / totalWeight);
+        weights.multiplyInPlace(positiveCount / totalWeight);
         return weights;
     }
 
-    private RealVector buildRegressandVector() {
-        return ApacheColumnVector.wrap(observationFrame, regressionModel.getRegressand(), observationRows).copy();
+    private D3xVector buildRegressandVector() {
+        return D3xVector.copyColumn(observationFrame, observationRows, regressionModel.getRegressand());
     }
 
-    private RealMatrix computeTwoATW() {
-        return designMatrix.transpose().scalarMultiply(2.0).multiply(new DiagonalMatrix(weightVector.toArray()));
+    private D3xMatrix computeTwoATW() {
+        return designMatrix.transpose().times(D3xMatrix.diagonal(weightVector.times(2.0)));
     }
 
-    private RealMatrix buildAugmentedMatrix() {
+    private D3xMatrix buildAugmentedMatrix() {
         //
         // Builds the augmented matrix:
         //
@@ -200,23 +194,23 @@ public final class ConstrainedRegressionSystem<R,C> {
         //    |    C     0   |
         //    +-            -+
         //
-        RealMatrix A = designMatrix;
-        RealMatrix C = regressionModel.getConstraintMatrix();
-        RealMatrix CT = C.transpose();
-        RealMatrix twoATWA = twoATW.multiply(A);
+        D3xMatrix A = designMatrix;
+        D3xMatrix C = regressionModel.getConstraintMatrix();
+        D3xMatrix CT = C.transpose();
+        D3xMatrix twoATWA = twoATW.times(A);
 
-        int N = A.getColumnDimension();
-        int P = C.getRowDimension();
-        RealMatrix augmat = new BlockRealMatrix(N + P, N + P);
+        int N = A.ncol();
+        int P = C.nrow();
+        D3xMatrix augmat = D3xMatrix.dense(N + P, N + P);
 
-        augmat.setSubMatrix(twoATWA.getData(),0, 0);
-        augmat.setSubMatrix(CT.getData(), 0, N);
-        augmat.setSubMatrix(C.getData(), N, 0);
+        augmat.setSubMatrix(0, 0, twoATWA);
+        augmat.setSubMatrix(0, N, CT);
+        augmat.setSubMatrix(N, 0, C);
 
         return augmat;
     }
 
-    private RealVector buildAugmentedVector() {
+    private D3xVector buildAugmentedVector() {
         //
         // Builds the augmented vector:
         //
@@ -226,14 +220,14 @@ public final class ConstrainedRegressionSystem<R,C> {
         //    |    d    |
         //    +-       -+
         //
-        RealMatrix A = designMatrix;
-        RealVector b = regressandVector;
-        RealVector d = regressionModel.getConstraintValues();
-        RealVector twoATWb = twoATW.operate(b);
+        D3xMatrix A = designMatrix;
+        D3xVector b = regressandVector;
+        D3xVector d = regressionModel.getConstraintValues();
+        D3xVector twoATWb = twoATW.times(b);
 
-        int N = A.getColumnDimension();
-        int P = d.getDimension();
-        RealVector augvec = new ArrayRealVector(N + P);
+        int N = A.ncol();
+        int P = d.length();
+        D3xVector augvec = D3xVector.dense(N + P);
 
         augvec.setSubVector(0, twoATWb);
         augvec.setSubVector(N, d);

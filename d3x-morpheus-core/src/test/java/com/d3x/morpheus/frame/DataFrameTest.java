@@ -17,9 +17,8 @@ package com.d3x.morpheus.frame;
 
 import java.util.List;
 
-import org.apache.commons.math3.linear.ArrayRealVector;
-import org.apache.commons.math3.linear.BlockRealMatrix;
-import org.apache.commons.math3.linear.RealVector;
+import com.d3x.morpheus.matrix.D3xMatrix;
+import com.d3x.morpheus.vector.D3xVector;
 
 import org.testng.annotations.Test;
 import static org.testng.Assert.*;
@@ -228,7 +227,7 @@ public class DataFrameTest extends DataFrameTestBase {
         String colKey = "col1";
         List<String> rowKeys = List.of("row1", "row2", "row3");
         double[] rowArray = new double[] { 1.0, 2.0, 3.0 };
-        RealVector rowValues = new ArrayRealVector(rowArray);
+        D3xVector rowValues = D3xVector.wrap(rowArray);
 
         DataFrame<String, String> frame1 = DataFrame.ofDoubles(rowKeys, colKey, rowArray);
         assertDoubleFrame(frame1, rowKeys, List.of(colKey), new double[][] {{ 1.0 }, { 2.0 }, { 3.0 }});
@@ -242,7 +241,7 @@ public class DataFrameTest extends DataFrameTestBase {
         String rowKey = "row1";
         List<String> colKeys = List.of("col1", "col2", "col3");
         double[] colArray = new double[] { 1.0, 2.0, 3.0 };
-        RealVector colValues = new ArrayRealVector(colArray);
+        D3xVector colValues = D3xVector.wrap(colArray);
 
         DataFrame<String, String> frame1 = DataFrame.ofDoubles(rowKey, colKeys, colArray);
         assertDoubleFrame(frame1, List.of(rowKey), colKeys, new double[][] {{ 1.0, 2.0, 3.0 }});
@@ -261,7 +260,7 @@ public class DataFrameTest extends DataFrameTestBase {
                 { 21.0, 22.0, 23.0 }
         };
 
-        DataFrame<String, String> frame = DataFrame.ofDoubles(rowKeys, colKeys, new BlockRealMatrix(values));
+        DataFrame<String, String> frame = DataFrame.ofDoubles(rowKeys, colKeys, D3xMatrix.wrap(values));
         assertDoubleFrame(frame, rowKeys, colKeys, values);
     }
 }

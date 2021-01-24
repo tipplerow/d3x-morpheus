@@ -15,8 +15,6 @@
  */
 package com.d3x.morpheus.matrix;
 
-import com.d3x.morpheus.vector.D3xVector;
-
 import lombok.NonNull;
 
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
@@ -24,6 +22,8 @@ import org.apache.commons.math3.linear.BlockRealMatrix;
 import org.apache.commons.math3.linear.DiagonalMatrix;
 import org.apache.commons.math3.linear.OpenMapRealMatrix;
 import org.apache.commons.math3.linear.RealMatrix;
+
+import com.d3x.morpheus.vector.D3xVector;
 
 /**
  * Wraps an Apache RealMatrix implementation in a D3xMatrix interface.
@@ -33,9 +33,22 @@ import org.apache.commons.math3.linear.RealMatrix;
 public final class ApacheMatrix implements D3xMatrix {
     @NonNull private final RealMatrix impl;
 
+    // The number of elements in a single block of a BlockRealMatrix...
+    private static final int BLOCK_ELEMENT_COUNT =
+            BlockRealMatrix.BLOCK_SIZE * BlockRealMatrix.BLOCK_SIZE;
+
+    // Use Array2DRowRealMatrix for matrices below this size,
+    // but BlockRealMatrix for this size and above...
+    private static final int BLOCK_THRESHOLD = 4 * BLOCK_ELEMENT_COUNT;
+
     private ApacheMatrix(RealMatrix impl) {
         this.impl = impl;
     }
+
+    /**
+     * The single empty vector.
+     */
+    public static final ApacheMatrix EMPTY = wrap(new Array2DRowRealMatrix());
 
     /**
      * Returns a read-only RealMatrix view of a generic D3xMatrix to be used
@@ -68,12 +81,7 @@ public final class ApacheMatrix implements D3xMatrix {
      * @return a new matrix containing a copy of the specified array.
      */
     public static ApacheMatrix copyOf(double[][] values) {
-        //
-        // The BlockRealMatrix is more cache-friendly for large matrices,
-        // and has only minimal overhead for small matrices, so we prefer
-        // it to Array2DRowRealMatrix...
-        //
-        return wrap(new BlockRealMatrix(values));
+        return wrap(new Array2DRowRealMatrix(values));
     }
 
     /**
@@ -88,12 +96,12 @@ public final class ApacheMatrix implements D3xMatrix {
      * @throws RuntimeException if either dimension is negative.
      */
     public static ApacheMatrix dense(int nrow, int ncol) {
-        //
-        // The BlockRealMatrix is more cache-friendly for large matrices,
-        // and has only minimal overhead for small matrices, so we prefer
-        // it to Array2DRowRealMatrix...
-        //
-        return wrap(new BlockRealMatrix(nrow, ncol));
+        int size = nrow * ncol;
+
+        if (size < BLOCK_THRESHOLD)
+            return wrap(new Array2DRowRealMatrix(nrow, ncol));
+        else
+            return wrap(new BlockRealMatrix(nrow, ncol));
     }
 
     /**
@@ -179,6 +187,15 @@ public final class ApacheMatrix implements D3xMatrix {
     }
 
     @Override
+    public D3xMatrix multiplyInPlace(double scalar) {
+        for (int i = 0; i < nrow(); ++i)
+            for (int j = 0; j < ncol(); ++j)
+                impl.multiplyEntry(i, j, scalar);
+
+        return this;
+    }
+
+    @Override
     public int nrow() {
         return impl.getRowDimension();
     }
@@ -191,6 +208,11 @@ public final class ApacheMatrix implements D3xMatrix {
     @Override
     public void set(int row, int col, double value) {
         impl.setEntry(row, col, value);
+    }
+
+    @Override
+    public ApacheMatrix times(double scalar) {
+        return wrap(impl.scalarMultiply(scalar));
     }
 
     @Override

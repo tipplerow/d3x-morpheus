@@ -35,6 +35,11 @@ public final class ApacheVector implements D3xVector {
     }
 
     /**
+     * The single empty vector.
+     */
+    public static final ApacheVector EMPTY = wrap(new ArrayRealVector());
+
+    /**
      * Returns a read-only RealVector view of a generic D3xVector to be used
      * as the operand in algebraic functions.  Modifying the returned vector
      * is not permitted, and the results of doing so are undefined.
@@ -160,6 +165,11 @@ public final class ApacheVector implements D3xVector {
     }
 
     @Override
+    public ApacheVector getSubVector(int start, int length) {
+        return wrap(impl.getSubVector(start, length));
+    }
+
+    @Override
     public int length() {
         return impl.getDimension();
     }
@@ -173,8 +183,25 @@ public final class ApacheVector implements D3xVector {
     }
 
     @Override
+    public ApacheVector multiplyInPlace(double scalar) {
+        impl.mapMultiplyToSelf(scalar);
+        return this;
+    }
+
+    @Override
     public void set(int index, double value) {
         impl.setEntry(index, value);
+    }
+
+    @Override
+    public ApacheVector setSubVector(int index, D3xVector subVector) {
+        impl.setSubVector(index, asOperand(subVector));
+        return this;
+    }
+
+    @Override
+    public ApacheVector times(double scalar) {
+        return wrap(impl.mapMultiply(scalar));
     }
 
     @Override

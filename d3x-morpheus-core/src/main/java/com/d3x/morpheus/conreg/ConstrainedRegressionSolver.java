@@ -24,8 +24,10 @@ import lombok.Getter;
 import lombok.NonNull;
 
 import com.d3x.core.util.Lazy;
-import com.d3x.morpheus.apache.SVDSolver;
 import com.d3x.morpheus.frame.DataFrame;
+import com.d3x.morpheus.linalg.SVDSolver;
+import com.d3x.morpheus.matrix.D3xMatrix;
+import com.d3x.morpheus.vector.D3xVector;
 
 /**
  * Estimates the parameters for a constrained linear regression model.
@@ -114,8 +116,8 @@ public final class ConstrainedRegressionSolver<R,C> {
         log.info("Building the constrained regression solver...");
         validateSingularValueThreshold();
 
-        RealMatrix augmat = system.get().getAugmentedMatrix();
-        SVDSolver  solver = SVDSolver.build(augmat);
+        D3xMatrix augmat = system.get().getAugmentedMatrix();
+        SVDSolver solver = SVDSolver.apache(augmat);
 
         if (!Double.isNaN(singularValueThreshold))
             solver = solver.withThreshold(singularValueThreshold);
@@ -200,16 +202,16 @@ public final class ConstrainedRegressionSolver<R,C> {
         int N = regressionModel.countRegressors();
         int P = regressionModel.countConstraints();
 
-        RealVector solution = solver.get().solve(system.get().getAugmentedVector());
-        assert solution.getDimension() == (N + P);
+        D3xVector solution = solver.get().solve(system.get().getAugmentedVector());
+        assert solution.length() == (N + P);
 
-        RealVector betaVector = solution.getSubVector(0, N);
-        RealVector dualVector = solution.getSubVector(N, P);
+        D3xVector betaVector = solution.getSubVector(0, N);
+        D3xVector dualVector = solution.getSubVector(N, P);
 
-        RealMatrix designMatrix = system.get().getDesignMatrix();
-        RealVector observations = system.get().getRegressandVector();
-        RealVector fittedVector = designMatrix.operate(betaVector);
-        RealVector residualVector = fittedVector.subtract(observations);
+        D3xMatrix designMatrix = system.get().getDesignMatrix();
+        D3xVector observations = system.get().getRegressandVector();
+        D3xVector fittedVector = designMatrix.times(betaVector);
+        D3xVector residualVector = fittedVector.minus(observations);
 
         DataFrame<ConstrainedRegressionField, C> betaFrame =
                 DataFrame.ofDoubles(ConstrainedRegressionField.BETA, regressionModel.getRegressors(), betaVector);

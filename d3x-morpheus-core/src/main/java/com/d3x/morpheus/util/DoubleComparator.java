@@ -17,8 +17,8 @@ package com.d3x.morpheus.util;
 
 import java.util.Comparator;
 
-import org.apache.commons.math3.linear.RealMatrix;
-import org.apache.commons.math3.linear.RealVector;
+import com.d3x.morpheus.matrix.D3xMatrix;
+import com.d3x.morpheus.vector.D3xVector;
 
 /**
  * Defines an interface for comparing double precision values while
@@ -188,7 +188,7 @@ public interface DoubleComparator extends Comparator<Double> {
     }
 
     /**
-     * Tests two RealVectors for (near) equality.
+     * Tests two D3xVectors for (near) equality.
      *
      * @param x the first vector to compare.
      * @param y the second vector to compare.
@@ -196,12 +196,12 @@ public interface DoubleComparator extends Comparator<Double> {
      * @return {@code true} iff the vectors have equal length and this
      * comparator determines that all corresponding elements are equal.
      */
-    default boolean equals(RealVector x, RealVector y) {
-        if (x.getDimension() != y.getDimension())
+    default boolean equals(D3xVector x, D3xVector y) {
+        if (x.length() != y.length())
             return false;
 
-        for (int i = 0; i < x.getDimension(); i++) {
-            if (!equals(x.getEntry(i), y.getEntry(i)))
+        for (int i = 0; i < x.length(); i++) {
+            if (!equals(x.get(i), y.get(i)))
                 return false;
         }
 
@@ -209,7 +209,7 @@ public interface DoubleComparator extends Comparator<Double> {
     }
 
     /**
-     * Tests two RealMatrix objects for (near) equality.
+     * Tests two D3xMatrix objects for (near) equality.
      *
      * @param x the first matrix to compare.
      * @param y the second matrix to compare.
@@ -217,16 +217,16 @@ public interface DoubleComparator extends Comparator<Double> {
      * @return {@code true} iff the matrices have equal dimensions and this
      * comparator determines that all corresponding elements are equal.
      */
-    default boolean equals(RealMatrix x, RealMatrix y) {
-        if (x.getRowDimension() != y.getRowDimension())
+    default boolean equals(D3xMatrix x, D3xMatrix y) {
+        if (x.nrow() != y.nrow())
             return false;
 
-        if (x.getColumnDimension() != y.getColumnDimension())
+        if (x.ncol() != y.ncol())
             return false;
 
-        for (int i = 0; i < x.getRowDimension(); i++) {
-            for (int j = 0; j < x.getColumnDimension(); j++) {
-                if (!equals(x.getEntry(i, j), y.getEntry(i, j)))
+        for (int i = 0; i < x.nrow(); i++) {
+            for (int j = 0; j < x.ncol(); j++) {
+                if (!equals(x.get(i, j), y.get(i, j)))
                     return false;
             }
         }

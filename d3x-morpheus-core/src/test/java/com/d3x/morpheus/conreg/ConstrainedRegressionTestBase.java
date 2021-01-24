@@ -20,11 +20,9 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import org.apache.commons.math3.linear.Array2DRowRealMatrix;
-import org.apache.commons.math3.linear.RealVector;
-
-import com.d3x.morpheus.apache.ApacheRealVector;
 import com.d3x.morpheus.frame.DataFrame;
+import com.d3x.morpheus.matrix.D3xMatrix;
+import com.d3x.morpheus.vector.D3xVector;
 import com.d3x.morpheus.util.DoubleComparator;
 
 public abstract class ConstrainedRegressionTestBase {
@@ -52,14 +50,14 @@ public abstract class ConstrainedRegressionTestBase {
         return ConstrainedRegressionModel.build(regressand, descriptors);
     }
 
-    public static final RealVector betaExact =
-            ApacheRealVector.of(10.0, 1.0, 2.0, -1.0, 3.0, -2.0, 4.0);
+    public static final D3xVector betaExact =
+            D3xVector.wrap(10.0, 1.0, 2.0, -1.0, 3.0, -2.0, 4.0);
 
     public static final double regressandExact(double[] observation) {
         double result = 0.0;
 
-        for (int col = 0; col < betaExact.getDimension(); col++)
-            result += betaExact.getEntry(col) * observation[col];
+        for (int col = 0; col < betaExact.length(); col++)
+            result += betaExact.get(col) * observation[col];
 
         return result;
     }
@@ -104,6 +102,6 @@ public abstract class ConstrainedRegressionTestBase {
         for (int row = 0; row < frameValues.length; row++)
             frameValues[row][7] = regressandExact(frameValues[row]) + 0.01 * random.nextDouble();
 
-        return DataFrame.ofDoubles(observationRows, columnNames, new Array2DRowRealMatrix(frameValues));
+        return DataFrame.ofDoubles(observationRows, columnNames, D3xMatrix.wrap(frameValues));
     }
 }

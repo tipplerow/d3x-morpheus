@@ -80,6 +80,14 @@ public interface D3xVector {
     D3xVector like(int length);
 
     /**
+     * Creates a new vector with the same length and concrete type as this vector.
+     * @return a new vector with the same length and concrete type as this vector.
+     */
+    default D3xVector like() {
+        return like(length());
+    }
+
+    /**
      * Forms a linear combination of this vector and another vector and
      * returns the result in a new vector; this vector is unchanged.
      *
@@ -186,6 +194,82 @@ public interface D3xVector {
      */
     default D3xVector subtractInPlace(D3xVector subtrahend) {
         return combineInPlace(1.0, -1.0, subtrahend);
+    }
+
+    /**
+     * Computes the product of this vector and a scalar factor and returns the
+     * product in a new vector; this vector is unchanged.
+     *
+     * @param scalar the scalar factor.
+     *
+     * @return a new vector containing the product of this vector and the given
+     * factor.
+     */
+    D3xVector times(double scalar);
+
+    /**
+     * Multiplies each element of this vector by a scalar factor and modifies
+     * the elements of this vector in place.
+     *
+     * @param scalar the scalar factor.
+     *
+     * @return this vector, for operator chaining.
+     */
+    D3xVector multiplyInPlace(double scalar);
+
+    /**
+     * Divides each element of this vector by a scalar factor and modifies
+     * the elements of this vector in place.
+     *
+     * @param scalar the scalar factor.
+     *
+     * @return this vector, for operator chaining.
+     */
+    default D3xVector divideInPlace(double scalar) {
+        return multiplyInPlace(1.0 / scalar);
+    }
+
+    /**
+     * Creates a new vector from a continuous range of elements in this vector.
+     *
+     * @param start the first element to include in the sub-vector.
+     * @param length the length of the sub-vector.
+     *
+     * @return a new vector containing the elements from {@code start} (inclusive)
+     * to {@code start + length} (exclusive).
+     *
+     * @throws RuntimeException unless the starting element and sub-vector
+     * length define a valid range in this vector.
+     */
+    default D3xVector getSubVector(int start, int length) {
+        validateIndex(start);
+        validateIndex(start + length - 1);
+        D3xVector result = like(length);
+
+        for (int subIndex = 0; subIndex < length; ++subIndex)
+            result.set(subIndex, this.get(start + subIndex));
+
+        return result;
+    }
+
+    /**
+     * Assigns a continuous range of elements in this vector from another vector.
+     *
+     * @param start the first element in the assignment range.
+     * @param subVector the sub-vector to assign.
+     *
+     * @return this vector, for operator chaining.
+     *
+     * @throws RuntimeException unless the assignment range is valid.
+     */
+    default D3xVector setSubVector(int start, D3xVector subVector) {
+        validateIndex(start);
+        validateIndex(start + subVector.length() - 1);
+
+        for (int subIndex = 0; subIndex < subVector.length(); ++subIndex)
+            set(start + subIndex, subVector.get(subIndex));
+
+        return this;
     }
 
     /**
@@ -300,6 +384,14 @@ public interface D3xVector {
      */
     static D3xVector dense(int length) {
         return rep(0.0, length);
+    }
+
+    /**
+     * Returns an empty vector.
+     * @return an empty vector.
+     */
+    static D3xVector empty() {
+        return ApacheVector.EMPTY;
     }
 
     /**
@@ -451,17 +543,6 @@ public interface D3xVector {
     }
 
     /**
-     * Determines if this vector has the same length as another vector.
-     *
-     * @param that the vector to compare to this.
-     *
-     * @return {@code true} iff the input vector has the same length as this vector.
-     */
-    default boolean isCongruent(D3xVector that) {
-        return this.length() == that.length();
-    }
-
-    /**
      * Creates a string representation of this vector.
      *
      * @return a string representation of this vector.
@@ -471,11 +552,14 @@ public interface D3xVector {
     }
 
     /**
-     * Creates a new vector with the same length and concrete type as this vector.
-     * @return a new vector with the same length and concrete type as this vector.
+     * Determines if this vector has the same length as another vector.
+     *
+     * @param that the vector to compare to this.
+     *
+     * @return {@code true} iff the input vector has the same length as this vector.
      */
-    default D3xVector like() {
-        return like(length());
+    default boolean isCongruent(D3xVector that) {
+        return this.length() == that.length();
     }
 
     /**
@@ -505,5 +589,17 @@ public interface D3xVector {
     default void validateCongruent(D3xVector that) {
         if (!isCongruent(that))
             throw new D3xException("Vector length mismatch: [%d != %d].", this.length(), that.length());
+    }
+
+    /**
+     * Ensures that an element index is valid.
+     *
+     * @param index the index to validate.
+     *
+     * @throws RuntimeException if the specified index is out of bounds.
+     */
+    default void validateIndex(int index) {
+        if (index < 0 || index >= length())
+            throw new D3xException("Index [%d] is out of bounds [0, %d).", index, length());
     }
 }
