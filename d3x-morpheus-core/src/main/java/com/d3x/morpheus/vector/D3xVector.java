@@ -17,6 +17,7 @@ package com.d3x.morpheus.vector;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 import com.d3x.core.lang.D3xException;
 import com.d3x.morpheus.frame.DataFrame;
@@ -300,6 +301,26 @@ public interface D3xVector {
     static D3xVector dense(int length) {
         return rep(0.0, length);
     }
+
+    /**
+     * Creates a new vector and populates it with pseudorandom values
+     * distributed uniformly over the interval {@code [0.0, 1.0)}.
+     *
+     * @param length the length of the vector.
+     * @param random the random number source.
+     *
+     * @return a new vector of the specified length populated with uniform
+     * random variables.
+     */
+    static D3xVector random(int length, Random random) {
+        D3xVector result = dense(length);
+
+        for (int index = 0; index < length; ++index)
+            result.set(index, random.nextDouble());
+
+        return result;
+    }
+
     /**
      * Like the {@code R} function {@code rep(x, n)}, creates a new vector
      * containing the value {@code x} replicated {@code n} times.

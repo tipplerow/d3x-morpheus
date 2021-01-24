@@ -16,6 +16,7 @@
 package com.d3x.morpheus.matrix;
 
 import java.util.List;
+import java.util.Random;
 
 import com.d3x.core.lang.D3xException;
 import com.d3x.morpheus.frame.DataFrame;
@@ -237,6 +238,27 @@ public interface D3xMatrix {
      */
     static D3xMatrix diagonal(D3xVector diagonals) {
         return ApacheMatrix.diagonal(diagonals);
+    }
+
+    /**
+     * Creates a new matrix and populates it with pseudorandom values
+     * distributed uniformly over the interval {@code [0.0, 1.0)}.
+     *
+     * @param nrow the number of matrix rows.
+     * @param ncol the number of matrix columns.
+     * @param random the random number source.
+     *
+     * @return a new matrix of the specified shape populated with uniform
+     * random variables.
+     */
+    static D3xMatrix random(int nrow, int ncol, Random random) {
+        D3xMatrix result = dense(nrow, ncol);
+
+        for (int i = 0; i < nrow; ++i)
+            for (int j = 0; j < ncol; ++j)
+                result.set(i, j, random.nextDouble());
+
+        return result;
     }
 
     /**
