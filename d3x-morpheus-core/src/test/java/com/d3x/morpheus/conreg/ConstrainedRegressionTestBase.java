@@ -26,8 +26,6 @@ import com.d3x.morpheus.vector.D3xVector;
 import com.d3x.morpheus.util.DoubleComparator;
 
 public abstract class ConstrainedRegressionTestBase {
-    public static final Random random = new Random(20210120);
-
     public static final String weight = "Weight";
     public static final String regressand = "Regressand";
     public static final List<String> descriptors = List.of("x0", "x1", "x2", "x3");
@@ -76,7 +74,7 @@ public abstract class ConstrainedRegressionTestBase {
                 .addCategory(categoryName, Set.copyOf(categoryColumns));
     }
 
-    public static DataFrame<String, String> buildObservationFrame() {
+    public static DataFrame<String, String> buildObservationFrame(Random random) {
         List<String> columnNames = new ArrayList<>();
         columnNames.addAll(descriptors);
         columnNames.addAll(categoryColumns);

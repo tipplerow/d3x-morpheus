@@ -15,6 +15,8 @@
  */
 package com.d3x.morpheus.conreg;
 
+import java.util.Random;
+
 import com.d3x.morpheus.frame.DataFrame;
 import com.d3x.morpheus.util.DoubleComparator;
 
@@ -22,13 +24,15 @@ import org.testng.annotations.Test;
 import static org.testng.Assert.*;
 
 public class ConstrainedRegressionSolverTest extends ConstrainedRegressionTestBase {
+    public static final Random random = new Random(20210120);
+
     private final ConstrainedRegressionModel<String> model;
     private final DataFrame<String, String> frame;
     private final ConstrainedRegressionSolver<String, String> solver;
 
     public ConstrainedRegressionSolverTest() {
         this.model = buildConstrainedModel();
-        this.frame = buildObservationFrame();
+        this.frame = buildObservationFrame(random);
         this.solver = ConstrainedRegressionSolver.build(model, frame);
     }
 
