@@ -15,9 +15,13 @@
  */
 package com.d3x.morpheus.vector;
 
+import java.time.LocalDate;
 import java.util.List;
-import com.d3x.morpheus.frame.DataFrame;
 
+import com.d3x.morpheus.frame.DataFrame;
+import com.d3x.morpheus.series.DoubleSeries;
+
+import org.testng.Assert;
 import org.testng.annotations.Test;
 import static org.testng.Assert.*;
 
@@ -147,6 +151,24 @@ public class D3xVectorTest {
         assertEquals(vector.get(0), 11.0, TOLERANCE);
         assertEquals(vector.get(1), 22.0, TOLERANCE);
         assertEquals(vector.get(2), 33.0, TOLERANCE);
+    }
+
+    @Test
+    public void testCopyOfSeries() {
+        String path = "/csv/aapl.csv";
+        DoubleSeries<LocalDate> series = DoubleSeries.<LocalDate>read(path).csv("Date", "Adj Close");
+
+        LocalDate date0 = LocalDate.parse("1980-12-12");
+        LocalDate date1 = LocalDate.parse("1999-12-30");
+        LocalDate date2 = LocalDate.parse("2014-08-29");
+        LocalDate date3 = LocalDate.parse("2099-12-31");
+
+        D3xVector vector = D3xVector.copyOf(series, List.of(date0, date1, date2, date3), Double.NaN);
+
+        assertEquals(vector.get(0), series.getDouble(date0), TOLERANCE);
+        assertEquals(vector.get(1), series.getDouble(date1), TOLERANCE);
+        assertEquals(vector.get(2), series.getDouble(date2), TOLERANCE);
+        assertTrue(Double.isNaN(vector.get(3)));
     }
 
     @Test

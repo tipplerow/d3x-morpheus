@@ -24,6 +24,7 @@ import com.d3x.morpheus.frame.DataFrame;
 import com.d3x.morpheus.frame.DataFrameColumn;
 import com.d3x.morpheus.frame.DataFrameException;
 import com.d3x.morpheus.frame.DataFrameRow;
+import com.d3x.morpheus.series.DoubleSeries;
 import com.d3x.morpheus.util.DoubleComparator;
 
 /**
@@ -281,6 +282,31 @@ public interface D3xVector {
      */
     static D3xVector copyOf(double... values) {
         return ApacheVector.copyOf(values);
+    }
+
+    /**
+     * Creates a new vector by copying values from a DoubleSeries.
+     *
+     * @param series       the series to be copied.
+     * @param keys         the keys of the values to be copied.
+     * @param defaultValue the default value to use for missing keys.
+     *
+     * @return a new vector containing a copy of the values in the
+     * specified series.
+     */
+    static <K> D3xVector copyOf(DoubleSeries<K> series, List<K> keys, double defaultValue) {
+        D3xVector vector = dense(keys.size());
+
+        for (int index = 0; index < keys.size(); ++index) {
+            K key = keys.get(index);
+
+            if (series.contains(key))
+                vector.set(index, series.getDouble(key));
+            else
+                vector.set(index, defaultValue);
+        }
+
+        return vector;
     }
 
     /**
