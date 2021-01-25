@@ -17,9 +17,6 @@ package com.d3x.morpheus.conreg;
 
 import java.util.List;
 
-import org.apache.commons.math3.linear.RealMatrix;
-import org.apache.commons.math3.linear.RealVector;
-
 import lombok.Getter;
 import lombok.NonNull;
 

@@ -17,7 +17,6 @@ package com.d3x.morpheus.stats;
 
 import java.util.function.Supplier;
 
-import com.d3x.morpheus.matrix.D3xMatrix;
 import com.d3x.morpheus.vector.D3xVector;
 
 /**
