@@ -130,6 +130,20 @@ public class D3xVectorTest {
     }
 
     @Test
+    public void testConcat() {
+        D3xVector v1 = D3xVector.wrap(1.0, 2.0, 3.0);
+        D3xVector v2 = D3xVector.wrap(4.0);
+        D3xVector v3 = D3xVector.empty();
+        D3xVector v4 = D3xVector.wrap(5.0, 6.0);
+
+        assertTrue(D3xVector.concat().equalsVector(D3xVector.wrap()));
+        assertTrue(D3xVector.concat(v1).equalsVector(D3xVector.wrap(1.0, 2.0, 3.0)));
+        assertTrue(D3xVector.concat(v1, v2).equalsVector(D3xVector.wrap(1.0, 2.0, 3.0, 4.0)));
+        assertTrue(D3xVector.concat(v1, v2, v3).equalsVector(D3xVector.wrap(1.0, 2.0, 3.0, 4.0)));
+        assertTrue(D3xVector.concat(v1, v2, v3, v4).equalsVector(D3xVector.wrap(1.0, 2.0, 3.0, 4.0, 5.0, 6.0)));
+    }
+
+    @Test
     public void testCopyOfArray() {
         double[] array = new double[] { 1.0, 2.0, 3.0 };
         D3xVector vector = D3xVector.copyOf(array);

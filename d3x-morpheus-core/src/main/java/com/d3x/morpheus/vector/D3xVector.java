@@ -274,6 +274,33 @@ public interface D3xVector {
     }
 
     /**
+     * Concatenates a sequence of vectors and returns the result in a new vector.
+     *
+     * @param vectors the vectors to concatenate.
+     *
+     * @return a new vector containing the concatenation of the input vectors.
+     */
+    static D3xVector concat(D3xVector... vectors) {
+        int length = 0;
+
+        for (D3xVector vector : vectors)
+            length += vector.length();
+
+        D3xVector result = D3xVector.dense(length);
+
+        int vectorIndex = 0;
+        int concatIndex = 0;
+
+        while (vectorIndex < vectors.length) {
+            result.setSubVector(concatIndex, vectors[vectorIndex]);
+            concatIndex += vectors[vectorIndex].length();
+            vectorIndex += 1;
+        }
+
+        return result;
+    }
+
+    /**
      * Creates a new vector by copying values from a bare array.
      *
      * @param values the values to be copied.
@@ -421,6 +448,17 @@ public interface D3xVector {
     }
 
     /**
+     * Creates a vector with every element equal to {@code 1.0}.
+     *
+     * @param length the length of the vector.
+     *
+     * @return a ones-vector with the specified length.
+     */
+    static D3xVector ones(int length) {
+        return rep(1.0, length);
+    }
+
+    /**
      * Creates a new vector and populates it with pseudorandom values
      * distributed uniformly over the interval {@code [0.0, 1.0)}.
      *
@@ -469,6 +507,17 @@ public interface D3xVector {
      */
     static D3xVector sparse(int length) {
         return ApacheVector.sparse(length);
+    }
+
+    /**
+     * Creates a vector with every element equal to {@code 0.0}.
+     *
+     * @param length the length of the vector.
+     *
+     * @return a zeros-vector with the specified length.
+     */
+    static D3xVector zeros(int length) {
+        return rep(0.0, length);
     }
 
     /**
