@@ -311,6 +311,17 @@ public interface D3xMatrix {
     }
 
     /**
+     * Creates an identity matrix with a given dimension.
+     *
+     * @param dim the number of rows and columns in the identity matrix.
+     *
+     * @return an identity matrix with the specified dimension.
+     */
+    static D3xMatrix identity(int dim) {
+        return diagonal(D3xVector.ones(dim));
+    }
+
+    /**
      * Creates a new matrix and populates it with pseudorandom values
      * distributed uniformly over the interval {@code [0.0, 1.0)}.
      *
@@ -370,6 +381,55 @@ public interface D3xMatrix {
     }
 
     /**
+     * Creates a square matrix with a special block structure common in
+     * constrained optimization problems.
+     *
+     * <p>Given an {@code N x N} square matrix {@code A}, a {@cod P x P}
+     * square matrix {@code B}, and a {@code P x N} matrix C, this method
+     * composes the following {@code (N + P) x (N + P)} matrix:
+     * <pre>
+     *       A  C'
+     *       C  B
+     * </pre>
+     * where the prime symbol ({@code '}) indicates the matrix transpose.</p>
+     *
+     * @param A a {@code N x N} matrix to fill the upper left block.
+     * @param B a {@code P x P} matrix to fill the lower right block.
+     * @param C a {@code P x N} matrix to fill the lower left block, with
+     *          its transpose as the upper right block.
+     *
+     * @return a square block-wise matrix with the structure described above.
+     *
+     * @throws RuntimeException unless the input matrices have the shapes
+     * described above.
+     */
+    static D3xMatrix squareBlock(D3xMatrix A, D3xMatrix B, D3xMatrix C) {
+        if (!A.isSquare())
+            throw new D3xException("Upper left block must be square.");
+
+        if (!B.isSquare())
+            throw new D3xException("Lower right block must be square.");
+
+        int N = A.nrow();
+        int P = B.nrow();
+
+        if (C.nrow() != P)
+            throw new D3xException("The lower left and lower right blocks must have the same number of rows.");
+
+        if (C.ncol() != N)
+            throw new D3xException("The lower left and upper right blocks must have the same number of columns.");
+
+        D3xMatrix block = dense(N + P, N + P);
+
+        block.setSubMatrix(0, 0, A);
+        block.setSubMatrix(N, N, B);
+        block.setSubMatrix(N, 0, C);
+        block.setSubMatrix(0, N, C.transpose());
+
+        return block;
+    }
+
+    /**
      * Creates a mutable matrix view over a bare array (a shallow copy).
      * Changes to the returned matrix will be reflected in the input
      * array, and changes to the array will be reflected in the matrix.
@@ -381,6 +441,21 @@ public interface D3xMatrix {
      */
     static D3xMatrix wrap(double[][] values) {
         return ApacheMatrix.wrap(values);
+    }
+
+    /**
+     * Creates a new matrix with sparse physical storage and all elements
+     * initialized to zero.
+     *
+     * @param nrow the number of matrix rows.
+     * @param ncol the number of matrix columns.
+     *
+     * @return a new spares matrix of zeros.
+     *
+     * @throws RuntimeException if either dimension is negative.
+     */
+    static D3xMatrix zeros(int nrow, int ncol) {
+        return ApacheMatrix.sparse(nrow, ncol);
     }
 
     /**

@@ -206,6 +206,32 @@ public class D3xMatrixTest {
     }
 
     @Test
+    public void testSquareBlock() {
+        D3xMatrix A = D3xMatrix.byrow(3, 3,
+                11.0, 12.0, 13.0,
+                21.0, 22.0, 23.0,
+                31.0, 32.0, 33.0);
+
+        D3xMatrix B = D3xMatrix.byrow(2, 2,
+                44.0, 45.0,
+                54.0, 55.0);
+
+        D3xMatrix C = D3xMatrix.byrow(2, 3,
+                41.0, 42.0, 43.0,
+                51.0, 52.0, 53.0);
+
+        D3xMatrix expected = D3xMatrix.byrow(5, 5,
+                11.0, 12.0, 13.0, 41.0, 51.0,
+                21.0, 22.0, 23.0, 42.0, 52.0,
+                31.0, 32.0, 33.0, 43.0, 53.0,
+                41.0, 42.0, 43.0, 44.0, 45.0,
+                51.0, 52.0, 53.0, 54.0, 55.0);
+
+        D3xMatrix block = D3xMatrix.squareBlock(A, B, C);
+        assertTrue(block.equalsMatrix(expected));
+    }
+
+    @Test
     public void testTimesMatrix() {
         double[][] arrayA = new double[][] {
                 {  1.0,  0.0, -2.0,  5.0 },
