@@ -18,6 +18,7 @@ package com.d3x.morpheus.linalg;
 import java.util.Random;
 
 import com.d3x.morpheus.matrix.D3xMatrix;
+import com.d3x.morpheus.util.DoubleComparator;
 import com.d3x.morpheus.vector.D3xVector;
 
 import org.testng.annotations.Test;
@@ -47,6 +48,20 @@ public class SVDSolverTest {
         assertEquals(x.get(1),  4.691809, 0.000001);
         assertEquals(x.get(2),  1.817325, 0.000001);
         assertEquals(x.get(3), -0.210961, 0.000001);
+
+        D3xMatrix actualInverse = SVDSolver.apache(A).invert();
+        D3xMatrix expectedInverse =
+                D3xMatrix.byrow(4, 4,
+                         0.5604007, -0.47554508,  0.068061285, -0.33352976,
+                        -0.2206836,  0.19357690, -0.042575133,  0.24543312,
+                        -0.1231585,  0.10135533, -0.007071302,  0.09958751,
+                         0.3126105, -0.05391868,  0.009575722, -0.11402475);
+
+        DoubleComparator comparator = DoubleComparator.relative(1.0E-06);
+        assertTrue(actualInverse.equalsMatrix(expectedInverse, comparator));
+
+        assertTrue(actualInverse.times(A).equalsMatrix(D3xMatrix.identity(4)));
+        assertTrue(A.times(actualInverse).equalsMatrix(D3xMatrix.identity(4)));
     }
 
     @Test
@@ -58,6 +73,10 @@ public class SVDSolverTest {
         D3xVector x = SVDSolver.apache(A).solve(b);
 
         assertTrue(SVDSolver.isExactSolution(A, x, b));
+
+        D3xMatrix invA = SVDSolver.apache(A).invert();
+        assertTrue(invA.times(A).equalsMatrix(D3xMatrix.identity(N)));
+        assertTrue(A.times(invA).equalsMatrix(D3xMatrix.identity(N)));
     }
 
     @Test
@@ -90,6 +109,10 @@ public class SVDSolverTest {
         assertEquals(b.get(2), b2, 0.01);
 
         assertTrue(SVDSolver.isLeastSquaresSolution(A, b, y));
+
+        D3xMatrix invATA = SVDSolver.apache(A.transpose().times(A)).invert();
+        D3xVector exactB = invATA.times(A.transpose()).times(y);
+        assertTrue(exactB.equalsVector(b));
     }
 
     @Test
@@ -102,5 +125,9 @@ public class SVDSolverTest {
         D3xVector x = SVDSolver.apache(A).solve(b);
 
         assertTrue(SVDSolver.isLeastSquaresSolution(A, x, b));
+
+        D3xMatrix invATA = SVDSolver.apache(A.transpose().times(A)).invert();
+        D3xVector exactX = invATA.times(A.transpose()).times(b);
+        assertTrue(exactX.equalsVector(x));
     }
 }

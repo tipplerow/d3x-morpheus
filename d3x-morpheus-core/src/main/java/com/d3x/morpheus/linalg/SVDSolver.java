@@ -333,6 +333,19 @@ public final class SVDSolver {
     }
 
     /**
+     * Computes the inverse (or pseudoinverse) of the original matrix {@code A}.
+     *
+     * @return the inverse (or pseudoinverse) of the original matrix {@code A}.
+     */
+    public D3xMatrix invert() {
+        D3xMatrix V = svd.getV();
+        D3xMatrix UT = svd.getUT();
+        D3xMatrix invW = invertSingularValues();
+
+        return V.times(invW.times(UT));
+    }
+
+    /**
      * Computes the solution vector {@code x} of the linear system {@code A * x = b}
      *  for a given right-hand side vector {@code b}.
      *
