@@ -17,6 +17,7 @@ package com.d3x.morpheus.conreg;
 
 import java.util.List;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -111,9 +112,13 @@ public final class ConstrainedRegressionSystem<R,C> {
     @Getter @NonNull
     private final D3xVector augmentedVector;
 
-    // Intermediate quantity required to build the augmented matrix and vector:
-    // The transpose of the design matrix (A), multiplied by the diagonal weight
-    // matrix (W) and a constant factor of 2.0...
+    /**
+     * The intermediate quantity {@code 2A'W}, twice the product of the transpose
+     * of the design matrix and the regression weight matrix, required to build
+     * the augmented matrix, the augmented vector, and the pseudo-inverse of the
+     * augmented matrix.
+     */
+    @Getter(AccessLevel.PACKAGE) @NonNull
     private final D3xMatrix twoATW;
 
     private ConstrainedRegressionSystem(ConstrainedRegressionModel<C> regressionModel, DataFrame<R, C> observationFrame, List<R> observationRows) {

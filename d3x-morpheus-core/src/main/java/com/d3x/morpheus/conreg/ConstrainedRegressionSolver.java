@@ -224,4 +224,43 @@ public final class ConstrainedRegressionSolver<R,C> {
 
         return new ConstrainedRegressionResult<>(betaFrame, dualFrame, fittedFrame, residualFrame);
     }
+
+    /**
+     * Computes an effective pseudo-inverse for the constrained regression
+     * system.
+     *
+     * <p>The effective pseudo-inverse is a matrix {@code Q} with shape {@code (N + P) x (M + P)},
+     * where {@code N} is the number of regressor variables, {@code M} the number of observations,
+     * and {@code P} is the number of linear constraints on the regression coefficients.  Given the
+     * pseudo-inverse matrix {@code Q}, the solution vector for the constrained regression system is
+     * computed as follows: {@code (beta, dual)' = Q * (obs, con)'}, where {@code (beta, dual)'} is
+     * an {@code (N + P) x 1} column vector containing the regression coefficients stacked over the
+     * dual values for the constraints and {@code (obs, con)'} is an {@code (M + P) x 1} column vector
+     * containing the observations stacked on the constraint right-hand side values.  In a system with
+     * no constraints and equally-weighted observations, this effective pseudo-inverse reduces to the
+     * standard least-squares pseudo-inverse {@code inv(A'A) * A'}, where {@code A} is the design matrix
+     * for the regression model.</p>
+     *
+     * @return an effective pseudo-inverse for the constrained regression
+     * system.
+     */
+    public D3xMatrix computePseudoInverse() {
+        D3xMatrix augInv = solver.get().invert();
+        D3xMatrix blockR = buildPseudoInverseRightBlock();
+
+        return augInv.times(blockR);
+    }
+
+    private D3xMatrix buildPseudoInverseRightBlock() {
+        int M = observationRows.size();
+        int N = regressionModel.countRegressors();
+        int P = regressionModel.countConstraints();
+
+        D3xMatrix blockR = D3xMatrix.dense(N + P, M + P);
+
+        blockR.setSubMatrix(0, 0, system.get().getTwoATW());
+        blockR.setSubMatrix(N, M, D3xMatrix.identity(P));
+
+        return blockR;
+    }
 }

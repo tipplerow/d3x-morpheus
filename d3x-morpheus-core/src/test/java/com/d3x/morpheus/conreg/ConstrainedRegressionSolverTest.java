@@ -18,7 +18,9 @@ package com.d3x.morpheus.conreg;
 import java.util.Random;
 
 import com.d3x.morpheus.frame.DataFrame;
+import com.d3x.morpheus.matrix.D3xMatrix;
 import com.d3x.morpheus.util.DoubleComparator;
+import com.d3x.morpheus.vector.D3xVector;
 
 import org.testng.annotations.Test;
 import static org.testng.Assert.*;
@@ -29,11 +31,13 @@ public class ConstrainedRegressionSolverTest extends ConstrainedRegressionTestBa
     private final ConstrainedRegressionModel<String> model;
     private final DataFrame<String, String> frame;
     private final ConstrainedRegressionSolver<String, String> solver;
+    private final ConstrainedRegressionSystem<String, String> system;
 
     public ConstrainedRegressionSolverTest() {
         this.model = buildConstrainedModel();
         this.frame = buildObservationFrame(random);
         this.solver = ConstrainedRegressionSolver.build(model, frame);
+        this.system = solver.getAugmentedSystem();
     }
 
     @Test
@@ -70,5 +74,14 @@ public class ConstrainedRegressionSolverTest extends ConstrainedRegressionTestBa
         };
 
         assertTrue(comparator0001.equals(fittedActual, fittedExpected));
+
+        // The pseudo-inverse is actually not used to determine the beta coefficients
+        // and dual values, but it is necessary to extract the "hat" matrix or compute
+        // the leverage of an observation...
+        D3xMatrix pseudoInverse = solver.computePseudoInverse();
+        D3xVector actualPseudoSolution = pseudoInverse.times(D3xVector.concat(system.getRegressandVector(), model.getConstraintValues()));
+        D3xVector expectedPseudoSolution = D3xVector.concat(D3xVector.wrap(betaExpected), D3xVector.wrap(dualExpected));
+
+        assertTrue(comparator0001.equals(actualPseudoSolution, expectedPseudoSolution));
     }
 }
