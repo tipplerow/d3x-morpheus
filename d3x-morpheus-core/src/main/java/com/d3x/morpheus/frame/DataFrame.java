@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -32,10 +33,12 @@ import javax.imageio.ImageIO;
 
 import com.d3x.morpheus.db.DbSource;
 import com.d3x.morpheus.index.Index;
+import com.d3x.morpheus.matrix.D3xMatrix;
 import com.d3x.morpheus.range.Range;
 import com.d3x.morpheus.stats.Stats;
 import com.d3x.morpheus.util.Resource;
 import com.d3x.morpheus.util.functions.ToBooleanFunction;
+import com.d3x.morpheus.vector.D3xVector;
 
 /**
  * The central interface of the Morpheus Library that defines a 2-dimensional data structure called <code>DataFrame</code>
@@ -288,6 +291,22 @@ public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperation
     DataFrame<R,C> update(DataFrame<R,C> update, boolean addRows, boolean addColumns);
 
     /**
+     * Updates data in this frame based on update frames provided
+     * @param updates       the DataFrames with updates to apply to this frame
+     * @param addRows       if true, add any missing row keys from the update
+     * @param addColumns    if true, add any missing column keys from the update
+     * @return              the updated DataFrame
+     */
+    default DataFrame<R,C> update(Iterable<DataFrame<R,C>> updates, boolean addRows, boolean addColumns) {
+        DataFrame<R,C> updated = this;
+
+        for (var update : updates)
+            updated = updated.update(update, addRows, addColumns);
+
+        return updated;
+    }
+
+    /**
      * Returns a <code>DataFrame</code> filter that includes a subset of rows and columns
      * @param rowKeys   the row key selection
      * @param colKeys   the column key selection
@@ -394,6 +413,262 @@ public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperation
         return new DataFrameBuilder<>(this);
     }
 
+    /**
+     * Determines whether this DataFrame contains a particular column.
+     *
+     * @param colKey the key of the column in question.
+     *
+     * @return {@code true} iff this DataFrame contains a column with the specified key.
+     */
+    default boolean containsColumn(C colKey) {
+        return cols().contains(colKey);
+    }
+
+    /**
+     * Determines whether this DataFrame contains particular columns.
+     *
+     * @param colKeys the keys of the columns in question.
+     *
+     * @return {@code true} iff this DataFrame contains a column for every key.
+     */
+    default boolean containsColumns(Iterable<C> colKeys) {
+        for (C colKey : colKeys) {
+            if (!containsColumn(colKey))
+                return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Determines whether this DataFrame contains a particular row.
+     *
+     * @param rowKey the key of the row in question.
+     *
+     * @return {@code true} iff this DataFrame contains a row with the specified key.
+     */
+    default boolean containsRow(R rowKey) {
+        return rows().contains(rowKey);
+    }
+
+    /**
+     * Determines whether this DataFrame contains particular rows.
+     *
+     * @param rowKeys the keys of the rows in question.
+     *
+     * @return {@code true} iff this DataFrame contains a row for every key.
+     */
+    default boolean containsRows(Iterable<R> rowKeys) {
+        for (R rowKey : rowKeys) {
+            if (!containsRow(rowKey))
+                return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Returns a list of the row keys for this DataFrame.
+     *
+     * @return a list of the row keys for this DataFrame.
+     */
+    default List<R> listRowKeys() {
+        return rows().keyList();
+    }
+
+    /**
+     * Returns a list of the column keys for this DataFrame.
+     *
+     * @return a list of the column keys for this DataFrame.
+     */
+    default List<C> listColumnKeys() {
+        return cols().keyList();
+    }
+
+    /**
+     * Ensures that this DataFrame contains a particular column.
+     *
+     * @param colKey the required column key.
+     *
+     * @throws DataFrameException unless this DataFrame contains a column with the specified key.
+     */
+    default void requireColumn(C colKey) {
+        if (!containsColumn(colKey))
+            throw new DataFrameException("Missing column [%s].", colKey);
+    }
+
+    /**
+     * Ensures that this DataFrame contains particular columns.
+     *
+     * @param colKeys the required column keys.
+     *
+     * @throws DataFrameException unless this DataFrame contains a column for each specified key.
+     */
+    default void requireColumns(Iterable<C> colKeys) {
+        for (C colKey : colKeys)
+            requireColumn(colKey);
+    }
+
+    /**
+     * Ensures that this DataFrame contains a particular column and that column
+     * contains data of a particular type.
+     *
+     * @param colKey the required column key.
+     * @param class_ the required data type.
+     *
+     * @throws DataFrameException unless this DataFrame contains a column with the
+     * specified key and that column contains double data of the specified type.
+     */
+    default void requireColumnClass(C colKey, Class<?> class_) {
+        requireColumn(colKey);
+
+        Class<?> actual = cols().type(colKey);
+        Class<?> expected = class_;
+
+        if (!actual.equals(expected))
+            throw new DataFrameException(
+                    "Column [%s] contains data of type [%s], not [%s] as required.",
+                    colKey, actual.getSimpleName(), expected.getSimpleName());
+    }
+
+    /**
+     * Ensures that this DataFrame contains a certain number of columns.
+     *
+     * @param expected the required number of columns.
+     *
+     * @throws DataFrameException unless this DataFrame contains the specified number of columns.
+     */
+    default void requireColumnCount(int expected) {
+        int actual = colCount();
+
+        if (actual != expected)
+            throw new DataFrameException("Expected [%d] columns but found [%d].", expected, actual);
+    }
+
+    /**
+     * Ensures that this DataFrame contains a particular column and that column
+     * contains double precision data.
+     *
+     * @param colKey the required double precision column key.
+     *
+     * @throws DataFrameException unless this DataFrame contains a column with the
+     * specified key and that column contains double precision data.
+     */
+    default void requireDoubleColumn(C colKey) {
+        requireColumnClass(colKey, Double.class);
+    }
+
+    /**
+     * Ensures that this DataFrame contains particular columns and those columns
+     * contain double precision data.
+     *
+     * @param colKeys the required double precision column keys.
+     *
+     * @throws DataFrameException unless this DataFrame contains a column for each
+     * specified key and each column contains double precision data.
+     */
+    default void requireDoubleColumns(Iterable<C> colKeys) {
+        for (C colKey : colKeys)
+            requireDoubleColumn(colKey);
+    }
+
+    /**
+     * Ensures that this DataFrame contains a particular column and that column contains numeric data.
+     *
+     * @param colKey the required numeric column key.
+     *
+     * @throws DataFrameException unless this DataFrame contains a column with the specified key and
+     * that column contains numeric data.
+     */
+    default void requireNumericColumn(C colKey) {
+        requireColumn(colKey);
+
+        if (!col(colKey).isNumeric())
+            throw new DataFrameException("Column [%s] contains non-numeric data.", colKey);
+    }
+
+    /**
+     * Ensures that this DataFrame contains particular columns and those columns contain numeric data.
+     *
+     * @param colKeys the required column keys.
+     *
+     * @throws DataFrameException unless this DataFrame contains a column for each specified key and
+     * each column contains numeric data.
+     */
+    default void requireNumericColumns(Iterable<C> colKeys) {
+        for (C colKey : colKeys)
+            requireNumericColumn(colKey);
+    }
+
+    /**
+     * Ensures that this DataFrame contains a particular row.
+     *
+     * @param rowKey the required row key.
+     *
+     * @throws DataFrameException unless this DataFrame contains a row with the specified key.
+     */
+    default void requireRow(R rowKey) {
+        if (!containsRow(rowKey))
+            throw new DataFrameException("Missing row [%s].", rowKey);
+    }
+
+   /**
+     * Ensures that this DataFrame contains particular rows.
+     *
+     * @param rowKeys the required row keys.
+     *
+     * @throws DataFrameException unless this DataFrame contains a row for each specified key.
+     */
+    default void requireRows(Iterable<R> rowKeys) {
+        for (R rowKey : rowKeys)
+            requireRow(rowKey);
+    }
+
+    /**
+     * Ensures that this DataFrame contains a certain number of rows.
+     *
+     * @param expected the required number of rows.
+     *
+     * @throws DataFrameException unless this DataFrame contains the specified number of rows.
+     */
+    default void requireRowCount(int expected) {
+        int actual = rowCount();
+
+        if (actual != expected)
+            throw new DataFrameException("Expected [%d] rows but found [%d].", expected, actual);
+    }
+
+    /**
+     * Returns the double precision data in this frame in a two-dimensional array.
+     *
+     * @return the double precision data in this frame in a two-dimensional array.
+     */
+    default double[][] getDoubleMatrix() {
+        double[][] matrixData = new double[rowCount()][];
+
+        for (int irow = 0; irow < rowCount(); irow++)
+            matrixData[irow] = rowAt(irow).getDoubleArray();
+
+        return matrixData;
+    }
+
+    /**
+     * Returns particular double precision data from this frame in a two-dimensional array.
+     *
+     * @param rowKeys the keys of the rows to extract.
+     * @param colKeys the keys of the columns to extract.
+     *
+     * @return the double precision elements from the specified rows and columns in
+     * a two-dimensional array.
+     */
+    default double[][] getDoubleMatrix(List<R> rowKeys, List<C> colKeys) {
+        double[][] matrixData = new double[rowKeys.size()][];
+
+        for (int irow = 0; irow < rowKeys.size(); irow++)
+            matrixData[irow] = row(rowKeys.get(irow)).getDoubleArray(colKeys);
+
+        return matrixData;
+    }
 
     /**
      * Returns a new DataFrame builder for row and column key types
@@ -760,6 +1035,46 @@ public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperation
     }
 
     /**
+     * Returns a newly created DataFrame with 1 row optimized to hold primitive doubles
+     * @param rowKey    the row key for frame
+     * @param colKeys   the column index for frame
+     * @param values    a vector of values to assign
+     * @param <R>       the row key type
+     * @param <C>       the column key type
+     * @return          the newly created DataFrame
+     * @throws          DataFrameException if the number of keys and values disagrees
+     */
+    static <R,C> DataFrame<R,C> ofDoubles(R rowKey, Iterable<C> colKeys, double[] values) {
+        DataFrame<R,C> frame = ofDoubles(rowKey, colKeys);
+
+        if (frame.colCount() != values.length)
+            throw new DataFrameException("Key/value length mismatch.");
+
+        frame.applyDoubles(cursor -> values[cursor.colOrdinal()]);
+        return frame;
+    }
+
+    /**
+     * Returns a newly created DataFrame with 1 row optimized to hold primitive doubles
+     * @param rowKey    the row key for frame
+     * @param colKeys   the column index for frame
+     * @param values    a vector of values to assign
+     * @param <R>       the row key type
+     * @param <C>       the column key type
+     * @return          the newly created DataFrame
+     * @throws          DataFrameException if the number of keys and values disagrees
+     */
+    static <R,C> DataFrame<R,C> ofDoubles(R rowKey, Iterable<C> colKeys, D3xVector values) {
+        DataFrame<R,C> frame = ofDoubles(rowKey, colKeys);
+
+        if (frame.colCount() != values.length())
+            throw new DataFrameException("Key/value length mismatch.");
+
+        frame.applyDoubles(cursor -> values.get(cursor.colOrdinal()));
+        return frame;
+    }
+
+    /**
      * Returns a newly created DataFrame with 1 row optimized to hold any object
      * @param rowKey    the row key for frame
      * @param colKeys   the column keys for frame
@@ -820,6 +1135,46 @@ public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperation
     }
 
     /**
+     * Returns a newly created DataFrame with 1 column optimized to hold primitive doubles
+     * @param rowKeys   the row keys for frame
+     * @param colKey    the column key for frame
+     * @param values    the vector values to assign
+     * @param <R>       the row key type
+     * @param <C>       the column key type
+     * @return          the newly created DataFrame
+     * @throws          DataFrameException if the number of keys and values disagrees
+     */
+    static <R,C> DataFrame<R,C> ofDoubles(Iterable<R> rowKeys, C colKey, double[] values) {
+        DataFrame<R,C> frame = ofDoubles(rowKeys, colKey);
+
+        if (frame.rowCount() != values.length)
+            throw new DataFrameException("Key/value length mismatch.");
+
+        frame.applyDoubles(cursor -> values[cursor.rowOrdinal()]);
+        return frame;
+    }
+
+    /**
+     * Returns a newly created DataFrame with 1 column optimized to hold primitive doubles
+     * @param rowKeys   the row keys for frame
+     * @param colKey    the column key for frame
+     * @param values    the vector values to assign
+     * @param <R>       the row key type
+     * @param <C>       the column key type
+     * @return          the newly created DataFrame
+     * @throws          DataFrameException if the number of keys and values disagrees
+     */
+    static <R,C> DataFrame<R,C> ofDoubles(Iterable<R> rowKeys, C colKey, D3xVector values) {
+        DataFrame<R,C> frame = ofDoubles(rowKeys, colKey);
+
+        if (frame.rowCount() != values.length())
+            throw new DataFrameException("Key/value length mismatch.");
+
+        frame.applyDoubles(cursor -> values.get(cursor.rowOrdinal()));
+        return frame;
+    }
+
+    /**
      * Returns a newly created DataFrame with 1 column optimized to hold any object
      * @param rowKeys   the row keys for frame
      * @param colKey    the column key for frame
@@ -877,6 +1232,31 @@ public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperation
      */
     static <R,C> DataFrame<R,C> ofDoubles(Iterable<R> rowKeys, Iterable<C> colKeys) {
         return DataFrame.factory().from(rowKeys, colKeys, Double.class);
+    }
+
+    /**
+     * Returns a newly created DataFrame with values assigned from a matrix.
+     *
+     * @param rowKeys   the row keys for frame
+     * @param colKeys   the column keys for frame
+     * @param values    the matrix of values to assign
+     * @param <R>       the row key type
+     * @param <C>       the column key type
+     * @return          the newly created DataFrame
+     *
+     * @throws DataFrameException unless the matrix dimensions match those of the row and column keys.
+     */
+    static <R,C> DataFrame<R,C> ofDoubles(Iterable<R> rowKeys, Iterable<C> colKeys, D3xMatrix values) {
+        DataFrame<R,C> frame = ofDoubles(rowKeys, colKeys);
+
+        if (frame.rowCount() != values.nrow())
+            throw new DataFrameException("Row dimension mismatch.");
+
+        if (frame.colCount() != values.ncol())
+            throw new DataFrameException("Column dimension mismatch.");
+
+        frame.applyDoubles(cursor -> values.get(cursor.rowOrdinal(), cursor.colOrdinal()));
+        return frame;
     }
 
     /**
@@ -1018,5 +1398,75 @@ public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperation
         } catch (Exception ex) {
             throw new DataFrameException("Failed to initialize DataFrame from image input stream", ex);
         }
+    }
+
+    /**
+     * Returns a single-column DataFrame with every row set to 1.0.
+     *
+     * @param <R>     the row key type.
+     * @param <C>     the column key type.
+     * @param rowKeys the row keys for the frame.
+     * @param colKey  the column key for the frame.
+     *
+     * @return a single-column DataFrame with every row set to 1.0.
+     */
+    static <R,C> DataFrame<R,C> onesColumn(Iterable<R> rowKeys, C colKey) {
+        return DataFrame.ofDoubles(rowKeys, colKey).applyDoubles(x -> 1.0);
+    }
+
+    /**
+     * Returns a single-row DataFrame with every column set to 1.0.
+     *
+     * @param <R>     the row key type.
+     * @param <C>     the column key type.
+     * @param rowKey  the row key for the frame.
+     * @param colKeys the column keys for the frame.
+     *
+     * @return a single-column DataFrame with every column set to 1.0.
+     */
+    static <R,C> DataFrame<R,C> onesRow(R rowKey, Iterable<C> colKeys) {
+        return DataFrame.ofDoubles(rowKey, colKeys).applyDoubles(x -> 1.0);
+    }
+
+    /**
+     * Returns a single-column DataFrame with every row set to 0.0.
+     *
+     * @param <R>     the row key type.
+     * @param <C>     the column key type.
+     * @param rowKeys the row keys for the frame.
+     * @param colKey  the column key for the frame.
+     *
+     * @return a single-column DataFrame with every row set to 0.0.
+     */
+    static <R,C> DataFrame<R,C> zerosColumn(Iterable<R> rowKeys, C colKey) {
+        return DataFrame.ofDoubles(rowKeys, colKey).applyDoubles(x -> 0.0);
+    }
+
+    /**
+     * Returns a single-column DataFrame with every column set to 0.0.
+     *
+     * @param <R>     the row key type.
+     * @param <C>     the column key type.
+     * @param rowKey  the row key for the frame.
+     * @param colKeys the column keys for the frame.
+     *
+     * @return a single-column DataFrame with every column set to 0.0.
+     */
+    static <R,C> DataFrame<R,C> zerosRow(R rowKey, Iterable<C> colKeys) {
+        return DataFrame.ofDoubles(rowKey, colKeys).applyDoubles(x -> 0.0);
+    }
+
+    /**
+     * Returns a DataFrame with every element set to 0.0.
+     *
+     * @param <R>     the row key type.
+     * @param <C>     the column key type.
+     * @param rowKeys the row key for the frame.
+     * @param colKeys the column keys for the frame.
+     *
+     * @return a DataFrame with every element set to 0.0.
+     */
+    static <R,C> DataFrame<R,C> zeros(Iterable<R> rowKeys, Iterable<C> colKeys) {
+        return DataFrame.ofDoubles(rowKeys, colKeys, x -> 0.0);
     }
 }

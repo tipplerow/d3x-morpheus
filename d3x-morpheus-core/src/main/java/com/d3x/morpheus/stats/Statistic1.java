@@ -15,6 +15,10 @@
  */
 package com.d3x.morpheus.stats;
 
+import java.util.function.Supplier;
+
+import com.d3x.morpheus.vector.D3xVector;
+
 /**
  * An interface that defines an incremental calculation of a uni-variate statistic.
  *
@@ -32,6 +36,56 @@ public interface Statistic1 extends Statistic {
     long add(double value);
 
     /**
+     * Adds new values to the sample for this statistic.
+     *
+     * @param values the values to add.
+     *
+     * @return the sample size after adding the values.
+     */
+    default long add(double[] values) {
+        for (double value : values)
+            add(value);
+
+        return getN();
+    }
+
+    /**
+     * Adds new values to the sample for this statistic.
+     *
+     * @param values the values to add.
+     *
+     * @return the sample size after adding the values.
+     */
+    default long add(D3xVector values) {
+        for (int index = 0; index < values.length(); index++)
+            add(values.get(index));
+
+        return getN();
+    }
+
+    /**
+     * Resets this statistic and computes the value for a given sample.
+     *
+     * @param sample the sample of values.
+     *
+     * @return the value of this statistic for the specified sample.
+     */
+    default double compute(double... sample) {
+        return compute(this, sample);
+    }
+
+    /**
+     * Resets this statistic and computes the value for a given sample.
+     *
+     * @param sample the sample of values.
+     *
+     * @return the value of this statistic for the specified sample.
+     */
+    default double compute(D3xVector sample) {
+        return compute(this, sample);
+    }
+
+    /**
      * Returns a copy of this statistic
      * @return  a copy of this object
      */
@@ -43,6 +97,45 @@ public interface Statistic1 extends Statistic {
      */
     Statistic1 reset();
 
+    /**
+     * Computes a univariate statistic over a given sample.
+     *
+     * @param stat      the statistic type
+     * @param sample    the sample of values
+     *
+     * @return          the value of the statistic for the given sample.
+     */
+    static double compute(Statistic1 stat, double... sample) {
+        stat.reset();
+        stat.add(sample);
+        return stat.getValue();
+    }
+
+    /**
+     * Computes a univariate statistic over a given sample.
+     *
+     * @param stat      the statistic type
+     * @param sample    the sample of values
+     *
+     * @return          the value of the statistic for the given sample.
+     */
+    static double compute(Statistic1 stat, D3xVector sample) {
+        stat.reset();
+        stat.add(sample);
+        return stat.getValue();
+    }
+
+    /**
+     * Computes a univariate statistic over a given sample.
+     *
+     * @param stat      a supplier of the statistic type
+     * @param sample    the sample of values
+     *
+     * @return          the value of the statistic for the given sample.
+     */
+    static double compute(Supplier<Statistic1> stat, double... sample) {
+        return compute(stat.get(), sample);
+    }
 
     /**
      * Convenience function to compute a univariate statistic on some sample

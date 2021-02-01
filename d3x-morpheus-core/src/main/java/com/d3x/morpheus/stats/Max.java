@@ -15,6 +15,8 @@
  */
 package com.d3x.morpheus.stats;
 
+import com.d3x.morpheus.vector.D3xVector;
+
 /**
  * A Statistic implementation that supports incremental calculation of a sample max
  *
@@ -32,6 +34,28 @@ public class Max implements Statistic1 {
      */
     public Max() {
         super();
+    }
+
+    /**
+     * Finds the maximum value in a sample.
+     *
+     * @param sample the values in the sample.
+     *
+     * @return the maximum value in the sample.
+     */
+    public static double of(double... sample) {
+        return Statistic1.compute(new Max(), sample);
+    }
+
+    /**
+     * Finds the maximum value in a sample.
+     *
+     * @param sample the values in the sample.
+     *
+     * @return the maximum value in the sample.
+     */
+    public static double of(D3xVector sample) {
+        return Statistic1.compute(new Max(), sample);
     }
 
     @Override

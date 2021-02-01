@@ -15,6 +15,9 @@
  */
 package com.d3x.morpheus.util;
 
+import com.d3x.morpheus.matrix.D3xMatrix;
+import com.d3x.morpheus.vector.D3xVector;
+
 import org.testng.annotations.Test;
 import static org.testng.Assert.*;
 
@@ -22,11 +25,82 @@ public class DoubleComparatorTest {
     private final DoubleComparator fixed1 = DoubleComparator.fixed(0.0001);
     private final DoubleComparator fixed2 = DoubleComparator.FIXED_DEFAULT;
 
+    private final DoubleComparator relative1 = DoubleComparator.relative(0.0001);
+    private final DoubleComparator relative2 = DoubleComparator.RELATIVE_DEFAULT;
+
     private final double tinyNeg = -1.0E-14;
     private final double tinyPos = +1.0E-14;
 
     private final double smallNeg = -1.0E-06;
     private final double smallPos = +1.0E-06;
+
+    @Test
+    public void testEqualsArray() {
+        double[] x1 = new double[] { 1.0, 2.0, 3.0 };
+        double[] x2 = new double[] { 1.0 + 1.0E-14, 2.0 + 1.0E-14, 3.0 + 1.0E-14 };
+        double[] x3 = new double[] { 1.0, 2.0, 4.0 };
+        double[] x4 = new double[] { 1.0, 2.0 };
+        double[] x5 = new double[] { 1.0, 2.0, 3.0, 4.0 };
+
+        assertTrue(fixed2.equals(x1, x2));
+        assertFalse(fixed2.equals(x1, x3));
+        assertFalse(fixed2.equals(x1, x4));
+        assertFalse(fixed2.equals(x1, x5));
+
+        D3xVector v1 = D3xVector.wrap(x1);
+        D3xVector v2 = D3xVector.wrap(x2);
+        D3xVector v3 = D3xVector.wrap(x3);
+        D3xVector v4 = D3xVector.wrap(x4);
+        D3xVector v5 = D3xVector.wrap(x5);
+
+        assertTrue(fixed2.equals(v1, v2));
+        assertFalse(fixed2.equals(v1, v3));
+        assertFalse(fixed2.equals(v1, v4));
+        assertFalse(fixed2.equals(v1, v5));
+    }
+
+    @Test
+    public void testEqualsMatrix() {
+        double[][] x1 = new double[][] {
+                { 1.0, 2.0, 3.0 },
+                { 4.0, 5.0, 6.0 }
+        };
+
+        double[][] x2 = new double[][] {
+                { 1.0 + 1.0E-14, 2.0 + 1.0E-14, 3.0 + 1.0E-14 },
+                { 4.0 + 1.0E-14, 5.0 + 1.0E-14, 6.0 + 1.0E-14 }
+        };
+
+        double[][] x3 = new double[][] {
+                { 1.0, 2.0, 3.0 },
+                { 4.0, 5.0, 7.0 }
+        };
+
+        double[][] x4 = new double[][] {
+                { 1.0, 2.0, 3.0, 4.0 },
+                { 4.0, 5.0, 6.0 }
+        };
+
+        double[][] x5 = new double[][] {
+                { 1.0, 2.0 },
+                { 3.0, 4.0 },
+                { 5.0, 6.0 }
+        };
+
+        assertTrue(fixed2.equals(x1, x2));
+        assertFalse(fixed2.equals(x1, x3));
+        assertFalse(fixed2.equals(x1, x4));
+        assertFalse(fixed2.equals(x1, x5));
+
+        D3xMatrix m1 = D3xMatrix.wrap(x1);
+        D3xMatrix m2 = D3xMatrix.wrap(x2);
+        D3xMatrix m3 = D3xMatrix.wrap(x3);
+        D3xMatrix m5 = D3xMatrix.wrap(x5);
+
+        assertTrue(fixed2.equals(m1, m2));
+        assertFalse(fixed2.equals(m1, m3));
+        assertFalse(fixed2.equals(m1, m5));
+    }
 
     @Test
     public void testFixedCompare() {
@@ -77,6 +151,98 @@ public class DoubleComparatorTest {
     }
 
     @Test
+    public void testRelativeCompare() {
+        // The exact value...
+        double x = 4.0 / 3.0;
+
+        // Values less than x...
+        double y1 = 1.333;
+        double y2 = 1.33333;
+        double y3 = 1.33333333333333;
+
+        // Values greater than x...
+        double z1 = 1.334;
+        double z2 = 1.33334;
+        double z3 = 1.33333333333334;
+
+        assertTrue(relative1.compare(x, y1) > 0);
+        assertTrue(relative1.compare(x, y2) == 0);
+        assertTrue(relative1.compare(x, y3) == 0);
+
+        assertTrue(relative2.compare(x, y1) > 0);
+        assertTrue(relative2.compare(x, y2) > 0);
+        assertTrue(relative2.compare(x, y3) == 0);
+
+        assertTrue(relative1.compare(x, z1) < 0);
+        assertTrue(relative1.compare(x, z2) == 0);
+        assertTrue(relative1.compare(x, z3) == 0);
+
+        assertTrue(relative2.compare(x, z1) < 0);
+        assertTrue(relative2.compare(x, z2) < 0);
+        assertTrue(relative2.compare(x, z3) == 0);
+
+        assertFalse(relative1.equals(x, y1));
+        assertTrue(relative1.equals(x, y2));
+        assertTrue(relative1.equals(x, y3));
+
+        assertFalse(relative2.equals(x, y1));
+        assertFalse(relative2.equals(x, y2));
+        assertTrue(relative2.equals(x, y3));
+
+        assertFalse(relative1.equals(x, z1));
+        assertTrue(relative1.equals(x, z2));
+        assertTrue(relative1.equals(x, z3));
+
+        assertFalse(relative2.equals(x, z1));
+        assertFalse(relative2.equals(x, z2));
+        assertTrue(relative2.equals(x, z3));
+
+        double rescale = 1.0E+12;
+
+        x *= rescale;
+
+        y1 *= rescale;
+        y2 *= rescale;
+        y3 *= rescale;
+
+        z1 *= rescale;
+        z2 *= rescale;
+        z3 *= rescale;
+
+        assertTrue(relative1.compare(x, y1) > 0);
+        assertTrue(relative1.compare(x, y2) == 0);
+        assertTrue(relative1.compare(x, y3) == 0);
+
+        assertTrue(relative2.compare(x, y1) > 0);
+        assertTrue(relative2.compare(x, y2) > 0);
+        assertTrue(relative2.compare(x, y3) == 0);
+
+        assertTrue(relative1.compare(x, z1) < 0);
+        assertTrue(relative1.compare(x, z2) == 0);
+        assertTrue(relative1.compare(x, z3) == 0);
+
+        assertTrue(relative2.compare(x, z1) < 0);
+        assertTrue(relative2.compare(x, z2) < 0);
+        assertTrue(relative2.compare(x, z3) == 0);
+
+        assertFalse(relative1.equals(x, y1));
+        assertTrue(relative1.equals(x, y2));
+        assertTrue(relative1.equals(x, y3));
+
+        assertFalse(relative2.equals(x, y1));
+        assertFalse(relative2.equals(x, y2));
+        assertTrue(relative2.equals(x, y3));
+
+        assertFalse(relative1.equals(x, z1));
+        assertTrue(relative1.equals(x, z2));
+        assertTrue(relative1.equals(x, z3));
+
+        assertFalse(relative2.equals(x, z1));
+        assertFalse(relative2.equals(x, z2));
+        assertTrue(relative2.equals(x, z3));
+    }
+
+    @Test
     public void testIsZero() {
         assertFalse(fixed1.isZero(1.0));
         assertTrue(fixed1.isZero(smallPos));
@@ -93,6 +259,25 @@ public class DoubleComparatorTest {
         assertTrue(fixed2.isZero(tinyNeg));
         assertFalse(fixed2.isZero(smallNeg));
         assertFalse(fixed2.isZero(-1.0));
+    }
+
+    @Test
+    public void testisNonZero() {
+        assertTrue(fixed1.isNonZero(1.0));
+        assertFalse(fixed1.isNonZero(smallPos));
+        assertFalse(fixed1.isNonZero(tinyPos));
+        assertFalse(fixed1.isNonZero(0.0));
+        assertFalse(fixed1.isNonZero(tinyNeg));
+        assertFalse(fixed1.isNonZero(smallNeg));
+        assertTrue(fixed1.isNonZero(-1.0));
+
+        assertTrue(fixed2.isNonZero(1.0));
+        assertTrue(fixed2.isNonZero(smallPos));
+        assertFalse(fixed2.isNonZero(tinyPos));
+        assertFalse(fixed2.isNonZero(0.0));
+        assertFalse(fixed2.isNonZero(tinyNeg));
+        assertTrue(fixed2.isNonZero(smallNeg));
+        assertTrue(fixed2.isNonZero(-1.0));
     }
 
     @Test
@@ -192,7 +377,7 @@ public class DoubleComparatorTest {
 
     @Test
     public void testNaN() {
-        DoubleComparator cmp = DoubleComparator.FIXED_DEFAULT;
+        DoubleComparator cmp = DoubleComparator.DEFAULT;
 
         // The IEEE standard defines NaN as greater than all other
         // floating point values and equal to itself.
@@ -204,7 +389,7 @@ public class DoubleComparatorTest {
 
     @Test
     public void testInfinity() {
-        DoubleComparator cmp = DoubleComparator.FIXED_DEFAULT;
+        DoubleComparator cmp = DoubleComparator.DEFAULT;
 
         assertEquals(cmp.compare(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY), 0);
         assertEquals(cmp.compare(Double.NEGATIVE_INFINITY, 0.0), -1);
@@ -213,5 +398,11 @@ public class DoubleComparatorTest {
         assertEquals(cmp.compare(Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY), 1);
         assertEquals(cmp.compare(Double.POSITIVE_INFINITY, 0.0), 1);
         assertEquals(cmp.compare(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY), 0);
+    }
+
+    @Test
+    public void testEpsilon() {
+        // The machine tolerance should be something like 2.2E-16...
+        assertTrue(DoubleComparator.epsilon() < 1.0E-15);
     }
 }

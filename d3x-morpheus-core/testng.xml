@@ -136,5 +136,33 @@
         </classes>
     </test>
 
+    <test name="Constrained Regression Tests">
+        <packages>
+            <package name="com.d3x.morpheus.conreg.*"/>
+        </packages>
+    </test>
 
+    <test name="Data Frame Interface Tests">
+        <packages>
+            <package name="com.d3x.morpheus.frame.*"/>
+        </packages>
+    </test>
+
+    <test name="Linear Algebra Tests">
+        <packages>
+            <package name="com.d3x.morpheus.linalg.*"/>
+        </packages>
+    </test>
+
+    <test name="Matrix Tests">
+        <packages>
+            <package name="com.d3x.morpheus.matrix.*"/>
+        </packages>
+    </test>
+
+    <test name="Vector Tests">
+        <packages>
+            <package name="com.d3x.morpheus.vector.*"/>
+        </packages>
+    </test>
 </suite>

@@ -17,6 +17,9 @@ package com.d3x.morpheus.util;
 
 import java.util.Comparator;
 
+import com.d3x.morpheus.matrix.D3xMatrix;
+import com.d3x.morpheus.vector.D3xVector;
+
 /**
  * Defines an interface for comparing double precision values while
  * allowing for a finite tolerance, which may be expressed in absolute
@@ -25,6 +28,19 @@ import java.util.Comparator;
  * @author Scott Shaffer
  */
 public interface DoubleComparator extends Comparator<Double> {
+    /**
+     * Compares two finite double precision values, allowing for the
+     * tolerance of this comparator.
+     *
+     * @param x the first value to compare.
+     * @param y the second value to compare.
+     *
+     * @return an integer less than, equal to, or greater than zero
+     * according to whether {@code x} is considered to be less than,
+     * equal to, or greater than {@code y} by this comparator.
+     */
+    int compareFinite(double x, double y);
+
     /**
      * Compares two double precision values, allowing for the finite
      * tolerance of this comparator.
@@ -36,23 +52,17 @@ public interface DoubleComparator extends Comparator<Double> {
      * according to whether {@code x} is considered to be less than,
      * equal to, or greater than {@code y} by this comparator.
      */
-    int compare(double x, double y);
-
-    /**
-     * Returns a comparator with the default fixed tolerance (suitable
-     * for most situations unless the values being compared are extreme
-     * in magnitude).
-     */
-    DoubleComparator FIXED_DEFAULT = FixedDoubleComparator.DEFAULT;
-
-    /**
-     * Returns a comparator with a fixed tolerance, independent of the
-     * magnitudes of the values being compared.
-     *
-     * @param tolerance the fixed tolerance for the comparator.
-     */
-    static DoubleComparator fixed(double tolerance) {
-        return FixedDoubleComparator.withTolerance(tolerance);
+    default int compare(double x, double y) {
+        //
+        // The IEEE standard specifies that NaN is greater than any other
+        // floating point value, including positive infinity.  The Double
+        // class implements that standard in its compare() method and also
+        // properly handles comparisons of infinite values.
+        //
+        if (Double.isFinite(x) && Double.isFinite(y))
+            return compareFinite(x, y);
+        else
+            return Double.compare(x, y);
     }
 
     /**
@@ -74,6 +84,54 @@ public interface DoubleComparator extends Comparator<Double> {
     }
 
     /**
+     * A comparator that should be suitable for most situations.
+     */
+    DoubleComparator DEFAULT = RelativeDoubleComparator.DEFAULT;
+
+    /**
+     * A comparator with the default fixed tolerance (suitable for
+     * many situations unless the values being compared are extreme
+     * in magnitude).
+     */
+    DoubleComparator FIXED_DEFAULT = FixedDoubleComparator.DEFAULT;
+
+    /**
+     * A relative value comparator with the default tolerance factor
+     * (suitable for most situations).
+     */
+    DoubleComparator RELATIVE_DEFAULT = RelativeDoubleComparator.DEFAULT;
+
+    /**
+     * Returns a comparator with a fixed tolerance, independent of the
+     * magnitudes of the values being compared.
+     *
+     * @param tolerance the fixed tolerance for the comparator.
+     */
+    static DoubleComparator fixed(double tolerance) {
+        return FixedDoubleComparator.withTolerance(tolerance);
+    }
+
+    /**
+     * Returns a comparator with a relative tolerance, which is a function
+     * of the magnitudes of the values being compared.
+     *
+     * @param toleranceFactor the relative tolerance factor for the comparator.
+     */
+    static DoubleComparator relative(double toleranceFactor) {
+        return RelativeDoubleComparator.withToleranceFactor(toleranceFactor);
+    }
+
+    /**
+     * Returns the <em>machine tolerance</em>: the smallest reasonable
+     * tolerance for comparing floating point values of order one.
+     *
+     * @return the machine tolerance.
+     */
+    static double epsilon() {
+        return Math.ulp(1.0d);
+    }
+
+    /**
      * Tests two double precision values for (near) equality.
      *
      * @param x the first value to compare.
@@ -85,6 +143,95 @@ public interface DoubleComparator extends Comparator<Double> {
      */
     default boolean equals(double x, double y) {
         return compare(x, y) == 0;
+    }
+
+    /**
+     * Tests two double precision arrays for (near) equality.
+     *
+     * @param x the first array to compare.
+     * @param y the second array to compare.
+     *
+     * @return {@code true} iff the arrays have equal length and this
+     * comparator determines that all corresponding elements are equal.
+     */
+    default boolean equals(double[] x, double[] y) {
+        if (x.length != y.length)
+            return false;
+
+        for (int i = 0; i < x.length; i++) {
+            if (!equals(x[i], y[i]))
+                return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Tests two double precision matrices for (near) equality.
+     *
+     * @param x the first matrix to compare.
+     * @param y the second matrix to compare.
+     *
+     * @return {@code true} iff the matrices have equal dimensions and this
+     * comparator determines that all corresponding elements are equal.
+     */
+    default boolean equals(double[][] x, double[][] y) {
+        if (x.length != y.length)
+            return false;
+
+        for (int i = 0; i < x.length; i++) {
+            if (!equals(x[i], y[i]))
+                return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Tests two D3xVectors for (near) equality.
+     *
+     * @param x the first vector to compare.
+     * @param y the second vector to compare.
+     *
+     * @return {@code true} iff the vectors have equal length and this
+     * comparator determines that all corresponding elements are equal.
+     */
+    default boolean equals(D3xVector x, D3xVector y) {
+        if (x.length() != y.length())
+            return false;
+
+        for (int i = 0; i < x.length(); i++) {
+            if (!equals(x.get(i), y.get(i)))
+                return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Tests two D3xMatrix objects for (near) equality.
+     *
+     * @param x the first matrix to compare.
+     * @param y the second matrix to compare.
+     *
+     * @return {@code true} iff the matrices have equal dimensions and this
+     * comparator determines that all corresponding elements are equal.
+     */
+    default boolean equals(D3xMatrix x, D3xMatrix y) {
+        if (x.nrow() != y.nrow())
+            return false;
+
+        if (x.ncol() != y.ncol())
+            return false;
+
+        for (int i = 0; i < x.nrow(); i++) {
+            for (int j = 0; j < x.ncol(); j++) {
+                if (!equals(x.get(i, j), y.get(i, j)))
+                    return false;
+            }
+        }
+
+        return true;
     }
 
     /**

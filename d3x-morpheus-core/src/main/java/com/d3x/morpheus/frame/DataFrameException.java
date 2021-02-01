@@ -27,10 +27,11 @@ public class DataFrameException extends RuntimeException {
     /**
      * Constructor
      *
-     * @param msg the exception message
+     * @param format the exception message format string.
+     * @param args the exception message arguments.
      */
-    public DataFrameException(String msg) {
-        this(msg, null);
+    public DataFrameException(String format, Object... args) {
+        super(String.format(format, args));
     }
 
     /**

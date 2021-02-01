@@ -15,6 +15,8 @@
  */
 package com.d3x.morpheus.stats;
 
+import com.d3x.morpheus.vector.D3xVector;
+
 /**
  * A Statistic implementation that supports incremental calculation of a sample sum
  *
@@ -32,6 +34,28 @@ public class Sum implements Statistic1 {
      */
     public Sum() {
         super();
+    }
+
+    /**
+     * Computes the sum of a sample.
+     *
+     * @param sample the values in the sample.
+     *
+     * @return the sum of the values in the sample.
+     */
+    public static double of(double... sample) {
+        return Statistic1.compute(new Sum(), sample);
+    }
+
+    /**
+     * Computes the sum of a sample.
+     *
+     * @param sample the values in the sample.
+     *
+     * @return the sum of the values in the sample.
+     */
+    public static double of(D3xVector sample) {
+        return Statistic1.compute(new Sum(), sample);
     }
 
     @Override
