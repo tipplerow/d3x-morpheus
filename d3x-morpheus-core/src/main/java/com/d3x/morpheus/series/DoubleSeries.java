@@ -24,6 +24,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.ParameterizedType;
 import java.net.URL;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -31,6 +32,7 @@ import java.util.function.ToDoubleFunction;
 import java.util.stream.DoubleStream;
 import java.util.stream.Stream;
 
+import com.d3x.core.lang.D3xException;
 import com.d3x.core.util.Generic;
 import com.d3x.core.util.IO;
 import com.d3x.morpheus.frame.DataFrame;
@@ -274,7 +276,35 @@ public interface DoubleSeries<K> extends DataSeries<K,Double> {
         return builder.build();
     }
 
+    /**
+     * Creates a new DoubleSeries from lists of keys and values.
+     *
+     * @param <K>    the runtime key type.
+     * @param keys   the series keys.
+     * @param values the series values.
+     *
+     * @return a new DoubleSeries containing the non-{@code NaN} entries
+     * from the specified key and value lists.
+     *
+     * @throws RuntimeException unless the keys and values have equal sizes.
+     */
+    static <K> DoubleSeries<K> build(Class<K> keyType, List<K> keys, List<Double> values) {
+        if (keys.size() != values.size())
+            throw new D3xException("Key/value length mismatch.");
 
+        DoubleSeriesBuilder<K> builder = builder(keyType);
+        builder.capacity(keys.size());
+
+        for (int index = 0; index < keys.size(); ++index) {
+            K key = keys.get(index);
+            double value = values.get(index);
+
+            if (!Double.isNaN(value))
+                builder.putDouble(key, value);
+        }
+
+        return builder.build();
+    }
 
     /**
      * Returns a new DoubleSeries Builder for key type
@@ -427,5 +457,32 @@ public interface DoubleSeries<K> extends DataSeries<K,Double> {
         void accept(K key, double value);
     }
 
+    /**
+     * Computes the inner product of two series, assuming that missing
+     * series values are {@code 0.0}, not {@code Double.NaN}.
+     *
+     * @param <K> the runtime type for the series.
+     * @param s1  the first series in the inner product.
+     * @param s2  the second series in the inner product.
+     *
+     * @return the inner product of the two series.
+     */
+    static <K> double innerProduct(DoubleSeries<K> s1, DoubleSeries<K> s2) {
+        return InnerProduct.compute(s1, s2);
+    }
 
+    /**
+     * Computes a weighted inner product of two series, assuming that
+     * missing series values are {@code 0.0}, not {@code Double.NaN}.
+     *
+     * @param <K> the runtime type for the series.
+     * @param s1  the first series in the inner product.
+     * @param s2  the second series in the inner product.
+     * @param wt  the weights to apply to each term in the inner product.
+     *
+     * @return the inner product of the two series.
+     */
+    static <K> double innerProduct(DoubleSeries<K> s1, DoubleSeries<K> s2, DoubleSeries<K> wt) {
+        return InnerProduct.compute(s1, s2, wt);
+    }
 }
