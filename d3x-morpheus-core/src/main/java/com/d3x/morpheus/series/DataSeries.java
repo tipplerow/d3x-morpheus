@@ -18,13 +18,13 @@ package com.d3x.morpheus.series;
 import java.io.File;
 import java.io.InputStream;
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.net.URL;
+import java.util.Optional;
 import java.util.function.ToDoubleFunction;
 import java.util.stream.Stream;
 
-import com.d3x.core.util.Generic;
-import com.d3x.core.util.Option;
-import com.d3x.morpheus.util.IO;
+import com.d3x.morpheus.util.GenericType;
 import com.d3x.morpheus.util.IntComparator;
 import com.d3x.morpheus.util.Resource;
 
@@ -140,16 +140,16 @@ public interface DataSeries<K,V> extends Cloneable {
      * Returns the first key in this series
      * @return  the first key in series
      */
-    default Option<K> firstKey() {
-        return isEmpty() ? Option.empty() : Option.of(getKey(0));
+    default Optional<K> firstKey() {
+        return isEmpty() ? Optional.empty() : Optional.of(getKey(0));
     }
 
     /**
      * Returns the last key in this series
      * @return  the last key in series
      */
-    default Option<K> lastKey() {
-        return isEmpty() ? Option.empty() : Option.of(getKey(size()-1));
+    default Optional<K> lastKey() {
+        return isEmpty() ? Optional.empty() : Optional.of(getKey(size()-1));
     }
 
     /**
@@ -181,8 +181,10 @@ public interface DataSeries<K,V> extends Cloneable {
      * @param valueType the value type for series
      * @return          the parameterized type
      */
-    static ParameterizedType ofType(Class<?> keyType, Class<?> valueType) {
-        return Generic.of(DataSeries.class, keyType, valueType);
+    static ParameterizedType ofType(
+        @lombok.NonNull Class<?> keyType,
+        @lombok.NonNull Class<?> valueType) {
+        return GenericType.of(DataSeries.class, keyType, valueType);
     }
 
     /**
@@ -223,13 +225,6 @@ public interface DataSeries<K,V> extends Cloneable {
      */
     static <K,V> DataSeriesRead<K,V,DataSeries<K,V>> read(InputStream is) {
         return new DataSeriesRead<>(Resource.of(is));
-    }
-
-
-    static void main(String[] args) {
-        var path = "/Users/witdxav/temp/opt-models/bf5489bf-18be-4442-8c49-d659207ceeee-data/opt-data.csv";
-        var series = DataSeries.read(new File(path)).csv("symbol", "##default##price");
-        IO.println(series);
     }
 
 }

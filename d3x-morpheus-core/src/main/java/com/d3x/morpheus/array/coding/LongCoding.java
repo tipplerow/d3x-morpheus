@@ -25,8 +25,7 @@ import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-
-import com.d3x.core.util.Option;
+import java.util.Optional;
 
 /**
  * An interface that exposes a coding between object values and corresponding long code
@@ -150,8 +149,8 @@ public interface LongCoding<T> extends Coding<T> {
          * @return      the coding option
          */
         @SuppressWarnings("unchecked")
-        public static <T> Option<LongCoding<T>> getCoding(Class<T> type) {
-            return Option.of((LongCoding<T>)codingMap.get(type));
+        public static <T> Optional<LongCoding<T>> getCoding(Class<T> type) {
+            return Optional.ofNullable((LongCoding<T>)codingMap.get(type));
         }
     }
 
