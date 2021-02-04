@@ -21,8 +21,6 @@ import java.util.List;
 import java.util.function.IntFunction;
 import java.util.stream.IntStream;
 
-import com.d3x.core.json.JsonEngine;
-import com.d3x.morpheus.util.IO;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -34,13 +32,6 @@ import org.testng.annotations.Test;
  */
 public class DoubleSeriesTests {
 
-
-    private static JsonEngine jsonEngine = new JsonEngine();
-
-    static {
-        DataSeriesJson.registerDefaults(jsonEngine);
-        DoubleSeriesJson.registerDefaults(jsonEngine);
-    }
 
 
     private IntFunction ofIntFunction(IntFunction function) {
@@ -66,33 +57,14 @@ public class DoubleSeriesTests {
         Assert.assertEquals(series.valueClass(), Double.class);
         Assert.assertEquals(series.keyClass(), LocalDate.class);
         Assert.assertEquals(series.size(), 8503);
-        Assert.assertEquals(series.firstKey().orNull(), LocalDate.parse("1980-12-12"));
-        Assert.assertEquals(series.lastKey().orNull(), LocalDate.parse("2014-08-29"));
+        Assert.assertEquals(series.firstKey().orElse(null), LocalDate.parse("1980-12-12"));
+        Assert.assertEquals(series.lastKey().orElse(null), LocalDate.parse("2014-08-29"));
         Assert.assertEquals(series.getDouble(LocalDate.parse("1980-12-12")), 0.44203d, 0.000001d);
         Assert.assertEquals(series.getDouble(LocalDate.parse("2014-08-29")), 101.65627d, 0.000001d);
         Assert.assertEquals(series.stats().min(), 0.16913d, 0.000001d);
         Assert.assertEquals(series.stats().max(), 101.65627d, 0.000001d);
     }
 
-
-    @Test()
-    @SuppressWarnings("unchecked")
-    public void jsonIO() {
-        var path = "/csv/aapl.csv";
-        var series = DoubleSeries.<LocalDate>read(path).csv("Date", "Adj Close");
-        var jsonIO = jsonEngine.io(DoubleSeries.ofType(LocalDate.class));
-        var jsonString = jsonIO.toString(series);
-        IO.println(jsonString);
-        var result = ((DoubleSeries<LocalDate>)jsonIO.fromString(jsonString));
-        Assert.assertEquals(result.size(), series.size());
-        Assert.assertEquals(result.valueClass(), series.valueClass());
-        Assert.assertEquals(result.keyClass(), series.keyClass());
-        series.keys().forEach(key -> {
-            var v1 = series.getDouble(key);
-            var v2 = result.getDouble(key);
-            Assert.assertEquals(v2, v1, 0.000001d);
-        });
-    }
 
 
     @Test()
@@ -142,10 +114,10 @@ public class DoubleSeriesTests {
         Assert.assertEquals(sorted.size(),  series.size());
         Assert.assertNotEquals(sorted.firstKey(), series.firstKey());
         Assert.assertEquals(sorted.lastKey(), series.lastKey());
-        Assert.assertEquals(series.firstKey().orNull(), LocalDate.parse("1980-12-12"));
-        Assert.assertEquals(series.lastKey().orNull(), LocalDate.parse("2014-08-29"));
-        Assert.assertEquals(sorted.firstKey().orNull(), LocalDate.parse("1982-07-08"));
-        Assert.assertEquals(sorted.lastKey().orNull(), LocalDate.parse("2014-08-29"));
+        Assert.assertEquals(series.firstKey().orElse(null), LocalDate.parse("1980-12-12"));
+        Assert.assertEquals(series.lastKey().orElse(null), LocalDate.parse("2014-08-29"));
+        Assert.assertEquals(sorted.firstKey().orElse(null), LocalDate.parse("1982-07-08"));
+        Assert.assertEquals(sorted.lastKey().orElse(null), LocalDate.parse("2014-08-29"));
         DoubleSeries.assertAscending(sorted);
     }
 

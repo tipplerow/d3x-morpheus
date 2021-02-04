@@ -18,10 +18,10 @@ package com.d3x.morpheus.matrix;
 import java.util.List;
 import java.util.Random;
 
-import com.d3x.core.lang.D3xException;
 import com.d3x.morpheus.frame.DataFrame;
 import com.d3x.morpheus.frame.DataFrameException;
 import com.d3x.morpheus.util.DoubleComparator;
+import com.d3x.morpheus.util.MorpheusException;
 import com.d3x.morpheus.vector.D3xVector;
 
 /**
@@ -197,7 +197,7 @@ public interface D3xMatrix {
         D3xMatrix matrix = dense(nrow, ncol);
 
         if (values.length != matrix.size())
-            throw new D3xException("Number of values does not match the number of elements.");
+            throw new MorpheusException("Number of values does not match the number of elements.");
 
         for (int i = 0; i < nrow; ++i)
             for (int j = 0; j < ncol; ++j)
@@ -405,19 +405,19 @@ public interface D3xMatrix {
      */
     static D3xMatrix squareBlock(D3xMatrix A, D3xMatrix B, D3xMatrix C) {
         if (!A.isSquare())
-            throw new D3xException("Upper left block must be square.");
+            throw new MorpheusException("Upper left block must be square.");
 
         if (!B.isSquare())
-            throw new D3xException("Lower right block must be square.");
+            throw new MorpheusException("Lower right block must be square.");
 
         int N = A.nrow();
         int P = B.nrow();
 
         if (C.nrow() != P)
-            throw new D3xException("The lower left and lower right blocks must have the same number of rows.");
+            throw new MorpheusException("The lower left and lower right blocks must have the same number of rows.");
 
         if (C.ncol() != N)
-            throw new D3xException("The lower left and upper right blocks must have the same number of columns.");
+            throw new MorpheusException("The lower left and upper right blocks must have the same number of columns.");
 
         D3xMatrix block = dense(N + P, N + P);
 
@@ -467,7 +467,7 @@ public interface D3xMatrix {
      */
     static void validateDimension(int dim) {
         if (dim < 0)
-            throw new D3xException("Matrix dimension [%d] is negative.", dim);
+            throw new MorpheusException("Matrix dimension [%d] is negative.", dim);
     }
 
     /**
@@ -480,7 +480,7 @@ public interface D3xMatrix {
      */
     static void validateIndex(int index, int dimension) {
         if (index < 0 || index >= dimension)
-            throw new D3xException("Invalid index: [%d] not in range [0, %d).", index, dimension);
+            throw new MorpheusException("Invalid index: [%d] not in range [0, %d).", index, dimension);
     }
 
     /**
@@ -646,7 +646,7 @@ public interface D3xMatrix {
      */
     default D3xVector getDiagonal() {
         if (!isSquare())
-            throw new D3xException("Non-square matrix.");
+            throw new MorpheusException("Non-square matrix.");
 
         D3xVector diagonal = D3xVector.dense(nrow());
 
@@ -804,7 +804,7 @@ public interface D3xMatrix {
         validateColumnIndex(col);
 
         if (vec.length() != nrow())
-            throw new D3xException("Invalid column vector length.");
+            throw new MorpheusException("Invalid column vector length.");
     }
 
     /**
@@ -831,7 +831,7 @@ public interface D3xMatrix {
         validateRowIndex(row);
 
         if (vec.length() != ncol())
-            throw new D3xException("Invalid row vector length.");
+            throw new MorpheusException("Invalid row vector length.");
     }
 
     /**
@@ -844,7 +844,7 @@ public interface D3xMatrix {
      */
     default void validateCongruent(D3xMatrix that) {
         if (!isCongruent(that))
-            throw new D3xException("Matrix shape mismatch: [(%d, %d) != (%d, %d)].",
+            throw new MorpheusException("Matrix shape mismatch: [(%d, %d) != (%d, %d)].",
                     this.nrow(), this.ncol(), that.nrow(), that.ncol());
     }
 }

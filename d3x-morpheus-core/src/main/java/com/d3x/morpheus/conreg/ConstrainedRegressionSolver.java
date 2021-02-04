@@ -20,11 +20,11 @@ import java.util.List;
 import lombok.Getter;
 import lombok.NonNull;
 
-import com.d3x.core.util.Lazy;
 import com.d3x.morpheus.frame.DataFrame;
 import com.d3x.morpheus.linalg.SVDSolver;
 import com.d3x.morpheus.matrix.D3xMatrix;
 import com.d3x.morpheus.vector.D3xVector;
+import com.d3x.morpheus.util.LazyValue;
 
 /**
  * Estimates the parameters for a constrained linear regression model.
@@ -58,8 +58,8 @@ public final class ConstrainedRegressionSolver<R,C> {
     private double singularValueThreshold = Double.NaN;
 
     // The augmented linear system and its SVD solver, built on demand and cached...
-    private final Lazy<SVDSolver> solver = Lazy.of(this::buildSolver);
-    private final Lazy<ConstrainedRegressionSystem<R,C>> system = Lazy.of(this::buildSystem);
+    private final LazyValue<SVDSolver> solver = LazyValue.of(this::buildSolver);
+    private final LazyValue<ConstrainedRegressionSystem<R,C>> system = LazyValue.of(this::buildSystem);
 
     private ConstrainedRegressionSolver(ConstrainedRegressionModel<C> regressionModel, DataFrame<R, C> observationFrame) {
         this.regressionModel  = regressionModel;

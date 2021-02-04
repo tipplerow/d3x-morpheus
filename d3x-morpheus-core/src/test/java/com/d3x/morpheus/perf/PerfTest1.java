@@ -3,7 +3,7 @@ package com.d3x.morpheus.perf;
 
 import java.util.stream.IntStream;
 
-import com.d3x.core.util.StopWatch;
+import com.d3x.morpheus.util.StopWatch;
 import com.d3x.morpheus.frame.DataFrame;
 import com.d3x.morpheus.range.Range;
 import com.d3x.morpheus.util.IO;

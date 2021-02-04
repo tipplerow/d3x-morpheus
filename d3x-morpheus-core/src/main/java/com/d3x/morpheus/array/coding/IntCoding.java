@@ -21,10 +21,10 @@ import java.util.Arrays;
 import java.util.Currency;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TimeZone;
 import java.util.stream.IntStream;
 
-import com.d3x.core.util.Option;
 import com.d3x.morpheus.util.IntComparator;
 import com.d3x.morpheus.util.SortAlgorithm;
 import gnu.trove.map.TObjectIntMap;
@@ -144,12 +144,12 @@ public interface IntCoding<T> extends Coding<T> {
          * @return      the coding option
          */
         @SuppressWarnings("unchecked")
-        public static <T> Option<IntCoding<T>> getCoding(Class<T> type) {
+        public static <T> Optional<IntCoding<T>> getCoding(Class<T> type) {
             if (type.isEnum()) {
                 var enumType = (Class<Enum>)type;
-                return Option.of((IntCoding<T>)new OfEnum<>(enumType));
+                return Optional.ofNullable((IntCoding<T>) new OfEnum<>(enumType));
             } else {
-                return Option.of((IntCoding<T>)codingMap.get(type));
+                return Optional.ofNullable((IntCoding<T>)codingMap.get(type));
             }
         }
     }

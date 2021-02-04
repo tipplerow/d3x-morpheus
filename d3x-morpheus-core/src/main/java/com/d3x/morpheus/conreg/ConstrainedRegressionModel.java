@@ -24,10 +24,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
 
-import com.d3x.core.lang.D3xException;
 import com.d3x.morpheus.frame.DataFrame;
 import com.d3x.morpheus.matrix.D3xMatrix;
 import com.d3x.morpheus.vector.D3xVector;
+import com.d3x.morpheus.util.MorpheusException;
 
 /**
  * Defines a linear regression model that enforces linear equality constraints
@@ -98,15 +98,15 @@ public final class ConstrainedRegressionModel<C> {
 
     private void validateModelRegressand() {
         if (containsRegressor(regressand))
-            throw new D3xException("The regressand [%s] is also a regressor.");
+            throw new MorpheusException("The regressand [%s] is also a regressor.");
     }
 
     private void validateModelRegressors() {
         if (regressors.isEmpty())
-            throw new D3xException("No regressors were specified.");
+            throw new MorpheusException("No regressors were specified.");
 
         if (regressorSet.size() != regressors.size())
-            throw new D3xException("At least one regressor is duplicated.");
+            throw new MorpheusException("At least one regressor is duplicated.");
     }
 
     private void validateModelConstraints() {
@@ -116,7 +116,7 @@ public final class ConstrainedRegressionModel<C> {
 
     private void validateModelConstraint(Constraint<C> constraint) {
         if (constraint.coeffs.rowCount() != 1)
-            throw new D3xException("A single-row data frame is required for regression constraints.");
+            throw new MorpheusException("A single-row data frame is required for regression constraints.");
 
         requireRegressors(constraint.coeffs.listColumnKeys());
     }
@@ -128,7 +128,7 @@ public final class ConstrainedRegressionModel<C> {
 
     private void requireRegressor(C regressor) {
         if (!containsRegressor(regressor))
-            throw new D3xException("Missing regressor [%s].", regressor);
+            throw new MorpheusException("Missing regressor [%s].", regressor);
     }
 
     /**
@@ -198,12 +198,12 @@ public final class ConstrainedRegressionModel<C> {
      */
     ConstrainedRegressionModel<C> addConstraint(DataFrame<String,C> constraintLHS, double constraintRHS) {
         if (constraintLHS.rowCount() != 1)
-            throw new D3xException("A single-row data frame is required for regression constraints.");
+            throw new MorpheusException("A single-row data frame is required for regression constraints.");
 
         String constraintKey = constraintLHS.listRowKeys().get(0);
 
         if (containsConstraint(constraintKey))
-            throw new D3xException("Duplicate constraint: [%s].", constraintKey);
+            throw new MorpheusException("Duplicate constraint: [%s].", constraintKey);
 
         constraints.put(constraintKey, new Constraint<C>(constraintKey, constraintRHS, constraintLHS));
         validateModel();

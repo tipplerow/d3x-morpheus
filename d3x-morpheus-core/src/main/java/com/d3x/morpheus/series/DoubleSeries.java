@@ -32,13 +32,13 @@ import java.util.function.ToDoubleFunction;
 import java.util.stream.DoubleStream;
 import java.util.stream.Stream;
 
-import com.d3x.core.lang.D3xException;
-import com.d3x.core.util.Generic;
-import com.d3x.core.util.IO;
 import com.d3x.morpheus.frame.DataFrame;
 import com.d3x.morpheus.stats.Stats;
 import com.d3x.morpheus.util.AssertException;
+import com.d3x.morpheus.util.GenericType;
+import com.d3x.morpheus.util.IO;
 import com.d3x.morpheus.util.IntComparator;
+import com.d3x.morpheus.util.MorpheusException;
 import com.d3x.morpheus.util.Resource;
 
 /**
@@ -290,7 +290,7 @@ public interface DoubleSeries<K> extends DataSeries<K,Double> {
      */
     static <K> DoubleSeries<K> build(Class<K> keyType, List<K> keys, List<Double> values) {
         if (keys.size() != values.size())
-            throw new D3xException("Key/value length mismatch.");
+            throw new MorpheusException("Key/value length mismatch.");
 
         DoubleSeriesBuilder<K> builder = builder(keyType);
         builder.capacity(keys.size());
@@ -321,7 +321,7 @@ public interface DoubleSeries<K> extends DataSeries<K,Double> {
      * @return          the parameterized type
      */
     static ParameterizedType ofType(Class<?> keyType) {
-        return Generic.of(DoubleSeries.class, keyType, Double.class);
+        return GenericType.of(DoubleSeries.class, keyType, Double.class);
     }
 
     /**

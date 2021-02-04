@@ -16,10 +16,10 @@
 package com.d3x.morpheus.series;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-import com.d3x.core.util.Option;
 import com.d3x.morpheus.frame.DataFrame;
 import com.d3x.morpheus.util.Resource;
 import com.d3x.morpheus.util.text.Formats;
@@ -165,37 +165,37 @@ public class DataSeriesRead<K,V,D extends DataSeries<K,V>> {
          * Returns the formats for these options
          * @return  the formats
          */
-        Option<Formats> getFormats() {
-            return Option.of(formats);
+        Optional<Formats> getFormats() {
+            return Optional.ofNullable(formats);
         }
 
         /**
          * Returns if header is included
          * @return  true if header expected
          */
-        Option<Boolean> getHeader() {
-            return Option.of(header);
+        Optional<Boolean> getHeader() {
+            return Optional.ofNullable(header);
         }
 
         /**
          * Returns the column names to include from CSV
          * @return  the column names
          */
-        Option<String[]> getColumnNames() {
+        Optional<String[]> getColumnNames() {
             var names = Stream.of(keyColName, valColName).filter(Objects::nonNull).toArray(String[]::new);
-            return names.length > 0 ? Option.of(names) : Option.empty();
+            return names.length > 0 ? Optional.ofNullable(names) : Optional.empty();
         }
 
         /**
          * Returns the column indexes to include from CSV
          * @return  the column indexes
          */
-        Option<int[]> getColumnIndexes() {
+        Optional<int[]> getColumnIndexes() {
             var indexes = Stream.of(keyColIndex, valColIndex).filter(Objects::nonNull).mapToInt(Integer::intValue).toArray();
             if (indexes.length == 0 && getColumnNames().isEmpty()) {
-                return Option.of(new int[] {0, 1});
+                return Optional.of(new int[] {0, 1});
             } else {
-                return indexes.length > 0 ? Option.of(indexes) : Option.empty();
+                return indexes.length > 0 ? Optional.ofNullable(indexes) : Optional.empty();
             }
         }
     }

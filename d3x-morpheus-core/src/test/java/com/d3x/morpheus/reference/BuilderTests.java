@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import com.d3x.core.util.StopWatch;
+import com.d3x.morpheus.util.StopWatch;
 import com.d3x.morpheus.frame.DataFrame;
 import com.d3x.morpheus.frame.DataFrameAsserts;
 import com.d3x.morpheus.util.IO;
@@ -404,8 +404,8 @@ public class BuilderTests {
                 }
                 return builder.build();
             });
-            IO.println("\n\nBuilt DataFrame " + result.getValue().orNull() + " in " + result.getMillis() + " millis");
-            result.getValue().orNull().out().print();
+            IO.println("\n\nBuilt DataFrame " + result.getValue().orElse(null) + " in " + result.getMillis() + " millis");
+            result.getValue().ifPresent(v -> v.out().print());
         });
     }
 

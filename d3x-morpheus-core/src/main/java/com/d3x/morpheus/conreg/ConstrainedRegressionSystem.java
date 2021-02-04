@@ -21,11 +21,11 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 
-import com.d3x.core.lang.D3xException;
 import com.d3x.morpheus.frame.DataFrame;
 import com.d3x.morpheus.matrix.D3xMatrix;
 import com.d3x.morpheus.vector.D3xVector;
 import com.d3x.morpheus.util.DoubleComparator;
+import com.d3x.morpheus.util.MorpheusException;
 
 /**
  * Encapsulates the augmented linear system that must be solved for the parameters
@@ -168,7 +168,7 @@ public final class ConstrainedRegressionSystem<R,C> {
             double weight = weights.get(index);
 
             if (DoubleComparator.DEFAULT.isNegative(weight))
-                throw new D3xException("Regression weight for observation [%s] is negative.", observationRows.get(index));
+                throw new MorpheusException("Regression weight for observation [%s] is negative.", observationRows.get(index));
             else if (DoubleComparator.DEFAULT.isPositive(weight))
                 positiveCount++;
 

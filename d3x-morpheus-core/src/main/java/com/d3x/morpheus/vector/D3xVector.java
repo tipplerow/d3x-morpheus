@@ -19,7 +19,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-import com.d3x.core.lang.D3xException;
 import com.d3x.morpheus.frame.DataFrame;
 import com.d3x.morpheus.frame.DataFrameColumn;
 import com.d3x.morpheus.frame.DataFrameException;
@@ -28,6 +27,7 @@ import com.d3x.morpheus.series.DoubleSeries;
 import com.d3x.morpheus.stats.Sum;
 import com.d3x.morpheus.stats.Statistic1;
 import com.d3x.morpheus.util.DoubleComparator;
+import com.d3x.morpheus.util.MorpheusException;
 
 /**
  * Represents a fixed-length vector of {@code double} values, provides static
@@ -569,7 +569,7 @@ public interface D3xVector {
      */
     static void validateLength(int length) {
         if (length < 0)
-            throw new D3xException("Length [%d] is negative.", length);
+            throw new MorpheusException("Length [%d] is negative.", length);
     }
 
     /**
@@ -703,7 +703,7 @@ public interface D3xVector {
      */
     default void validateCongruent(D3xVector that) {
         if (!isCongruent(that))
-            throw new D3xException("Vector length mismatch: [%d != %d].", this.length(), that.length());
+            throw new MorpheusException("Vector length mismatch: [%d != %d].", this.length(), that.length());
     }
 
     /**
@@ -715,6 +715,6 @@ public interface D3xVector {
      */
     default void validateIndex(int index) {
         if (index < 0 || index >= length())
-            throw new D3xException("Index [%d] is out of bounds [0, %d).", index, length());
+            throw new MorpheusException("Index [%d] is out of bounds [0, %d).", index, length());
     }
 }
