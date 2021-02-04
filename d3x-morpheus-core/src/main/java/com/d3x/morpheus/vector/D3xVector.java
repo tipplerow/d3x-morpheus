@@ -161,7 +161,7 @@ public interface D3xVector {
         double sum = sum();
 
         if (DoubleComparator.DEFAULT.isZero(sum))
-            throw new D3xException("Cannot normalize a vector with zero element sum.");
+            throw new MorpheusException("Cannot normalize a vector with zero element sum.");
 
         return divideInPlace(sum);
     }
