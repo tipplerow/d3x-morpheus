@@ -25,6 +25,8 @@ import com.d3x.morpheus.frame.DataFrameColumn;
 import com.d3x.morpheus.frame.DataFrameException;
 import com.d3x.morpheus.frame.DataFrameRow;
 import com.d3x.morpheus.series.DoubleSeries;
+import com.d3x.morpheus.stats.Sum;
+import com.d3x.morpheus.stats.Statistic1;
 import com.d3x.morpheus.util.DoubleComparator;
 
 /**
@@ -146,6 +148,32 @@ public interface D3xVector {
      * length as this vector.
      */
     double dot(D3xVector vector);
+
+    /**
+     * Rescales this vector (in place) so that the elements sum to one.
+     *
+     * @return this vector, modified, for operator chaining.
+     *
+     * @throws RuntimeException if the elements sum to zero within a
+     * small floating-point tolerance.
+     */
+    default D3xVector normalize() {
+        double sum = sum();
+
+        if (DoubleComparator.DEFAULT.isZero(sum))
+            throw new D3xException("Cannot normalize a vector with zero element sum.");
+
+        return divideInPlace(sum);
+    }
+
+    /**
+     * Computes the sum of all elements in this vector.
+     *
+     * @return the sum of all elements in this vector.
+     */
+    default double sum() {
+        return Statistic1.compute(new Sum(), this);
+    }
 
     /**
      * Computes the sum of this vector and another and returns the sum

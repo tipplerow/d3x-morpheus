@@ -301,6 +301,22 @@ public class D3xVectorTest {
     }
 
     @Test
+    public void testSum() {
+        assertEquals(D3xVector.wrap().sum(), 0.0);
+        assertEquals(D3xVector.wrap(1.0).sum(), 1.0);
+        assertEquals(D3xVector.wrap(1.0, 2.0).sum(), 3.0);
+        assertEquals(D3xVector.wrap(1.0, 2.0, -3.0).sum(), 0.0);
+    }
+
+    @Test
+    public void testNormalize() {
+        D3xVector actual = D3xVector.wrap(2.0, 4.0, 6.0, 8.0).normalize();
+        D3xVector expected = D3xVector.wrap(0.1, 0.2, 0.3, 0.4);
+
+        assertTrue(actual.equalsVector(expected));
+    }
+
+    @Test
     public void testWrap() {
         double[] array = new double[] { 1.0, 2.0, 3.0 };
         D3xVector vector = D3xVector.wrap(array);
