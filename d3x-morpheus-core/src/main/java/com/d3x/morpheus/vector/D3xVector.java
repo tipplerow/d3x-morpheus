@@ -136,6 +136,18 @@ public interface D3xVector {
     }
 
     /**
+     * Computes the dot product of this vector and another.
+     *
+     * @param vector the second vector in the dot product.
+     *
+     * @return the dot product of this vector and the input vector.
+     *
+     * @throws RuntimeException unless the input vector has the same
+     * length as this vector.
+     */
+    double dot(D3xVector vector);
+
+    /**
      * Computes the sum of this vector and another and returns the sum
      * in a new vector; this vector is unchanged.
      *

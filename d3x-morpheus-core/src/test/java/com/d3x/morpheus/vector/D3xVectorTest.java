@@ -21,7 +21,6 @@ import java.util.List;
 import com.d3x.morpheus.frame.DataFrame;
 import com.d3x.morpheus.series.DoubleSeries;
 
-import org.testng.Assert;
 import org.testng.annotations.Test;
 import static org.testng.Assert.*;
 
@@ -81,6 +80,30 @@ public class D3xVectorTest {
         assertTrue(vec1.equalsArray(arr3));
         assertTrue(vec2.equalsArray(arr2));
         assertTrue(vec4.equalsArray(arr3));
+    }
+
+    @Test
+    public void testDot() {
+        int N = 100000;
+        runDotTest(D3xVector.dense(N), D3xVector.dense(N));
+        runDotTest(D3xVector.sparse(N), D3xVector.sparse(N));
+    }
+
+    private void runDotTest(D3xVector v1, D3xVector v2) {
+        v1.set(10, 1.0);
+        v1.set(20, 2.0);
+        v1.set(30, 3.0);
+        v1.set(40, 4.0);
+
+        v2.set(20, 20.0);
+        v2.set(30, 30.0);
+        v2.set(40, 40.0);
+        v2.set(50, 50.0);
+
+        assertEquals(v1.dot(v1),   30.0, TOLERANCE);
+        assertEquals(v1.dot(v2),  290.0, TOLERANCE);
+        assertEquals(v2.dot(v1),  290.0, TOLERANCE);
+        assertEquals(v2.dot(v2), 5400.0, TOLERANCE);
     }
 
     @Test
