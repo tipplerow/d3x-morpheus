@@ -50,7 +50,7 @@ public final class SVDSolver {
 
     private SVDSolver(SVD svd) {
         this.svd = svd;
-        this.threshold = defaultThreshold(svd);
+        this.threshold = svd.getSingularValueThreshold();
         validateThreshold();
     }
 
@@ -70,29 +70,6 @@ public final class SVDSolver {
      */
     public static SVDSolver apache(D3xMatrix matrixA) {
         return new SVDSolver(SVD.apache(matrixA));
-    }
-
-    /**
-     * Returns the default singular value threshold for a given decomposition.
-     *
-     * <p>We use the expression implemented in the {@code SVD::solve} method from
-     * Section 2.6 of <em>Numerical Recipes, 3rd Edition</em>, which is a function
-     * of the dimensions of the linear system, the maximum singular value, and the
-     * machine tolerance.
-     *
-     * @param svd a singular value decomposition of a coefficient matrix.
-     *
-     * @return the default singular value threshold for the specified decomposition.
-     */
-    public static double defaultThreshold(SVD svd) {
-        //
-        // See the SVD::solve method in Section 2.6 of Numerical Recipes, 3rd Edition...
-        //
-        int M = svd.getRowDimension();
-        int N = svd.getColumnDimension();
-        double wmax = new Max().compute(svd.getSingularValueVector());
-
-        return 0.5 * Math.sqrt(M + N + 1.0) * wmax * epsilon;
     }
 
     /**

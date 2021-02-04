@@ -16,6 +16,8 @@
 package com.d3x.morpheus.linalg;
 
 import com.d3x.morpheus.matrix.D3xMatrix;
+import com.d3x.morpheus.stats.Max;
+import com.d3x.morpheus.util.DoubleComparator;
 import com.d3x.morpheus.vector.D3xVector;
 
 /**
@@ -90,6 +92,46 @@ public interface SVD {
      */
     default int getColumnDimension() {
         return getA().ncol();
+    }
+
+    /**
+     * Returns the rank of the original matrix.
+     * @return the rank of the original matrix.
+     */
+    default int getRank() {
+        int rank = 0;
+        double thresh = getSingularValueThreshold();
+        D3xVector values = getSingularValueVector();
+
+        for (int index = 0; index < values.length(); ++index)
+            if (values.get(index) > thresh)
+                ++rank;
+
+        return rank;
+    }
+
+    /**
+     * Returns the default singular value threshold for this decomposition: the
+     * singular values below this threshold are within the estimated numerical
+     * precision of zero and should be treated as if they are exactly zero when
+     * they are used to solve linear systems or determine the rank of a matrix.
+     *
+     * <p>We use the expression implemented in the {@code SVD::solve} method from
+     * Section 2.6 of <em>Numerical Recipes, 3rd Edition</em>, which is a function
+     * of the dimensions of the linear system, the maximum singular value, and the
+     * machine tolerance.
+     *
+     * @return the default singular value threshold for this decomposition.
+     */
+    default double getSingularValueThreshold() {
+        //
+        // See the SVD::solve method in Section 2.6 of Numerical Recipes, 3rd Edition...
+        //
+        int M = getRowDimension();
+        int N = getColumnDimension();
+        double wmax = new Max().compute(getSingularValueVector());
+
+        return 0.5 * Math.sqrt(M + N + 1.0) * wmax * DoubleComparator.epsilon();
     }
 
     /**
