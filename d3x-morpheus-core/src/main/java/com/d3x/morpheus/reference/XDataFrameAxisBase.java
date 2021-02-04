@@ -30,7 +30,6 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import com.d3x.core.util.Collect;
 import com.d3x.morpheus.array.Array;
 import com.d3x.morpheus.array.ArrayBuilder;
 import com.d3x.morpheus.frame.DataFrame;
@@ -43,6 +42,7 @@ import com.d3x.morpheus.frame.DataFrameVector;
 import com.d3x.morpheus.index.Index;
 import com.d3x.morpheus.range.Range;
 import com.d3x.morpheus.util.Asserts;
+import com.d3x.morpheus.util.Collect;
 import com.d3x.morpheus.util.Parallel;
 import com.d3x.morpheus.util.Tuple;
 

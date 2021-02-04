@@ -17,12 +17,12 @@ package com.d3x.morpheus.util;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.Closeable;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.zip.GZIPOutputStream;
 
 /**
  * A utility class that provides some useful I/O related methods
@@ -154,6 +154,46 @@ public class IO {
             }
         } else {
             return readText(new BufferedInputStream(is), bufferSize);
+        }
+    }
+
+    /**
+     * Returns a file output stream to the file specified
+     * @param file          the output file
+     * @return              the output stream to file
+     * @throws IOException  if fails to open stream
+     */
+    public static OutputStream toFile(File file) throws IOException {
+        return toFile(file, false);
+    }
+
+
+    /**
+     * Returns a file output stream to the file specified
+     * @param path          the file path
+     * @param compressed    true for compressed output
+     * @return              the output stream to file
+     * @throws IOException  if fails to open stream
+     */
+    public static OutputStream toFile(String path, boolean compressed) throws IOException {
+        return toFile(new File(path), compressed);
+    }
+
+
+    /**
+     * Returns a file output stream to the file specified
+     * @param file          the output file
+     * @param compressed    true for compressed output
+     * @return              the output stream to file
+     * @throws IOException  if fails to open stream
+     */
+    public static OutputStream toFile(File file, boolean compressed) throws IOException {
+        var parent = file.getParentFile();
+        if (parent != null) parent.mkdirs();
+        if (compressed) {
+            return new GZIPOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
+        } else {
+            return new BufferedOutputStream(new FileOutputStream(file));
         }
     }
 

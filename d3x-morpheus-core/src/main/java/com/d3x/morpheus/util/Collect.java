@@ -31,6 +31,7 @@ import java.util.Spliterators;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -71,6 +72,23 @@ public class Collect {
      */
     public static <T> List<T> asList(Iterable<T> values) {
         return Collect.asList(false, values);
+    }
+
+
+    /**
+     * Returns a list result by applying the predicate to iterable
+     * @param iterable      the collection instance to filter
+     * @param <T>           the collection element type
+     * @return              the filtered collection
+     */
+    public static <T> List<T> asList(Iterable<T> iterable, Predicate<T> predicate) {
+        var results = new ArrayList<T>();
+        for (T value : iterable) {
+            if (predicate.test(value)) {
+                results.add(value);
+            }
+        }
+        return results;
     }
 
 

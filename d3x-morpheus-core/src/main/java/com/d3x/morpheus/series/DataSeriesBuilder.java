@@ -120,10 +120,10 @@ public interface DataSeriesBuilder<K,V> {
         if (valueType.equals(Double.class)) {
             return (DataSeriesBuilder<K,V>)DoubleSeriesBuilder.builder(keyType);
         } else if (LongCoding.Support.includes(keyType)) {
-            var coding = LongCoding.Support.getCoding(keyType).orNull();
+            var coding = LongCoding.Support.getCoding(keyType).orElse(null);
             return new LongCodingDataSeriesBuilder<>(keyType, valueType, coding);
         } else if (IntCoding.Support.includes(keyType)) {
-            var coding = IntCoding.Support.getCoding(keyType).orNull();
+            var coding = IntCoding.Support.getCoding(keyType).orElse(null);
             return new IntCodingDataSeriesBuilder<>(keyType, valueType, coding);
         } else {
             return new DefaultDataSeriesBuilder<>(keyType, valueType);

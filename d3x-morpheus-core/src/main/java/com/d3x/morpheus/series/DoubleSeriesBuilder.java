@@ -15,15 +15,12 @@
  */
 package com.d3x.morpheus.series;
 
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import com.d3x.core.util.StopWatch;
 import com.d3x.morpheus.array.Array;
 import com.d3x.morpheus.array.ArrayBuilder;
 import com.d3x.morpheus.array.coding.IntCoding;
 import com.d3x.morpheus.array.coding.LongCoding;
-import com.d3x.morpheus.util.IO;
 import com.d3x.morpheus.util.IntComparator;
 import com.d3x.morpheus.util.SortAlgorithm;
 import com.d3x.morpheus.util.Swapper;
@@ -89,10 +86,10 @@ public interface DoubleSeriesBuilder<K> extends DataSeriesBuilder<K,Double> {
      */
     static <K> DoubleSeriesBuilder<K> builder(Class<K> keyType) {
         if (LongCoding.Support.includes(keyType)) {
-            var coding = LongCoding.Support.getCoding(keyType).orNull();
+            var coding = LongCoding.Support.getCoding(keyType).orElse(null);
             return new LongCodingDoubleSeriesBuilder<>(keyType, coding);
         } else if (IntCoding.Support.includes(keyType)) {
-            var coding = IntCoding.Support.getCoding(keyType).orNull();
+            var coding = IntCoding.Support.getCoding(keyType).orElse(null);
             return new IntCodingDoubleSeriesBuilder<>(keyType, coding);
         } else {
             return new DefaultDoubleSeriesBuilder<>(keyType);
@@ -320,7 +317,9 @@ public interface DoubleSeriesBuilder<K> extends DataSeriesBuilder<K,Double> {
 
         @Override
         public String toString() {
-            return String.format("DoubleSeries, size: %s, first: %s, last: %s", size(), firstKey().orNull(), lastKey().orNull());
+            var first = firstKey().orElse(null);
+            var last = lastKey().orElse(null);
+            return String.format("DoubleSeries, size: %s, first: %s, last: %s", size(), first, last);
         }
 
         @Override
@@ -618,25 +617,6 @@ public interface DoubleSeriesBuilder<K> extends DataSeriesBuilder<K,Double> {
                 this.temp[x] = d2;
                 this.temp[y] = d1;
             }
-        }
-    }
-
-
-
-
-    static void main(String[] args) {
-        var size = 10000000;
-        var builder = DoubleSeries.builder(Integer.class).capacity(size);
-        IntStream.range(0, size).forEach(i -> builder.putDouble(i, Math.random() * 100d));
-        var series = builder.build().parallel();
-        for (int i=0; i<10; ++i) {
-            ((IntCodingDoubleSeries)series).keys.shuffle(5);
-            var time2 = StopWatch.time(() -> series.sort((i1, i2) -> {
-                var d1 = series.getDoubleAt(i1);
-                var d2 = series.getDoubleAt(i2);
-                return Double.compare(d1, d2);
-            }));
-            IO.println("Series Sort " + size + " entries in " + time2 + " millis");
         }
     }
 }

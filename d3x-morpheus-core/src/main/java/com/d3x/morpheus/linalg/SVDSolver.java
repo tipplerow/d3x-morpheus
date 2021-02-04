@@ -17,12 +17,12 @@ package com.d3x.morpheus.linalg;
 
 import lombok.NonNull;
 
-import com.d3x.core.lang.D3xException;
 import com.d3x.morpheus.matrix.D3xMatrix;
 import com.d3x.morpheus.stats.Max;
 import com.d3x.morpheus.stats.SumSquares;
 import com.d3x.morpheus.util.DoubleComparator;
 import com.d3x.morpheus.vector.D3xVector;
+import com.d3x.morpheus.util.MorpheusException;
 
 /**
  * Solves systems of linear equations by singular value decomposition of the
@@ -105,10 +105,10 @@ public final class SVDSolver {
      */
     public static void validateThreshold(double threshold) {
         if (!Double.isFinite(threshold))
-            throw new D3xException("The singular value threshold must be finite.");
+            throw new MorpheusException("The singular value threshold must be finite.");
 
         if (threshold < epsilon)
-            throw new D3xException("The singular value threshold must be larger than the machine tolerance.");
+            throw new MorpheusException("The singular value threshold must be larger than the machine tolerance.");
     }
 
     /**
