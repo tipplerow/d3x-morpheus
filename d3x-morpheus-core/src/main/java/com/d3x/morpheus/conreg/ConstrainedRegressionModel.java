@@ -15,19 +15,15 @@
  */
 package com.d3x.morpheus.conreg;
 
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
 
 import com.d3x.morpheus.frame.DataFrame;
-import com.d3x.morpheus.matrix.D3xMatrix;
-import com.d3x.morpheus.vector.D3xVector;
-import com.d3x.morpheus.util.MorpheusException;
+import com.d3x.morpheus.series.DoubleSeries;
+import com.d3x.morpheus.util.LazyValue;
 
 /**
  * Defines a linear regression model that enforces linear equality constraints
@@ -40,288 +36,289 @@ import com.d3x.morpheus.util.MorpheusException;
  * column of ones in the observation set, like the market factor in an asset
  * risk model.</p>
  *
- * @param <C> the runtime type for the keys of the columns in the observation frame.
+ * @param <R> the runtime type for the keys of the observations (rows).
+ * @param <C> the runtime type for the keys of the regressand and regressors (columns).
  *
  * <p>This is open source software released under the
  * <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 License</a></p>
  *
  * @author  Scott Shaffer
  */
-public final class ConstrainedRegressionModel<C> {
+public final class ConstrainedRegressionModel<R,C> {
     /**
-     * The column in the observation DataFrame that contains the independent
-     * variable (the right-hand side).
+     * The DataFrame containing the independent (left-hand side) values.
      */
     @Getter @NonNull
-    private final C regressand;
+    private final DataFrame<R,C> regressorFrame;
 
     /**
-     * The columns in the observation DataFrame that contain the regressor
-     * variables (the left-hand side).
+     * The DoubleSeries containing the dependent (right-hand side) values.
      */
     @Getter @NonNull
-    private final List<C> regressors;
+    private final DoubleSeries<R> regressandSeries;
 
     /**
-     * An optional column in the observation DataFrame that contains regression
-     * weights; if {@code null}, all observations will be weighted equally.
+     * The keys for the regressors that will be used in the regression.
      */
-    @Getter
-    private C weight = null;
+    @Getter @NonNull
+    private List<C> regressorKeys;
 
-    // To allow constant-time inspection of the regressors present in this model...
-    private final Set<C> regressorSet;
+    /**
+     * The keys for the observations that will be used in the regression
+     * (the elements of the regressand and rows of the regressor frame).
+     */
+    @Getter @NonNull
+    private List<R> observationKeys;
 
-    // The constraints indexed by key with insertion order maintained...
-    private final Map<String, Constraint<C>> constraints = new LinkedHashMap<>();
+    /**
+     * The DoubleSeries containing the regression weights to apply to
+     * each observation.
+     */
+    @Getter @NonNull
+    private DoubleSeries<R> observationWeights;
 
-    @AllArgsConstructor
-    private static final class Constraint<C> {
-        @Getter @NonNull final String key;
-        @Getter @NonNull final double value;
-        @Getter @NonNull final DataFrame<String,C> coeffs;
+    private final List<RegressionConstraint<C>> constraintList = new ArrayList<>();
+    private final LazyValue<RegressionConstraintSet<C>> constraintSet = LazyValue.of(this::buildConstraintSet);
+
+    private RegressionConstraintSet<C> buildConstraintSet() {
+        return RegressionConstraintSet.create(constraintList);
     }
 
-    private ConstrainedRegressionModel(@NonNull C regressand, @NonNull List<C> regressors) {
-        this.regressand = regressand;
-        this.regressors = List.copyOf(regressors); // Immutable copy...
-        this.regressorSet = Set.copyOf(regressors); // Immutable copy...
+    private ConstrainedRegressionModel(DataFrame<R,C> regressorFrame, DoubleSeries<R> regressandSeries) {
+        this.regressorFrame = regressorFrame;
+        this.regressandSeries = regressandSeries;
 
-        validateModel();
+        this.regressorKeys = List.copyOf(regressorFrame.listColumnKeys());
+        this.observationKeys = List.copyOf(regressorFrame.listRowKeys());
+        this.observationWeights = createDefaultWeights();
+
+        validateKeys();
     }
 
-    private void validateModel() {
-        validateModelRegressand();
-        validateModelRegressors();
-        validateModelConstraints();
+    private DoubleSeries<R> createDefaultWeights() {
+        return DoubleSeries.ones(regressorFrame.rows().keyClass(), observationKeys);
     }
 
-    private void validateModelRegressand() {
-        if (containsRegressor(regressand))
-            throw new MorpheusException("The regressand [%s] is also a regressor.");
+    private void validateKeys() {
+        regressorFrame.requireRows(observationKeys);
+        regressorFrame.requireColumns(regressorKeys);
+        regressandSeries.requireKeys(observationKeys);
+        observationWeights.requireKeys(observationKeys);
     }
 
-    private void validateModelRegressors() {
-        if (regressors.isEmpty())
-            throw new MorpheusException("No regressors were specified.");
-
-        if (regressorSet.size() != regressors.size())
-            throw new MorpheusException("At least one regressor is duplicated.");
-    }
-
-    private void validateModelConstraints() {
-        for (Constraint<C> constraint : constraints.values())
-            validateModelConstraint(constraint);
-    }
-
-    private void validateModelConstraint(Constraint<C> constraint) {
-        if (constraint.coeffs.rowCount() != 1)
-            throw new MorpheusException("A single-row data frame is required for regression constraints.");
-
-        requireRegressors(constraint.coeffs.listColumnKeys());
-    }
-
-    private void requireRegressors(Iterable<C> regressors) {
-        for (C regressor : regressors)
-            requireRegressor(regressor);
-    }
-
-    private void requireRegressor(C regressor) {
-        if (!containsRegressor(regressor))
-            throw new MorpheusException("Missing regressor [%s].", regressor);
+    private void validateConstraint(RegressionConstraint<C> constraint) {
+        regressorFrame.requireNumericColumns(constraint.listRegressors());
     }
 
     /**
      * Builds a new constrained regression model with fixed regressand and
-     * regressor variables. The constraints should be added by calling the
-     * {@code addConstraint()} method.  When the parameters are estimated,
-     * the observations will be weighted equally unless a column of weights
-     * is specified by calling {@code withWeight()}.
+     * regressor variables.  The constraints should be added by calling the
+     * {@code withConstraint()} method. By default, all observations in the
+     * observation frame are used and weighted equally in the regression.
+     * Call {@code withObservations()} to restrict the regression to a
+     * subset of the observations; call {@code withWeights()} to supply a
+     * series of weights for the observations; call {@code withRegressors()}
+     * to restrict the explanatory variables to a subset of those found in
+     * the regressor frame.
      *
-     * @param regressand the column in the observation DataFrame that contains
-     *                   the independent variable (the right-hand side).
+     * @param regressorFrame a DataFrame containing the independent variables
+     *                       (the left-hand side).
      *
-     * @param regressors the columns in the observation DataFrame that contain
-     *                   the dependent variables (the left-hand side).
+     * @param regressandSeries a DoubleSeries containing the dependent variables
+     *                         (the right-hand side).
      *
      * @return a new constrained regression model with the specified regressand
      * and regressor variables.
      */
-    public static <C> ConstrainedRegressionModel<C> build(C regressand, List<C> regressors) {
-        return new ConstrainedRegressionModel<>(regressand, regressors);
+    public static <R,C> ConstrainedRegressionModel<R,C> create(DataFrame<R, C> regressorFrame,
+                                                               DoubleSeries<R> regressandSeries) {
+        return new ConstrainedRegressionModel<>(regressorFrame, regressandSeries);
     }
 
     /**
-     * Adds <em>category variables</em> to this constrained regression model.
+     * Builds a new constrained regression model with fixed regressand and
+     * regressor variables.  The constraints should be added by calling the
+     * {@code withConstraint()} method. By default, all observations in the
+     * observation frame are used and weighted equally in the regression.
+     * Call {@code withObservations()} to restrict the regression to a
+     * subset of the observations; call {@code withWeights()} to supply a
+     * series of weights for the observations.
      *
-     * <p>Category variables (often called dummy variables) are used to place observations
-     * into discrete groups, like countries or industries in a model of asset returns. The
-     * category variables must sum to one for each observation.  They are often restricted
-     * to be exactly zero or one, but that restriction may be relaxed for observations that
-     * span multiple categories (for a company that conducts business across more than one
-     * industry, for example).</p>
+     * @param regressandColumn the key of the column that contains the dependent
+     *                         (right-hand side) variable.
      *
-     * <p>This method may be called multiple times (with different category names) to add
-     * multiple categories (which must be linearly independent of all other categories).</p>
+     * @param regressorColumns the keys of the columns that contain the independent
+     *                         (left-hand side) variables.
      *
-     * <p>The model must contain an added intercept or a regressor variable that serves as
-     * an intercept (a column of ones). The regression coefficients (betas) for the category
-     * variables may be interpreted as offsets relative to the overall level quantified by
-     * the intercept. The regression coefficients (betas) will sum to zero when weighted by
-     * the regression weights.</p>
+     * @param regressorFrame a DataFrame containing the both the regressand and
+     *                       regressor variables.
      *
-     * @param categoryKey the unique name for the category (e.g., COUNTRY).
-     * @param regressors  the columns that contain the category regressor variables.
+     * @return a new constrained regression model with the specified regressand
+     * and regressor variables.
      *
-     * @return this constrained regression model, updated.
-     *
-     * @throws RuntimeException unless all category variables are regressors in this model.
+     * @throws RuntimeException unless the DataFrame contains all column keys.
      */
-    ConstrainedRegressionModel<C> addCategory(String categoryKey, Set<C> regressors) {
-        return addConstraint(DataFrame.onesRow(categoryKey, regressors), 0.0);
+    public static <R,C> ConstrainedRegressionModel<R,C> create(C regressandColumn,
+                                                               List<C> regressorColumns,
+                                                               DataFrame<R, C> regressorFrame) {
+
+        DoubleSeries<R> regressandSeries =
+                DoubleSeries.from(regressorFrame, regressandColumn);
+
+        return create(regressorFrame, regressandSeries).withRegressors(regressorColumns);
     }
 
     /**
-     * Adds a linear constraint on the regression coefficients in this model.
+     * Builds the linear system that must be solved to estimate this
+     * constrained regression model.
      *
-     * @param constraintLHS a single-row DataFrame containing the constraint
-     *                      key as the row key and the constraint coefficients
-     *                      (the left-hand side terms) as the column data.
-     *
-     * @param constraintRHS the right-hand side value for the constraint.
-
-     * @return this constrained regression model, updated.
-     *
-     * @throws RuntimeException unless the constraint key is unique and all
-     * column keys in {@code constraintLHS} are regressor variables in this
-     * model.
+     * @return the linear system that must be solved to estimate this
+     * constrained regression model.
      */
-    ConstrainedRegressionModel<C> addConstraint(DataFrame<String,C> constraintLHS, double constraintRHS) {
-        if (constraintLHS.rowCount() != 1)
-            throw new MorpheusException("A single-row data frame is required for regression constraints.");
+    public ConstrainedRegressionSystem<R,C> build() {
+        return ConstrainedRegressionSystem.build(this);
+    }
 
-        String constraintKey = constraintLHS.listRowKeys().get(0);
-
-        if (containsConstraint(constraintKey))
-            throw new MorpheusException("Duplicate constraint: [%s].", constraintKey);
-
-        constraints.put(constraintKey, new Constraint<C>(constraintKey, constraintRHS, constraintLHS));
-        validateModel();
-
+    /**
+     * Adds a constraint on the regression coefficients.
+     *
+     * @param constraint the constraint to add.
+     *
+     * @return this model, updated, for operator chaining.
+     *
+     * @throws RuntimeException unless the regressor frame contains a column
+     * for every regressor affected by the constraint.
+     */
+    ConstrainedRegressionModel<R,C> withConstraint(RegressionConstraint<C> constraint) {
+        validateConstraint(constraint);
+        this.constraintSet.reset();
+        this.constraintList.add(constraint);
         return this;
     }
 
     /**
-     * Specifies a column of regression weights for this model.
+     * Adds a constraint on the regression coefficients.
      *
-     * @param weight the column in the observation frame that contains the weights.
+     * @param name  a unique name for the constraint.
+     * @param value the right-hand side value for the constraint.
+     * @param terms the left-hand side terms for the constraint.
      *
-     * @return this constrained regression model, updated.
+     * @return this model, updated, for operator chaining.
+     *
+     * @throws RuntimeException unless the regressor frame contains a column
+     * for every regressor affected by the constraint.
      */
-    ConstrainedRegressionModel<C> withWeight(C weight) {
-        this.weight = weight;
+    ConstrainedRegressionModel<R,C> withConstraint(String name, double value, DoubleSeries<C> terms) {
+        return withConstraint(new RegressionConstraint<>(name, value, terms));
+    }
+
+    /**
+     * Restricts the regression to a subset of the observations.
+     *
+     * @param regressorKeys the keys of the explanatory variables to include
+     *                      in the regression.
+     *
+     * @return this model, updated, for operator chaining.
+     *
+     * @throws RuntimeException unless all regressor keys refer to columns in
+     * the regressor frame.
+     */
+    ConstrainedRegressionModel<R,C> withRegressors(List<C> regressorKeys) {
+        this.regressorKeys = List.copyOf(regressorKeys);
+        validateKeys();
         return this;
     }
 
     /**
-     * Identifies named constraints in this model.
+     * Restricts the regression to a subset of the observations.
      *
-     * @param constraintKey the key of the constraint in question.
+     * @param observationKeys the observations to include in the regression
+     *                        (the keys for the regressand and regressors).
      *
-     * @return {@code true} iff this model contains the specified constraint.
+     * @return this model, updated, for operator chaining.
+     *
+     * @throws RuntimeException unless the observations are present in the
+     * regressand series, regressor frame, and weight series.
      */
-    public boolean containsConstraint(String constraintKey) {
-        return constraints.containsKey(constraintKey);
+    ConstrainedRegressionModel<R,C> withObservations(List<R> observationKeys) {
+        this.observationKeys = List.copyOf(observationKeys);
+        validateKeys();
+        return this;
     }
 
     /**
-     * Identifies regressor variables in this model.
+     * Adds observation weights from the regressor frame to this model.
      *
-     * @param regressor the key of the regressor in question.
+     * @param weightColumn the key of the regressor frame that contains observation weights.
      *
-     * @return {@code true} iff this model contains the specified regressor variable.
+     * @return this model, updated, for operator chaining.
+     *
+     * @throws RuntimeException unless the regressor frame contains the specified column.
      */
-    public boolean containsRegressor(C regressor) {
-        return regressorSet.contains(regressor);
+    ConstrainedRegressionModel<R,C> withWeights(C weightColumn) {
+        return withWeights(DoubleSeries.from(regressorFrame, weightColumn));
+    }
+
+    /**
+     * Adds observation weights to this model.
+     *
+     * @param observationWeights the observation weights to apply during the regression.
+     *
+     * @return this model, updated, for operator chaining.
+     *
+     * @throws RuntimeException unless there is a weight for each observation in this model.
+     */
+    ConstrainedRegressionModel<R,C> withWeights(DoubleSeries<R> observationWeights) {
+        this.observationWeights = observationWeights;
+        validateKeys();
+        return this;
     }
 
     /**
      * Returns the number of constraints in this model.
-     *
      * @return the number of constraints in this model.
      */
     public int countConstraints() {
-        return constraints.size();
+        return getConstraintSet().countConstraints();
     }
 
     /**
-     * Returns the number of regressors in this model.
-     *
-     * @return the number of regressors in this model.
+     * Returns the number of regressor variables in this model.
+     * @return the number of regressor variables in this model.
      */
     public int countRegressors() {
-        return regressors.size();
+        return regressorKeys.size();
     }
 
     /**
-     * Returns the keys of the linear constraints, in the order that they were
-     * added to this model.
+     * Returns the number of observations in this model.
+     * @return the number of observations in this model.
+     */
+    public int countObservations() {
+        return observationKeys.size();
+    }
+
+    /**
+     * Returns the keys of the constraints on the regression coefficients.
      *
-     * @return the keys of the linear constraints, in the order that they were
-     * added to this model.
+     * @return the keys of the constraints on the regression coefficients.
+     *
+     * @throws RuntimeException unless the constraints that have been
+     * added to this model form a valid constraint set.
      */
     public List<String> getConstraintKeys() {
-        return List.copyOf(constraints.keySet());
+        return getConstraintSet().getConstraintNames();
     }
 
     /**
-     * Returns the linear constraint coefficient matrix (the left-hand side terms)
-     * with rows having the same order as the keys in {@code getConstraintKeys()}.
-     * The matrix has dimensions {@code P x N}, where {@code P} is the number of
-     * constraints and {@code N} is the number of regressor variables.
+     * Returns the set of constraints on the regression coefficients.
      *
-     * @return the linear constraint coefficient matrix (the left-hand side terms).
-     */
-    public D3xMatrix getConstraintMatrix() {
-        if (constraints.keySet().isEmpty())
-            return D3xMatrix.empty();
-
-        DataFrame<String,C> frame = DataFrame.zeros(constraints.keySet(), regressors);
-
-        for (Constraint<C> constraint : constraints.values())
-            frame = frame.update(constraint.coeffs, false, false);
-
-        return D3xMatrix.copyFrame(frame);
-    }
-
-    /**
-     * Returns the linear constraint value vector (the right-hand side values) with
-     * elements having the same order as the keys in {@code getConstraintKeys()}.
-     * The vector length is equal to the number of constraints.
+     * @return the set of constraints on the regression coefficients.
      *
-     * @return the linear constraint value vector (the right-hand side values).
+     * @throws RuntimeException unless the constraints that have been
+     * added to this model form a valid constraint set.
      */
-    public D3xVector getConstraintValues() {
-        if (countConstraints() < 1)
-            return D3xVector.empty();
-
-        int index = 0;
-        D3xVector values = D3xVector.dense(countConstraints());
-
-        for (Constraint<C> constraint : constraints.values()) {
-            values.set(index, constraint.value);
-            index++;
-        }
-
-        return values;
-    }
-
-    /**
-     * Identifies models with regression weights.
-     *
-     * @return {@code true} iff this model contains a column of regression weights.
-     */
-    public boolean hasWeights() {
-        return weight != null;
+    public RegressionConstraintSet<C> getConstraintSet() {
+        return constraintSet.get();
     }
 }

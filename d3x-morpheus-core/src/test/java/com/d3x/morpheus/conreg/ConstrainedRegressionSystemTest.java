@@ -15,8 +15,6 @@
  */
 package com.d3x.morpheus.conreg;
 
-import java.util.Random;
-
 import com.d3x.morpheus.frame.DataFrame;
 import com.d3x.morpheus.matrix.D3xMatrix;
 import com.d3x.morpheus.vector.D3xVector;
@@ -25,16 +23,12 @@ import org.testng.annotations.Test;
 import static org.testng.Assert.*;
 
 public class ConstrainedRegressionSystemTest extends ConstrainedRegressionTestBase {
-    public static final Random random = new Random(20210120);
-
-    private final ConstrainedRegressionModel<String> model;
     private final DataFrame<String, String> frame;
     private final ConstrainedRegressionSystem<String, String> system;
 
     public ConstrainedRegressionSystemTest() {
-        this.model = buildConstrainedModel();
-        this.frame = buildObservationFrame(random);
-        this.system = ConstrainedRegressionSystem.build(model, frame);
+        this.frame = buildObservationFrame();
+        this.system = buildConstrainedModel().build();
     }
 
     @Test

@@ -61,6 +61,9 @@ public final class RegressionConstraintSet<C> {
     }
 
     private void validateConstraints() {
+        if (constraintMap.isEmpty())
+            return;
+
         D3xMatrix matrix = getConstraintMatrix(List.copyOf(regressorKeys));
         SVD svd = SVD.apache(matrix);
 

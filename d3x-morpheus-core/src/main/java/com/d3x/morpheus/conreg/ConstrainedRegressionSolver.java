@@ -15,8 +15,6 @@
  */
 package com.d3x.morpheus.conreg;
 
-import java.util.List;
-
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -37,19 +35,11 @@ import com.d3x.morpheus.util.LazyValue;
  *
  * @author  Scott Shaffer
  */
-@lombok.extern.slf4j.Slf4j
+@lombok.extern.slf4j.Slf4j()
 public final class ConstrainedRegressionSolver<R,C> {
     /** The constrained regression model to be estimated. */
     @Getter @NonNull
-    private final ConstrainedRegressionModel<C> regressionModel;
-
-    /** The DataFrame containing sample observations and weights. */
-    @Getter @NonNull
-    private final DataFrame<R,C> observationFrame;
-
-    /** The subset of observations to be used in the estimation. */
-    @Getter @NonNull
-    private List<R> observationRows;
+    private final ConstrainedRegressionModel<R,C> regressionModel;
 
     // Singular values below this threshold will be treated as if they are exactly
     // zero and they will be ignored in the calculation of regression coefficients.
@@ -61,34 +51,8 @@ public final class ConstrainedRegressionSolver<R,C> {
     private final LazyValue<SVDSolver> solver = LazyValue.of(this::buildSolver);
     private final LazyValue<ConstrainedRegressionSystem<R,C>> system = LazyValue.of(this::buildSystem);
 
-    private ConstrainedRegressionSolver(ConstrainedRegressionModel<C> regressionModel, DataFrame<R, C> observationFrame) {
+    private ConstrainedRegressionSolver(ConstrainedRegressionModel<R,C> regressionModel) {
         this.regressionModel  = regressionModel;
-        this.observationFrame = observationFrame;
-        this.observationRows  = observationFrame.listRowKeys();
-
-        validateState();
-    }
-
-    private void validateState() {
-        validateObservationRows();
-        validateObservationColumns();
-        validateSingularValueThreshold();
-    }
-
-    private void validateObservationRows() {
-        validateObservationRows(observationRows);
-    }
-
-    private void validateObservationRows(Iterable<R> rows) {
-        observationFrame.requireRows(rows);
-    }
-
-    private void validateObservationColumns() {
-        observationFrame.requireColumn(regressionModel.getRegressand());
-        observationFrame.requireColumns(regressionModel.getRegressors());
-
-        if (regressionModel.hasWeights())
-            observationFrame.requireColumn(regressionModel.getWeight());
     }
 
     private void validateSingularValueThreshold() {
@@ -102,11 +66,7 @@ public final class ConstrainedRegressionSolver<R,C> {
 
     private ConstrainedRegressionSystem<R,C> buildSystem() {
         log.info("Building the augmented linear system...");
-
-        ConstrainedRegressionSystem<R,C> system =
-                ConstrainedRegressionSystem.build(regressionModel, observationFrame, observationRows);
-
-        return system;
+        return ConstrainedRegressionSystem.build(regressionModel);
     }
 
     private SVDSolver buildSolver() {
@@ -117,45 +77,20 @@ public final class ConstrainedRegressionSolver<R,C> {
         SVDSolver solver = SVDSolver.apache(augmat);
 
         if (!Double.isNaN(singularValueThreshold))
-            solver = solver.withThreshold(singularValueThreshold);
+            solver.withThreshold(singularValueThreshold);
 
         return solver;
     }
 
     /**
-     * Creates a new solver for a constrained regression model and observation frame.
+     * Creates a new solver for a constrained regression model.
      *
-     * @param regressionModel  the regression model to estimate.
-     * @param observationFrame a DataFrame containing the sample observations.
+     * @param regressionModel the regression model to estimate.
      *
      * @return a new solver for the specified model and sample.
-     *
-     * @throws RuntimeException unless the observation frame contains columns for all
-     * variables in the regression model.
      */
-    public static <R,C> ConstrainedRegressionSolver<R,C> build(
-            ConstrainedRegressionModel<C> regressionModel, DataFrame<R,C> observationFrame) {
-        return new ConstrainedRegressionSolver<>(regressionModel, observationFrame);
-    }
-
-    /**
-     * Defines a subset of observations to be used in the parameter estimation.
-     *
-     * @param rows the subset of observations to be used for parameter estimation.
-     *
-     * @return this solver, updated.
-     *
-     * @throws RuntimeException unless the observation frame contains every specified row.
-     */
-    ConstrainedRegressionSolver<R,C> withObservationRows(List<R> rows) {
-        validateObservationRows(rows);
-        observationRows = rows;
-
-        // New observations invalidate the augmented linear system and solver...
-        system.reset();
-        solver.reset();
-
-        return this;
+    public static <R,C> ConstrainedRegressionSolver<R,C> build(ConstrainedRegressionModel<R,C> regressionModel) {
+        return new ConstrainedRegressionSolver<>(regressionModel);
     }
 
     /**
@@ -211,16 +146,16 @@ public final class ConstrainedRegressionSolver<R,C> {
         D3xVector residualVector = fittedVector.minus(observations);
 
         DataFrame<ConstrainedRegressionField, C> betaFrame =
-                DataFrame.ofDoubles(ConstrainedRegressionField.BETA, regressionModel.getRegressors(), betaVector);
+                DataFrame.ofDoubles(ConstrainedRegressionField.BETA, regressionModel.getRegressorKeys(), betaVector);
 
         DataFrame<ConstrainedRegressionField, String> dualFrame =
                 DataFrame.ofDoubles(ConstrainedRegressionField.DUAL, regressionModel.getConstraintKeys(), dualVector);
 
         DataFrame<ConstrainedRegressionField, R> fittedFrame =
-                DataFrame.ofDoubles(ConstrainedRegressionField.FITTED, observationRows, fittedVector);
+                DataFrame.ofDoubles(ConstrainedRegressionField.FITTED, regressionModel.getObservationKeys(), fittedVector);
 
         DataFrame<ConstrainedRegressionField, R> residualFrame =
-                DataFrame.ofDoubles(ConstrainedRegressionField.RESIDUAL, observationRows, residualVector);
+                DataFrame.ofDoubles(ConstrainedRegressionField.RESIDUAL, regressionModel.getObservationKeys(), residualVector);
 
         return new ConstrainedRegressionResult<>(betaFrame, dualFrame, fittedFrame, residualFrame);
     }
@@ -252,7 +187,7 @@ public final class ConstrainedRegressionSolver<R,C> {
     }
 
     private D3xMatrix buildPseudoInverseRightBlock() {
-        int M = observationRows.size();
+        int M = regressionModel.countObservations();
         int N = regressionModel.countRegressors();
         int P = regressionModel.countConstraints();
 

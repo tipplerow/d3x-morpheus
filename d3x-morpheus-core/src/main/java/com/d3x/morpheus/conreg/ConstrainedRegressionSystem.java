@@ -21,7 +21,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 
-import com.d3x.morpheus.frame.DataFrame;
 import com.d3x.morpheus.matrix.D3xMatrix;
 import com.d3x.morpheus.vector.D3xVector;
 import com.d3x.morpheus.util.DoubleComparator;
@@ -40,17 +39,23 @@ import com.d3x.morpheus.util.MorpheusException;
  * @author  Scott Shaffer
  */
 public final class ConstrainedRegressionSystem<R,C> {
-    /** The constrained regression model to be estimated. */
+    /**
+     * The constrained regression model to be estimated.
+     */
     @Getter @NonNull
-    private final ConstrainedRegressionModel<C> regressionModel;
+    private final ConstrainedRegressionModel<R,C> regressionModel;
 
-    /** The DataFrame containing sample observations and weights. */
+    /**
+     * The keys of the regressor variables.
+     */
     @Getter @NonNull
-    private final DataFrame<R,C> observationFrame;
+    private final List<C> regressorKeys;
 
-    /** The subset of observations to be used in the estimation. */
+    /**
+     * The keys of the observations to include in the regression.
+     */
     @Getter @NonNull
-    private final List<R> observationRows;
+    private final List<R> observationKeys;
 
     /**
      * The design matrix {@code A} for the linear regression {@code Ax = b},
@@ -121,13 +126,11 @@ public final class ConstrainedRegressionSystem<R,C> {
     @Getter(AccessLevel.PACKAGE) @NonNull
     private final D3xMatrix twoATW;
 
-    private ConstrainedRegressionSystem(ConstrainedRegressionModel<C> regressionModel, DataFrame<R, C> observationFrame, List<R> observationRows) {
-        this.regressionModel  = regressionModel;
-        this.observationFrame = observationFrame;
-        this.observationRows  = observationRows;
+    private ConstrainedRegressionSystem(ConstrainedRegressionModel<R,C> regressionModel) {
+        this.regressionModel = regressionModel;
 
-        validateObservationRows();
-        validateObservationColumns();
+        this.regressorKeys = regressionModel.getRegressorKeys();
+        this.observationKeys = regressionModel.getObservationKeys();
 
         this.designMatrix = buildDesignMatrix();
         this.weightVector = buildWeightVector();
@@ -138,29 +141,15 @@ public final class ConstrainedRegressionSystem<R,C> {
         this.augmentedVector = buildAugmentedVector();
     }
 
-    private void validateObservationRows() {
-        observationFrame.requireRows(observationRows);
-    }
-
-    private void validateObservationColumns() {
-        observationFrame.requireColumn(regressionModel.getRegressand());
-        observationFrame.requireColumns(regressionModel.getRegressors());
-
-        if (regressionModel.hasWeights())
-            observationFrame.requireColumn(regressionModel.getWeight());
-    }
-
     private D3xMatrix buildDesignMatrix() {
-        return D3xMatrix.copyFrame(observationFrame, observationRows, regressionModel.getRegressors());
+        return D3xMatrix.copyFrame(regressionModel.getRegressorFrame(), observationKeys, regressorKeys);
     }
 
     private D3xVector buildWeightVector() {
-        if (!regressionModel.hasWeights())
-            return D3xVector.rep(1.0, observationRows.size());
+        D3xVector weights = D3xVector.copyOf(regressionModel.getObservationWeights(), observationKeys, 0.0);
 
-        D3xVector weights = D3xVector.copyColumn(observationFrame, observationRows, regressionModel.getWeight());
-
-        // Ensure that weights are non-negative, count the number of positive (non-zero) weights, and compute the total weight...
+        // Ensure that weights are non-negative, count the number of positive
+        // (non-zero) weights, and compute the total weight...
         int positiveCount = 0;
         double totalWeight = 0.0;
 
@@ -168,7 +157,7 @@ public final class ConstrainedRegressionSystem<R,C> {
             double weight = weights.get(index);
 
             if (DoubleComparator.DEFAULT.isNegative(weight))
-                throw new MorpheusException("Regression weight for observation [%s] is negative.", observationRows.get(index));
+                throw new MorpheusException("Regression weight for observation [%s] is negative.", observationKeys.get(index));
             else if (DoubleComparator.DEFAULT.isPositive(weight))
                 positiveCount++;
 
@@ -182,7 +171,7 @@ public final class ConstrainedRegressionSystem<R,C> {
     }
 
     private D3xVector buildRegressandVector() {
-        return D3xVector.copyColumn(observationFrame, observationRows, regressionModel.getRegressand());
+        return regressionModel.getRegressandSeries().getRequired(observationKeys);
     }
 
     private D3xMatrix computeTwoATW() {
@@ -200,7 +189,7 @@ public final class ConstrainedRegressionSystem<R,C> {
         //    +-            -+
         //
         D3xMatrix A = designMatrix;
-        D3xMatrix C = regressionModel.getConstraintMatrix();
+        D3xMatrix C = regressionModel.getConstraintSet().getConstraintMatrix(regressorKeys);
         D3xMatrix CT = C.transpose();
         D3xMatrix twoATWA = twoATW.times(A);
 
@@ -227,7 +216,7 @@ public final class ConstrainedRegressionSystem<R,C> {
         //
         D3xMatrix A = designMatrix;
         D3xVector b = regressandVector;
-        D3xVector d = regressionModel.getConstraintValues();
+        D3xVector d = regressionModel.getConstraintSet().getConstraintValues();
         D3xVector twoATWb = twoATW.times(b);
 
         int N = A.ncol();
@@ -240,39 +229,14 @@ public final class ConstrainedRegressionSystem<R,C> {
         return augvec;
     }
 
-
     /**
-     * Creates a new augmented linear system for a given constrained regression model
-     * and observation frame (using all rows in the observation frame).
+     * Creates a new augmented linear system for a given constrained regression model.
      *
-     * @param regressionModel  the regression model to estimate.
-     * @param observationFrame a DataFrame containing the sample observations.
+     * @param regressionModel the regression model to estimate.
      *
-     * @return a new augmented linear system for the specified model and sample.
-     *
-     * @throws RuntimeException unless the observation frame contains columns for all
-     * variables in the regression model.
+     * @return a new augmented linear system for the specified model.
      */
-    public static <R,C> ConstrainedRegressionSystem<R,C> build(
-            ConstrainedRegressionModel<C> regressionModel, DataFrame<R, C> observationFrame) {
-        return build(regressionModel, observationFrame, observationFrame.listRowKeys());
-    }
-
-    /**
-     * Creates a new augmented linear system for a given constrained regression model
-     * and observation frame.
-     *
-     * @param regressionModel  the regression model to estimate.
-     * @param observationFrame a DataFrame containing the sample observations.
-     * @param observationRows  a subset of rows to include in the estimation.
-     *
-     * @return a new augmented linear system for the specified model and sample.
-     *
-     * @throws RuntimeException unless the observation frame contains columns for all
-     * variables in the regression model and rows for all specified observations.
-     */
-    public static <R,C> ConstrainedRegressionSystem<R,C> build(
-            ConstrainedRegressionModel<C> regressionModel, DataFrame<R, C> observationFrame, List<R> observationRows) {
-        return new ConstrainedRegressionSystem<>(regressionModel, observationFrame, observationRows);
+    public static <R,C> ConstrainedRegressionSystem<R,C> build(ConstrainedRegressionModel<R,C> regressionModel) {
+        return new ConstrainedRegressionSystem<>(regressionModel);
     }
 }

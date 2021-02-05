@@ -40,6 +40,7 @@ import com.d3x.morpheus.util.IO;
 import com.d3x.morpheus.util.IntComparator;
 import com.d3x.morpheus.util.MorpheusException;
 import com.d3x.morpheus.util.Resource;
+import com.d3x.morpheus.vector.D3xVector;
 
 /**
  * An interface to an immutable series of doubles stored against a unique key
@@ -134,6 +135,41 @@ public interface DoubleSeries<K> extends DataSeries<K,Double> {
         return Double.isNaN(value) ? 0d : value;
     }
 
+    /**
+     * Returns the value mapped to a particular key, which must exist.
+     *
+     * @param key the key of the required value.
+     *
+     * @return the value mapped to the specified key.
+     *
+     * @throws RuntimeException unless this series contains the given key.
+     */
+    default double getRequired(K key) {
+        double value = getDouble(key);
+
+        if (Double.isNaN(value))
+            throw new MorpheusException("Missing series entry for key [%s].", key);
+        else
+            return value;
+    }
+
+    /**
+     * Returns the values mapped to a list of keys, which must exist.
+     *
+     * @param keys the keys of the required values.
+     *
+     * @return the values mapped to the specified keys.
+     *
+     * @throws RuntimeException unless this series contains all keys.
+     */
+    default D3xVector getRequired(List<K> keys) {
+        D3xVector vector = D3xVector.dense(keys.size());
+
+        for (int index = 0; index < keys.size(); ++index)
+            vector.set(index, getRequired(keys.get(index)));
+
+        return vector;
+    }
 
     /**
      * Returns a deep copy of this series
@@ -277,6 +313,43 @@ public interface DoubleSeries<K> extends DataSeries<K,Double> {
     }
 
     /**
+     * Creates a new series with all values equal to a constant.
+     *
+     * @param keyClass the runtime key type.
+     * @param keys     the keys to include in the series.
+     * @param value    the constant value for all entries.
+     *
+     * @return a new series with each key mapped to {@code value}.
+     */
+    static <K> DoubleSeries<K> of(Class<K> keyClass, Iterable<K> keys, double value) {
+        return of(keyClass, keys, key -> value);
+    }
+
+    /**
+     * Creates a new series with all values equal to {@code 1.0}.
+     *
+     * @param keyClass the runtime key type.
+     * @param keys     the keys to include in the series.
+     *
+     * @return a new series with each key mapped to the value {@code 1.0}.
+     */
+    static <K> DoubleSeries<K> ones(Class<K> keyClass, Iterable<K> keys) {
+        return of(keyClass, keys, 1.0);
+    }
+
+    /**
+     * Creates a new series with all values equal to {@code 0.0}.
+     *
+     * @param keyClass the runtime key type.
+     * @param keys     the keys to include in the series.
+     *
+     * @return a new series with each key mapped to the value {@code 0.0}.
+     */
+    static <K> DoubleSeries<K> zeros(Class<K> keyClass, Iterable<K> keys) {
+        return of(keyClass, keys, 0.0);
+    }
+
+    /**
      * Creates a new DoubleSeries from lists of keys and values.
      *
      * @param <K>    the runtime key type.
@@ -371,6 +444,8 @@ public interface DoubleSeries<K> extends DataSeries<K,Double> {
      * @return          the the does series
      */
     static <R,C> DoubleSeries<R> from(DataFrame<R,C> frame, C colKey) {
+        frame.requireNumericColumn(colKey);
+
         var keyType = frame.rows().keyClass();
         var result = DoubleSeries.builder(keyType);
         var col = frame.cols().ordinal(colKey);
@@ -383,7 +458,6 @@ public interface DoubleSeries<K> extends DataSeries<K,Double> {
         });
         return result.build();
     }
-
 
     /**
      * Returns an empty dataset of asset values

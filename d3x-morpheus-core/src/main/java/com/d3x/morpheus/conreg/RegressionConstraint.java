@@ -42,7 +42,7 @@ public final class RegressionConstraint<C> {
     /**
      * The right-hand side value for the linear equality constraint.
      */
-    @Getter @NonNull
+    @Getter
     private final double value;
 
     /**

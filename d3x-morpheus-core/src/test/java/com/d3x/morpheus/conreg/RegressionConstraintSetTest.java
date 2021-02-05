@@ -16,13 +16,11 @@
 package com.d3x.morpheus.conreg;
 
 import java.util.List;
-import java.util.Set;
 
-import com.d3x.morpheus.frame.DataFrame;
 import com.d3x.morpheus.matrix.D3xMatrix;
 import com.d3x.morpheus.series.DoubleSeries;
-
 import com.d3x.morpheus.vector.D3xVector;
+
 import org.testng.annotations.Test;
 import static org.testng.Assert.*;
 
