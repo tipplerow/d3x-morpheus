@@ -180,7 +180,24 @@ public final class ConstrainedRegressionModel<R,C> {
     }
 
     /**
-     * Adds a constraint on the regression coefficients.
+     * Adds linear equality constraints on the regression coefficients.
+     *
+     * @param constraints the constraints to add.
+     *
+     * @return this model, updated, for operator chaining.
+     *
+     * @throws RuntimeException unless the regressor frame contains a column
+     * for every regressor affected by the constraints.
+     */
+    ConstrainedRegressionModel<R,C> withConstraints(Iterable<RegressionConstraint<C>> constraints) {
+        for (RegressionConstraint<C> constraint : constraints)
+            withConstraint(constraint);
+
+        return this;
+    }
+
+    /**
+     * Adds a linear equality constraint on the regression coefficients.
      *
      * @param constraint the constraint to add.
      *
@@ -197,7 +214,7 @@ public final class ConstrainedRegressionModel<R,C> {
     }
 
     /**
-     * Adds a constraint on the regression coefficients.
+     * Adds a linear equality constraint on the regression coefficients.
      *
      * @param name  a unique name for the constraint.
      * @param value the right-hand side value for the constraint.
