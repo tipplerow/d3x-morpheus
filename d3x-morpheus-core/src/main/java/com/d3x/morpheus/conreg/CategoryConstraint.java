@@ -22,6 +22,7 @@ import com.d3x.morpheus.frame.DataFrame;
 import com.d3x.morpheus.frame.DataFrameColumn;
 import com.d3x.morpheus.series.DoubleSeries;
 import com.d3x.morpheus.series.DoubleSeriesBuilder;
+import com.d3x.morpheus.util.MorpheusException;
 import com.d3x.morpheus.vector.D3xVector;
 
 /**
@@ -66,6 +67,9 @@ public final class CategoryConstraint<R,C> {
                                Set<C> regressorKeys,
                                DataFrame<R,C> observationFrame,
                                DoubleSeries<R> observationWeights) {
+        if (regressorKeys.size() < 2)
+            throw new MorpheusException("At least two category variables are required.");
+
         this.categoryName = categoryName;
         this.regressorKeys = regressorKeys;
         this.observationFrame = observationFrame;
