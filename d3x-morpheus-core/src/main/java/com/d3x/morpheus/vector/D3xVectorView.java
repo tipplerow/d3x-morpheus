@@ -17,6 +17,8 @@ package com.d3x.morpheus.vector;
 
 import java.util.List;
 
+import com.d3x.morpheus.util.DoubleComparator;
+
 /**
  * Provides a read-only view of {@code double} values that are accessed
  * by ordinal index (location).
@@ -39,6 +41,53 @@ public interface D3xVectorView {
      * @throws RuntimeException if the index is out of bounds.
      */
     double get(int index);
+
+    /**
+     * Determines whether the entries in this view are equal to those in another
+     * view <em>within the tolerance of the default DoubleComparator</em>.
+     *
+     * @param that the view to test for equality.
+     *
+     * @return {@code true} iff the input view has the same length as this view and
+     * each value matches the corresponding entry in this view within the tolerance
+     * of the default DoubleComparator.
+     */
+    default boolean equalsView(D3xVectorView that) {
+        return equalsView(that, DoubleComparator.DEFAULT);
+    }
+
+    /**
+     * Determines whether the entries in this view are equal to those in another
+     * view within the tolerance of a given DoubleComparator.
+     *
+     * @param that       the vector to test for equality.
+     * @param comparator the element comparator.
+     *
+     * @return {@code true} iff the input view has the same length as this view and
+     * each value matches the corresponding entry in this view within the tolerance
+     * of the specified comparator.
+     */
+    default boolean equalsView(D3xVectorView that, DoubleComparator comparator) {
+        if (this.length() != that.length())
+            return false;
+
+        for (int index = 0; index < length(); ++index)
+            if (!comparator.equals(this.get(index), that.get(index)))
+                return false;
+
+        return true;
+    }
+
+    /**
+     * Returns a vector view over a bare array.
+     *
+     * @param array the array to wrap in a view.
+     *
+     * @return a vector view over the given array.
+     */
+    static D3xVectorView of(double... array) {
+        return new ArrayView(array);
+    }
 
     /**
      * Returns a vector view over a Double list.

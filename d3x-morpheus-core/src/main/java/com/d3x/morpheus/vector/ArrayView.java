@@ -17,27 +17,25 @@ package com.d3x.morpheus.vector;
 
 import lombok.NonNull;
 
-import java.util.List;
-
 /**
- * Wraps a Double list in a vector view.
+ * Wraps a bare array in a vector view.
  *
  * @author Scott Shaffer
  */
-final class ListView implements D3xVectorView {
-    @NonNull private final List<Double> list;
+final class ArrayView implements D3xVectorView {
+    @NonNull private final double[] array;
 
-    ListView(List<Double> list) {
-        this.list = list;
+    ArrayView(double[] array) {
+        this.array = array;
     }
 
     @Override
     public int length() {
-        return list.size();
+        return array.length;
     }
 
     @Override
     public double get(int index) {
-        return list.get(index);
+        return array[index];
     }
 }

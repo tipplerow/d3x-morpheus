@@ -594,14 +594,7 @@ public interface D3xVector extends D3xVectorView {
      * of the specified comparator.
      */
     default boolean equalsArray(double[] values, DoubleComparator comparator) {
-        if (values.length != this.length())
-            return false;
-
-        for (int index = 0; index < values.length; ++index)
-            if (!comparator.equals(values[index], get(index)))
-                return false;
-
-        return true;
+        return equalsView(D3xVectorView.of(values));
     }
 
     /**
@@ -630,14 +623,7 @@ public interface D3xVector extends D3xVectorView {
      * of the specified comparator.
      */
     default boolean equalsVector(D3xVector that, DoubleComparator comparator) {
-        if (this.length() != that.length())
-            return false;
-
-        for (int index = 0; index < length(); ++index)
-            if (!comparator.equals(this.get(index), that.get(index)))
-                return false;
-
-        return true;
+        return equalsView(that, comparator);
     }
 
     /**
@@ -658,6 +644,15 @@ public interface D3xVector extends D3xVectorView {
      */
     default boolean isCongruent(D3xVector that) {
         return this.length() == that.length();
+    }
+
+    /**
+     * Identifies empty vectors.
+     *
+     * @return {@code true} iff this vector has zero length.
+     */
+    default boolean isEmpty() {
+        return length() == 0;
     }
 
     /**
