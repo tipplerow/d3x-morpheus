@@ -51,21 +51,3 @@ public interface D3xVectorView {
         return new ListView(list);
     }
 }
-
-final class ListView implements D3xVectorView {
-    private final List<Double> list;
-
-    ListView(List<Double> list) {
-        this.list = list;
-    }
-
-    @Override
-    public int length() {
-        return list.size();
-    }
-
-    @Override
-    public double get(int index) {
-        return list.get(index);
-    }
-}
