@@ -338,4 +338,20 @@ public final class ConstrainedRegressionModel<R,C> {
     public RegressionConstraintSet<C> getConstraintSet() {
         return constraintSet.get();
     }
+
+    /**
+     * Returns the runtime type of the observation (row) variables.
+     * @return the runtime type of the observation (row) variables.
+     */
+    public Class<R> getObservationClass() {
+        return regressorFrame.rows().keyClass();
+    }
+
+    /**
+     * Returns the runtime type of the regressor (column) variables.
+     * @return the runtime type of the regressor (column) variables.
+     */
+    public Class<C> getRegressorClass() {
+        return regressorFrame.cols().keyClass();
+    }
 }

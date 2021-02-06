@@ -15,6 +15,7 @@
  */
 package com.d3x.morpheus.conreg;
 
+import com.d3x.morpheus.series.DoubleSeries;
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -52,7 +53,7 @@ public final class ConstrainedRegressionSolver<R,C> {
     private final LazyValue<ConstrainedRegressionSystem<R,C>> system = LazyValue.of(this::buildSystem);
 
     private ConstrainedRegressionSolver(ConstrainedRegressionModel<R,C> regressionModel) {
-        this.regressionModel  = regressionModel;
+        this.regressionModel = regressionModel;
     }
 
     private void validateSingularValueThreshold() {
@@ -145,19 +146,16 @@ public final class ConstrainedRegressionSolver<R,C> {
         D3xVector fittedVector = designMatrix.times(betaVector);
         D3xVector residualVector = fittedVector.minus(observations);
 
-        DataFrame<ConstrainedRegressionField, C> betaFrame =
-                DataFrame.ofDoubles(ConstrainedRegressionField.BETA, regressionModel.getRegressorKeys(), betaVector);
+        Class<R> rowClass = regressionModel.getObservationClass();
+        Class<C> colClass = regressionModel.getRegressorClass();
 
-        DataFrame<ConstrainedRegressionField, String> dualFrame =
-                DataFrame.ofDoubles(ConstrainedRegressionField.DUAL, regressionModel.getConstraintKeys(), dualVector);
+        DoubleSeries<C> betaSeries = DoubleSeries.build(colClass, regressionModel.getRegressorKeys(), betaVector);
+        DoubleSeries<String> dualSeries = DoubleSeries.build(String.class, regressionModel.getConstraintKeys(), dualVector);
 
-        DataFrame<ConstrainedRegressionField, R> fittedFrame =
-                DataFrame.ofDoubles(ConstrainedRegressionField.FITTED, regressionModel.getObservationKeys(), fittedVector);
+        DoubleSeries<R> fittedSeries = DoubleSeries.build(rowClass, regressionModel.getObservationKeys(), fittedVector);
+        DoubleSeries<R> residualSeries = DoubleSeries.build(rowClass, regressionModel.getObservationKeys(), residualVector);
 
-        DataFrame<ConstrainedRegressionField, R> residualFrame =
-                DataFrame.ofDoubles(ConstrainedRegressionField.RESIDUAL, regressionModel.getObservationKeys(), residualVector);
-
-        return new ConstrainedRegressionResult<>(betaFrame, dualFrame, fittedFrame, residualFrame);
+        return new ConstrainedRegressionResult<>(betaSeries, dualSeries, fittedSeries, residualSeries);
     }
 
     /**

@@ -17,6 +17,12 @@ package com.d3x.morpheus.conreg;
 
 import com.d3x.morpheus.frame.DataFrame;
 import com.d3x.morpheus.frame.DataFrameException;
+import com.d3x.morpheus.series.DoubleSeries;
+
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NonNull;
 
 /**
  * Encapsulates the parameters for a constrained linear regression model.
@@ -29,55 +35,41 @@ import com.d3x.morpheus.frame.DataFrameException;
  *
  * @author  Scott Shaffer
  */
+@AllArgsConstructor(access = AccessLevel.PACKAGE)
 public final class ConstrainedRegressionResult<R, C> {
-    private final DataFrame<ConstrainedRegressionField, C> betaCoefficients;
-    private final DataFrame<ConstrainedRegressionField, String> dualValues;
-    private final DataFrame<ConstrainedRegressionField, R> fittedValues;
-    private final DataFrame<ConstrainedRegressionField, R> residuals;
+    /**
+     * A DoubleSeries containing the regression coefficients.
+     */
+    @Getter @NonNull
+    private final DoubleSeries<C> betaCoefficients;
 
     /**
-     * Creates a new constrained regression result set.
-     *
-     * @param betaCoefficients a single-column DataFrame of regression coefficients with
-     *                         row key equal to {@code ConstrainedRegressionField.BETA}.
-     *
-     * @param dualValues       a single-column DataFrame containing the dual values for the
-     *                         linear constraints in the model (indexed by constraint key)
-     *                         with row key {@code ConstrainedRegressionField.DUAL}.
-     *
-     * @param fittedValues     a single-row DataFrame containing the fitted values, with the
-     *                         column key equal to {@code ConstrainedRegressionField.FITTED}.
-     *
-     * @param residuals        a single-row DataFrame containing the residuals, with column
-     *                         key equal to {@code ConstrainedRegressionField.RESIDUAL}.
+     * A DoubleSeries containing the dual values for the linear
+     * equality constraints on the regression coefficients.
      */
-    public ConstrainedRegressionResult(DataFrame<ConstrainedRegressionField, C> betaCoefficients,
-                                       DataFrame<ConstrainedRegressionField, String> dualValues,
-                                       DataFrame<ConstrainedRegressionField, R> fittedValues,
-                                       DataFrame<ConstrainedRegressionField, R> residuals) {
-        this.betaCoefficients = betaCoefficients;
-        this.dualValues = dualValues;
-        this.fittedValues = fittedValues;
-        this.residuals = residuals;
-        validateResult();
-    }
+    @Getter @NonNull
+    private final DoubleSeries<String> dualValues;
 
-    private void validateResult() {
-        betaCoefficients.requireRow(ConstrainedRegressionField.BETA);
-        betaCoefficients.requireRowCount(1);
+    /**
+     * A DoubleSeries containing the fitted values for the model, equal to
+     * {@code Ax}, where {@code A} is the design matrix of regressors and
+     * {@code x} is the vector of regression coefficients.  Note that the
+     * fitted values are computed for all rows in the observation frame,
+     * even those that were excluded from the regression.
+     */
+    @Getter @NonNull
+    private final DoubleSeries<R> fittedValues;
 
-        dualValues.requireRow(ConstrainedRegressionField.DUAL);
-        dualValues.requireRowCount(1);
-
-        fittedValues.requireRow(ConstrainedRegressionField.FITTED);
-        fittedValues.requireRowCount(1);
-
-        residuals.requireRow(ConstrainedRegressionField.RESIDUAL);
-        residuals.requireRowCount(1);
-
-        if (!residuals.listColumnKeys().equals(fittedValues.listColumnKeys()))
-            throw new DataFrameException("Residual and fitted value keys do not match.");
-    }
+    /**
+     * A DoubleSeries containing the regression residual values, equal to
+     * {@code Ax - b}, where {@code A} is the design matrix of regressors,
+     * {@code x} is the vector of regression coefficients, and {@code b} is
+     * the vector of observations.  Note that residuals are computed for all
+     *  rows in the observation frame, even those that were excluded from the
+     *  regression.
+     */
+    @Getter @NonNull
+    private final DoubleSeries<R> residuals;
 
     /**
      * Returns the value of the regression coefficient for a particular regressor.
@@ -89,55 +81,6 @@ public final class ConstrainedRegressionResult<R, C> {
      * @throws RuntimeException unless the regressor key is valid.
      */
     public double getBetaCoefficient(C regressor) {
-        return betaCoefficients.getDouble(ConstrainedRegressionField.BETA, regressor);
-    }
-
-    /**
-     * Returns a single-column DataFrame containing the regression coefficients.
-     * The row key is {@code ConstrainedRegressionField.BETA}.
-     *
-     * @return a single-column DataFrame containing the regression coefficients.
-     */
-    public DataFrame<ConstrainedRegressionField, C> getBetaCoefficients() {
-        return betaCoefficients;
-    }
-
-    /**
-     * Returns a single-column DataFrame containing the dual values for the
-     * linear constraints in the model (indexed by the constraint key). The
-     * row key is {@code ConstrainedRegressionField.DUAL}.
-     *
-     * @return a single-column DataFrame containing the dual values for the
-     *         linear constraints in the model (indexed by the constraint key).
-     */
-    public DataFrame<ConstrainedRegressionField, String> getDualValues() {
-        return dualValues;
-    }
-
-    /**
-     * Returns a single-column DataFrame containing the fitted values for the model,
-     * equal to {@code Ax}, where {@code A} is the design matrix of regressors and
-     * {@code x} is the vector of regression coefficients.  Note that fitted values
-     * are computed for all rows in the observation frame, even those that were
-     * excluded from the regression.  The column key is {@code ConstrainedRegressionField.FITTED}.
-     *
-     * @return a single-column DataFrame containing the fitted values for the model.
-     */
-    public DataFrame<ConstrainedRegressionField, R> getFittedValues() {
-        return fittedValues;
-    }
-
-    /**
-     * Returns a single-column DataFrame containing the residuals for the model,
-     * equal to {@code Ax - b}, where {@code A} is the design matrix of regressors,
-     * {@code x} is the vector of regression coefficients, and {@code b} is the
-     * vector of observations.  Note that residuals are computed for all rows in
-     * the observation frame, even those that were excluded from the regression.
-     * The column key is {@code ConstrainedRegressionField.RESIDUAL}.
-     *
-     * @return a single-column DataFrame containing the residuals for the model.
-     */
-    public DataFrame<ConstrainedRegressionField, R> getResiduals() {
-        return residuals;
+        return betaCoefficients.getDouble(regressor);
     }
 }

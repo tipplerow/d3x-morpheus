@@ -48,8 +48,8 @@ public class ConstrainedRegressionSolverTest extends ConstrainedRegressionTestBa
         ConstrainedRegressionResult<String, String> result = solver.solve();
         DoubleComparator comparator0001 = DoubleComparator.fixed(0.0001);
 
-        double[] betaActual = result.getBetaCoefficients().getDoubleMatrix()[0];
-        double[] dualActual = result.getDualValues().getDoubleMatrix()[0];
+        double[] betaActual = result.getBetaCoefficients().toDoubles().toArray();
+        double[] dualActual = result.getDualValues().toDoubles().toArray();
 
         double[] betaExpected = new double[] { 15.2567, -0.4256,  1.7128, -0.9699, -1.7853, -6.0586,  7.8439 };
         double[] dualExpected = new double[] { 42.7805, 0.0 };
@@ -61,7 +61,7 @@ public class ConstrainedRegressionSolverTest extends ConstrainedRegressionTestBa
         assertEquals(betaActual[1] + 2.0 * betaActual[2], 3.0, 1.0E-09);
         assertEquals(betaActual[4] + betaActual[5] + betaActual[6], 0.0,1.0E-09);
 
-        double[] fittedActual = result.getFittedValues().getDoubleMatrix()[0];
+        double[] fittedActual = result.getFittedValues().toDoubles().toArray();
         double[] fittedExpected = new double[] {
                 179.6608, 104.6542, 56.3516, 24.6599, 12.3064, 9.1980, 9.5153, 4.0130, -2.8516, -13.2724, -57.4485
         };
