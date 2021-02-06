@@ -36,24 +36,7 @@ import com.d3x.morpheus.util.MorpheusException;
  *
  * @author Scott Shaffer
  */
-public interface D3xVector {
-    /**
-     * Returns the length of this vector.
-     * @return the length of this vector.
-     */
-    int length();
-
-    /**
-     * Returns the value of an element at a given location.
-     *
-     * @param index the index of the element to return.
-     *
-     * @return the value of the element at the specified location.
-     *
-     * @throws RuntimeException if the index is out of bounds.
-     */
-    double get(int index);
-
+public interface D3xVector extends D3xVectorView {
     /**
      * Assigns the value of an element at a given location.
      *

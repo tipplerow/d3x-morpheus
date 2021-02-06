@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.function.IntFunction;
 import java.util.stream.IntStream;
 
+import com.d3x.morpheus.vector.D3xVector;
+
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -146,6 +148,23 @@ public class DoubleSeriesTests {
 
         List<String> keys = List.of("A", "B", "C", "D");
         List<Double> values = List.of(1.0, 2.0, Double.NaN, 4.0);
+        DoubleSeries<String> series = DoubleSeries.build(String.class, keys, values);
+
+        Assert.assertEquals(series.size(), 3);
+        Assert.assertEquals(series.getDouble("A"), 1.0, TOLERANCE);
+        Assert.assertEquals(series.getDoubleAt(0), 1.0, TOLERANCE);
+        Assert.assertEquals(series.getDouble("B"), 2.0, TOLERANCE);
+        Assert.assertEquals(series.getDoubleAt(1), 2.0, TOLERANCE);
+        Assert.assertEquals(series.getDouble("D"), 4.0, TOLERANCE);
+        Assert.assertEquals(series.getDoubleAt(2), 4.0, TOLERANCE);
+    }
+
+    @Test
+    public void testBuildFromVector() {
+        double TOLERANCE = 1.0E-12;
+
+        List<String> keys = List.of("A", "B", "C", "D");
+        D3xVector values = D3xVector.wrap(1.0, 2.0, Double.NaN, 4.0);
         DoubleSeries<String> series = DoubleSeries.build(String.class, keys, values);
 
         Assert.assertEquals(series.size(), 3);

@@ -41,6 +41,7 @@ import com.d3x.morpheus.util.IntComparator;
 import com.d3x.morpheus.util.MorpheusException;
 import com.d3x.morpheus.util.Resource;
 import com.d3x.morpheus.vector.D3xVector;
+import com.d3x.morpheus.vector.D3xVectorView;
 
 /**
  * An interface to an immutable series of doubles stored against a unique key
@@ -49,7 +50,7 @@ import com.d3x.morpheus.vector.D3xVector;
  *
  * @author Xavier Witdouck
  */
-public interface DoubleSeries<K> extends DataSeries<K,Double> {
+public interface DoubleSeries<K> extends DataSeries<K,Double>, D3xVectorView {
 
     /**
      * Returns the value for key, NaN if no match
@@ -82,6 +83,16 @@ public interface DoubleSeries<K> extends DataSeries<K,Double> {
     @Override
     default boolean isNullAt(int index) {
         return Double.isNaN(getDoubleAt(index));
+    }
+
+    @Override
+    default int length() {
+        return size();
+    }
+
+    @Override
+    default double get(int index) {
+        return getValueAt(index);
     }
 
     /**
@@ -362,7 +373,23 @@ public interface DoubleSeries<K> extends DataSeries<K,Double> {
      * @throws RuntimeException unless the keys and values have equal sizes.
      */
     static <K> DoubleSeries<K> build(Class<K> keyType, List<K> keys, List<Double> values) {
-        if (keys.size() != values.size())
+        return build(keyType, keys, D3xVectorView.of(values));
+    }
+
+    /**
+     * Creates a new DoubleSeries from a list of keys and a vector of values.
+     *
+     * @param <K>    the runtime key type.
+     * @param keys   the series keys.
+     * @param values the series values.
+     *
+     * @return a new DoubleSeries containing the non-{@code NaN} entries
+     * from the specified keys and values.
+     *
+     * @throws RuntimeException unless the keys and values have equal sizes.
+     */
+    static <K> DoubleSeries<K> build(Class<K> keyType, List<K> keys, D3xVectorView values) {
+        if (keys.size() != values.length())
             throw new MorpheusException("Key/value length mismatch.");
 
         DoubleSeriesBuilder<K> builder = builder(keyType);
