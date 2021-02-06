@@ -104,7 +104,7 @@ public final class ConstrainedRegressionSolver<R,C> {
      *
      * @throws RuntimeException if the threshold is less than the machine tolerance.
      */
-    ConstrainedRegressionSolver<R,C> withSingularValueThreshold(double threshold) {
+    public ConstrainedRegressionSolver<R,C> withSingularValueThreshold(double threshold) {
         validateSingularValueThreshold(threshold);
         singularValueThreshold = threshold;
 

@@ -189,7 +189,7 @@ public final class ConstrainedRegressionModel<R,C> {
      * @throws RuntimeException unless the regressor frame contains a column
      * for every regressor affected by the constraints.
      */
-    ConstrainedRegressionModel<R,C> withConstraints(Iterable<RegressionConstraint<C>> constraints) {
+    public ConstrainedRegressionModel<R,C> withConstraints(Iterable<RegressionConstraint<C>> constraints) {
         for (RegressionConstraint<C> constraint : constraints)
             withConstraint(constraint);
 
@@ -206,7 +206,7 @@ public final class ConstrainedRegressionModel<R,C> {
      * @throws RuntimeException unless the regressor frame contains a column
      * for every regressor affected by the constraint.
      */
-    ConstrainedRegressionModel<R,C> withConstraint(RegressionConstraint<C> constraint) {
+    public ConstrainedRegressionModel<R,C> withConstraint(RegressionConstraint<C> constraint) {
         validateConstraint(constraint);
         this.constraintSet.reset();
         this.constraintList.add(constraint);
@@ -225,7 +225,7 @@ public final class ConstrainedRegressionModel<R,C> {
      * @throws RuntimeException unless the regressor frame contains a column
      * for every regressor affected by the constraint.
      */
-    ConstrainedRegressionModel<R,C> withConstraint(String name, double value, DoubleSeries<C> terms) {
+    public ConstrainedRegressionModel<R,C> withConstraint(String name, double value, DoubleSeries<C> terms) {
         return withConstraint(new RegressionConstraint<>(name, value, terms));
     }
 
@@ -240,7 +240,7 @@ public final class ConstrainedRegressionModel<R,C> {
      * @throws RuntimeException unless all regressor keys refer to columns in
      * the regressor frame.
      */
-    ConstrainedRegressionModel<R,C> withRegressors(List<C> regressorKeys) {
+    public ConstrainedRegressionModel<R,C> withRegressors(List<C> regressorKeys) {
         this.regressorKeys = List.copyOf(regressorKeys);
         validateKeys();
         return this;
@@ -257,7 +257,7 @@ public final class ConstrainedRegressionModel<R,C> {
      * @throws RuntimeException unless the observations are present in the
      * regressand series, regressor frame, and weight series.
      */
-    ConstrainedRegressionModel<R,C> withObservations(List<R> observationKeys) {
+    public ConstrainedRegressionModel<R,C> withObservations(List<R> observationKeys) {
         this.observationKeys = List.copyOf(observationKeys);
         validateKeys();
         return this;
@@ -272,7 +272,7 @@ public final class ConstrainedRegressionModel<R,C> {
      *
      * @throws RuntimeException unless the regressor frame contains the specified column.
      */
-    ConstrainedRegressionModel<R,C> withWeights(C weightColumn) {
+    public ConstrainedRegressionModel<R,C> withWeights(C weightColumn) {
         return withWeights(DoubleSeries.from(regressorFrame, weightColumn));
     }
 
@@ -285,7 +285,7 @@ public final class ConstrainedRegressionModel<R,C> {
      *
      * @throws RuntimeException unless there is a weight for each observation in this model.
      */
-    ConstrainedRegressionModel<R,C> withWeights(DoubleSeries<R> observationWeights) {
+    public ConstrainedRegressionModel<R,C> withWeights(DoubleSeries<R> observationWeights) {
         this.observationWeights = observationWeights;
         validateKeys();
         return this;
