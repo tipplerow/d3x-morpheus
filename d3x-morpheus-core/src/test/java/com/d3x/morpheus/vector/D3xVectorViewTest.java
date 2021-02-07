@@ -15,7 +15,9 @@
  */
 package com.d3x.morpheus.vector;
 
+import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.testng.annotations.Test;
 import static org.testng.Assert.*;
@@ -57,6 +59,29 @@ public class D3xVectorViewTest {
         assertTrue(view2.equalsView(view1));
         assertFalse(view1.equalsView(view3));
         assertFalse(view1.equalsView(view4));
+    }
+
+    @Test
+    public void testIterator() {
+        assertFalse(D3xVectorView.of().iterator().hasNext());
+
+        Iterator<Double> iterator = D3xVectorView.of(1.0, 2.0, 3.0).iterator();
+
+        assertTrue(iterator.hasNext());
+        assertEquals(iterator.next(), 1.0, TOLERANCE);
+
+        assertTrue(iterator.hasNext());
+        assertEquals(iterator.next(), 2.0, TOLERANCE);
+
+        assertTrue(iterator.hasNext());
+        assertEquals(iterator.next(), 3.0, TOLERANCE);
+
+        assertFalse(iterator.hasNext());
+    }
+
+    @Test(expectedExceptions = NoSuchElementException.class)
+    public void testIteratorException() {
+        D3xVectorView.of().iterator().next();
     }
 }
 
