@@ -36,28 +36,6 @@ public class Min implements Statistic1 {
         super();
     }
 
-    /**
-     * Finds the minimum value in a sample.
-     *
-     * @param sample the values in the sample.
-     *
-     * @return the minimum value in the sample.
-     */
-    public static double of(double... sample) {
-        return Statistic1.compute(new Min(), sample);
-    }
-
-    /**
-     * Finds the minimum value in a sample.
-     *
-     * @param sample the values in the sample.
-     *
-     * @return the minimum value in the sample.
-     */
-    public static double of(D3xVector sample) {
-        return Statistic1.compute(new Min(), sample);
-    }
-
     @Override
     public long getN() {
         return n;

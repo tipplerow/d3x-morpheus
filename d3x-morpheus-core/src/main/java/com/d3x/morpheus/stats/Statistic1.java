@@ -17,7 +17,7 @@ package com.d3x.morpheus.stats;
 
 import java.util.function.Supplier;
 
-import com.d3x.morpheus.vector.D3xVector;
+import com.d3x.morpheus.vector.D3xVectorView;
 
 /**
  * An interface that defines an incremental calculation of a uni-variate statistic.
@@ -42,7 +42,7 @@ public interface Statistic1 extends Statistic {
      *
      * @return the sample size after adding the values.
      */
-    default long add(double[] values) {
+    default long add(D3xVectorView values) {
         for (double value : values)
             add(value);
 
@@ -50,38 +50,13 @@ public interface Statistic1 extends Statistic {
     }
 
     /**
-     * Adds new values to the sample for this statistic.
-     *
-     * @param values the values to add.
-     *
-     * @return the sample size after adding the values.
-     */
-    default long add(D3xVector values) {
-        for (int index = 0; index < values.length(); index++)
-            add(values.get(index));
-
-        return getN();
-    }
-
-    /**
      * Resets this statistic and computes the value for a given sample.
      *
      * @param sample the sample of values.
      *
      * @return the value of this statistic for the specified sample.
      */
-    default double compute(double... sample) {
-        return compute(this, sample);
-    }
-
-    /**
-     * Resets this statistic and computes the value for a given sample.
-     *
-     * @param sample the sample of values.
-     *
-     * @return the value of this statistic for the specified sample.
-     */
-    default double compute(D3xVector sample) {
+    default double compute(D3xVectorView sample) {
         return compute(this, sample);
     }
 
@@ -105,21 +80,7 @@ public interface Statistic1 extends Statistic {
      *
      * @return          the value of the statistic for the given sample.
      */
-    static double compute(Statistic1 stat, double... sample) {
-        stat.reset();
-        stat.add(sample);
-        return stat.getValue();
-    }
-
-    /**
-     * Computes a univariate statistic over a given sample.
-     *
-     * @param stat      the statistic type
-     * @param sample    the sample of values
-     *
-     * @return          the value of the statistic for the given sample.
-     */
-    static double compute(Statistic1 stat, D3xVector sample) {
+    static double compute(Statistic1 stat, D3xVectorView sample) {
         stat.reset();
         stat.add(sample);
         return stat.getValue();
@@ -134,7 +95,7 @@ public interface Statistic1 extends Statistic {
      * @return          the value of the statistic for the given sample.
      */
     static double compute(Supplier<Statistic1> stat, double... sample) {
-        return compute(stat.get(), sample);
+        return compute(stat.get(), D3xVectorView.of(sample));
     }
 
     /**
