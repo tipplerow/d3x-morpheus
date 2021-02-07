@@ -34,6 +34,7 @@ import javax.imageio.ImageIO;
 import com.d3x.morpheus.db.DbSource;
 import com.d3x.morpheus.index.Index;
 import com.d3x.morpheus.matrix.D3xMatrix;
+import com.d3x.morpheus.matrix.D3xMatrixView;
 import com.d3x.morpheus.range.Range;
 import com.d3x.morpheus.stats.Stats;
 import com.d3x.morpheus.util.Resource;
@@ -47,7 +48,7 @@ import com.d3x.morpheus.vector.D3xVector;
  *
  * @author  Xavier Witdouck
  */
-public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperations<R,C,DataFrame<R,C>>, DataFrameIterators<R,C>, DataFrameAlgebra<R,C> {
+public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperations<R,C,DataFrame<R,C>>, DataFrameIterators<R,C>, DataFrameAlgebra<R,C>, D3xMatrixView {
 
     /**
      * Checks if this DataFrame is empty, according to its number of rows.
@@ -468,6 +469,20 @@ public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperation
     }
 
     /**
+     * Returns the value of an element at a given location.
+     *
+     * @param row the row index of the element to return.
+     * @param col the column index of the element to return.
+     *
+     * @return the value of the element at the specified location.
+     *
+     * @throws RuntimeException if either index is out of bounds.
+     */
+    default double get(int row, int col) {
+        return getDoubleAt(row, col);
+    }
+
+    /**
      * Returns a list of the row keys for this DataFrame.
      *
      * @return a list of the row keys for this DataFrame.
@@ -483,6 +498,22 @@ public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperation
      */
     default List<C> listColumnKeys() {
         return cols().keyList();
+    }
+
+    /**
+     * Returns the number of rows in this DataFrame.
+     * @return the number of rows in this DataFrame.
+     */
+    default int nrow() {
+        return rowCount();
+    }
+
+    /**
+     * Returns the number of columns in this DataFrame.
+     * @return the number of columns in this DataFrame.
+     */
+    default int ncol() {
+        return colCount();
     }
 
     /**

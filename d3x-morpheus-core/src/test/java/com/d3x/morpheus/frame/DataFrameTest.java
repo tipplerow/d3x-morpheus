@@ -27,6 +27,8 @@ import static org.testng.Assert.*;
  * Tests default methods implemented in the DataFrame interface.
  */
 public class DataFrameTest extends DataFrameTestBase {
+    private static final double TOLERANCE = 1.0E-12;
+
     @Test
     public void testContainsColumn() {
         assertTrue(intFrame.containsColumn("col1"));
@@ -262,5 +264,20 @@ public class DataFrameTest extends DataFrameTestBase {
 
         DataFrame<String, String> frame = DataFrame.ofDoubles(rowKeys, colKeys, D3xMatrix.wrap(values));
         assertDoubleFrame(frame, rowKeys, colKeys, values);
+    }
+    
+    @Test
+    public void testMatrixView() {
+        assertEquals(doubleFrame.nrow(), 2);
+        assertEquals(doubleFrame.ncol(), 3);
+        assertEquals(doubleFrame.size(), 6);
+
+        assertEquals(doubleFrame.get(0, 0), 11.0, TOLERANCE);
+        assertEquals(doubleFrame.get(0, 1), 12.0, TOLERANCE);
+        assertEquals(doubleFrame.get(0, 2), 13.0, TOLERANCE);
+
+        assertEquals(doubleFrame.get(1, 0), 21.0, TOLERANCE);
+        assertEquals(doubleFrame.get(1, 1), 22.0, TOLERANCE);
+        assertEquals(doubleFrame.get(1, 2), 23.0, TOLERANCE);
     }
 }
