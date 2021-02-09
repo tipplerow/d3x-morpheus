@@ -16,6 +16,7 @@
 package com.d3x.morpheus.util;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -247,6 +248,48 @@ public class Collect {
                 return stream.iterator();
             }
         };
+    }
+
+    /**
+     * Adds an iterable sequence to an existing collection.
+     *
+     * @param <T>    the runtime object type.
+     * @param sink   the collection to accept the objects.
+     * @param source the iterable sequence to add to the sink.
+     *
+     * @return the sink collection, for operator chaining.
+     */
+    public static <T> Collection<T> collect(Collection<T> sink, Iterable<T> source) {
+        return collect(sink, source.iterator());
+    }
+
+    /**
+     * Adds an iteration sequence to an existing collection.
+     *
+     * @param <T>    the runtime object type.
+     * @param sink   the collection to accept the objects.
+     * @param source the iteration sequence to add to the sink.
+     *
+     * @return the sink collection, for operator chaining.
+     */
+    public static <T> Collection<T> collect(Collection<T> sink, Iterator<T> source) {
+        while (source.hasNext())
+            sink.add(source.next());
+
+        return sink;
+    }
+
+    /**
+     * Adds all objects in a stream to an existing collection.
+     *
+     * @param <T>    the runtime object type.
+     * @param sink   the collection to accept the objects.
+     * @param source the stream of objects to add to the sink.
+     *
+     * @return the sink collection, for operator chaining.
+     */
+    public static <T> Collection<T> collect(Collection<T> sink, Stream<T> source) {
+        return collect(sink, source.iterator());
     }
 
     /**
