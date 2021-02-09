@@ -15,13 +15,12 @@
  */
 package com.d3x.morpheus.conreg;
 
-import com.d3x.morpheus.series.DoubleSeries;
 import lombok.Getter;
 import lombok.NonNull;
 
-import com.d3x.morpheus.frame.DataFrame;
 import com.d3x.morpheus.linalg.SVDSolver;
 import com.d3x.morpheus.matrix.D3xMatrix;
+import com.d3x.morpheus.series.DoubleSeries;
 import com.d3x.morpheus.vector.D3xVector;
 import com.d3x.morpheus.util.LazyValue;
 
@@ -190,9 +189,10 @@ public final class ConstrainedRegressionSolver<R,C> {
         int P = regressionModel.countConstraints();
 
         D3xMatrix blockR = D3xMatrix.dense(N + P, M + P);
-
         blockR.setSubMatrix(0, 0, system.get().getTwoATW());
-        blockR.setSubMatrix(N, M, D3xMatrix.identity(P));
+
+        if (P > 0)
+            blockR.setSubMatrix(N, M, D3xMatrix.identity(P));
 
         return blockR;
     }

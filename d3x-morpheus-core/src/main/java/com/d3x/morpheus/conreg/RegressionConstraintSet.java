@@ -61,7 +61,7 @@ public final class RegressionConstraintSet<C> {
     }
 
     private void validateConstraints() {
-        if (constraintMap.isEmpty())
+        if (isEmpty())
             return;
 
         D3xMatrix matrix = getConstraintMatrix(List.copyOf(regressorKeys));
@@ -153,7 +153,7 @@ public final class RegressionConstraintSet<C> {
      * @return the linear constraint coefficient matrix (the left-hand side terms).
      */
     public D3xMatrix getConstraintMatrix(List<C> columnKeys) {
-        if (constraintMap.isEmpty())
+        if (isEmpty())
             return D3xMatrix.empty();
 
         List<String> rowKeys = getConstraintNames();
@@ -177,7 +177,7 @@ public final class RegressionConstraintSet<C> {
      * @return the linear constraint value vector (the right-hand side values).
      */
     public D3xVector getConstraintValues() {
-        if (countConstraints() < 1)
+        if (isEmpty())
             return D3xVector.empty();
 
         List<String> rowKeys = getConstraintNames();
@@ -187,5 +187,13 @@ public final class RegressionConstraintSet<C> {
             values.set(index, constraintMap.get(rowKeys.get(index)).getValue());
 
         return values;
+    }
+
+    /**
+     * Identifies empty constraint sets.
+     * @return {@code true} iff this constraint set is empty.
+     */
+    public boolean isEmpty() {
+        return constraintMap.isEmpty();
     }
 }

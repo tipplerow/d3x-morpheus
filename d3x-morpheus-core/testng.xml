@@ -160,6 +160,12 @@
         </packages>
     </test>
 
+    <test name="Stats Package Tests">
+        <packages>
+            <package name="com.d3x.morpheus.stats.*"/>
+        </packages>
+    </test>
+
     <test name="Vector Tests">
         <packages>
             <package name="com.d3x.morpheus.vector.*"/>

@@ -144,9 +144,6 @@ public class ConstrainedRegressionSystemTest extends ConstrainedRegressionTestBa
         assertEquals(myVector.get(4), baseVector.get(8), TOLERANCE);
         assertEquals(myVector.get(5), baseVector.get(10), TOLERANCE);
 
-        System.out.println(myMatrix);
-        System.out.println(baseMatrix);
-
         assertEquals(myMatrix.get(0,0), baseMatrix.get(0,3), TOLERANCE);
         assertEquals(myMatrix.get(0,1), baseMatrix.get(0,2), TOLERANCE);
         assertEquals(myMatrix.get(0,2), baseMatrix.get(0,1), TOLERANCE);
@@ -161,5 +158,20 @@ public class ConstrainedRegressionSystemTest extends ConstrainedRegressionTestBa
         assertEquals(myMatrix.get(2,1), baseMatrix.get(4,2), TOLERANCE);
         assertEquals(myMatrix.get(2,2), baseMatrix.get(4,1), TOLERANCE);
         assertEquals(myMatrix.get(2,3), baseMatrix.get(4,0), TOLERANCE);
+    }
+
+    @Test
+    public void testUnconstrained() {
+        ConstrainedRegressionSystem<String, String> mySystem =
+                buildUnconstrainedModel().build();
+
+        // Computed separately in R...
+        D3xMatrix augmat = D3xMatrix.byrow(4, 4,
+                  22.0,    0.0,  216.0,     0.0,
+                   0.0,  220.0,   -8.0,  3916.0,
+                 216.0,   -8.0, 3892.0,   -32.0,
+                   0.0, 3916.0,  -32.0, 82060.0);
+
+        assertTrue(mySystem.getAugmentedMatrix().equalsMatrix(augmat));
     }
 }

@@ -190,6 +190,10 @@ public final class ConstrainedRegressionSystem<R,C> {
         //
         D3xMatrix A = designMatrix;
         D3xMatrix C = regressionModel.getConstraintSet().getConstraintMatrix(regressorKeys);
+
+        if (C.isEmpty())
+            return twoATW.times(A);
+
         D3xMatrix CT = C.transpose();
         D3xMatrix twoATWA = twoATW.times(A);
 
@@ -218,6 +222,9 @@ public final class ConstrainedRegressionSystem<R,C> {
         D3xVector b = regressandVector;
         D3xVector d = regressionModel.getConstraintSet().getConstraintValues();
         D3xVector twoATWb = twoATW.times(b);
+
+        if (d.isEmpty())
+            return twoATWb;
 
         int N = A.ncol();
         int P = d.length();
