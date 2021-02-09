@@ -63,8 +63,11 @@ public final class RegressionConstraintSet<C> {
     private void validateConstraints() {
         if (isEmpty())
             return;
+        else
+            validateConstraintMatrix(getConstraintMatrix(List.copyOf(regressorKeys)));
+    }
 
-        D3xMatrix matrix = getConstraintMatrix(List.copyOf(regressorKeys));
+    private void validateConstraintMatrix(D3xMatrix matrix) {
         SVD svd = SVD.apache(matrix);
 
         int matrixRank = svd.getRank();
@@ -151,6 +154,9 @@ public final class RegressionConstraintSet<C> {
      *                   that are not affected by the constraints in this set.
      *
      * @return the linear constraint coefficient matrix (the left-hand side terms).
+     *
+     * @throws RuntimeException unless the constraint matrix has full rank when
+     * built for the specified column keys.
      */
     public D3xMatrix getConstraintMatrix(List<C> columnKeys) {
         if (isEmpty())
@@ -166,6 +172,10 @@ public final class RegressionConstraintSet<C> {
                 matrix.set(row, col, terms.getDoubleOrZero(columnKeys.get(col)));
         }
 
+        // Even if the constraint matrix has full rank when constructed for
+        // the complete set of regressors, it may be rank-deficient if only
+        // a subset of those regressors is passed in...
+        validateConstraintMatrix(matrix);
         return matrix;
     }
 
