@@ -15,6 +15,8 @@
  */
 package com.d3x.morpheus.frame;
 
+import com.d3x.morpheus.series.DoubleSeries;
+
 /**
  * A convenience marker interface used to represent a row vector on a DataFrame
  *
@@ -31,7 +33,24 @@ package com.d3x.morpheus.frame;
  * @author  Xavier Witdouck
  */
 public interface DataFrameRow<R,C> extends DataFrameVector<R,C,R,C,DataFrameRow<R,C>> {
-
+    /**
+     * Computes the scalar (dot) product between this row vector and a
+     * DoubleSeries that represents a column vector.  Column keys that
+     * are present in this row but missing from the column series are
+     * assigned the default value.
+     *
+     * @param columnSeries a DoubleSeries that represents a column vector.
+     * @param defaultValue the default value to use for missing elements
+     *                     in the column series.
+     *
+     * @return the scalar (dot) product between this row vector and the
+     * specified column vector.
+     *
+     * @throws RuntimeException unless this row holds numeric data.
+     */
+    default double scalarProduct(DoubleSeries<C> columnSeries, double defaultValue) {
+        return values().mapToDouble(value -> value.getDouble() * columnSeries.getDouble(value.colKey(), defaultValue)).sum();
+    }
 
     /**
      * An interface to a movable DataFrameRow

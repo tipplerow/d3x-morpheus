@@ -59,6 +59,20 @@ public interface DoubleSeries<K> extends DataSeries<K,Double>, D3xVectorView {
      */
     double getDouble(K key);
 
+    /**
+     * Returns the value mapped to a particular key or a default
+     * value for missing keys.
+     *
+     * @param key          the key of the desired value.
+     * @param defaultValue the default value to use for missing keys.
+     *
+     * @return the value mapped to the specified key, or the default
+     * value is this series does not contain the key.
+     */
+    default double getDouble(K key, double defaultValue) {
+        double value = getDouble(key);
+        return Double.isNaN(value) ? defaultValue : value;
+    }
 
     @Override
     default Double getValue(K key) {
@@ -136,14 +150,14 @@ public interface DoubleSeries<K> extends DataSeries<K,Double>, D3xVectorView {
         return Stats.of(this::toDoubles);
     }
 
+
     /**
      * Returns the value for asset, zero if no match for asset
      * @param key   the item identifier
      * @return      the value for item, zero if no match
      */
     default double getDoubleOrZero(K key) {
-        var value = getDouble(key);
-        return Double.isNaN(value) ? 0d : value;
+        return getDouble(key, 0.0);
     }
 
     /**
