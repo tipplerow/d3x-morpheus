@@ -27,15 +27,15 @@ public class DataFrameRowTest {
     private static final double TOLERANCE = 1.0E-12;
 
     @Test
-    public void testScalarProduct() {
+    public void testInnerProduct() {
         DataFrame<String, String> frame =
                 DataFrame.ofDoubles("row", List.of("col1", "col2", "col3"), D3xVector.wrap(2.0, 3.0, 4.0));
 
         DoubleSeries<String> column =
                 DoubleSeries.build(String.class, List.of("col2", "col3", "col4"), D3xVector.wrap(10.0, 20.0, 30.0));
 
-        assertEquals(frame.row("row").scalarProduct(column, 0.0), 110.0, TOLERANCE);
-        assertEquals(frame.row("row").scalarProduct(column, 1.0), 112.0, TOLERANCE);
-        assertTrue(Double.isNaN(frame.row("row").scalarProduct(column, Double.NaN)));
+        assertEquals(frame.row("row").innerProduct(column, 0.0), 110.0, TOLERANCE);
+        assertEquals(frame.row("row").innerProduct(column, 1.0), 112.0, TOLERANCE);
+        assertTrue(Double.isNaN(frame.row("row").innerProduct(column, Double.NaN)));
     }
 }

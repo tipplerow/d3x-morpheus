@@ -48,7 +48,7 @@ public interface DataFrameRow<R,C> extends DataFrameVector<R,C,R,C,DataFrameRow<
      *
      * @throws RuntimeException unless this row holds numeric data.
      */
-    default double scalarProduct(DoubleSeries<C> columnSeries, double defaultValue) {
+    default double innerProduct(DoubleSeries<C> columnSeries, double defaultValue) {
         return values().mapToDouble(value -> value.getDouble() * columnSeries.getDouble(value.colKey(), defaultValue)).sum();
     }
 
