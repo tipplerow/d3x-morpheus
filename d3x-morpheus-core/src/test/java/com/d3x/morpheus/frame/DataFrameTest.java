@@ -20,7 +20,6 @@ import java.util.List;
 import com.d3x.morpheus.matrix.D3xMatrix;
 import com.d3x.morpheus.vector.D3xVector;
 
-import org.hsqldb.Row;
 import org.testng.annotations.Test;
 import static org.testng.Assert.*;
 
