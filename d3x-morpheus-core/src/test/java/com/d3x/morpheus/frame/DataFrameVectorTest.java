@@ -26,19 +26,19 @@ import static org.testng.Assert.*;
 public class DataFrameVectorTest extends DataFrameTestBase {
     @Test
     public void testGetDoubleArray1() {
-        double[] row1 = doubleFrame.row("row1").getDoubleArray();
-        double[] col2 = doubleFrame.col("col2").getDoubleArray();
+        double[] rowarr1 = doubleFrame.row(row1).getDoubleArray();
+        double[] colarr2 = doubleFrame.col(col2).getDoubleArray();
 
-        assertTrue(comparator.equals(row1, new double[] { 11.0, 12.0, 13.0 }));
-        assertTrue(comparator.equals(col2, new double[] { 12.0, 22.0 }));
+        assertTrue(comparator.equals(rowarr1, new double[] { 11.0, 12.0, 13.0 }));
+        assertTrue(comparator.equals(colarr2, new double[] { 12.0, 22.0 }));
     }
 
     @Test
     public void testGetDoubleArray2() {
-        double[] row1 = doubleFrame.row("row1").getDoubleArray(List.of("col3", "col1", "col2"));
-        double[] col2 = doubleFrame.col("col2").getDoubleArray(List.of("row2", "row1"));
+        double[] rowarr1 = doubleFrame.row(row1).getDoubleArray(List.of(col3, col1, col2));
+        double[] colarr2 = doubleFrame.col(col2).getDoubleArray(List.of(row2, row1));
 
-        assertTrue(comparator.equals(row1, new double[] { 13.0, 11.0, 12.0 }));
-        assertTrue(comparator.equals(col2, new double[] { 22.0, 12.0 }));
+        assertTrue(comparator.equals(rowarr1, new double[] { 13.0, 11.0, 12.0 }));
+        assertTrue(comparator.equals(colarr2, new double[] { 22.0, 12.0 }));
     }
 }
