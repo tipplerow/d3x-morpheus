@@ -15,6 +15,8 @@
  */
 package com.d3x.morpheus.frame;
 
+import com.d3x.morpheus.series.DoubleSeries;
+
 /**
  * A convenience marker interface used to represent a column vector on a DataFrame
  *
@@ -31,7 +33,24 @@ package com.d3x.morpheus.frame;
  * @author  Xavier Witdouck
  */
 public interface DataFrameColumn<R,C> extends DataFrameVector<C,R,R,C,DataFrameColumn<R,C>> {
-
+    /**
+     * Computes the inner (dot) product between this column vector and a
+     * DoubleSeries that represents a row vector.  Keys that are present
+     * in this column but missing from the row series are assigned the
+     * default value.
+     *
+     * @param rowSeries    a DoubleSeries that represents a row vector.
+     * @param defaultValue the default value to use for missing elements
+     *                     in the row series.
+     *
+     * @return the inner (dot) product between this column vector and
+     * the specified row vector.
+     *
+     * @throws RuntimeException unless this column holds numeric data.
+     */
+    default double innerProduct(DoubleSeries<R> rowSeries, double defaultValue) {
+        return values().mapToDouble(value -> value.getDouble() * rowSeries.getDouble(value.rowKey(), defaultValue)).sum();
+    }
     /**
      * An interface to a movable DataFrameRow
      * @param <R>   the row key type

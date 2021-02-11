@@ -34,9 +34,9 @@ import com.d3x.morpheus.series.DoubleSeries;
  */
 public interface DataFrameRow<R,C> extends DataFrameVector<R,C,R,C,DataFrameRow<R,C>> {
     /**
-     * Computes the scalar (dot) product between this row vector and a
-     * DoubleSeries that represents a column vector.  Column keys that
-     * are present in this row but missing from the column series are
+     * Computes the scalar (dot) product between this row vector and
+     * a DoubleSeries that represents a column vector. Keys that are
+     * present in this row but missing from the column series are
      * assigned the default value.
      *
      * @param columnSeries a DoubleSeries that represents a column vector.
