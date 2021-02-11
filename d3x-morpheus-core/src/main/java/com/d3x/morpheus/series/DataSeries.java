@@ -17,6 +17,7 @@ package com.d3x.morpheus.series;
 
 import java.io.File;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.lang.reflect.ParameterizedType;
 import java.net.URL;
 import java.util.ArrayList;
@@ -214,6 +215,14 @@ public interface DataSeries<K,V> extends Cloneable {
         return mapped.build();
     }
 
+    /**
+     * Writes the contents of this series to an output stream.
+     *
+     * @param stream where the display will appear.
+     */
+    default void display(PrintStream stream) {
+        keys().forEach(key -> stream.println(key.toString() + " => " + getValue(key).toString()));
+    }
 
     /**
      * Returns a new DataSeries Builder for key and value type
