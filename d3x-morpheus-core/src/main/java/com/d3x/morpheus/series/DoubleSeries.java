@@ -24,6 +24,8 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.ParameterizedType;
 import java.net.URL;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -35,6 +37,8 @@ import java.util.stream.Stream;
 import com.d3x.morpheus.frame.DataFrame;
 import com.d3x.morpheus.stats.Stats;
 import com.d3x.morpheus.util.AssertException;
+import com.d3x.morpheus.util.Collect;
+import com.d3x.morpheus.util.DoubleComparator;
 import com.d3x.morpheus.util.GenericType;
 import com.d3x.morpheus.util.IO;
 import com.d3x.morpheus.util.IntComparator;
@@ -293,6 +297,35 @@ public interface DoubleSeries<K> extends DataSeries<K,Double>, D3xVectorView {
         }
     }
 
+    /**
+     * Identifies series with the same keys and values as this series.
+     *
+     * @param that a series to test for equality.
+     *
+     * @return {@code true} iff the input series and this series contain
+     * exactly the same keys and the corresponding values match within the
+     * tolerance of the default DoubleComparator.
+     */
+    default boolean equalsSeries(DoubleSeries<K> that) {
+        if (this.size() != that.size())
+            return false;
+
+        Collection<K> thisKeySet = Collect.collect(new HashSet<K>(size()), this.keys());
+        Collection<K> thatKeySet = Collect.collect(new HashSet<K>(size()), that.keys());
+
+        if (!thisKeySet.equals(thatKeySet))
+            return false;
+
+        for (K key : thisKeySet) {
+            double thisValue = this.getDouble(key);
+            double thatValue = that.getDouble(key);
+
+            if (!DoubleComparator.DEFAULT.equals(thisValue, thatValue))
+                return false;
+        }
+
+        return true;
+    }
 
     /**
      * Returns a newly created double series based on the args

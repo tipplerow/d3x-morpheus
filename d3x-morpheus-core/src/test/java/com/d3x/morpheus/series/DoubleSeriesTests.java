@@ -33,8 +33,7 @@ import org.testng.annotations.Test;
  * @author Xavier Witdouck
  */
 public class DoubleSeriesTests {
-
-
+    private static final double TOLERANCE = 1.0E-12;
 
     private IntFunction ofIntFunction(IntFunction function) {
         return function;
@@ -144,8 +143,6 @@ public class DoubleSeriesTests {
 
     @Test
     public void testBuildFromLists() {
-        double TOLERANCE = 1.0E-12;
-
         List<String> keys = List.of("A", "B", "C", "D");
         List<Double> values = List.of(1.0, 2.0, Double.NaN, 4.0);
         DoubleSeries<String> series = DoubleSeries.build(String.class, keys, values);
@@ -161,8 +158,6 @@ public class DoubleSeriesTests {
 
     @Test
     public void testBuildFromVector() {
-        double TOLERANCE = 1.0E-12;
-
         List<String> keys = List.of("A", "B", "C", "D");
         D3xVector values = D3xVector.wrap(1.0, 2.0, Double.NaN, 4.0);
         DoubleSeries<String> series = DoubleSeries.build(String.class, keys, values);
@@ -174,6 +169,26 @@ public class DoubleSeriesTests {
         Assert.assertEquals(series.getDoubleAt(1), 2.0, TOLERANCE);
         Assert.assertEquals(series.getDouble("D"), 4.0, TOLERANCE);
         Assert.assertEquals(series.getDoubleAt(2), 4.0, TOLERANCE);
+    }
+    
+    @Test
+    public void testPutSeries() {
+        DoubleSeries<String> series1 =
+                DoubleSeries.build(String.class, List.of("A", "B", "C"), List.of(1.0, 2.0, 3.0));
+
+        DoubleSeries<String> series2 =
+                DoubleSeries.build(String.class, List.of("D", "E"), List.of(4.0, 5.0));
+
+        DoubleSeries<String> series3 =
+                DoubleSeries.build(String.class, List.of("A", "B", "C", "D", "E"), List.of(1.0, 2.0, 3.0, 4.0, 5.0));
+
+        DoubleSeries<String> series4 =
+                DoubleSeries.builder(String.class)
+                .putSeries(series1)
+                .putSeries(series2)
+                .build();
+
+        Assert.assertTrue(series3.equalsSeries(series4));
     }
 
     /*
