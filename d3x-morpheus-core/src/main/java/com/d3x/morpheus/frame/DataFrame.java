@@ -18,6 +18,7 @@ package com.d3x.morpheus.frame;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
@@ -314,6 +315,30 @@ public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperation
      * @return          the <code>DataFrame</code> filter containing selected rows & columns
      */
     DataFrame<R,C> select(Iterable<R> rowKeys, Iterable<C> colKeys);
+
+    /**
+     * Returns a {@code DataFrame} that contains a subset of the rows in this frame.
+     *
+     * @param rowKeys the keys of the rows to retain.
+     *
+     * @return a new {@code DataFrame} containing all columns in this frame but only
+     * the specified rows.
+     */
+    default DataFrame<R,C> selectRows(Iterable<R> rowKeys) {
+        return select(rowKeys, listColumnKeys());
+    }
+
+    /**
+     * Returns a {@code DataFrame} that contains a subset of the columns in this frame.
+     *
+     * @param colKeys the keys of the columns to retain.
+     *
+     * @return a new {@code DataFrame} containing all rows in this frame but only the
+     * specified columns.
+     */
+    default DataFrame<R,C> selectColumns(Iterable<C> colKeys) {
+        return select(listRowKeys(), colKeys);
+    }
 
     /**
      * Returns a <code>DataFrame</code> selection that includes a subset of rows and columns
@@ -699,6 +724,14 @@ public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperation
             matrixData[irow] = row(rowKeys.get(irow)).getDoubleArray(colKeys);
 
         return matrixData;
+    }
+
+    /**
+     * Writes the contents of this DataFrame to an output stream.
+     * @param stream the stream where this frame will appear.
+     */
+    default void display(PrintStream stream) {
+        values().forEach(v -> stream.println(String.format("(%s, %s) => %s", v.rowKey().toString(), v.colKey().toString(), v.getValue().toString())));
     }
 
     /**

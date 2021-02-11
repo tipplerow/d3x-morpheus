@@ -20,6 +20,7 @@ import java.util.List;
 import com.d3x.morpheus.matrix.D3xMatrix;
 import com.d3x.morpheus.vector.D3xVector;
 
+import org.hsqldb.Row;
 import org.testng.annotations.Test;
 import static org.testng.Assert.*;
 
@@ -272,5 +273,41 @@ public class DataFrameTest extends DataFrameTestBase {
         assertEquals(doubleFrame.get(1, 0), 21.0, TOLERANCE);
         assertEquals(doubleFrame.get(1, 1), 22.0, TOLERANCE);
         assertEquals(doubleFrame.get(1, 2), 23.0, TOLERANCE);
+    }
+
+    @Test
+    public void testSelect() {
+        DataFrame<RowKey, ColKey> frame = DataFrame.ofDoubles(
+                List.of(row1, row2, row3, row4),
+                List.of(col1, col2, col3, col4),
+                D3xMatrix.byrow(4, 4,
+                        11.0, 12.0, 13.0, 14.0,
+                        21.0, 22.0, 23.0, 24.0,
+                        31.0, 32.0, 33.0, 34.0,
+                        41.0, 42.0, 43.0, 44.0));
+
+        DataFrame<RowKey, ColKey> sub1 = frame.selectRows(List.of(row4, row2));
+        DataFrame<RowKey, ColKey> sub2 = frame.selectColumns(List.of(col3, col1));
+        DataFrame<RowKey, ColKey> sub3 = frame.select(List.of(row2, row3), List.of(col3, col1));
+
+        assertEquals(sub1.listRowKeys(), List.of(row4, row2));
+        assertEquals(sub1.listColumnKeys(), List.of(col1, col2, col3, col4));
+        assertTrue(D3xMatrix.wrap(sub1.getDoubleMatrix()).equalsMatrix(D3xMatrix.byrow(2, 4,
+                41.0, 42.0, 43.0, 44.0,
+                21.0, 22.0, 23.0, 24.0)));
+
+        assertEquals(sub2.listRowKeys(), List.of(row1, row2, row3, row4));
+        assertEquals(sub2.listColumnKeys(), List.of(col3, col1));
+        assertTrue(D3xMatrix.wrap(sub2.getDoubleMatrix()).equalsMatrix(D3xMatrix.byrow(4, 2,
+                13.0, 11.0,
+                23.0, 21.0,
+                33.0, 31.0,
+                43.0, 41.0)));
+
+        assertEquals(sub3.listRowKeys(), List.of(row2, row3));
+        assertEquals(sub3.listColumnKeys(), List.of(col3, col1));
+        assertTrue(D3xMatrix.wrap(sub3.getDoubleMatrix()).equalsMatrix(D3xMatrix.byrow(2, 2,
+                23.0, 21.0,
+                33.0, 31.0)));
     }
 }

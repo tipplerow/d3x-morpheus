@@ -170,7 +170,7 @@ public class DoubleSeriesTests {
         Assert.assertEquals(series.getDouble("D"), 4.0, TOLERANCE);
         Assert.assertEquals(series.getDoubleAt(2), 4.0, TOLERANCE);
     }
-    
+
     @Test
     public void testPutSeries() {
         DoubleSeries<String> series1 =
