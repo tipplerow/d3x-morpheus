@@ -49,7 +49,7 @@ public class DataFrameColumnTest extends DataFrameTestBase {
                         1.0, 2.0, 3.0,
                         4.0, 5.0, 6.0));
 
-        assertEquals(frame.col(col1).innerProduct(frame.col(col1)),  5.0, TOLERANCE);
+        assertEquals(frame.col(col1).innerProduct(frame.col(col1)), 17.0, TOLERANCE);
         assertEquals(frame.col(col1).innerProduct(frame.col(col2)), 22.0, TOLERANCE);
         assertEquals(frame.col(col1).innerProduct(frame.col(col3)), 27.0, TOLERANCE);
         assertEquals(frame.col(col2).innerProduct(frame.col(col1)), 22.0, TOLERANCE);
