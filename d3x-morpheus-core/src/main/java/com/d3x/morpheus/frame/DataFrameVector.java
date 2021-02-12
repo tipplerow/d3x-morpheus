@@ -25,6 +25,7 @@ import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
 import com.d3x.morpheus.array.Array;
+import com.d3x.morpheus.series.DoubleSeries;
 import com.d3x.morpheus.stats.Statistic1;
 import com.d3x.morpheus.stats.Stats;
 import com.d3x.morpheus.util.Bounds;
@@ -152,6 +153,52 @@ public interface DataFrameVector<X,Y,R,C,Z> extends DataFrameOperations<R,C,Z>, 
     <V> Array<V> distinct(int limit);
 
     /**
+     * Computes the scalar (dot) product between this data vector and
+     * another vector, which must have identical keys to this vector.
+     *
+     * @param that the other vector in the inner product.
+     *
+     * @return the scalar (dot) product between this data vector and
+     * the input vector.
+     *
+     * @throws RuntimeException unless the input vector has keys that
+     * are identical to those in this vector.
+     */
+    default double innerProduct(DataFrameVector<?,Y,?,?,?> that) {
+        if (this.size() != that.size())
+            throw new DataFrameException("DataFrameVector size mismatch.");
+
+        if (this == that)
+            return values().mapToDouble(value -> value.getDouble() * value.getDouble()).sum();
+        else if (isRow())
+            return values().mapToDouble(value -> value.getDouble() * that.getDouble((Y) value.colKey())).sum();
+        else
+            return values().mapToDouble(value -> value.getDouble() * that.getDouble((Y) value.rowKey())).sum();
+    }
+
+    /**
+     * Computes the scalar (dot) product between this data vector and
+     * a DoubleSeries that represents another vector. Entries that are
+     * present in this vector but missing from the series are assigned
+     * the default value.
+     *
+     * @param doubleSeries a DoubleSeries that represents another vector.
+     * @param defaultValue the default value to use for missing elements
+     *                     in the input series.
+     *
+     * @return the scalar (dot) product between this data vector and the
+     * specified double series.
+     *
+     * @throws RuntimeException unless this vector holds numeric data.
+     */
+    default double innerProduct(DoubleSeries<Y> doubleSeries, double defaultValue) {
+        if (isRow())
+            return values().mapToDouble(value -> value.getDouble() * doubleSeries.getDouble((Y) value.colKey(), defaultValue)).sum();
+        else
+            return values().mapToDouble(value -> value.getDouble() * doubleSeries.getDouble((Y) value.rowKey(), defaultValue)).sum();
+    }
+
+    /**
      * Returns a stream of primitive integers
      * @return  the stream of primitive integers
      */
@@ -189,7 +236,7 @@ public interface DataFrameVector<X,Y,R,C,Z> extends DataFrameOperations<R,C,Z>, 
     DataFrame<R,C> toDataFrame();
 
     /**
-     * Returns a DataFrame representing a frquency distribution of this vector
+     * Returns a DataFrame representing a frequency distribution of this vector
      * @param binCount      the number of bins to include in the histogram frame
      * @return              the newly created DataFrame with frequency distribution
      */

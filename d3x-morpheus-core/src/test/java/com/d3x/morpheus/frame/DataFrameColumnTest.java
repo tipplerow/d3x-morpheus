@@ -17,6 +17,7 @@ package com.d3x.morpheus.frame;
 
 import java.util.List;
 
+import com.d3x.morpheus.matrix.D3xMatrix;
 import com.d3x.morpheus.series.DoubleSeries;
 import com.d3x.morpheus.vector.D3xVector;
 
@@ -27,7 +28,7 @@ public class DataFrameColumnTest extends DataFrameTestBase {
     private static final double TOLERANCE = 1.0E-12;
 
     @Test
-    public void testInnerProduct() {
+    public void testSeriesInnerProduct() {
         DataFrame<RowKey, ColKey> frame =
                 DataFrame.ofDoubles(List.of(row1, row2, row3), col1, D3xVector.wrap(2.0, 3.0, 4.0));
 
@@ -37,5 +38,25 @@ public class DataFrameColumnTest extends DataFrameTestBase {
         assertEquals(frame.col(col1).innerProduct(series, 0.0), 110.0, TOLERANCE);
         assertEquals(frame.col(col1).innerProduct(series, 1.0), 112.0, TOLERANCE);
         assertTrue(Double.isNaN(frame.col(col1).innerProduct(series, Double.NaN)));
+    }
+
+    @Test
+    public void testVectorInnerProduct() {
+        DataFrame<RowKey, ColKey> frame = DataFrame.ofDoubles(
+                List.of(row1, row2),
+                List.of(col1, col2, col3),
+                D3xMatrix.byrow(2, 3,
+                        1.0, 2.0, 3.0,
+                        4.0, 5.0, 6.0));
+
+        assertEquals(frame.col(col1).innerProduct(frame.col(col1)),  5.0, TOLERANCE);
+        assertEquals(frame.col(col1).innerProduct(frame.col(col2)), 22.0, TOLERANCE);
+        assertEquals(frame.col(col1).innerProduct(frame.col(col3)), 27.0, TOLERANCE);
+        assertEquals(frame.col(col2).innerProduct(frame.col(col1)), 22.0, TOLERANCE);
+        assertEquals(frame.col(col2).innerProduct(frame.col(col2)), 29.0, TOLERANCE);
+        assertEquals(frame.col(col2).innerProduct(frame.col(col3)), 36.0, TOLERANCE);
+        assertEquals(frame.col(col3).innerProduct(frame.col(col1)), 27.0, TOLERANCE);
+        assertEquals(frame.col(col3).innerProduct(frame.col(col2)), 36.0, TOLERANCE);
+        assertEquals(frame.col(col3).innerProduct(frame.col(col3)), 45.0, TOLERANCE);
     }
 }
