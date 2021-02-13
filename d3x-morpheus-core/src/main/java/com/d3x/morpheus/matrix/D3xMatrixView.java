@@ -173,6 +173,23 @@ public interface D3xMatrixView {
     }
 
     /**
+     * Identifies symmetric matrices.
+     *
+     * @return {@code true} iff this matrix is symmetric.
+     */
+    default boolean isSymmetric() {
+        if (!isSquare())
+            return false;
+
+        for (int irow = 0; irow < nrow(); ++irow)
+            for (int jcol = irow + 1; jcol < ncol(); ++jcol)
+                if (!DoubleComparator.DEFAULT.equals(get(irow, jcol), get(jcol, irow)))
+                    return false;
+
+        return true;
+    }
+
+    /**
      * Returns the number of elements in this matrix (the product of the number
      * of rows and the number of columns).
      *
