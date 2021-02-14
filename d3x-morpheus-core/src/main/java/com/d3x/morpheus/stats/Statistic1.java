@@ -16,7 +16,9 @@
 package com.d3x.morpheus.stats;
 
 import java.util.function.Supplier;
+import java.util.stream.DoubleStream;
 
+import com.d3x.morpheus.frame.DataFrameVector;
 import com.d3x.morpheus.vector.D3xVectorView;
 
 /**
@@ -50,6 +52,29 @@ public interface Statistic1 extends Statistic {
     }
 
     /**
+     * Adds new values to the sample for this statistic.
+     *
+     * @param vector a vector of values to add.
+     *
+     * @return the sample size after adding the values.
+     */
+    default long add(DataFrameVector<?,?,?,?,?> vector) {
+        return add(vector.toDoubleStream());
+    }
+
+    /**
+     * Adds new values to the sample for this statistic.
+     *
+     * @param stream a stream of values to add.
+     *
+     * @return the sample size after adding the values.
+     */
+    default long add(DoubleStream stream) {
+        stream.forEach(this::add);
+        return getN();
+    }
+
+    /**
      * Resets this statistic and computes the value for a given sample.
      *
      * @param sample the sample of values.
@@ -57,6 +82,28 @@ public interface Statistic1 extends Statistic {
      * @return the value of this statistic for the specified sample.
      */
     default double compute(D3xVectorView sample) {
+        return compute(this, sample);
+    }
+
+    /**
+     * Resets this statistic and computes the value for a given sample.
+     *
+     * @param sample the sample of values.
+     *
+     * @return the value of this statistic for the specified sample.
+     */
+    default double compute(DataFrameVector<?,?,?,?,?> sample) {
+        return compute(this, sample);
+    }
+
+    /**
+     * Resets this statistic and computes the value for a given sample.
+     *
+     * @param sample the sample of values.
+     *
+     * @return the value of this statistic for the specified sample.
+     */
+    default double compute(DoubleStream sample) {
         return compute(this, sample);
     }
 
@@ -81,6 +128,34 @@ public interface Statistic1 extends Statistic {
      * @return          the value of the statistic for the given sample.
      */
     static double compute(Statistic1 stat, D3xVectorView sample) {
+        stat.reset();
+        stat.add(sample);
+        return stat.getValue();
+    }
+
+    /**
+     * Computes a univariate statistic over a given sample.
+     *
+     * @param stat      the statistic type
+     * @param sample    the sample of values
+     *
+     * @return          the value of the statistic for the given sample.
+     */
+    static double compute(Statistic1 stat, DataFrameVector<?,?,?,?,?> sample) {
+        stat.reset();
+        stat.add(sample);
+        return stat.getValue();
+    }
+
+    /**
+     * Computes a univariate statistic over a given sample.
+     *
+     * @param stat      the statistic type
+     * @param sample    the sample of values
+     *
+     * @return          the value of the statistic for the given sample.
+     */
+    static double compute(Statistic1 stat, DoubleStream sample) {
         stat.reset();
         stat.add(sample);
         return stat.getValue();
@@ -115,5 +190,4 @@ public interface Statistic1 extends Statistic {
         }
         return stat.getValue();
     }
-
 }
