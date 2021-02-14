@@ -155,6 +155,23 @@ public interface D3xMatrixView {
     }
 
     /**
+     * Identifies diagonal matrices.
+     *
+     * @return {@code true} iff this matrix is diagonal.
+     */
+    default boolean isDiagonal() {
+        if (!isSquare())
+            return false;
+
+        for (int irow = 0; irow < nrow(); ++irow)
+            for (int jcol = 0; jcol < ncol(); ++jcol)
+                if (jcol != irow && DoubleComparator.DEFAULT.isNonZero(get(irow, jcol)))
+                    return false;
+
+        return true;
+    }
+
+    /**
      * Identifies empty matrices.
      *
      * @return {@code true} iff this matrix contains no elements.

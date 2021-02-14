@@ -87,6 +87,38 @@ public class D3xMatrixViewTest {
     }
 
     @Test
+    public void testIsDiagonal() {
+        double[][] array1 = new double[][] {
+                { 1.0, 0.0, 0.0 },
+                { 0.0, 4.0, 0.0 }
+        };
+
+        double[][] array2 = new double[][] {
+                { 1.0, 0.0 },
+                { 0.0, 4.0 },
+                { 0.0, 0.0 }
+        };
+
+        double[][] array3 = new double[][] {
+                { 1.0, 0.0, 0.0 },
+                { 0.0, 4.0, 0.0 },
+                { 0.0, 0.0, 9.0 }
+        };
+
+        D3xMatrixView matrix1 = D3xMatrixView.of(array1);
+        D3xMatrixView matrix2 = D3xMatrixView.of(array2);
+        D3xMatrixView matrix3 = D3xMatrixView.of(array3);
+
+        assertFalse(matrix1.isDiagonal());
+        assertFalse(matrix2.isDiagonal());
+        assertTrue(matrix3.isDiagonal());
+
+        array3[1][2] = 0.1;
+
+        assertFalse(matrix3.isDiagonal());
+    }
+
+    @Test
     public void testIsSymmetric() {
         double[][] array1 = new double[][] {
                 { 10.0, 20.0, 30.0 },
@@ -108,11 +140,9 @@ public class D3xMatrixViewTest {
         assertFalse(matrix1.isSymmetric());
         assertTrue(matrix2.isSymmetric());
 
-        System.out.println(matrix2.get(0, 1));
         array2[0][1] = 88.8;
 
         assertTrue(matrix2.isSquare());
-        System.out.println(matrix2.get(0, 1));
         assertFalse(matrix2.isSymmetric());
     }
 }
