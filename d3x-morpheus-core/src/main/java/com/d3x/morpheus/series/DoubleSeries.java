@@ -27,6 +27,7 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -405,6 +406,18 @@ public interface DoubleSeries<K> extends DataSeries<K,Double>, D3xVectorView {
      */
     static <K> DoubleSeries<K> zeros(Class<K> keyClass, Iterable<K> keys) {
         return of(keyClass, keys, 0.0);
+    }
+
+    /**
+     * Creates a new DoubleSeries from a map.
+     *
+     * @param <K>    the runtime key type.
+     * @param map a mapping from key to double value.
+     *
+     * @return a new DoubleSeries containing the same mapping as the input map.
+     */
+    static <K> DoubleSeries<K> build(Class<K> keyType, Map<K, Double> map) {
+        return of(keyType, map.keySet(), map::get);
     }
 
     /**

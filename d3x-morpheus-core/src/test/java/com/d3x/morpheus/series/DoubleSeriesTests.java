@@ -18,6 +18,7 @@ package com.d3x.morpheus.series;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.function.IntFunction;
 import java.util.stream.IntStream;
 
@@ -154,6 +155,16 @@ public class DoubleSeriesTests {
         Assert.assertEquals(series.getDoubleAt(1), 2.0, TOLERANCE);
         Assert.assertEquals(series.getDouble("D"), 4.0, TOLERANCE);
         Assert.assertEquals(series.getDoubleAt(2), 4.0, TOLERANCE);
+    }
+
+    @Test
+    public void testBuildFromMap() {
+        DoubleSeries<String> series = DoubleSeries.build(String.class, Map.of("A", 1.0, "B", 2.0, "C", 3.0));
+
+        Assert.assertEquals(series.size(), 3);
+        Assert.assertEquals(series.getDouble("A"), 1.0, TOLERANCE);
+        Assert.assertEquals(series.getDouble("B"), 2.0, TOLERANCE);
+        Assert.assertEquals(series.getDouble("C"), 3.0, TOLERANCE);
     }
 
     @Test
