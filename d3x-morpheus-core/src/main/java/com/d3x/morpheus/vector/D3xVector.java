@@ -34,24 +34,7 @@ import com.d3x.morpheus.util.MorpheusException;
  *
  * @author Scott Shaffer
  */
-public interface D3xVector {
-    /**
-     * Returns the length of this vector.
-     * @return the length of this vector.
-     */
-    int length();
-
-    /**
-     * Returns the value of an element at a given location.
-     *
-     * @param index the index of the element to return.
-     *
-     * @return the value of the element at the specified location.
-     *
-     * @throws RuntimeException if the index is out of bounds.
-     */
-    double get(int index);
-
+public interface D3xVector extends D3xVectorView {
     /**
      * Assigns the value of an element at a given location.
      *
@@ -134,6 +117,36 @@ public interface D3xVector {
 
         return this;
     }
+
+    /**
+     * Computes the dot product of this vector and another.
+     *
+     * @param vector the second vector in the dot product.
+     *
+     * @return the dot product of this vector and the input vector.
+     *
+     * @throws RuntimeException unless the input vector has the same
+     * length as this vector.
+     */
+    double dot(D3xVector vector);
+
+    /**
+     * Rescales this vector (in place) so that the elements sum to one.
+     *
+     * @return this vector, modified, for operator chaining.
+     *
+     * @throws RuntimeException if the elements sum to zero within a
+     * small floating-point tolerance.
+     */
+    default D3xVector normalize() {
+        double sum = sum();
+
+        if (DoubleComparator.DEFAULT.isZero(sum))
+            throw new MorpheusException("Cannot normalize a vector with zero element sum.");
+
+        return divideInPlace(sum);
+    }
+
 
     /**
      * Computes the sum of this vector and another and returns the sum
@@ -546,42 +559,6 @@ public interface D3xVector {
     }
 
     /**
-     * Determines whether the entries in this vector are equal to those in a bare array
-     * <em>within the tolerance of the default DoubleComparator</em>.
-     *
-     * @param values the values to test for equality.
-     *
-     * @return {@code true} iff the input array has the same length as this vector and
-     * each value matches the corresponding entry in this vector within the tolerance
-     * of the default DoubleComparator.
-     */
-    default boolean equalsArray(double... values) {
-        return equalsArray(values, DoubleComparator.DEFAULT);
-    }
-
-    /**
-     * Determines whether the entries in this vector are equal to those in a bare array
-     * within the tolerance of a given DoubleComparator.
-     *
-     * @param values     the values to test for equality.
-     * @param comparator the element comparator.
-     *
-     * @return {@code true} iff the input array has the same length as this vector and
-     * each value matches the corresponding entry in this vector within the tolerance
-     * of the specified comparator.
-     */
-    default boolean equalsArray(double[] values, DoubleComparator comparator) {
-        if (values.length != this.length())
-            return false;
-
-        for (int index = 0; index < values.length; ++index)
-            if (!comparator.equals(values[index], get(index)))
-                return false;
-
-        return true;
-    }
-
-    /**
      * Determines whether the entries in this vector are equal to those in another vector
      * <em>within the tolerance of the default DoubleComparator</em>.
      *
@@ -607,74 +584,16 @@ public interface D3xVector {
      * of the specified comparator.
      */
     default boolean equalsVector(D3xVector that, DoubleComparator comparator) {
-        if (this.length() != that.length())
-            return false;
-
-        for (int index = 0; index < length(); ++index)
-            if (!comparator.equals(this.get(index), that.get(index)))
-                return false;
-
-        return true;
+        return equalsView(that, comparator);
     }
 
     /**
-     * Creates a string representation of this vector.
+     * Identifies empty vectors.
      *
-     * @return a string representation of this vector.
+     * @return {@code true} iff this vector has zero length.
      */
-    default String format() {
-        return Arrays.toString(toArray());
+    default boolean isEmpty() {
+        return length() == 0;
     }
 
-    /**
-     * Determines if this vector has the same length as another vector.
-     *
-     * @param that the vector to compare to this.
-     *
-     * @return {@code true} iff the input vector has the same length as this vector.
-     */
-    default boolean isCongruent(D3xVector that) {
-        return this.length() == that.length();
-    }
-
-    /**
-     * Creates a new array with the same contents as this vector. Changes to the
-     * returned array will not be reflected in this vector, and changes to this
-     * vector will not be reflected in the returned array.
-     *
-     * @return the elements of this vector in a new array.
-     */
-    default double[] toArray() {
-        double[] array = new double[length()];
-
-        for (int index = 0; index < array.length; ++index)
-            array[index] = get(index);
-
-        return array;
-    }
-
-    /**
-     * Ensures that this vector has the same length as another vector.
-     *
-     * @param that the vector to validate.
-     *
-     * @throws RuntimeException unless the specified vector has the same length as
-     * this vector.
-     */
-    default void validateCongruent(D3xVector that) {
-        if (!isCongruent(that))
-            throw new MorpheusException("Vector length mismatch: [%d != %d].", this.length(), that.length());
-    }
-
-    /**
-     * Ensures that an element index is valid.
-     *
-     * @param index the index to validate.
-     *
-     * @throws RuntimeException if the specified index is out of bounds.
-     */
-    default void validateIndex(int index) {
-        if (index < 0 || index >= length())
-            throw new MorpheusException("Index [%d] is out of bounds [0, %d).", index, length());
-    }
 }

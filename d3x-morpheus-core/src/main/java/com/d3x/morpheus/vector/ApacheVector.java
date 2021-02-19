@@ -160,6 +160,11 @@ public final class ApacheVector implements D3xVector {
     }
 
     @Override
+    public double dot(D3xVector vector) {
+        return impl.dotProduct(asOperand(vector));
+    }
+
+    @Override
     public double get(int index) {
         return impl.getEntry(index);
     }

@@ -17,15 +17,18 @@ package com.d3x.morpheus.series;
 
 import java.io.File;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.ToDoubleFunction;
 import java.util.stream.Stream;
 
 import com.d3x.morpheus.util.GenericType;
 import com.d3x.morpheus.util.IntComparator;
+import com.d3x.morpheus.util.MorpheusException;
 import com.d3x.morpheus.util.Resource;
 
 /**
@@ -153,6 +156,54 @@ public interface DataSeries<K,V> extends Cloneable {
     }
 
     /**
+     * Returns a list of the keys in this series.
+     * @return a list for which {@code get(k).equals(this.getKey(k))}.
+     */
+    default List<K> listKeys() {
+        List<K> keyList = new ArrayList<>(size());
+
+        for (int index = 0; index < size(); ++index)
+            keyList.add(getKey(index));
+
+        return keyList;
+    }
+
+    /**
+     * Ensures that a DataSeries contains a particular key.
+     *
+     * @param key the required key.
+     *
+     * @throws RuntimeException unless this series contains the specified key.
+     */
+    default void requireKey(K key) {
+        if (!contains(key))
+            throw new MorpheusException("Missing required key: [%s].", key);
+    }
+
+    /**
+     * Ensures that a DataSeries contains particular keys.
+     *
+     * @param keys the required keys.
+     *
+     * @throws RuntimeException unless this series contains the specified keys.
+     */
+    default void requireKeys(Iterable<K> keys) {
+        for (K key : keys)
+            requireKey(key);
+    }
+
+    /**
+     * Ensures that a DataSeries contains particular keys.
+     *
+     * @param keys the required keys.
+     *
+     * @throws RuntimeException unless this series contains the specified keys.
+     */
+    default void requireKeys(Stream<K> keys) {
+        keys.forEach(this::requireKey);
+    }
+
+    /**
      * Maps this data series to a double series
      * @param mapper    the mapper function
      * @return          the resulting series
@@ -164,6 +215,14 @@ public interface DataSeries<K,V> extends Cloneable {
         return mapped.build();
     }
 
+    /**
+     * Writes the contents of this series to an output stream.
+     *
+     * @param stream where the display will appear.
+     */
+    default void display(PrintStream stream) {
+        keys().forEach(key -> stream.println(key.toString() + " => " + getValue(key).toString()));
+    }
 
     /**
      * Returns a new DataSeries Builder for key and value type

@@ -18,10 +18,10 @@ package com.d3x.morpheus.conreg;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 
 import com.d3x.morpheus.frame.DataFrame;
 import com.d3x.morpheus.matrix.D3xMatrix;
+import com.d3x.morpheus.series.DoubleSeries;
 import com.d3x.morpheus.vector.D3xVector;
 import com.d3x.morpheus.util.DoubleComparator;
 
@@ -32,20 +32,23 @@ public abstract class ConstrainedRegressionTestBase {
 
     public static final String descriptorConstraintName = "DescriptorConstraint";
     public static final double descriptorConstraintValue = 3.0;
-    public static final double[] descriptorConstraintCoeff = new double[] { 0.0, 1.0, 2.0, 0.0 };
-    public static final DataFrame<String, String> descriptorConstraintFrame =
-            DataFrame.ofDoubles(descriptorConstraintName, descriptors, descriptorConstraintCoeff);
+    public static final List<Double> descriptorConstraintCoeffs = List.of(0.0, 1.0, 2.0, 0.0);
+    public static final DoubleSeries<String> descriptorConstraintTerms = DoubleSeries.build(String.class, descriptors, descriptorConstraintCoeffs);
+    public static final RegressionConstraint<String> descriptorConstraint =
+            new RegressionConstraint<>(descriptorConstraintName, descriptorConstraintValue, descriptorConstraintTerms);
 
     public static final String categoryName = "AutoMaker";
     public static final List<String> categoryColumns = List.of("Ford", "GM", "BMW");
+    public static final RegressionConstraint<String> categoryConstraint =
+            new RegressionConstraint<>(categoryName, 0.0, DoubleSeries.ones(String.class, categoryColumns));
 
     public static final List<String> observationRows =
             List.of("row1", "row2", "row3", "row4", "row5", "row6", "row7", "row8", "row9", "row10", "row11");
 
     public static final DoubleComparator comparator = DoubleComparator.DEFAULT;
 
-    public static ConstrainedRegressionModel<String> buildUnconstrainedModel() {
-        return ConstrainedRegressionModel.build(regressand, descriptors);
+    public static ConstrainedRegressionModel<String, String> buildUnconstrainedModel() {
+        return ConstrainedRegressionModel.create(regressand, descriptors, buildObservationFrame());
     }
 
     public static final D3xVector betaExact =
@@ -67,14 +70,15 @@ public abstract class ConstrainedRegressionTestBase {
         return regressors;
     }
 
-    public static ConstrainedRegressionModel<String> buildConstrainedModel() {
-        return ConstrainedRegressionModel.build(regressand, getRegressors())
-                .withWeight(weight)
-                .addConstraint(descriptorConstraintFrame, descriptorConstraintValue)
-                .addCategory(categoryName, Set.copyOf(categoryColumns));
+    public static ConstrainedRegressionModel<String, String> buildConstrainedModel() {
+        return ConstrainedRegressionModel.create(regressand, getRegressors(), buildObservationFrame())
+                .withWeights(weight)
+                .withConstraint(descriptorConstraint)
+                .withConstraint(categoryConstraint);
     }
 
-    public static DataFrame<String, String> buildObservationFrame(Random random) {
+    public static DataFrame<String, String> buildObservationFrame() {
+        Random random = new Random(20210120);
         List<String> columnNames = new ArrayList<>();
         columnNames.addAll(descriptors);
         columnNames.addAll(categoryColumns);

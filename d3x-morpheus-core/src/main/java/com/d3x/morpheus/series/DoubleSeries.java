@@ -24,6 +24,10 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.ParameterizedType;
 import java.net.URL;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -34,10 +38,15 @@ import java.util.stream.Stream;
 import com.d3x.morpheus.frame.DataFrame;
 import com.d3x.morpheus.stats.Stats;
 import com.d3x.morpheus.util.AssertException;
+import com.d3x.morpheus.util.Collect;
+import com.d3x.morpheus.util.DoubleComparator;
 import com.d3x.morpheus.util.GenericType;
 import com.d3x.morpheus.util.IO;
 import com.d3x.morpheus.util.IntComparator;
+import com.d3x.morpheus.util.MorpheusException;
 import com.d3x.morpheus.util.Resource;
+import com.d3x.morpheus.vector.D3xVector;
+import com.d3x.morpheus.vector.D3xVectorView;
 
 /**
  * An interface to an immutable series of doubles stored against a unique key
@@ -46,7 +55,7 @@ import com.d3x.morpheus.util.Resource;
  *
  * @author Xavier Witdouck
  */
-public interface DoubleSeries<K> extends DataSeries<K,Double> {
+public interface DoubleSeries<K> extends DataSeries<K,Double>, D3xVectorView {
 
     /**
      * Returns the value for key, NaN if no match
@@ -55,6 +64,20 @@ public interface DoubleSeries<K> extends DataSeries<K,Double> {
      */
     double getDouble(K key);
 
+    /**
+     * Returns the value mapped to a particular key or a default
+     * value for missing keys.
+     *
+     * @param key          the key of the desired value.
+     * @param defaultValue the default value to use for missing keys.
+     *
+     * @return the value mapped to the specified key, or the default
+     * value is this series does not contain the key.
+     */
+    default double getDouble(K key, double defaultValue) {
+        double value = getDouble(key);
+        return Double.isNaN(value) ? defaultValue : value;
+    }
 
     @Override
     default Double getValue(K key) {
@@ -79,6 +102,16 @@ public interface DoubleSeries<K> extends DataSeries<K,Double> {
     @Override
     default boolean isNullAt(int index) {
         return Double.isNaN(getDoubleAt(index));
+    }
+
+    @Override
+    default int length() {
+        return size();
+    }
+
+    @Override
+    default double get(int index) {
+        return getValueAt(index);
     }
 
     /**
@@ -122,16 +155,51 @@ public interface DoubleSeries<K> extends DataSeries<K,Double> {
         return Stats.of(this::toDoubles);
     }
 
+
     /**
      * Returns the value for asset, zero if no match for asset
      * @param key   the item identifier
      * @return      the value for item, zero if no match
      */
     default double getDoubleOrZero(K key) {
-        var value = getDouble(key);
-        return Double.isNaN(value) ? 0d : value;
+        return getDouble(key, 0.0);
     }
 
+    /**
+     * Returns the value mapped to a particular key, which must exist.
+     *
+     * @param key the key of the required value.
+     *
+     * @return the value mapped to the specified key.
+     *
+     * @throws RuntimeException unless this series contains the given key.
+     */
+    default double getRequired(K key) {
+        double value = getDouble(key);
+
+        if (Double.isNaN(value))
+            throw new MorpheusException("Missing series entry for key [%s].", key);
+        else
+            return value;
+    }
+
+    /**
+     * Returns the values mapped to a list of keys, which must exist.
+     *
+     * @param keys the keys of the required values.
+     *
+     * @return the values mapped to the specified keys.
+     *
+     * @throws RuntimeException unless this series contains all keys.
+     */
+    default D3xVector getRequired(List<K> keys) {
+        D3xVector vector = D3xVector.dense(keys.size());
+
+        for (int index = 0; index < keys.size(); ++index)
+            vector.set(index, getRequired(keys.get(index)));
+
+        return vector;
+    }
 
     /**
      * Returns a deep copy of this series
@@ -230,6 +298,35 @@ public interface DoubleSeries<K> extends DataSeries<K,Double> {
         }
     }
 
+    /**
+     * Identifies series with the same keys and values as this series.
+     *
+     * @param that a series to test for equality.
+     *
+     * @return {@code true} iff the input series and this series contain
+     * exactly the same keys and the corresponding values match within the
+     * tolerance of the default DoubleComparator.
+     */
+    default boolean equalsSeries(DoubleSeries<K> that) {
+        if (this.size() != that.size())
+            return false;
+
+        Collection<K> thisKeySet = Collect.collect(new HashSet<K>(size()), this.keys());
+        Collection<K> thatKeySet = Collect.collect(new HashSet<K>(size()), that.keys());
+
+        if (!thisKeySet.equals(thatKeySet))
+            return false;
+
+        for (K key : thisKeySet) {
+            double thisValue = this.getDouble(key);
+            double thatValue = that.getDouble(key);
+
+            if (!DoubleComparator.DEFAULT.equals(thisValue, thatValue))
+                return false;
+        }
+
+        return true;
+    }
 
     /**
      * Returns a newly created double series based on the args
@@ -274,7 +371,100 @@ public interface DoubleSeries<K> extends DataSeries<K,Double> {
         return builder.build();
     }
 
+    /**
+     * Creates a new series with all values equal to a constant.
+     *
+     * @param keyClass the runtime key type.
+     * @param keys     the keys to include in the series.
+     * @param value    the constant value for all entries.
+     *
+     * @return a new series with each key mapped to {@code value}.
+     */
+    static <K> DoubleSeries<K> of(Class<K> keyClass, Iterable<K> keys, double value) {
+        return of(keyClass, keys, key -> value);
+    }
 
+    /**
+     * Creates a new series with all values equal to {@code 1.0}.
+     *
+     * @param keyClass the runtime key type.
+     * @param keys     the keys to include in the series.
+     *
+     * @return a new series with each key mapped to the value {@code 1.0}.
+     */
+    static <K> DoubleSeries<K> ones(Class<K> keyClass, Iterable<K> keys) {
+        return of(keyClass, keys, 1.0);
+    }
+
+    /**
+     * Creates a new series with all values equal to {@code 0.0}.
+     *
+     * @param keyClass the runtime key type.
+     * @param keys     the keys to include in the series.
+     *
+     * @return a new series with each key mapped to the value {@code 0.0}.
+     */
+    static <K> DoubleSeries<K> zeros(Class<K> keyClass, Iterable<K> keys) {
+        return of(keyClass, keys, 0.0);
+    }
+
+    /**
+     * Creates a new DoubleSeries from a map.
+     *
+     * @param <K>    the runtime key type.
+     * @param map a mapping from key to double value.
+     *
+     * @return a new DoubleSeries containing the same mapping as the input map.
+     */
+    static <K> DoubleSeries<K> build(Class<K> keyType, Map<K, Double> map) {
+        return of(keyType, map.keySet(), map::get);
+    }
+
+    /**
+     * Creates a new DoubleSeries from lists of keys and values.
+     *
+     * @param <K>    the runtime key type.
+     * @param keys   the series keys.
+     * @param values the series values.
+     *
+     * @return a new DoubleSeries containing the non-{@code NaN} entries
+     * from the specified key and value lists.
+     *
+     * @throws RuntimeException unless the keys and values have equal sizes.
+     */
+    static <K> DoubleSeries<K> build(Class<K> keyType, List<K> keys, List<Double> values) {
+        return build(keyType, keys, D3xVectorView.of(values));
+    }
+
+    /**
+     * Creates a new DoubleSeries from a list of keys and a vector of values.
+     *
+     * @param <K>    the runtime key type.
+     * @param keys   the series keys.
+     * @param values the series values.
+     *
+     * @return a new DoubleSeries containing the non-{@code NaN} entries
+     * from the specified keys and values.
+     *
+     * @throws RuntimeException unless the keys and values have equal sizes.
+     */
+    static <K> DoubleSeries<K> build(Class<K> keyType, List<K> keys, D3xVectorView values) {
+        if (keys.size() != values.length())
+            throw new MorpheusException("Key/value length mismatch.");
+
+        DoubleSeriesBuilder<K> builder = builder(keyType);
+        builder.capacity(keys.size());
+
+        for (int index = 0; index < keys.size(); ++index) {
+            K key = keys.get(index);
+            double value = values.get(index);
+
+            if (!Double.isNaN(value))
+                builder.putDouble(key, value);
+        }
+
+        return builder.build();
+    }
 
     /**
      * Returns a new DoubleSeries Builder for key type
@@ -341,6 +531,8 @@ public interface DoubleSeries<K> extends DataSeries<K,Double> {
      * @return          the the does series
      */
     static <R,C> DoubleSeries<R> from(DataFrame<R,C> frame, C colKey) {
+        frame.requireNumericColumn(colKey);
+
         var keyType = frame.rows().keyClass();
         var result = DoubleSeries.builder(keyType);
         var col = frame.cols().ordinal(colKey);
@@ -353,7 +545,6 @@ public interface DoubleSeries<K> extends DataSeries<K,Double> {
         });
         return result.build();
     }
-
 
     /**
      * Returns an empty dataset of asset values
@@ -427,5 +618,32 @@ public interface DoubleSeries<K> extends DataSeries<K,Double> {
         void accept(K key, double value);
     }
 
+    /**
+     * Computes the inner product of two series, assuming that missing
+     * series values are {@code 0.0}, not {@code Double.NaN}.
+     *
+     * @param <K> the runtime type for the series.
+     * @param s1  the first series in the inner product.
+     * @param s2  the second series in the inner product.
+     *
+     * @return the inner product of the two series.
+     */
+    static <K> double innerProduct(DoubleSeries<K> s1, DoubleSeries<K> s2) {
+        return InnerProduct.compute(s1, s2);
+    }
 
+    /**
+     * Computes a weighted inner product of two series, assuming that
+     * missing series values are {@code 0.0}, not {@code Double.NaN}.
+     *
+     * @param <K> the runtime type for the series.
+     * @param s1  the first series in the inner product.
+     * @param s2  the second series in the inner product.
+     * @param wt  the weights to apply to each term in the inner product.
+     *
+     * @return the inner product of the two series.
+     */
+    static <K> double innerProduct(DoubleSeries<K> s1, DoubleSeries<K> s2, DoubleSeries<K> wt) {
+        return InnerProduct.compute(s1, s2, wt);
+    }
 }

@@ -15,26 +15,25 @@
  */
 package com.d3x.morpheus.conreg;
 
-import java.util.Random;
+import java.util.List;
 
 import com.d3x.morpheus.frame.DataFrame;
 import com.d3x.morpheus.matrix.D3xMatrix;
+import com.d3x.morpheus.series.DoubleSeries;
 import com.d3x.morpheus.vector.D3xVector;
 
 import org.testng.annotations.Test;
 import static org.testng.Assert.*;
 
 public class ConstrainedRegressionSystemTest extends ConstrainedRegressionTestBase {
-    public static final Random random = new Random(20210120);
-
-    private final ConstrainedRegressionModel<String> model;
     private final DataFrame<String, String> frame;
     private final ConstrainedRegressionSystem<String, String> system;
 
+    private static final double TOLERANCE = 1.0E-12;
+
     public ConstrainedRegressionSystemTest() {
-        this.model = buildConstrainedModel();
-        this.frame = buildObservationFrame(random);
-        this.system = ConstrainedRegressionSystem.build(model, frame);
+        this.frame = buildObservationFrame();
+        this.system = buildConstrainedModel().build();
     }
 
     @Test
@@ -116,5 +115,63 @@ public class ConstrainedRegressionSystemTest extends ConstrainedRegressionTestBa
     public void testWeightVector() {
         // There are ten non-zero weights, so the weights should be rescaled to sum to 10.0...
         assertTrue(comparator.equals(system.getWeightVector(), D3xVector.wrap(0.5, 1.0, 1.5, 2.0, 0.0, 0.5, 1.0, 1.5, 0.5, 1.0, 0.5)));
+    }
+
+    @Test
+    public void testObservationOrder() {
+        List<String> myRows = List.of("row1", "row3", "row5", "row7", "row9", "row11");
+        List<String> myCols = List.of("x3", "x2", "x1", "x0");
+        DataFrame<String, String> myFrame = buildObservationFrame();
+        DoubleSeries<String> conTerms = DoubleSeries.build(String.class, List.of("x1", "x2", "x3"), List.of(1.0, 2.0, 3.0));
+
+        ConstrainedRegressionSystem<String, String> mySystem =
+                ConstrainedRegressionModel.create(myFrame, DoubleSeries.from(myFrame, regressand))
+                        .withObservations(myRows)
+                        .withRegressors(myCols)
+                        .withConstraint("con1", 4.0, conTerms)
+                        .build();
+
+        D3xVector myVector = mySystem.getRegressandVector();
+        D3xVector baseVector = system.getRegressandVector();
+
+        D3xMatrix myMatrix = mySystem.getDesignMatrix();
+        D3xMatrix baseMatrix = system.getDesignMatrix();
+
+        assertEquals(myVector.get(0), baseVector.get(0), TOLERANCE);
+        assertEquals(myVector.get(1), baseVector.get(2), TOLERANCE);
+        assertEquals(myVector.get(2), baseVector.get(4), TOLERANCE);
+        assertEquals(myVector.get(3), baseVector.get(6), TOLERANCE);
+        assertEquals(myVector.get(4), baseVector.get(8), TOLERANCE);
+        assertEquals(myVector.get(5), baseVector.get(10), TOLERANCE);
+
+        assertEquals(myMatrix.get(0,0), baseMatrix.get(0,3), TOLERANCE);
+        assertEquals(myMatrix.get(0,1), baseMatrix.get(0,2), TOLERANCE);
+        assertEquals(myMatrix.get(0,2), baseMatrix.get(0,1), TOLERANCE);
+        assertEquals(myMatrix.get(0,3), baseMatrix.get(0,0), TOLERANCE);
+
+        assertEquals(myMatrix.get(1,0), baseMatrix.get(2,3), TOLERANCE);
+        assertEquals(myMatrix.get(1,1), baseMatrix.get(2,2), TOLERANCE);
+        assertEquals(myMatrix.get(1,2), baseMatrix.get(2,1), TOLERANCE);
+        assertEquals(myMatrix.get(1,3), baseMatrix.get(2,0), TOLERANCE);
+
+        assertEquals(myMatrix.get(2,0), baseMatrix.get(4,3), TOLERANCE);
+        assertEquals(myMatrix.get(2,1), baseMatrix.get(4,2), TOLERANCE);
+        assertEquals(myMatrix.get(2,2), baseMatrix.get(4,1), TOLERANCE);
+        assertEquals(myMatrix.get(2,3), baseMatrix.get(4,0), TOLERANCE);
+    }
+
+    @Test
+    public void testUnconstrained() {
+        ConstrainedRegressionSystem<String, String> mySystem =
+                buildUnconstrainedModel().build();
+
+        // Computed separately in R...
+        D3xMatrix augmat = D3xMatrix.byrow(4, 4,
+                  22.0,    0.0,  216.0,     0.0,
+                   0.0,  220.0,   -8.0,  3916.0,
+                 216.0,   -8.0, 3892.0,   -32.0,
+                   0.0, 3916.0,  -32.0, 82060.0);
+
+        assertTrue(mySystem.getAugmentedMatrix().equalsMatrix(augmat));
     }
 }

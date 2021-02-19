@@ -28,31 +28,7 @@ import com.d3x.morpheus.vector.D3xVector;
  * Represents a matrix of {@code double} values with fixed row and column
  * dimensions.
  */
-public interface D3xMatrix {
-    /**
-     * Returns the number of rows in this matrix.
-     * @return the number of rows in this matrix.
-     */
-    int nrow();
-
-    /**
-     * Returns the number of columns in this matrix.
-     * @return the number of columns in this matrix.
-     */
-    int ncol();
-
-    /**
-     * Returns the value of an element at a given location.
-     *
-     * @param row the row index of the element to return.
-     * @param col the column index of the element to return.
-     *
-     * @return the value of the element at the specified location.
-     *
-     * @throws RuntimeException if either index is out of bounds.
-     */
-    double get(int row, int col);
-
+public interface D3xMatrix extends D3xMatrixView {
     /**
      * Assigns the value of an element at a given location.
      *
@@ -458,43 +434,6 @@ public interface D3xMatrix {
         return ApacheMatrix.sparse(nrow, ncol);
     }
 
-    /**
-     * Ensures that a matrix dimension is non-negative.
-     *
-     * @param dim the matrix dimension to validate.
-     *
-     * @throws RuntimeException if the dimension is negative.
-     */
-    static void validateDimension(int dim) {
-        if (dim < 0)
-            throw new MorpheusException("Matrix dimension [%d] is negative.", dim);
-    }
-
-    /**
-     * Ensures that a row or column index is valid.
-     *
-     * @param index the row or column index to validate.
-     * @param dimension the row or column dimension in the matrix.
-     *
-     * @throws RuntimeException unless the index is valid.
-     */
-    static void validateIndex(int index, int dimension) {
-        if (index < 0 || index >= dimension)
-            throw new MorpheusException("Invalid index: [%d] not in range [0, %d).", index, dimension);
-    }
-
-    /**
-     * Ensures that a matrix shape is valid.
-     *
-     * @param nrow the number of rows to validate.
-     * @param ncol the number of columns to validate.
-     *
-     * @throws RuntimeException if either dimension is negative.
-     */
-    static void validateShape(int nrow, int ncol) {
-        validateDimension(nrow);
-        validateDimension(ncol);
-    }
 
     /**
      * Returns the elements of this matrix in a vector having row-major order.
@@ -533,49 +472,6 @@ public interface D3xMatrix {
     }
 
     /**
-     * Determines whether the entries in this matrix are equal to those in a bare array
-     * <em>within the tolerance of the default DoubleComparator</em>.
-     *
-     * @param values the values to test for equality.
-     *
-     * @return {@code true} iff the input array has the same shape as this matrix and
-     * each value matches the corresponding entry in this matrix within the tolerance
-     * of the default DoubleComparator.
-     */
-    default boolean equalsArray(double[][] values) {
-        return equalsArray(values, DoubleComparator.DEFAULT);
-    }
-
-    /**
-     * Determines whether the entries in this matrix are equal to those in a bare array
-     * within the tolerance of a given DoubleComparator.
-     *
-     * @param values     the values to test for equality.
-     * @param comparator the element comparator.
-     *
-     * @return {@code true} iff the input array has the same shape as this matrix and
-     * each value matches the corresponding entry in this matrix within the tolerance
-     * of the specified comparator.
-     */
-    default boolean equalsArray(double[][] values, DoubleComparator comparator) {
-        if (values.length != nrow())
-            return false;
-
-        for (int i = 0; i < nrow(); ++i) {
-            double[] rowi = values[i];
-
-            if (rowi.length != ncol())
-                return false;
-
-            for (int j = 0; j < ncol(); ++j)
-                if (!comparator.equals(rowi[j], get(i, j)))
-                    return false;
-        }
-
-        return true;
-    }
-
-    /**
      * Determines whether the entries in this matrix are equal to those in another matrix
      * <em>within the tolerance of the default DoubleComparator</em>.
      *
@@ -601,18 +497,7 @@ public interface D3xMatrix {
      * of the specified comparator.
      */
     default boolean equalsMatrix(D3xMatrix that, DoubleComparator comparator) {
-        if (this.nrow() != that.nrow())
-            return false;
-
-        if (this.ncol() != that.ncol())
-            return false;
-
-        for (int i = 0; i < nrow(); ++i)
-            for (int j = 0; j < ncol(); ++j)
-                if (!comparator.equals(this.get(i, j), that.get(i, j)))
-                    return false;
-
-        return true;
+        return equalsView(that, comparator);
     }
 
     /**
@@ -695,26 +580,6 @@ public interface D3xMatrix {
     }
 
     /**
-     * Determines if this matrix has the same shape as another matrix.
-     *
-     * @param that the matrix to compare to this.
-     *
-     * @return {@code true} iff the input matrix has the same shape as this matrix.
-     */
-    default boolean isCongruent(D3xMatrix that) {
-        return this.nrow() == that.nrow() && this.ncol() == that.ncol();
-    }
-
-    /**
-     * Identifies square matrices.
-     *
-     * @return {@code true} iff this matrix is square.
-     */
-    default boolean isSquare() {
-        return nrow() == ncol();
-    }
-
-    /**
      * Assigns the elements in a column of this matrix to the values of a column vector.
      *
      * @param col the index of the column to assign.
@@ -747,104 +612,27 @@ public interface D3xMatrix {
     }
 
     /**
-     * Returns the number of elements in this matrix (the product of the number
-     * of rows and the number of columns).
+     * Ensures that a matrix dimension is non-negative.
      *
-     * @return the number of elements in this matrix.
+     * @param dim the matrix dimension to validate.
+     *
+     * @throws RuntimeException if the dimension is negative.
      */
-    default int size() {
-        return nrow() * ncol();
+    static void validateDimension(int dim) {
+        if (dim < 0)
+            throw new MorpheusException("Matrix dimension [%d] is negative.", dim);
     }
 
     /**
-     * Copies the elements of this matrix into a new array, which does not contain
-     * a reference to the underlying data in this matrix.
+     * Ensures that a matrix shape is valid.
      *
-     * <p>Changes to the returned array will not be reflected in this matrix, and
-     * changes to this matrix will not be reflected in the returned array.</p>
+     * @param nrow the number of rows to validate.
+     * @param ncol the number of columns to validate.
      *
-     * @return the elements of this matrix in a new array.
+     * @throws RuntimeException if either dimension is negative.
      */
-    default double[][] toArray() {
-        double[][] array = new double[nrow()][];
-
-        for (int i = 0; i < nrow(); ++i) {
-            double[] rowi = new double[ncol()];
-
-            for (int j = 0; j < ncol(); ++j)
-                rowi[j] = get(i, j);
-
-            array[i] = rowi;
-        }
-
-        return array;
-    }
-
-    /**
-     * Ensures that a column index is valid.
-     *
-     * @param col the index of the column to validate.
-     *
-     * @throws RuntimeException unless the column index is valid.
-     */
-    default void validateColumnIndex(int col) {
-        validateIndex(col, ncol());
-    }
-
-    /**
-     * Ensures that a column vector is valid.
-     *
-     * @param col the index of the column to validate.'
-     * @param vec the column vector to validate.
-     *
-     * @throws RuntimeException unless the column index is valid and the
-     * length of the vector matches the number of rows in this matrix.
-     */
-    default void validateColumnVector(int col, D3xVector vec) {
-        validateColumnIndex(col);
-
-        if (vec.length() != nrow())
-            throw new MorpheusException("Invalid column vector length.");
-    }
-
-    /**
-     * Ensures that a row index is valid.
-     *
-     * @param row the index of the row to validate.
-     *
-     * @throws RuntimeException unless the row index is valid.
-     */
-    default void validateRowIndex(int row) {
-        validateIndex(row, nrow());
-    }
-
-    /**
-     * Ensures that a row vector is valid.
-     *
-     * @param row the index of the row to validate.'
-     * @param vec the row vector to validate.
-     *
-     * @throws RuntimeException unless the row index is valid and the
-     * length of the vector matches the number of columns in this matrix.
-     */
-    default void validateRowVector(int row, D3xVector vec) {
-        validateRowIndex(row);
-
-        if (vec.length() != ncol())
-            throw new MorpheusException("Invalid row vector length.");
-    }
-
-    /**
-     * Ensures that this matrix has the same shape as another matrix.
-     *
-     * @param that the matrix to validate.
-     *
-     * @throws RuntimeException unless the specified matrix has the same
-     * shape as this matrix.
-     */
-    default void validateCongruent(D3xMatrix that) {
-        if (!isCongruent(that))
-            throw new MorpheusException("Matrix shape mismatch: [(%d, %d) != (%d, %d)].",
-                    this.nrow(), this.ncol(), that.nrow(), that.ncol());
+    static void validateShape(int nrow, int ncol) {
+        validateDimension(nrow);
+        validateDimension(ncol);
     }
 }

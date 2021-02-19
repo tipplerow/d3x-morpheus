@@ -21,7 +21,6 @@ import java.util.List;
 import com.d3x.morpheus.frame.DataFrame;
 import com.d3x.morpheus.series.DoubleSeries;
 
-import org.testng.Assert;
 import org.testng.annotations.Test;
 import static org.testng.Assert.*;
 
@@ -81,6 +80,30 @@ public class D3xVectorTest {
         assertTrue(vec1.equalsArray(arr3));
         assertTrue(vec2.equalsArray(arr2));
         assertTrue(vec4.equalsArray(arr3));
+    }
+
+    @Test
+    public void testDot() {
+        int N = 100000;
+        runDotTest(D3xVector.dense(N), D3xVector.dense(N));
+        runDotTest(D3xVector.sparse(N), D3xVector.sparse(N));
+    }
+
+    private void runDotTest(D3xVector v1, D3xVector v2) {
+        v1.set(10, 1.0);
+        v1.set(20, 2.0);
+        v1.set(30, 3.0);
+        v1.set(40, 4.0);
+
+        v2.set(20, 20.0);
+        v2.set(30, 30.0);
+        v2.set(40, 40.0);
+        v2.set(50, 50.0);
+
+        assertEquals(v1.dot(v1),   30.0, TOLERANCE);
+        assertEquals(v1.dot(v2),  290.0, TOLERANCE);
+        assertEquals(v2.dot(v1),  290.0, TOLERANCE);
+        assertEquals(v2.dot(v2), 5400.0, TOLERANCE);
     }
 
     @Test
@@ -275,6 +298,22 @@ public class D3xVectorTest {
         assertEquals(vector.get(0), 11.0, TOLERANCE);
         assertEquals(vector.get(1), 22.0, TOLERANCE);
         assertEquals(vector.get(2), 33.0, TOLERANCE);
+    }
+
+    @Test
+    public void testSum() {
+        assertEquals(D3xVector.wrap().sum(), 0.0);
+        assertEquals(D3xVector.wrap(1.0).sum(), 1.0);
+        assertEquals(D3xVector.wrap(1.0, 2.0).sum(), 3.0);
+        assertEquals(D3xVector.wrap(1.0, 2.0, -3.0).sum(), 0.0);
+    }
+
+    @Test
+    public void testNormalize() {
+        D3xVector actual = D3xVector.wrap(2.0, 4.0, 6.0, 8.0).normalize();
+        D3xVector expected = D3xVector.wrap(0.1, 0.2, 0.3, 0.4);
+
+        assertTrue(actual.equalsVector(expected));
     }
 
     @Test

@@ -27,57 +27,55 @@ import static org.testng.Assert.*;
  * Tests default methods implemented in the DataFrame interface.
  */
 public class DataFrameTest extends DataFrameTestBase {
+    private static final double TOLERANCE = 1.0E-12;
+
     @Test
     public void testContainsColumn() {
-        assertTrue(intFrame.containsColumn("col1"));
-        assertTrue(intFrame.containsColumn("col2"));
-        assertTrue(intFrame.containsColumn("col3"));
+        assertTrue(intFrame.containsColumn(col1));
+        assertTrue(intFrame.containsColumn(col2));
+        assertTrue(intFrame.containsColumn(col3));
+        assertFalse(intFrame.containsColumn(col4));
 
-        assertFalse(intFrame.containsColumn("row1"));
-        assertFalse(intFrame.containsColumn("row2"));
     }
 
     @Test
     public void testContainsColumns() {
-        assertTrue(intFrame.containsColumns(List.of("col1")));
-        assertTrue(intFrame.containsColumns(List.of("col1", "col2")));
-        assertTrue(intFrame.containsColumns(List.of("col1", "col2", "col3")));
-        assertFalse(intFrame.containsColumns(List.of("col1", "col2", "col3", "col4")));
+        assertTrue(intFrame.containsColumns(List.of(col1)));
+        assertTrue(intFrame.containsColumns(List.of(col1, col2)));
+        assertTrue(intFrame.containsColumns(List.of(col1, col2, col3)));
+        assertFalse(intFrame.containsColumns(List.of(col1, col2, col3, col4)));
     }
 
     @Test
     public void testContainsRow() {
-        assertTrue(intFrame.containsRow("row1"));
-        assertTrue(intFrame.containsRow("row2"));
-
-        assertFalse(intFrame.containsRow("col1"));
-        assertFalse(intFrame.containsRow("col2"));
-        assertFalse(intFrame.containsRow("col3"));
+        assertTrue(intFrame.containsRow(row1));
+        assertTrue(intFrame.containsRow(row2));
+        assertFalse(intFrame.containsRow(row4));
     }
 
     @Test
     public void testContainsRows() {
-        assertTrue(intFrame.containsRows(List.of("row1")));
-        assertTrue(intFrame.containsRows(List.of("row1", "row2")));
-        assertFalse(intFrame.containsRows(List.of("row1", "row2", "row3")));
+        assertTrue(intFrame.containsRows(List.of(row1)));
+        assertTrue(intFrame.containsRows(List.of(row1, row2)));
+        assertFalse(intFrame.containsRows(List.of(row1, row2, row3)));
     }
 
     @Test
     public void testRequireColumnPresent() {
-        intFrame.requireColumn("col1");
-        intFrame.requireColumn("col2");
-        intFrame.requireColumn("col3");
+        intFrame.requireColumn(col1);
+        intFrame.requireColumn(col2);
+        intFrame.requireColumn(col3);
     }
 
     @Test(expectedExceptions = DataFrameException.class)
     public void testRequireColumnAbsent() {
-        intFrame.requireColumn("row1");
+        intFrame.requireColumn(col4);
     }
 
     @Test
     public void testRequireDoubleColumnPresent() {
-        doubleFrame.requireDoubleColumn("col1");
-        doubleFrame.requireDoubleColumns(List.of("col2", "col3"));
+        doubleFrame.requireDoubleColumn(col1);
+        doubleFrame.requireDoubleColumns(List.of(col2, col3));
     }
 
     @Test(expectedExceptions = DataFrameException.class)
@@ -85,33 +83,33 @@ public class DataFrameTest extends DataFrameTestBase {
         //
         // Integer columns are "numeric" but not "double"...
         //
-        intFrame.requireDoubleColumn("col1");
+        intFrame.requireDoubleColumn(col1);
     }
 
     @Test
     public void testRequireNumericColumnPresent() {
-        intFrame.requireNumericColumn("col1");
-        intFrame.requireNumericColumns(List.of("col2", "col3"));
+        intFrame.requireNumericColumn(col1);
+        intFrame.requireNumericColumns(List.of(col2, col3));
 
-        doubleFrame.requireNumericColumn("col1");
-        doubleFrame.requireNumericColumns(List.of("col2", "col3"));
+        doubleFrame.requireNumericColumn(col1);
+        doubleFrame.requireNumericColumns(List.of(col2, col3));
     }
 
     @Test(expectedExceptions = DataFrameException.class)
     public void testRequireNumericColumnAbsent() {
-        DataFrame<String, String> stringDataFrame = DataFrame.ofStrings(rowKeys, colKeys);
-        stringDataFrame.requireNumericColumn("col1");
+        DataFrame<RowKey, ColKey> stringDataFrame = DataFrame.ofStrings(rowKeys, colKeys);
+        stringDataFrame.requireNumericColumn(col1);
     }
 
     @Test
     public void testRequireRowPresent() {
-        intFrame.requireRow("row1");
-        intFrame.requireRow("row2");
+        intFrame.requireRow(row1);
+        intFrame.requireRow(row2);
     }
 
     @Test(expectedExceptions = DataFrameException.class)
     public void testRequiredRowAbsent() {
-        intFrame.requireRow("col1");
+        intFrame.requireRow(row4);
     }
 
     @Test
@@ -138,7 +136,7 @@ public class DataFrameTest extends DataFrameTestBase {
     @Test
     public void testGetMatrix2() {
         double[][] actual =
-                doubleFrame.getDoubleMatrix(List.of("row2", "row1"), List.of("col3", "col1", "col2"));
+                doubleFrame.getDoubleMatrix(List.of(row2, row1), List.of(col3, col1, col2));
 
         double[][] expected = new double[][] {
                 { 23.0, 21.0, 22.0 },
@@ -150,11 +148,11 @@ public class DataFrameTest extends DataFrameTestBase {
 
     @Test
     public void testOnesColumn() {
-        var colKey = "col1";
-        var colKeys = List.of("col1", "col2", "col3");
+        var colKey = col1;
+        var colKeys = List.of(col1, col2, col3);
 
-        var rowKey = "row1";
-        var rowKeys = List.of("row1", "row2", "row3");
+        var rowKey = row1;
+        var rowKeys = List.of(row1, row2, row3);
 
         var colData0 = new double[][] {
                 { 0.0 },
@@ -190,7 +188,7 @@ public class DataFrameTest extends DataFrameTestBase {
 
     @Test
     public void testZeros() {
-        DataFrame<String,String> frame = DataFrame.zeros(rowKeys, colKeys);
+        DataFrame<RowKey, ColKey> frame = DataFrame.zeros(rowKeys, colKeys);
 
         double[][] expected = new double[][] {
                 { 0.0, 0.0, 0.0 },
@@ -202,17 +200,17 @@ public class DataFrameTest extends DataFrameTestBase {
 
     @Test
     public void testPatchyUpdate() {
-        DataFrame<String,String> frame = DataFrame.zeros(rowKeys, colKeys);
+        DataFrame<RowKey, ColKey> frame = DataFrame.zeros(rowKeys, colKeys);
 
-        DataFrame<String,String> row1 = DataFrame.ofDoubles("row1", List.of("col1", "col2"));
-        row1.setDouble("row1", "col1", 11.0);
-        row1.setDouble("row1", "col2", 12.0);
+        DataFrame<RowKey, ColKey> frameRow1 = DataFrame.ofDoubles(row1, List.of(col1, col2));
+        frameRow1.setDouble(row1, col1, 11.0);
+        frameRow1.setDouble(row1, col2, 12.0);
 
-        DataFrame<String,String> row2 = DataFrame.ofDoubles("row2", List.of("col2", "col3"));
-        row2.setDouble("row2", "col2", 22.0);
-        row2.setDouble("row2", "col3", 23.0);
+        DataFrame<RowKey, ColKey> frameRow2 = DataFrame.ofDoubles(row2, List.of(col2, col3));
+        frameRow2.setDouble(row2, col2, 22.0);
+        frameRow2.setDouble(row2, col3, 23.0);
 
-        frame = frame.update(List.of(row1, row2), false, false);
+        frame = frame.update(List.of(frameRow1, frameRow2), false, false);
 
         double[][] expected = new double[][] {
                 { 11.0, 12.0,  0.0 },
@@ -224,43 +222,91 @@ public class DataFrameTest extends DataFrameTestBase {
 
     @Test
     public void testColumnFrame() {
-        String colKey = "col1";
-        List<String> rowKeys = List.of("row1", "row2", "row3");
+        ColKey colKey = col1;
+        List<RowKey> rowKeys = List.of(row1, row2, row3);
         double[] rowArray = new double[] { 1.0, 2.0, 3.0 };
         D3xVector rowValues = D3xVector.wrap(rowArray);
 
-        DataFrame<String, String> frame1 = DataFrame.ofDoubles(rowKeys, colKey, rowArray);
+        DataFrame<RowKey, ColKey> frame1 = DataFrame.ofDoubles(rowKeys, colKey, rowArray);
         assertDoubleFrame(frame1, rowKeys, List.of(colKey), new double[][] {{ 1.0 }, { 2.0 }, { 3.0 }});
 
-        DataFrame<String, String> frame2 = DataFrame.ofDoubles(rowKeys, colKey, rowValues);
+        DataFrame<RowKey, ColKey> frame2 = DataFrame.ofDoubles(rowKeys, colKey, rowValues);
         assertDoubleFrame(frame2, rowKeys, List.of(colKey), new double[][] {{ 1.0 }, { 2.0 }, { 3.0 }});
     }
 
     @Test
     public void testRowFrame() {
-        String rowKey = "row1";
-        List<String> colKeys = List.of("col1", "col2", "col3");
+        RowKey rowKey = row1;
+        List<ColKey> colKeys = List.of(col1, col2, col3);
         double[] colArray = new double[] { 1.0, 2.0, 3.0 };
         D3xVector colValues = D3xVector.wrap(colArray);
 
-        DataFrame<String, String> frame1 = DataFrame.ofDoubles(rowKey, colKeys, colArray);
+        DataFrame<RowKey, ColKey> frame1 = DataFrame.ofDoubles(rowKey, colKeys, colArray);
         assertDoubleFrame(frame1, List.of(rowKey), colKeys, new double[][] {{ 1.0, 2.0, 3.0 }});
 
-        DataFrame<String, String> frame2 = DataFrame.ofDoubles(rowKey, colKeys, colValues);
+        DataFrame<RowKey, ColKey> frame2 = DataFrame.ofDoubles(rowKey, colKeys, colValues);
         assertDoubleFrame(frame2, List.of(rowKey), colKeys, new double[][] {{ 1.0, 2.0, 3.0 }});
     }
 
     @Test
     public void testMatrixFrame() {
-        List<String> rowKeys = List.of("row1", "row2");
-        List<String> colKeys = List.of("col1", "col2", "col3");
-
         double[][] values = new double[][] {
                 { 11.0, 12.0, 13.0 },
                 { 21.0, 22.0, 23.0 }
         };
 
-        DataFrame<String, String> frame = DataFrame.ofDoubles(rowKeys, colKeys, D3xMatrix.wrap(values));
+        DataFrame<RowKey, ColKey> frame = DataFrame.ofDoubles(rowKeys, colKeys, D3xMatrix.wrap(values));
         assertDoubleFrame(frame, rowKeys, colKeys, values);
+    }
+    
+    @Test
+    public void testMatrixView() {
+        assertEquals(doubleFrame.nrow(), 2);
+        assertEquals(doubleFrame.ncol(), 3);
+        assertEquals(doubleFrame.size(), 6);
+
+        assertEquals(doubleFrame.get(0, 0), 11.0, TOLERANCE);
+        assertEquals(doubleFrame.get(0, 1), 12.0, TOLERANCE);
+        assertEquals(doubleFrame.get(0, 2), 13.0, TOLERANCE);
+
+        assertEquals(doubleFrame.get(1, 0), 21.0, TOLERANCE);
+        assertEquals(doubleFrame.get(1, 1), 22.0, TOLERANCE);
+        assertEquals(doubleFrame.get(1, 2), 23.0, TOLERANCE);
+    }
+
+    @Test
+    public void testSelect() {
+        DataFrame<RowKey, ColKey> frame = DataFrame.ofDoubles(
+                List.of(row1, row2, row3, row4),
+                List.of(col1, col2, col3, col4),
+                D3xMatrix.byrow(4, 4,
+                        11.0, 12.0, 13.0, 14.0,
+                        21.0, 22.0, 23.0, 24.0,
+                        31.0, 32.0, 33.0, 34.0,
+                        41.0, 42.0, 43.0, 44.0));
+
+        DataFrame<RowKey, ColKey> sub1 = frame.selectRows(List.of(row4, row2));
+        DataFrame<RowKey, ColKey> sub2 = frame.selectColumns(List.of(col3, col1));
+        DataFrame<RowKey, ColKey> sub3 = frame.select(List.of(row2, row3), List.of(col3, col1));
+
+        assertEquals(sub1.listRowKeys(), List.of(row4, row2));
+        assertEquals(sub1.listColumnKeys(), List.of(col1, col2, col3, col4));
+        assertTrue(D3xMatrix.wrap(sub1.getDoubleMatrix()).equalsMatrix(D3xMatrix.byrow(2, 4,
+                41.0, 42.0, 43.0, 44.0,
+                21.0, 22.0, 23.0, 24.0)));
+
+        assertEquals(sub2.listRowKeys(), List.of(row1, row2, row3, row4));
+        assertEquals(sub2.listColumnKeys(), List.of(col3, col1));
+        assertTrue(D3xMatrix.wrap(sub2.getDoubleMatrix()).equalsMatrix(D3xMatrix.byrow(4, 2,
+                13.0, 11.0,
+                23.0, 21.0,
+                33.0, 31.0,
+                43.0, 41.0)));
+
+        assertEquals(sub3.listRowKeys(), List.of(row2, row3));
+        assertEquals(sub3.listColumnKeys(), List.of(col3, col1));
+        assertTrue(D3xMatrix.wrap(sub3.getDoubleMatrix()).equalsMatrix(D3xMatrix.byrow(2, 2,
+                23.0, 21.0,
+                33.0, 31.0)));
     }
 }

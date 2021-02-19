@@ -25,36 +25,46 @@ import static org.testng.Assert.*;
  * Provides common data for tests in the {@code com.d3x.morpheus.frame} package.
  */
 public abstract class DataFrameTestBase {
-    protected final DataFrame<String, String> intFrame = newIntFrame();
-    protected final DataFrame<String, String> doubleFrame = newDoubleFrame();
+    protected static final RowKey row1 = RowKey.of("row1");
+    protected static final RowKey row2 = RowKey.of("row2");
+    protected static final RowKey row3 = RowKey.of("row3");
+    protected static final RowKey row4 = RowKey.of("row4");
 
-    protected static final List<String> rowKeys = List.of("row1", "row2");
-    protected static final List<String> colKeys = List.of("col1", "col2", "col3");
+    protected static final ColKey col1 = ColKey.of("col1");
+    protected static final ColKey col2 = ColKey.of("col2");
+    protected static final ColKey col3 = ColKey.of("col3");
+    protected static final ColKey col4 = ColKey.of("col4");
+
+    protected final DataFrame<RowKey, ColKey> intFrame = newIntFrame();
+    protected final DataFrame<RowKey, ColKey> doubleFrame = newDoubleFrame();
+
+    protected static final List<RowKey> rowKeys = List.of(row1, row2);
+    protected static final List<ColKey> colKeys = List.of(col1, col2, col3);
 
     protected static final DoubleComparator comparator = DoubleComparator.DEFAULT;
 
-    protected static DataFrame<String, String> newIntFrame() {
-        DataFrame<String, String> frame = DataFrame.ofInts(rowKeys, colKeys);
+    protected static DataFrame<RowKey, ColKey> newIntFrame() {
+        DataFrame<RowKey, ColKey> frame = DataFrame.ofInts(rowKeys, colKeys);
 
-        frame.setInt("row1", "col1", 11);
-        frame.setInt("row1", "col2", 12);
-        frame.setInt("row1", "col3", 13);
-        frame.setInt("row2", "col1", 21);
-        frame.setInt("row2", "col2", 22);
-        frame.setInt("row2", "col3", 23);
+        frame.setInt(row1, col1, 11);
+        frame.setInt(row1, col2, 12);
+        frame.setInt(row1, col3, 13);
+        frame.setInt(row2, col1, 21);
+        frame.setInt(row2, col2, 22);
+        frame.setInt(row2, col3, 23);
 
         return frame;
     }
 
-    protected static DataFrame<String, String> newDoubleFrame() {
-        DataFrame<String, String> frame = DataFrame.ofDoubles(rowKeys, colKeys);
+    protected static DataFrame<RowKey, ColKey> newDoubleFrame() {
+        DataFrame<RowKey, ColKey> frame = DataFrame.ofDoubles(rowKeys, colKeys);
 
-        frame.setDouble("row1", "col1", 11.0);
-        frame.setDouble("row1", "col2", 12.0);
-        frame.setDouble("row1", "col3", 13.0);
-        frame.setDouble("row2", "col1", 21.0);
-        frame.setDouble("row2", "col2", 22.0);
-        frame.setDouble("row2", "col3", 23.0);
+        frame.setDouble(row1, col1, 11.0);
+        frame.setDouble(row1, col2, 12.0);
+        frame.setDouble(row1, col3, 13.0);
+        frame.setDouble(row2, col1, 21.0);
+        frame.setDouble(row2, col2, 22.0);
+        frame.setDouble(row2, col3, 23.0);
 
         return frame;
     }

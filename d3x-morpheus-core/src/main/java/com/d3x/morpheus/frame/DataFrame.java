@@ -18,6 +18,7 @@ package com.d3x.morpheus.frame;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
@@ -34,6 +35,7 @@ import javax.imageio.ImageIO;
 import com.d3x.morpheus.db.DbSource;
 import com.d3x.morpheus.index.Index;
 import com.d3x.morpheus.matrix.D3xMatrix;
+import com.d3x.morpheus.matrix.D3xMatrixView;
 import com.d3x.morpheus.range.Range;
 import com.d3x.morpheus.stats.Stats;
 import com.d3x.morpheus.util.Resource;
@@ -47,7 +49,7 @@ import com.d3x.morpheus.vector.D3xVector;
  *
  * @author  Xavier Witdouck
  */
-public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperations<R,C,DataFrame<R,C>>, DataFrameIterators<R,C>, DataFrameAlgebra<R,C> {
+public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperations<R,C,DataFrame<R,C>>, DataFrameIterators<R,C>, DataFrameAlgebra<R,C>, D3xMatrixView {
 
     /**
      * Checks if this DataFrame is empty, according to its number of rows.
@@ -315,6 +317,30 @@ public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperation
     DataFrame<R,C> select(Iterable<R> rowKeys, Iterable<C> colKeys);
 
     /**
+     * Returns a {@code DataFrame} that contains a subset of the rows in this frame.
+     *
+     * @param rowKeys the keys of the rows to retain.
+     *
+     * @return a new {@code DataFrame} containing all columns in this frame but only
+     * the specified rows.
+     */
+    default DataFrame<R,C> selectRows(Iterable<R> rowKeys) {
+        return select(rowKeys, listColumnKeys());
+    }
+
+    /**
+     * Returns a {@code DataFrame} that contains a subset of the columns in this frame.
+     *
+     * @param colKeys the keys of the columns to retain.
+     *
+     * @return a new {@code DataFrame} containing all rows in this frame but only the
+     * specified columns.
+     */
+    default DataFrame<R,C> selectColumns(Iterable<C> colKeys) {
+        return select(listRowKeys(), colKeys);
+    }
+
+    /**
      * Returns a <code>DataFrame</code> selection that includes a subset of rows and columns
      * @param rowPredicate  the predicate to select rows
      * @param colPredicate  the predicate to select columns
@@ -468,6 +494,20 @@ public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperation
     }
 
     /**
+     * Returns the value of an element at a given location.
+     *
+     * @param row the row index of the element to return.
+     * @param col the column index of the element to return.
+     *
+     * @return the value of the element at the specified location.
+     *
+     * @throws RuntimeException if either index is out of bounds.
+     */
+    default double get(int row, int col) {
+        return getDoubleAt(row, col);
+    }
+
+    /**
      * Returns a list of the row keys for this DataFrame.
      *
      * @return a list of the row keys for this DataFrame.
@@ -483,6 +523,22 @@ public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperation
      */
     default List<C> listColumnKeys() {
         return cols().keyList();
+    }
+
+    /**
+     * Returns the number of rows in this DataFrame.
+     * @return the number of rows in this DataFrame.
+     */
+    default int nrow() {
+        return rowCount();
+    }
+
+    /**
+     * Returns the number of columns in this DataFrame.
+     * @return the number of columns in this DataFrame.
+     */
+    default int ncol() {
+        return colCount();
     }
 
     /**
@@ -668,6 +724,14 @@ public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperation
             matrixData[irow] = row(rowKeys.get(irow)).getDoubleArray(colKeys);
 
         return matrixData;
+    }
+
+    /**
+     * Writes the contents of this DataFrame to an output stream.
+     * @param stream the stream where this frame will appear.
+     */
+    default void display(PrintStream stream) {
+        values().forEach(v -> stream.println(String.format("(%s, %s) => %s", v.rowKey().toString(), v.colKey().toString(), v.getValue().toString())));
     }
 
     /**

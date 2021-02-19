@@ -65,6 +65,16 @@ public interface DoubleSeriesBuilder<K> extends DataSeriesBuilder<K,Double> {
     DoubleSeriesBuilder<K> putDouble(@lombok.NonNull K key, double value);
 
     /**
+     * Puts all entries from another DoubleSeries into this builder.
+     * @param series the series to put into this builder.
+     * @return this builder.
+     */
+    default DoubleSeriesBuilder<K> putSeries(@lombok.NonNull DoubleSeries<K> series) {
+        series.forEach(this::putDouble);
+        return this;
+    }
+
+    /**
      * Adds the value to the existing value for key, or simply puts value if no existing value
      * @param key       the entry key
      * @param value     the entry value
