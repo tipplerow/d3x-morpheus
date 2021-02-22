@@ -15,6 +15,7 @@
  */
 package com.d3x.morpheus.vector;
 
+import java.io.PrintStream;
 import java.util.List;
 import java.util.Map;
 import java.util.PrimitiveIterator;
@@ -129,6 +130,15 @@ public interface DataVectorView<K> {
      */
     default Set<K> collectKeys() {
         return streamKeys().collect(Collectors.toUnmodifiableSet());
+    }
+
+    /**
+     * Writes the contents of this series to an output stream.
+     *
+     * @param stream where the display will appear.
+     */
+    default void display(PrintStream stream) {
+        streamKeys().forEach(key -> stream.println(key.toString() + " => " + getElement(key)));
     }
 
     /**
