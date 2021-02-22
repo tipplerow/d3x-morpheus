@@ -78,6 +78,39 @@ public interface DataVectorView<K> {
     DoubleStream streamValues();
 
     /**
+     * Returns an empty view.
+     * @return an empty view.
+     */
+    static <K> DataVectorView<K> empty() {
+        return new DataVectorView<K>() {
+            @Override
+            public boolean containsElement(K key) {
+                return false;
+            }
+
+            @Override
+            public double getElement(K elementKey, double defaultValue) {
+                return defaultValue;
+            }
+
+            @Override
+            public int length() {
+                return 0;
+            }
+
+            @Override
+            public Stream<K> streamKeys() {
+                return Stream.empty();
+            }
+
+            @Override
+            public DoubleStream streamValues() {
+                return DoubleStream.empty();
+            }
+        };
+    }
+
+    /**
      * Returns a DataVectorView of a Double map; changes to the
      * underlying map will be reflected in the returned vector.
      *
