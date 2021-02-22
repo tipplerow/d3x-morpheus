@@ -68,5 +68,25 @@ public class DataVectorViewTest {
     public void testSeries() {
         runTest(DoubleSeries.build(String.class, keyList, valueList));
     }
+
+    @Test
+    public void testInnerProduct() {
+        DataVectorView<String> s1 =
+                DoubleSeries.build(String.class, List.of("A", "B", "C", "D", "E"), List.of(1.0, 2.0, 3.0, 4.0, 5.0));
+
+        DataVectorView<String> s2 =
+                DataFrame.ofDoubles("row", List.of("B", "C", "D", "F", "G", "H"), new double[] { 10.0, 20.0, 30.0, 40.0, 50.0, 60.0 }).row("row");
+
+        DataVectorView<String > wt =
+                DoubleSeries.build(String.class, List.of("C", "D"), List.of(0.25, 0.75));
+
+        assertEquals(s1.innerProduct(s1), 55.0, TOLERANCE);
+        assertEquals(s1.innerProduct(s2), 2.0 * 10.0 + 3.0 * 20.0 + 4.0 * 30.0, TOLERANCE);
+        assertEquals(s2.innerProduct(s1), 2.0 * 10.0 + 3.0 * 20.0 + 4.0 * 30.0, TOLERANCE);
+
+        assertEquals(s1.innerProduct(s1, wt), 14.25, TOLERANCE);
+        assertEquals(s1.innerProduct(s2, wt), 0.25 * 3.0 * 20.0 + 0.75 * 4.0 * 30.0, TOLERANCE);
+        assertEquals(s2.innerProduct(s1, wt), 0.25 * 3.0 * 20.0 + 0.75 * 4.0 * 30.0, TOLERANCE);
+    }
 }
 

@@ -172,4 +172,34 @@ public interface DataVectorView<K> {
 
         return vector;
     }
+
+    /**
+     * Computes the inner (dot) product between this data vector and
+     * another vector; missing values (elements not contained in both
+     * vectors) are replaced with zero.
+     *
+     * @param that the other vector in the inner product.
+     *
+     * @return the inner (dot) product between this data vector and
+     * the input vector.
+     */
+    default double innerProduct(DataVectorView<K> that) {
+        return InnerProduct.compute(this, that);
+    }
+
+    /**
+     * Computes the weighted inner product between this data vector and
+     * another vector; missing values (elements not contained in both
+     * vectors and the weight vector) are replaced with zero.
+     *
+     * @param operand the other vector operand in the inner product.
+     * @param weights a vector of weights to apply to each term in the
+     *                inner product.
+     *
+     * @return the weighted inner product between this data vector and
+     * the input vector.
+     */
+    default double innerProduct(DataVectorView<K> operand, DataVectorView<K> weights) {
+        return InnerProduct.compute(this, operand, weights);
+    }
 }

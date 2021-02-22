@@ -637,33 +637,4 @@ public interface DoubleSeries<K> extends DataSeries<K,Double>, D3xVectorView, Da
 
         void accept(K key, double value);
     }
-
-    /**
-     * Computes the inner product of two series, assuming that missing
-     * series values are {@code 0.0}, not {@code Double.NaN}.
-     *
-     * @param <K> the runtime type for the series.
-     * @param s1  the first series in the inner product.
-     * @param s2  the second series in the inner product.
-     *
-     * @return the inner product of the two series.
-     */
-    static <K> double innerProduct(DoubleSeries<K> s1, DoubleSeries<K> s2) {
-        return InnerProduct.compute(s1, s2);
-    }
-
-    /**
-     * Computes a weighted inner product of two series, assuming that
-     * missing series values are {@code 0.0}, not {@code Double.NaN}.
-     *
-     * @param <K> the runtime type for the series.
-     * @param s1  the first series in the inner product.
-     * @param s2  the second series in the inner product.
-     * @param wt  the weights to apply to each term in the inner product.
-     *
-     * @return the inner product of the two series.
-     */
-    static <K> double innerProduct(DoubleSeries<K> s1, DoubleSeries<K> s2, DoubleSeries<K> wt) {
-        return InnerProduct.compute(s1, s2, wt);
-    }
 }
