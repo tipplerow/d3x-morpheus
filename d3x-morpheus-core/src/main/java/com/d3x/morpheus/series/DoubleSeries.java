@@ -47,6 +47,7 @@ import com.d3x.morpheus.util.MorpheusException;
 import com.d3x.morpheus.util.Resource;
 import com.d3x.morpheus.vector.D3xVector;
 import com.d3x.morpheus.vector.D3xVectorView;
+import com.d3x.morpheus.vector.DataVectorView;
 
 /**
  * An interface to an immutable series of doubles stored against a unique key
@@ -55,7 +56,7 @@ import com.d3x.morpheus.vector.D3xVectorView;
  *
  * @author Xavier Witdouck
  */
-public interface DoubleSeries<K> extends DataSeries<K,Double>, D3xVectorView {
+public interface DoubleSeries<K> extends DataSeries<K,Double>, D3xVectorView, DataVectorView<K> {
 
     /**
      * Returns the value for key, NaN if no match
@@ -77,6 +78,15 @@ public interface DoubleSeries<K> extends DataSeries<K,Double>, D3xVectorView {
     default double getDouble(K key, double defaultValue) {
         double value = getDouble(key);
         return Double.isNaN(value) ? defaultValue : value;
+    }
+
+    @Override default boolean containsElement(K key) {
+        return contains(key);
+    }
+
+    @Override
+    default double getElement(K key, double defaultValue) {
+        return getDouble(key, defaultValue);
     }
 
     @Override
@@ -112,6 +122,16 @@ public interface DoubleSeries<K> extends DataSeries<K,Double>, D3xVectorView {
     @Override
     default double get(int index) {
         return getValueAt(index);
+    }
+
+    @Override
+    default Stream<K> streamKeys() {
+        return keys();
+    }
+
+    @Override
+    default DoubleStream streamValues() {
+        return toDoubles();
     }
 
     /**
