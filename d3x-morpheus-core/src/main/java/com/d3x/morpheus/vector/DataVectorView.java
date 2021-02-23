@@ -25,6 +25,7 @@ import java.util.stream.DoubleStream;
 import java.util.stream.Stream;
 
 import com.d3x.morpheus.util.DoubleComparator;
+import com.d3x.morpheus.util.MorpheusException;
 
 /**
  * Provides a read-only view of {@code double} values that are accessed
@@ -198,6 +199,21 @@ public interface DataVectorView<K> {
     }
 
     /**
+     * Extracts a required element from this view.
+     *
+     * @param key the key of the desired element.
+     *
+     * @return the value of the element indexed by the specified key.
+     *
+     * @throws RuntimeException unless this vector contains an element
+     * for the specified key.
+     */
+    default double getRequiredElement(K key) {
+        requireElement(key);
+        return getElement(key);
+    }
+
+    /**
      * Extracts elements from this view.
      *
      * @param elementKeys the keys of the desired elements.
@@ -244,5 +260,43 @@ public interface DataVectorView<K> {
      */
     default double innerProduct(DataVectorView<K> operand, DataVectorView<K> weights) {
         return InnerProduct.compute(this, operand, weights);
+    }
+
+    /**
+     * Ensures that this vector contains an element for a particular key.
+     *
+     * @param key the key of the required element.
+     *
+     * @throws RuntimeException unless this vector contains an element for
+     * the specified key.
+     */
+    default void requireElement(K key) {
+        if (!containsElement(key))
+            throw new MorpheusException("Missing key: [%s].", key);
+    }
+
+    /**
+     * Ensures that this vector contains an element for particular keys.
+     *
+     * @param keys the keys of the required elements.
+     *
+     * @throws RuntimeException unless this vector contains an element for
+     * each specified key.
+     */
+    default void requireElements(Iterable<K> keys) {
+        for (K key : keys)
+            requireElement(key);
+    }
+
+    /**
+     * Ensures that this vector contains an element for particular keys.
+     *
+     * @param keys the keys of the required elements.
+     *
+     * @throws RuntimeException unless this vector contains an element for
+     * each specified key.
+     */
+    default void requireElements(Stream<K> keys) {
+        keys.forEach(this::requireElement);
     }
 }

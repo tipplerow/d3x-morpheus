@@ -88,5 +88,15 @@ public class DataVectorViewTest {
         assertEquals(s1.innerProduct(s2, wt), 0.25 * 3.0 * 20.0 + 0.75 * 4.0 * 30.0, TOLERANCE);
         assertEquals(s2.innerProduct(s1, wt), 0.25 * 3.0 * 20.0 + 0.75 * 4.0 * 30.0, TOLERANCE);
     }
+
+    @Test(expectedExceptions = RuntimeException.class)
+    public void testRequireElementAbsent() {
+        baseView.requireElement("foo");
+    }
+
+    @Test
+    public void testRequireElementPresent() {
+        baseView.requireElement("A");
+    }
 }
 
