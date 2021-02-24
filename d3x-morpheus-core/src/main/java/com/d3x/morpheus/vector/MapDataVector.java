@@ -16,6 +16,7 @@
 package com.d3x.morpheus.vector;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.DoubleStream;
@@ -30,6 +31,10 @@ import lombok.NonNull;
  */
 final class MapDataVector<K> implements DataVector<K> {
     @NonNull private final Map<K, Double> map;
+
+    MapDataVector() {
+        this(new HashMap<>());
+    }
 
     MapDataVector(Map<K, Double> map) {
         this.map = map;

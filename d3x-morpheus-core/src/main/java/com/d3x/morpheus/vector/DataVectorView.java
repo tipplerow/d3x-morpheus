@@ -125,6 +125,23 @@ public interface DataVectorView<K> {
     }
 
     /**
+     * Creates a new DoubleSeries by copying values from a vector view and
+     * padding any missing values with a default value.
+     *
+     * @param <K>      the runtime key type.
+     * @param view     the vector view to copy from.
+     * @param padding  the default value to use
+     */
+    static <K> DataVectorView<K> pad(DataVectorView<K> view, Iterable<K> keys, double padding) {
+        DataVector<K> vector = new MapDataVector<K>();
+
+        for (K key : keys)
+            vector.setElement(key, view.getElement(key, padding));
+
+        return vector;
+    }
+
+    /**
      * Returns a read-only set view of the keys in this view.
      *
      * @return a read-only set view of the keys in this view.

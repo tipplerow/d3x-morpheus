@@ -89,6 +89,14 @@ public class DataVectorViewTest {
         assertEquals(s2.innerProduct(s1, wt), 0.25 * 3.0 * 20.0 + 0.75 * 4.0 * 30.0, TOLERANCE);
     }
 
+    @Test
+    public void testPad() {
+        DataVectorView<String> padded = DataVectorView.pad(baseView, List.of("A", "B", "F", "G"), 0.2);
+        DataVectorView<String> expected = DoubleSeries.build(String.class, List.of("A", "B", "F", "G"), List.of(1.0, 2.0, 0.2, 0.2));
+
+        assertTrue(padded.equalsView(expected));
+    }
+
     @Test(expectedExceptions = RuntimeException.class)
     public void testRequireElementAbsent() {
         baseView.requireElement("foo");
