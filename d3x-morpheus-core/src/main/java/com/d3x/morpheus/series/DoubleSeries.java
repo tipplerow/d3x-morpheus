@@ -238,6 +238,19 @@ public interface DoubleSeries<K> extends DataSeries<K,Double>, D3xVectorView, Da
         }
     }
 
+    /**
+     * Creates a new DoubleSeries by copying values from another vector view.
+     *
+     * @param <K>        the runtime key type.
+     * @param keyClass   the runtime key class.
+     * @param vectorView the vector view to copy.
+     *
+     * @return a new DoubleSeries containing a copy of the elements in the
+     * specified vector view.
+     */
+    static <K> DoubleSeries<K> copyOf(Class<K> keyClass, DataVectorView<K> vectorView) {
+        return of(keyClass, vectorView.streamKeys(), vectorView::getElement);
+    }
 
     /**
      * Iterates over all entries in this map
@@ -360,7 +373,6 @@ public interface DoubleSeries<K> extends DataSeries<K,Double>, D3xVectorView, Da
         consumer.accept(builder);
         return builder.build();
     }
-
 
     /**
      * Returns a newly created double series based on the args

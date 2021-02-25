@@ -17,6 +17,7 @@ package com.d3x.morpheus.series;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.IntFunction;
@@ -24,6 +25,7 @@ import java.util.stream.IntStream;
 
 import com.d3x.morpheus.vector.D3xVector;
 
+import com.d3x.morpheus.vector.DataVectorView;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -180,6 +182,25 @@ public class DoubleSeriesTests {
         Assert.assertEquals(series.getDoubleAt(1), 2.0, TOLERANCE);
         Assert.assertEquals(series.getDouble("D"), 4.0, TOLERANCE);
         Assert.assertEquals(series.getDoubleAt(2), 4.0, TOLERANCE);
+    }
+
+    @Test
+    public void testCopyOf() {
+        Map<String, Double> map = new HashMap<>();
+        DataVectorView<String> view = DataVectorView.of(map);
+        DoubleSeries<String> expected = DoubleSeries.build(String.class, Map.of("A", 1.0, "B", 2.0, "C", 3.0));
+
+        map.put("A", 1.0);
+        map.put("B", 2.0);
+        map.put("C", 3.0);
+
+        DoubleSeries<String> series1 = DoubleSeries.copyOf(String.class, view);
+        Assert.assertTrue(series1.equalsSeries(expected));
+
+        map.put("B", 22.0);
+        map.put("D", 44.0);
+
+        Assert.assertTrue(series1.equalsSeries(expected));
     }
 
     @Test
