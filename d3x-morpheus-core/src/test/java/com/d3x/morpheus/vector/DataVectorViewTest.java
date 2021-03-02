@@ -15,6 +15,7 @@
  */
 package com.d3x.morpheus.vector;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -47,6 +48,13 @@ public class DataVectorViewTest {
         assertEquals(vector.getElement("D", 0.0), 0.0, TOLERANCE);
 
         assertTrue(vector.equalsView(baseView));
+
+        Collection<DataVectorElement<String>> elements = vector.collectElements();
+
+        assertEquals(3, elements.size());
+        assertTrue(elements.contains(DataVectorElement.of("A", 1.0)));
+        assertTrue(elements.contains(DataVectorElement.of("B", 2.0)));
+        assertTrue(elements.contains(DataVectorElement.of("C", 3.0)));
     }
 
     @Test

@@ -16,6 +16,7 @@
 package com.d3x.morpheus.vector;
 
 import java.io.PrintStream;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.PrimitiveIterator;
@@ -139,6 +140,18 @@ public interface DataVectorView<K> {
             vector.setElement(key, view.getElement(key, padding));
 
         return vector;
+    }
+
+    /**
+     * Returns a collection view of the elements in this vector (in no particular
+     * order); the collection may be modified, but changes will not be reflected
+     * in this vector view.
+     *
+     * @return a collection view of the elements in this vector, in no particular
+     * order.
+     */
+    default Collection<DataVectorElement<K>> collectElements() {
+        return streamElements().collect(Collectors.toList());
     }
 
     /**
@@ -315,5 +328,14 @@ public interface DataVectorView<K> {
      */
     default void requireElements(Stream<K> keys) {
         keys.forEach(this::requireElement);
+    }
+
+    /**
+     * Returns the elements in this vector in a stream (in no particular order).
+     *
+     * @return the elements in this vector in a stream (in no particular order).
+     */
+    default Stream<DataVectorElement<K>> streamElements() {
+        return streamKeys().map(key -> DataVectorElement.of(key, getElement(key)));
     }
 }
