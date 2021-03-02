@@ -18,8 +18,8 @@ package com.d3x.morpheus.stats;
 import java.util.function.Supplier;
 import java.util.stream.DoubleStream;
 
-import com.d3x.morpheus.frame.DataFrameVector;
 import com.d3x.morpheus.vector.D3xVectorView;
+import com.d3x.morpheus.vector.DataVectorView;
 
 /**
  * An interface that defines an incremental calculation of a uni-variate statistic.
@@ -58,8 +58,8 @@ public interface Statistic1 extends Statistic {
      *
      * @return the sample size after adding the values.
      */
-    default long add(DataFrameVector<?,?,?,?,?> vector) {
-        return add(vector.toDoubleStream());
+    default long add(DataVectorView<?> vector) {
+        return add(vector.streamValues());
     }
 
     /**
@@ -92,7 +92,7 @@ public interface Statistic1 extends Statistic {
      *
      * @return the value of this statistic for the specified sample.
      */
-    default double compute(DataFrameVector<?,?,?,?,?> sample) {
+    default double compute(DataVectorView<?> sample) {
         return compute(this, sample);
     }
 
@@ -141,7 +141,7 @@ public interface Statistic1 extends Statistic {
      *
      * @return          the value of the statistic for the given sample.
      */
-    static double compute(Statistic1 stat, DataFrameVector<?,?,?,?,?> sample) {
+    static double compute(Statistic1 stat, DataVectorView<?> sample) {
         stat.reset();
         stat.add(sample);
         return stat.getValue();

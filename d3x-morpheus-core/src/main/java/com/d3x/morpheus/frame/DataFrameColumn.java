@@ -15,6 +15,8 @@
  */
 package com.d3x.morpheus.frame;
 
+import java.util.stream.Stream;
+
 /**
  * A convenience marker interface used to represent a column vector on a DataFrame
  *
@@ -31,6 +33,16 @@ package com.d3x.morpheus.frame;
  * @author  Xavier Witdouck
  */
 public interface DataFrameColumn<R,C> extends DataFrameVector<C,R,R,C,DataFrameColumn<R,C>> {
+
+    @Override
+    default boolean containsElement(R rowKey) {
+        return frame().containsRow(rowKey);
+    }
+
+    @Override
+    default Stream<R> streamKeys() {
+        return frame().rows().keys();
+    }
 
     /**
      * An interface to a movable DataFrameRow

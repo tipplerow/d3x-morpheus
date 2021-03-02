@@ -34,15 +34,15 @@ public class InnerProductTest {
 
     @Test
     public void testEqualWeight() {
-        assertEquals(DoubleSeries.innerProduct(s1, s1), 55.0, TOLERANCE);
-        assertEquals(DoubleSeries.innerProduct(s1, s2), 2.0 * 10.0 + 3.0 * 20.0 + 4.0 * 30.0, TOLERANCE);
-        assertEquals(DoubleSeries.innerProduct(s2, s1), 2.0 * 10.0 + 3.0 * 20.0 + 4.0 * 30.0, TOLERANCE);
+        assertEquals(s1.innerProduct(s1), 55.0, TOLERANCE);
+        assertEquals(s1.innerProduct(s2), 2.0 * 10.0 + 3.0 * 20.0 + 4.0 * 30.0, TOLERANCE);
+        assertEquals(s2.innerProduct(s1), 2.0 * 10.0 + 3.0 * 20.0 + 4.0 * 30.0, TOLERANCE);
     }
 
     @Test
     public void testWeighted() {
-        assertEquals(DoubleSeries.innerProduct(s1, s1, wt), 14.25, TOLERANCE);
-        assertEquals(DoubleSeries.innerProduct(s1, s2, wt), 0.25 * 3.0 * 20.0 + 0.75 * 4.0 * 30.0, TOLERANCE);
-        assertEquals(DoubleSeries.innerProduct(s2, s1, wt), 0.25 * 3.0 * 20.0 + 0.75 * 4.0 * 30.0, TOLERANCE);
+        assertEquals(s1.innerProduct(s1, wt), 14.25, TOLERANCE);
+        assertEquals(s1.innerProduct(s2, wt), 0.25 * 3.0 * 20.0 + 0.75 * 4.0 * 30.0, TOLERANCE);
+        assertEquals(s2.innerProduct(s1, wt), 0.25 * 3.0 * 20.0 + 0.75 * 4.0 * 30.0, TOLERANCE);
     }
 }

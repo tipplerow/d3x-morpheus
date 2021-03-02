@@ -16,7 +16,6 @@
 package com.d3x.morpheus.vector;
 
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.PrimitiveIterator;
 
@@ -52,7 +51,7 @@ public interface D3xVectorView extends Iterable<Double> {
      * Returns a read-only iterator over this vector view.
      * @return a read-only iterator over this vector view.
      */
-    default PrimitiveIterator.OfDouble iterator() {
+    @Override default PrimitiveIterator.OfDouble iterator() {
         return new VectorIterator(this);
     }
 

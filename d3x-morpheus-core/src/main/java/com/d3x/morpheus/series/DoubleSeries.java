@@ -47,6 +47,7 @@ import com.d3x.morpheus.util.MorpheusException;
 import com.d3x.morpheus.util.Resource;
 import com.d3x.morpheus.vector.D3xVector;
 import com.d3x.morpheus.vector.D3xVectorView;
+import com.d3x.morpheus.vector.DataVectorView;
 
 /**
  * An interface to an immutable series of doubles stored against a unique key
@@ -55,7 +56,7 @@ import com.d3x.morpheus.vector.D3xVectorView;
  *
  * @author Xavier Witdouck
  */
-public interface DoubleSeries<K> extends DataSeries<K,Double>, D3xVectorView {
+public interface DoubleSeries<K> extends DataSeries<K,Double>, D3xVectorView, DataVectorView<K> {
 
     /**
      * Returns the value for key, NaN if no match
@@ -77,6 +78,15 @@ public interface DoubleSeries<K> extends DataSeries<K,Double>, D3xVectorView {
     default double getDouble(K key, double defaultValue) {
         double value = getDouble(key);
         return Double.isNaN(value) ? defaultValue : value;
+    }
+
+    @Override default boolean containsElement(K key) {
+        return contains(key);
+    }
+
+    @Override
+    default double getElement(K key, double defaultValue) {
+        return getDouble(key, defaultValue);
     }
 
     @Override
@@ -112,6 +122,16 @@ public interface DoubleSeries<K> extends DataSeries<K,Double>, D3xVectorView {
     @Override
     default double get(int index) {
         return getValueAt(index);
+    }
+
+    @Override
+    default Stream<K> streamKeys() {
+        return keys();
+    }
+
+    @Override
+    default DoubleStream streamValues() {
+        return toDoubles();
     }
 
     /**
@@ -218,6 +238,19 @@ public interface DoubleSeries<K> extends DataSeries<K,Double>, D3xVectorView {
         }
     }
 
+    /**
+     * Creates a new DoubleSeries by copying values from another vector view.
+     *
+     * @param <K>        the runtime key type.
+     * @param keyClass   the runtime key class.
+     * @param vectorView the vector view to copy.
+     *
+     * @return a new DoubleSeries containing a copy of the elements in the
+     * specified vector view.
+     */
+    static <K> DoubleSeries<K> copyOf(Class<K> keyClass, DataVectorView<K> vectorView) {
+        return of(keyClass, vectorView.streamKeys(), vectorView::getElement);
+    }
 
     /**
      * Iterates over all entries in this map
@@ -340,7 +373,6 @@ public interface DoubleSeries<K> extends DataSeries<K,Double>, D3xVectorView {
         consumer.accept(builder);
         return builder.build();
     }
-
 
     /**
      * Returns a newly created double series based on the args
@@ -616,34 +648,5 @@ public interface DoubleSeries<K> extends DataSeries<K,Double>, D3xVectorView {
     interface BiConsumer<K> {
 
         void accept(K key, double value);
-    }
-
-    /**
-     * Computes the inner product of two series, assuming that missing
-     * series values are {@code 0.0}, not {@code Double.NaN}.
-     *
-     * @param <K> the runtime type for the series.
-     * @param s1  the first series in the inner product.
-     * @param s2  the second series in the inner product.
-     *
-     * @return the inner product of the two series.
-     */
-    static <K> double innerProduct(DoubleSeries<K> s1, DoubleSeries<K> s2) {
-        return InnerProduct.compute(s1, s2);
-    }
-
-    /**
-     * Computes a weighted inner product of two series, assuming that
-     * missing series values are {@code 0.0}, not {@code Double.NaN}.
-     *
-     * @param <K> the runtime type for the series.
-     * @param s1  the first series in the inner product.
-     * @param s2  the second series in the inner product.
-     * @param wt  the weights to apply to each term in the inner product.
-     *
-     * @return the inner product of the two series.
-     */
-    static <K> double innerProduct(DoubleSeries<K> s1, DoubleSeries<K> s2, DoubleSeries<K> wt) {
-        return InnerProduct.compute(s1, s2, wt);
     }
 }

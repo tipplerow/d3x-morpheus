@@ -29,6 +29,7 @@ import com.d3x.morpheus.series.DoubleSeries;
 import com.d3x.morpheus.stats.Statistic1;
 import com.d3x.morpheus.stats.Stats;
 import com.d3x.morpheus.util.Bounds;
+import com.d3x.morpheus.vector.DataVector;
 
 /**
  * An interface to a row or column vector in a <code>DataFrame</code>
@@ -37,7 +38,7 @@ import com.d3x.morpheus.util.Bounds;
  *
  * @author  Xavier Witdouck
  */
-public interface DataFrameVector<X,Y,R,C,Z> extends DataFrameOperations<R,C,Z>, DataFrameIterators<R,C>, Iterable<DataFrameValue<R,C>> {
+public interface DataFrameVector<X,Y,R,C,Z> extends DataFrameOperations<R,C,Z>, DataFrameIterators<R,C>, Iterable<DataFrameValue<R,C>>, DataVector<Y> {
 
     /**
      * Returns the key for this vector
@@ -521,4 +522,29 @@ public interface DataFrameVector<X,Y,R,C,Z> extends DataFrameOperations<R,C,Z>, 
      */
     <V> V setValueAt(int ordinal, V value);
 
+    @Override
+    default double getElement(Y elementKey, double defaultValue) {
+        if (containsElement(elementKey))
+            return getDouble(elementKey);
+        else
+            return defaultValue;
+    }
+
+    @Override
+    default int length() {
+        return size();
+    }
+
+    @Override
+    default void setElement(Y elementKey, double elementValue) {
+        if (containsElement(elementKey))
+            setDouble(elementKey, elementValue);
+        else
+            throw new DataFrameException("Invalid element key: [%s].", elementKey);
+    }
+
+    @Override
+    default DoubleStream streamValues() {
+        return toDoubleStream();
+    }
 }
