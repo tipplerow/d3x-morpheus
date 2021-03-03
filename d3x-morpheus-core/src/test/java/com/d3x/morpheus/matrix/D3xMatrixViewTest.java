@@ -25,6 +25,31 @@ public class D3xMatrixViewTest {
     private static final double TOLERANCE = 1.0E-12;
 
     @Test
+    public void testAnyAll() {
+        D3xMatrixView view1 = D3xMatrixView.of(
+                new double[][] {
+                        { 1.0, 2.0, 3.0 },
+                        { 4.0, 5.0, 6.0 }
+                });
+
+        D3xMatrixView view2 = D3xMatrixView.of(
+                new double[][] {
+                        { 1.0, 2.0, Double.NaN },
+                        { 4.0, 5.0, 6.0 }
+                });
+
+        assertTrue(view1.all(Double::isFinite));
+        assertTrue(view1.all(x -> x > 0.0));
+        assertFalse(view1.all(x -> x > 1.1));
+        assertFalse(view2.all(Double::isFinite));
+
+        assertFalse(view1.any(Double::isNaN));
+        assertFalse(view1.any(x -> x < 0.0));
+        assertTrue(view1.any(x -> x < 1.1));
+        assertTrue(view2.any(Double::isNaN));
+    }
+
+    @Test
     public void testFrame() {
         DataFrame<String, String> frame = D3xVectorTest.newFrame();
         D3xMatrixView view = D3xMatrixView.of(frame);

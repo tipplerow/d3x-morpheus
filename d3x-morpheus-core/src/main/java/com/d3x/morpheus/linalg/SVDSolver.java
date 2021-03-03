@@ -18,7 +18,6 @@ package com.d3x.morpheus.linalg;
 import lombok.NonNull;
 
 import com.d3x.morpheus.matrix.D3xMatrix;
-import com.d3x.morpheus.stats.Max;
 import com.d3x.morpheus.stats.SumSquares;
 import com.d3x.morpheus.util.DoubleComparator;
 import com.d3x.morpheus.vector.D3xVector;

@@ -17,6 +17,7 @@ package com.d3x.morpheus.linalg;
 
 import com.d3x.morpheus.matrix.ApacheMatrix;
 import com.d3x.morpheus.matrix.D3xMatrix;
+import com.d3x.morpheus.util.MorpheusException;
 import com.d3x.morpheus.vector.D3xVector;
 
 import org.apache.commons.math3.linear.BlockRealMatrix;
@@ -42,6 +43,9 @@ final class ApacheSVD implements SVD {
         // For an (M x N) matrix A, the decomposition takes O(M * N^2) operations,
         // so do not worry about some additional copying, which is only O(M * N)...
         //
+        if (!A.all(Double::isFinite))
+            throw new MorpheusException("Non-finite values in target matrix.");
+
         BlockRealMatrix blockA = new BlockRealMatrix(A.toArray());
         SingularValueDecomposition svd = new SingularValueDecomposition(blockA);
 
