@@ -18,6 +18,7 @@ package com.d3x.morpheus.vector;
 import java.util.Arrays;
 import java.util.List;
 import java.util.PrimitiveIterator;
+import java.util.function.DoublePredicate;
 
 import com.d3x.morpheus.stats.Statistic1;
 import com.d3x.morpheus.stats.Sum;
@@ -75,6 +76,38 @@ public interface D3xVectorView extends Iterable<Double> {
      */
     static D3xVectorView of(List<Double> list) {
         return new ListView(list);
+    }
+
+    /**
+     * Tests whether all elements in this vector satisfy a predicate.
+     *
+     * @param predicate the predicate to evaluate.
+     *
+     * @return {@code true} iff every element in this vector satisfies
+     * the specified predicate.
+     */
+    default boolean all(DoublePredicate predicate) {
+        for (int index = 0; index < length(); ++index)
+            if (!predicate.test(get(index)))
+                return false;
+
+        return true;
+    }
+
+    /**
+     * Tests whether any element in this vector satisfies a predicate.
+     *
+     * @param predicate the predicate to evaluate.
+     *
+     * @return {@code true} iff at least one element in this vector
+     * satisfies the specified predicate.
+     */
+    default boolean any(DoublePredicate predicate) {
+        for (int index = 0; index < length(); ++index)
+            if (predicate.test(get(index)))
+                return true;
+
+        return false;
     }
 
     /**

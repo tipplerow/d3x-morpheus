@@ -26,6 +26,22 @@ public class D3xVectorViewTest {
     private static final double TOLERANCE = 1.0E-12;
 
     @Test
+    public void testAnyAll() {
+        D3xVectorView view1 = D3xVectorView.of(1.0, 2.0, 3.0);
+        D3xVectorView view2 = D3xVectorView.of(1.0, Double.NaN, 3.0);
+
+        assertTrue(view1.all(Double::isFinite));
+        assertTrue(view1.all(x -> x > 0.0));
+        assertFalse(view1.all(x -> x > 1.1));
+        assertFalse(view2.all(Double::isFinite));
+
+        assertFalse(view1.any(Double::isNaN));
+        assertFalse(view1.any(x -> x < 0.0));
+        assertTrue(view1.any(x -> x < 1.1));
+        assertTrue(view2.any(Double::isNaN));
+    }
+
+    @Test
     public void testArrayView() {
         assertEquals(D3xVectorView.of().length(), 0);
 

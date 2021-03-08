@@ -15,10 +15,11 @@
  */
 package com.d3x.morpheus.matrix;
 
+import java.util.function.DoublePredicate;
+
 import com.d3x.morpheus.frame.DataFrame;
 import com.d3x.morpheus.util.DoubleComparator;
 import com.d3x.morpheus.util.MorpheusException;
-import com.d3x.morpheus.vector.D3xVector;
 import com.d3x.morpheus.vector.D3xVectorView;
 
 /**
@@ -72,6 +73,40 @@ public interface D3xMatrixView {
      */
     static D3xMatrixView of(DataFrame<?,?> frame) {
         return new FrameView(frame);
+    }
+
+    /**
+     * Tests whether all elements in this matrix satisfy a predicate.
+     *
+     * @param predicate the predicate to evaluate.
+     *
+     * @return {@code true} iff every element in this matrix satisfies
+     * the specified predicate.
+     */
+    default boolean all(DoublePredicate predicate) {
+        for (int row = 0; row < nrow(); ++row)
+            for (int col = 0; col < ncol(); ++col)
+                if (!predicate.test(get(row, col)))
+                    return false;
+
+        return true;
+    }
+
+    /**
+     * Tests whether any element in this matrix satisfies a predicate.
+     *
+     * @param predicate the predicate to evaluate.
+     *
+     * @return {@code true} iff at least one element in this matrix
+     * satisfies the specified predicate.
+     */
+    default boolean any(DoublePredicate predicate) {
+        for (int row = 0; row < nrow(); ++row)
+            for (int col = 0; col < ncol(); ++col)
+                if (predicate.test(get(row, col)))
+                    return true;
+
+        return false;
     }
 
     /**
