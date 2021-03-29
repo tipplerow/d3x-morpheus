@@ -159,17 +159,17 @@ public class ExcelSource implements DataFrameSource<Integer,String, ExcelSource.
     private Object getCellValue(Cell cell, FormulaEvaluator evaluator) {
         if (cell == null) {
             return null;
-        } else if (cell.getCellTypeEnum() == CellType.BOOLEAN) {
+        } else if (cell.getCellType() == CellType.BOOLEAN) {
             return cell.getBooleanCellValue();
-        } else if (cell.getCellTypeEnum() == CellType.STRING) {
+        } else if (cell.getCellType() == CellType.STRING) {
             return cell.getRichStringCellValue().getString();
-        } else if (cell.getCellTypeEnum() == CellType.NUMERIC && DateUtil.isCellDateFormatted(cell)) {
+        } else if (cell.getCellType() == CellType.NUMERIC && DateUtil.isCellDateFormatted(cell)) {
             return cell.getDateCellValue();
-        } else if (cell.getCellTypeEnum() == CellType.NUMERIC) {
+        } else if (cell.getCellType() == CellType.NUMERIC) {
             return cell.getNumericCellValue();
-        } else if (cell.getCellTypeEnum() == CellType.FORMULA) {
+        } else if (cell.getCellType() == CellType.FORMULA) {
             return getCellValue(evaluator.evaluateInCell(cell), evaluator);
-        } else if (cell.getCellTypeEnum() == CellType.BLANK) {
+        } else if (cell.getCellType() == CellType.BLANK) {
             return null;
         } else {
             return null;
@@ -182,8 +182,8 @@ public class ExcelSource implements DataFrameSource<Integer,String, ExcelSource.
      */
     @lombok.AllArgsConstructor()
     public static class Coordinate {
-        private int rowIndex;
-        private int colIndex;
+        private final int rowIndex;
+        private final int colIndex;
     }
 
 
