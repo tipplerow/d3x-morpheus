@@ -326,6 +326,11 @@
                     <version>6.0.5</version>
                     <configuration>
                         <failBuildOnCVSS>8</failBuildOnCVSS>
+                        <excludes>
+                            <exclude>org.apache.xmlgraphics:batik-all</exclude>
+                            <exclude>org.apache.xmlgraphics:batik-svgpp</exclude>
+                            <exclude>org.apache.xmlgraphics:xmlgraphics-commons</exclude>
+                        </excludes>
                     </configuration>
                     <executions>
                         <execution>
