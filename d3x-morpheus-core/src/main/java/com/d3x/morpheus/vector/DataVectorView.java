@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
 import java.util.stream.Stream;
 
+import com.d3x.morpheus.series.DoubleSeries;
 import com.d3x.morpheus.util.DoubleComparator;
 import com.d3x.morpheus.util.MorpheusException;
 
@@ -337,5 +338,18 @@ public interface DataVectorView<K> {
      */
     default Stream<DataVectorElement<K>> streamElements() {
         return streamKeys().map(key -> DataVectorElement.of(key, getElement(key)));
+    }
+
+    /**
+     * Returns a DoubleSeries with the same elements as this view (or this view
+     * itself, if it is a DoubleSeries).
+     *
+     * @return a DoubleSeries with the same elements as this view.
+     */
+    default DoubleSeries<K> toSeries(Class<K> keyClass) {
+        if (this instanceof DoubleSeries)
+            return (DoubleSeries<K>) this;
+        else
+            return DoubleSeries.copyOf(keyClass, this);
     }
 }

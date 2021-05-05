@@ -30,13 +30,14 @@ import lombok.NonNull;
  * @author Scott Shaffer
  */
 final class MapDataVector<K> implements DataVector<K> {
-    @NonNull private final Map<K, Double> map;
+    @NonNull
+    private final Map<K, Double> map;
 
     MapDataVector() {
         this(new HashMap<>());
     }
 
-    MapDataVector(Map<K, Double> map) {
+    MapDataVector(@NonNull Map<K, Double> map) {
         this.map = map;
     }
 

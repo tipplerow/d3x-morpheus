@@ -15,6 +15,7 @@
  */
 package com.d3x.morpheus.vector;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public interface DataVector<K> extends DataVectorView<K> {
@@ -25,6 +26,42 @@ public interface DataVector<K> extends DataVectorView<K> {
      * @param value the value to assign.
      */
     void setElement(K key, double value);
+
+    /**
+     * Assigns a vector element.
+     *
+     * @param element the element to assign.
+     */
+    default void setElement(DataVectorElement<K> element) {
+        setElement(element.getKey(), element.getValue());
+    }
+
+    /**
+     * Creates a new data vector by copying the elements of an existing view.
+     *
+     * @param view the data vector view to copy.
+     *
+     * @return a new data vector with the same elements as the input view.
+     */
+    static <K> DataVector<K> copy(DataVectorView<K> view) {
+        DataVector<K> vector = create();
+
+        for (DataVectorElement<K> element : view.collectElements())
+            vector.setElement(element);
+
+        return vector;
+    }
+
+    /**
+     * Creates a new, empty data vector.
+     *
+     * @param <K> the runtime key type.
+     *
+     * @return a new, empty data vector with the desired key type.
+     */
+    static <K> DataVector<K> create() {
+        return new MapDataVector<>(new HashMap<>());
+    }
 
     /**
      * Returns a DataVector backed by a Double map; changes to the map

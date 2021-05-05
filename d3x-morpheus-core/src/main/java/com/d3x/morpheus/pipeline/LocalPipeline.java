@@ -13,48 +13,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.d3x.morpheus.vector;
+package com.d3x.morpheus.pipeline;
 
-import com.d3x.morpheus.util.DoubleComparator;
+import java.util.function.DoubleUnaryOperator;
+
+import com.d3x.morpheus.vector.DataVector;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
 
 /**
- * An immutable element in a DataVectorView.
+ * Implements local, length-preserving data pipelines.
+ *
+ * @author Scott Shaffer
  */
 @AllArgsConstructor(staticName = "of")
-public final class DataVectorElement<K> {
-    /**
-     * The key of this vector element.
-     */
+public final class LocalPipeline implements DataPipeline {
     @Getter @NonNull
-    private final K key;
-
-    /**
-     * The value in this vector element.
-     */
-    @Getter
-    private final double value;
+    private final DoubleUnaryOperator operator;
 
     @Override
-    @SuppressWarnings("unchecked")
-    public boolean equals(Object obj) {
-        return (obj instanceof DataVectorElement) && equalsElement((DataVectorElement<K>) obj);
-    }
+    public <K> DataVector<K> apply(DataVector<K> vector) {
+        for (K key : vector.collectKeys())
+            vector.setElement(key, operator.applyAsDouble(vector.getElement(key)));
 
-    private boolean equalsElement(DataVectorElement<K> that) {
-        return this.key.equals(that.key) && DoubleComparator.DEFAULT.equals(this.value, that.value);
+        return vector;
     }
 
     @Override
-    public int hashCode() {
-        return key.hashCode();
+    public boolean isLengthPreserving() {
+        return true;
     }
 
     @Override
-    public String toString() {
-        return key + " => " + Double.toString(value);
+    public boolean isLocal() {
+        return true;
     }
 }
