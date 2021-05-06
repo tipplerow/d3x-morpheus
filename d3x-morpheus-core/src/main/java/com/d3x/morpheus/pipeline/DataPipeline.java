@@ -230,7 +230,7 @@ public interface DataPipeline {
      * element by the given factor.
      */
     static DataPipeline divide(double factor) {
-        return local(element -> element / factor);
+        return multiply(1.0 / factor);
     }
 
     /**
@@ -280,7 +280,7 @@ public interface DataPipeline {
      * given value from each element.
      */
     static DataPipeline subtract(double subtrahend) {
-        return local(element -> element - subtrahend);
+        return add(-subtrahend);
     }
 
     /**

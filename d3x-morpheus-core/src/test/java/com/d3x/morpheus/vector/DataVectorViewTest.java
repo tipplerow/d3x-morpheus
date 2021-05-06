@@ -114,5 +114,15 @@ public class DataVectorViewTest {
     public void testRequireElementPresent() {
         baseView.requireElement("A");
     }
+
+    @Test
+    public void testToSeries() {
+        DataVectorView<String> view1 = DataVector.of(Map.of("A", 1.0, "B", 2.0, "C", 3.0));
+        DataVectorView<String> view2 = view1.toSeries(String.class);
+
+        assertSame(baseView.toSeries(String.class), baseView);
+        assertNotSame(view1, view2);
+        assertTrue(view1.equalsView(view2));
+    }
 }
 
