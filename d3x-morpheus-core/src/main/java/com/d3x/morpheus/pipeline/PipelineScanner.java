@@ -17,7 +17,6 @@ package com.d3x.morpheus.pipeline;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,6 +31,7 @@ public class PipelineScanner {
     private final String source;
     private final Matcher matcher;
     private final PipelineFactory factory;
+    private final ArgumentScanner scanner;
     private final List<DataPipeline> pipelines = new ArrayList<>();
 
     // Index of the character in the source string where the last
@@ -39,16 +39,12 @@ public class PipelineScanner {
     // remains after all pipelines are matched...
     private int matchEnd;
 
-    private PipelineScanner(String source, PipelineFactory factory) {
+    private PipelineScanner(String source, PipelineFactory factory, ArgumentScanner scanner) {
         this.source = source;
         this.factory = factory;
+        this.scanner = scanner;
         this.matcher = PIPELINE_PATTERN.matcher(source);
     }
-
-    /**
-     * The delimiter used to separate pipeline arguments.
-     */
-    public static final String ARGUMENT_SEPARATOR = ",";
 
     /**
      * The delimiter used to separate pipelines in a composite pipeline.
@@ -63,7 +59,6 @@ public class PipelineScanner {
 
     private static final String FREE_TEXT   = ".*?";  // Any text, possibly empty (zero or more characters)...
     private static final String SINGLE_WORD = "\\w+"; // A valid Java word having at least one character
-    private static final String WHITE_SPACE = "\\s*"; // Zero or more white-space characters...
 
     // The delimiter and surrounding white space that will precede all pipelines except the first...
     private static final String DELIM_GROUP = START_GROUP + FREE_TEXT + END_GROUP;
@@ -74,14 +69,32 @@ public class PipelineScanner {
     // The pipeline argument(s), enclosed in parentheses...
     private static final String ARGS_GROUP = OPEN_PAREN + START_GROUP + FREE_TEXT + END_GROUP + CLOSE_PAREN;
 
-    private static final Pattern ARGUMENT_PATTERN = Pattern.compile(WHITE_SPACE + ARGUMENT_SEPARATOR + WHITE_SPACE);
+    // The final pipeline pattern with three indexed groups...
     private static final Pattern PIPELINE_PATTERN = Pattern.compile(DELIM_GROUP + NAME_GROUP + ARGS_GROUP);
 
     /**
-     * Returns the single or composite pipeline encoded in a string.
+     * Parses a pipeline string using the default pipeline factory and
+     * argument scanner.
+     *
+     * @param source the string containing an encoded pipeline(s).
+     *
+     * @return the single or composite pipeline encoded in the given
+     * source string.
+     *
+     * @throws RuntimeException unless the input string is properly
+     * formatted and the default factory can create every encoded pipeline.
+     */
+    public static DataPipeline scan(String source) {
+        return scan(source, PipelineFactory.DEFAULT, ArgumentScanner.DEFAULT);
+    }
+
+    /**
+     * Parses a pipeline string using a customized pipeline factory and
+     * argument scanner.
      *
      * @param source  the string containing an encoded pipeline(s).
      * @param factory a factory able to create the encoded pipeline(s).
+     * @param scanner a customized scanner for argument parsing.
      *
      * @return the single or composite pipeline encoded in the given
      * source string.
@@ -89,9 +102,8 @@ public class PipelineScanner {
      * @throws RuntimeException unless the input string is properly
      * formatted and the factory can create every encoded pipeline.
      */
-    public static DataPipeline scan(String source, PipelineFactory factory) {
-        PipelineScanner scanner = new PipelineScanner(source, factory);
-        return scanner.scan();
+    public static DataPipeline scan(String source, PipelineFactory factory, ArgumentScanner scanner) {
+        return new PipelineScanner(source, factory, scanner).scan();
     }
 
     private DataPipeline scan() {
@@ -107,7 +119,7 @@ public class PipelineScanner {
         matchEnd = matcher.end();
 
         String name = matcher.group(2);
-        Object[] args = parseArguments(matcher.group(3));
+        Object[] args = scanner.scan(matcher.group(3));
 
         pipelines.add(factory.create(name, args));
     }
@@ -131,29 +143,6 @@ public class PipelineScanner {
 
         if (!pipelines.isEmpty() && !content.equals(PIPELINE_SEPARATOR))
             throw new MorpheusException("Invalid pipeline text: [%s].", group1);
-    }
-
-    private static Object[] parseArguments(String argString) {
-        List<Object> argList = new ArrayList<>();
-        Scanner scanner = new Scanner(argString).useDelimiter(ARGUMENT_PATTERN);
-
-        while (scanner.hasNext())
-            argList.add(getNext(scanner));
-
-        return argList.toArray();
-    }
-
-    private static Object getNext(Scanner scanner) {
-        if (scanner.hasNextBoolean())
-            return scanner.nextBoolean();
-
-        if (scanner.hasNextInt())
-            return scanner.nextInt();
-
-        if (scanner.hasNextDouble())
-            return scanner.nextDouble();
-
-        return scanner.next();
     }
 
     private void validateMatchEnd() {

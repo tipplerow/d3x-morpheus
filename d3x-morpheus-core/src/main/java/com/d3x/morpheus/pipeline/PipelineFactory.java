@@ -24,6 +24,12 @@ import com.d3x.morpheus.util.MorpheusException;
  */
 public class PipelineFactory {
     /**
+     * The default pipeline factory, which recognizes all pipelines defined
+     * in the DataPipeline interface.
+     */
+    public static final PipelineFactory DEFAULT = new PipelineFactory();
+
+    /**
      * Creates a new pipeline given its name and argument(s).
      *
      * @param name the name of the pipeline.
@@ -53,6 +59,10 @@ public class PipelineFactory {
                 assertArgs(name, args, Number.class);
                 return DataPipeline.divide(doubleArg(args, 0));
 
+            case "exp":
+                assertNoArgs(name, args);
+                return DataPipeline.exp;
+
             case "flip":
                 assertNoArgs(name, args);
                 return DataPipeline.flip;
@@ -61,6 +71,10 @@ public class PipelineFactory {
                 assertNoArgs(name, args);
                 return DataPipeline.identity;
 
+            case "invert":
+                assertNoArgs(name, args);
+                return DataPipeline.invert;
+
             case "log":
                 assertNoArgs(name, args);
                 return DataPipeline.log;
@@ -68,6 +82,10 @@ public class PipelineFactory {
             case "multiply":
                 assertArgs(name, args, Number.class);
                 return DataPipeline.multiply(doubleArg(args, 0));
+
+            case "pow":
+                assertArgs(name, args, Number.class);
+                return DataPipeline.pow(doubleArg(args, 0));
 
             case "replaceNaN":
                 assertArgs(name, args, Number.class);
@@ -80,6 +98,10 @@ public class PipelineFactory {
             case "sqrt":
                 assertNoArgs(name, args);
                 return DataPipeline.sqrt;
+
+            case "square":
+                assertNoArgs(name, args);
+                return DataPipeline.square;
 
             case "standardize":
                 assertNoArgs(name, args);

@@ -101,6 +101,11 @@ public class DataPipelineTest extends NumericTestBase {
     }
 
     @Test
+    public void testExp() {
+        assertPipeline1(DataPipeline.exp, 0.1353353, 2.7182818, NA, 20.0855369, 0.6065307);
+    }
+
+    @Test
     public void testFlip() {
         assertPipeline1(DataPipeline.flip, 2.0, -1.0, NA, -3.0, 0.5);
     }
@@ -111,6 +116,11 @@ public class DataPipelineTest extends NumericTestBase {
     }
 
     @Test
+    public void testInvert() {
+        assertPipeline1(DataPipeline.invert, -0.5, 1.0, NA, 0.3333333, -2.0);
+    }
+
+    @Test
     public void testLog() {
         assertPipeline2(DataPipeline.log, 0.6931472, 0.0, NA, 1.0986123, -0.6931472);
     }
@@ -118,6 +128,11 @@ public class DataPipelineTest extends NumericTestBase {
     @Test
     public void testMultiply() {
         assertPipeline1(DataPipeline.multiply(2.0), -4.0, 2.0, NA, 6.0, -1.0);
+    }
+
+    @Test
+    public void testPow() {
+        assertPipeline1(DataPipeline.pow(3.0), -8.0, 1.0, NA, 27.0, -0.125);
     }
 
     @Test
@@ -135,6 +150,11 @@ public class DataPipelineTest extends NumericTestBase {
     @Test
     public void testSqrt() {
         assertPipeline2(DataPipeline.sqrt,  1.4142136, 1.0, NA, 1.7320508, 0.7071068);
+    }
+
+    @Test
+    public void testSquare() {
+        assertPipeline1(DataPipeline.square, 4.0, 1.0, NA, 9.0, 0.25);
     }
 
     @Test

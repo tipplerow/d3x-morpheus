@@ -108,6 +108,12 @@ public interface DataPipeline {
     };
 
     /**
+     * A local, length-preserving pipeline that applies the exponential function
+     * to each element.
+     */
+    DataPipeline exp = local(Math::exp);
+
+    /**
      * A local, length-preserving pipeline that flips the sign of each element.
      */
     DataPipeline flip = local(value -> -value);
@@ -116,6 +122,12 @@ public interface DataPipeline {
      * The identity pipeline: all elements are unchanged.
      */
     DataPipeline identity = local(DoubleUnaryOperator.identity());
+
+    /**
+     * A local, length-preserving pipeline that replaces each element
+     * with its reciprocal.
+     */
+    DataPipeline invert = local(x -> 1.0 / x);
 
     /**
      * A local, length-preserving pipeline that replaces each element
@@ -138,6 +150,11 @@ public interface DataPipeline {
      * with its square root.
      */
     DataPipeline sqrt = local(Math::sqrt);
+
+    /**
+     * A local, length-preserving pipeline that squares each element.
+     */
+    DataPipeline square = local(x -> x * x);
 
     /**
      * A non-local, length-preserving pipeline that subtracts the mean
@@ -255,6 +272,19 @@ public interface DataPipeline {
      */
     static DataPipeline multiply(double factor) {
         return local(element -> element * factor);
+    }
+
+    /**
+     * Returns a local, length-preserving pipeline that raises each element
+     * to a power.
+     *
+     * @param exponent the exponent of the power function.
+     *
+     * @return a local, length-preserving pipeline that raises each element
+     * to the specified power.
+     */
+    static DataPipeline pow(double exponent) {
+        return local(element -> Math.pow(element, exponent));
     }
 
     /**

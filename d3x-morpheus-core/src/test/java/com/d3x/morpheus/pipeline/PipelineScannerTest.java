@@ -24,13 +24,11 @@ import org.testng.annotations.Test;
 import static org.testng.Assert.*;
 
 public class PipelineScannerTest {
-    private final PipelineFactory factory;
     private final DoubleSeries<Integer> series;
     private static final int SERIES_LENGTH = 1000;
 
     private PipelineScannerTest() {
         this.series = createSeries();
-        this.factory = new PipelineFactory();
     }
 
     private DoubleSeries<Integer> createSeries() {
@@ -44,7 +42,7 @@ public class PipelineScannerTest {
     }
 
     private void assertScanned(String source, DataPipeline expected) {
-        DataPipeline actual = PipelineScanner.scan(source, factory);
+        DataPipeline actual = PipelineScanner.scan(source);
         assertTrue(actual.apply(Integer.class, series).equalsSeries(expected.apply(Integer.class, series)));
     }
 
@@ -83,6 +81,11 @@ public class PipelineScannerTest {
     }
 
     @Test
+    public void testExp() {
+        assertScanned("exp()", DataPipeline.exp);
+    }
+
+    @Test
     public void testFlip() {
         assertScanned("flip()", DataPipeline.flip);
     }
@@ -90,6 +93,11 @@ public class PipelineScannerTest {
     @Test
     public void testIdentity() {
         assertScanned("identity()", DataPipeline.identity);
+    }
+
+    @Test
+    public void testInvert() {
+        assertScanned("invert()", DataPipeline.invert);
     }
 
     @Test
@@ -101,6 +109,11 @@ public class PipelineScannerTest {
     public void testMultiply() {
         assertScanned("multiply(5)", DataPipeline.multiply(5));
         assertScanned("multiply(7.7)", DataPipeline.multiply(7.7));
+    }
+
+    @Test
+    public void testPow() {
+        assertScanned("pow(1.23)", DataPipeline.pow(1.23));
     }
 
     @Test
@@ -117,6 +130,11 @@ public class PipelineScannerTest {
     @Test
     public void testSqrt() {
         assertScanned("sqrt()", DataPipeline.sqrt);
+    }
+
+    @Test
+    public void testSquare() {
+        assertScanned("square()", DataPipeline.square);
     }
 
     @Test
