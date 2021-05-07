@@ -54,8 +54,7 @@ public interface DataPipeline {
      * @param keyClass   the runtime class for the keys.
      * @param vectorView the vector view to transform.
      *
-     * @return the input vector, as modified by this pipeline, for
-     * operator chaining.
+     * @return the transformed vector.
      */
     default <K> DoubleSeries<K> apply(Class<K> keyClass, DataVectorView<K> vectorView) {
         return DoubleSeries.copyOf(keyClass, apply(DataVector.copy(vectorView)));
