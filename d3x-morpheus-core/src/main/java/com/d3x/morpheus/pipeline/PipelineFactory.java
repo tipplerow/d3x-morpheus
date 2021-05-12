@@ -87,6 +87,7 @@ public class PipelineFactory {
                 assertArgs(name, args, Number.class);
                 return DataPipeline.pow(doubleArg(args, 0));
 
+            case "replaceNA": // Fall-through
             case "replaceNaN":
                 assertArgs(name, args, Number.class);
                 return DataPipeline.replaceNaN(doubleArg(args, 0));

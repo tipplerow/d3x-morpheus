@@ -165,7 +165,6 @@ public interface DataPipeline {
         @Override
         public <K> DataVector<K> apply(DataVector<K> vector) {
             double sdev = new StdDev(true).compute(vector);
-
             return composite(demean, divide(sdev)).apply(vector);
         }
 
