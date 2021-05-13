@@ -75,4 +75,9 @@ final class MapDataVector<K> implements DataVector<K> {
     public DoubleStream streamValues() {
         return map.keySet().stream().mapToDouble(map::get);
     }
+
+    @Override
+    public String toString() {
+        return map.toString();
+    }
 }

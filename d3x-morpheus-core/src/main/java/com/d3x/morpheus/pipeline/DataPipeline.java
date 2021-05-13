@@ -135,6 +135,27 @@ public interface DataPipeline {
     DataPipeline log = local(Math::log);
 
     /**
+     * A non-local, length-preserving pipeline that rescales the vector
+     * into a normalized unit vector.
+     */
+    DataPipeline normalize = new DataPipeline() {
+        @Override
+        public <K> DataVector<K> apply(DataVector<K> vector) {
+            return divide(vector.norm2()).apply(vector);
+        }
+
+        @Override
+        public boolean isLengthPreserving() {
+            return true;
+        }
+
+        @Override
+        public boolean isLocal() {
+            return false;
+        }
+    };
+
+    /**
      * A local, length-preserving pipeline that replaces each element
      * with its sign: {@code -1.0} if the element is negative (by an
      * amount greater than the default DoubleComparator tolerance),
@@ -246,6 +267,44 @@ public interface DataPipeline {
      */
     static DataPipeline divide(double factor) {
         return multiply(1.0 / factor);
+    }
+
+    /**
+     * Creates a new non-local, length-preserving pipeline that rescales
+     * the elements of a vector to a target <em>leverage</em>: the sum of
+     * the absolute values in the vector.
+     *
+     * @param target the target leverage.
+     *
+     * @return a leverage pipeline with the specified target leverage.
+     *
+     * @throws RuntimeException unless the target leverage is positive.
+     */
+    static DataPipeline lever(double target) {
+        if (!DoubleComparator.DEFAULT.isPositive(target))
+            throw new MorpheusException("Target leverage must be positive.");
+
+        return new DataPipeline() {
+            @Override
+            public <K> DataVector<K> apply(DataVector<K> vector) {
+                double norm1 = vector.norm1();
+
+                if (DoubleComparator.DEFAULT.isPositive(norm1))
+                    return multiply(target / norm1).apply(vector);
+                else
+                    throw new MorpheusException("Cannot apply target leverage to a vector with zero norm.");
+            }
+
+            @Override
+            public boolean isLengthPreserving() {
+                return true;
+            }
+
+            @Override
+            public boolean isLocal() {
+                return false;
+            }
+        };
     }
 
     /**

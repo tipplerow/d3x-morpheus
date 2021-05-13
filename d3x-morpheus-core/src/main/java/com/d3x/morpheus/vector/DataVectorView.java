@@ -26,6 +26,7 @@ import java.util.stream.DoubleStream;
 import java.util.stream.Stream;
 
 import com.d3x.morpheus.series.DoubleSeries;
+import com.d3x.morpheus.stats.SumSquares;
 import com.d3x.morpheus.util.DoubleComparator;
 import com.d3x.morpheus.util.MorpheusException;
 
@@ -291,6 +292,23 @@ public interface DataVectorView<K> {
      */
     default double innerProduct(DataVectorView<K> operand, DataVectorView<K> weights) {
         return InnerProduct.compute(this, operand, weights);
+    }
+
+    /**
+     * Computes the 1-norm of this data vector: the sum of the absolute
+     * values of each element.
+     * @return the 1-norm of this data vector.
+     */
+    default double norm1() {
+        return streamValues().filter(x -> !Double.isNaN(x)).map(Math::abs).sum();
+    }
+
+    /**
+     * Computes the 2-norm (Euclidean norm) of this data vector.
+     * @return the 2-norm (Euclidean norm) of this data vector.
+     */
+    default double norm2() {
+        return Math.sqrt(new SumSquares().compute(this));
     }
 
     /**

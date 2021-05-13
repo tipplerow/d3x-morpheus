@@ -75,6 +75,10 @@ public class PipelineFactory {
                 assertNoArgs(name, args);
                 return DataPipeline.invert;
 
+            case "lever":
+                assertArgs(name, args, Number.class);
+                return DataPipeline.lever(doubleArg(args, 0));
+
             case "log":
                 assertNoArgs(name, args);
                 return DataPipeline.log;
@@ -82,6 +86,10 @@ public class PipelineFactory {
             case "multiply":
                 assertArgs(name, args, Number.class);
                 return DataPipeline.multiply(doubleArg(args, 0));
+
+            case "normalize":
+                assertNoArgs(name, args);
+                return DataPipeline.normalize;
 
             case "pow":
                 assertArgs(name, args, Number.class);

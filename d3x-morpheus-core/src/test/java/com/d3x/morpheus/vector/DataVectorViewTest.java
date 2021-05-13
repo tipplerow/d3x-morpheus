@@ -23,10 +23,11 @@ import java.util.Set;
 import com.d3x.morpheus.frame.DataFrame;
 import com.d3x.morpheus.series.DoubleSeries;
 
+import com.d3x.morpheus.testng.NumericTestBase;
 import org.testng.annotations.Test;
 import static org.testng.Assert.*;
 
-public class DataVectorViewTest {
+public class DataVectorViewTest extends NumericTestBase {
     private static final double TOLERANCE = 1.0E-12;
 
     private static final List<String> keyList = List.of("A", "B", "C");
@@ -70,6 +71,18 @@ public class DataVectorViewTest {
     @Test
     public void testMap() {
         runTest(DataVectorView.of(Map.of("A", 1.0, "B", 2.0, "C", 3.0)));
+    }
+
+    @Test
+    public void testNorm1() {
+        DoubleSeries<String> vector = DoubleSeries.build(String.class, List.of("A", "B", "C"), List.of(1.0, -2.0, 3.0));
+        assertDouble(vector.norm1(), 6.0);
+    }
+
+    @Test
+    public void testNorm2() {
+        DoubleSeries<String> vector = DoubleSeries.build(String.class, List.of("A", "B", "C"), List.of(1.0, -2.0, 3.0));
+        assertDouble(baseView.norm2(), Math.sqrt(14.0));
     }
 
     @Test

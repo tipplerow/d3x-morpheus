@@ -121,6 +121,11 @@ public class DataPipelineTest extends NumericTestBase {
     }
 
     @Test
+    public void testLever() {
+        assertPipeline1(DataPipeline.lever(2.0), -0.6153846, 0.3076923, NA, 0.9230769, -0.1538462);
+    }
+
+    @Test
     public void testLog() {
         assertPipeline2(DataPipeline.log, 0.6931472, 0.0, NA, 1.0986123, -0.6931472);
     }
@@ -128,6 +133,11 @@ public class DataPipelineTest extends NumericTestBase {
     @Test
     public void testMultiply() {
         assertPipeline1(DataPipeline.multiply(2.0), -4.0, 2.0, NA, 6.0, -1.0);
+    }
+
+    @Test
+    public void testNormalize() {
+        assertPipeline1(DataPipeline.normalize, -0.5298129, 0.2649065, NA, 0.7947194, -0.1324532);
     }
 
     @Test

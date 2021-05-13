@@ -101,6 +101,12 @@ public class PipelineScannerTest {
     }
 
     @Test
+    public void testLever() {
+        assertScanned("lever(1.0)", DataPipeline.lever(1.0));
+        assertScanned("lever(4.5)", DataPipeline.lever(4.5));
+    }
+
+    @Test
     public void testLog() {
         assertScanned("log()", DataPipeline.log);
     }
@@ -109,6 +115,11 @@ public class PipelineScannerTest {
     public void testMultiply() {
         assertScanned("multiply(5)", DataPipeline.multiply(5));
         assertScanned("multiply(7.7)", DataPipeline.multiply(7.7));
+    }
+
+    @Test
+    public void testNormalize() {
+        assertScanned("normalize()", DataPipeline.normalize);
     }
 
     @Test
