@@ -28,6 +28,7 @@ import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
 import java.util.function.ToIntFunction;
 import java.util.function.ToLongFunction;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
@@ -430,6 +431,32 @@ public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperation
      */
     <T> DataFrame<R,C> mapToObjects(C colKey, Class<T> type, Function<DataFrameValue<R,C>,T> mapper);
 
+    /**
+     * Returns a copy of this DataFrame with row and column keys mapped to
+     * other classes.
+     *
+     * @param rowMapper a function to map row keys
+     * @param colMapper a function to map column keys
+     *
+     * @return a new data frame with the same element values as this but with
+     * row and column keys mapped by the mapping functions.
+     */
+    default <R2, C2> DataFrame<R2, C2> remapKeys(Function<R, R2> rowMapper,
+                                                 Function<C, C2> colMapper) {
+        // Since we use ordinal indexing, ensure that the key streams are sequential...
+        DataFrame<R, C> source = this.sequential();
+
+        List<R2> rowKeys2 = source.rows().keys().map(rowMapper).collect(Collectors.toList());
+        List<C2> colKeys2 = source.cols().keys().map(colMapper).collect(Collectors.toList());
+        Class<?> dataType = source.isEmpty() ? Double.class : source.getValueAt(0, 0).getClass();
+        DataFrame<R2, C2> remapped = DataFrame.of(rowKeys2, colKeys2, dataType);
+
+        for (int row = 0; row < source.nrow(); ++row)
+            for (int col = 0; col < source.ncol(); ++col)
+                remapped.setValueAt(row, col, source.getValueAt(row, col));
+
+        return remapped;
+    }
 
     /**
      * Returns a newly created builder initialized with the contents of this frame

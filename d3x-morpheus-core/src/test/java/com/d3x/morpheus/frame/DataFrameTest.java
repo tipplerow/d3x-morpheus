@@ -15,7 +15,10 @@
  */
 package com.d3x.morpheus.frame;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import com.d3x.morpheus.matrix.D3xMatrix;
 import com.d3x.morpheus.vector.D3xVector;
@@ -308,5 +311,42 @@ public class DataFrameTest extends DataFrameTestBase {
         assertTrue(D3xMatrix.wrap(sub3.getDoubleMatrix()).equalsMatrix(D3xMatrix.byrow(2, 2,
                 23.0, 21.0,
                 33.0, 31.0)));
+    }
+
+    @Test
+    public void testRemapFrame() {
+        DataFrame<Integer, LocalDate> frame1 = createFrame(12000, 200);
+
+        long start = System.currentTimeMillis();
+        DataFrame<String, String> frame2 = frame1.remapKeys(Object::toString, LocalDate::toString);
+        DataFrame<Integer, LocalDate> frame3 = frame2.remapKeys(Integer::valueOf, LocalDate::parse);
+        System.out.println(System.currentTimeMillis() - start);
+
+        assertEquals(frame3.listRowKeys(), frame1.listRowKeys());
+        assertEquals(frame3.listColumnKeys(), frame1.listColumnKeys());
+
+        for (int row = 0; row < frame1.nrow(); ++row)
+            for (int col = 0; col < frame1.ncol(); ++col)
+                assertEquals(frame3.getIntAt(row, col), frame1.getIntAt(row, col));
+    }
+
+    private static DataFrame<Integer, LocalDate> createFrame(int nrow, int ncol) {
+        Random random = new Random(20210512);
+        List<Integer> rowKeys = new ArrayList<>();
+        List<LocalDate> colKeys = new ArrayList<>();
+
+        for (int row = 0; row < nrow; ++row)
+            rowKeys.add(row);
+
+        for (int col = 0; col < ncol; ++col)
+            colKeys.add(LocalDate.ofYearDay(2021, 1 + col));
+
+        DataFrame<Integer, LocalDate> frame = DataFrame.ofInts(rowKeys, colKeys);
+
+        for (int row = 0; row < nrow; ++row)
+            for (int col = 0; col < ncol; ++col)
+                frame.setIntAt(row, col, random.nextInt(1000));
+
+        return frame;
     }
 }
