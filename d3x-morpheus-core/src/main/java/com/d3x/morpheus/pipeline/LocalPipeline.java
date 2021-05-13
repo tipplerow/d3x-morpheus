@@ -30,6 +30,9 @@ import lombok.NonNull;
  */
 @AllArgsConstructor(staticName = "of")
 public final class LocalPipeline implements DataPipeline {
+    /**
+     * The local transformation applied to each element.
+     */
     @Getter @NonNull
     private final DoubleUnaryOperator operator;
 

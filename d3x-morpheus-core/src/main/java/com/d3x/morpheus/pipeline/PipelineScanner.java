@@ -128,10 +128,6 @@ public class PipelineScanner {
         if (matcher.groupCount() != 3)
             throw new MorpheusException("Malformed pipeline: [%s].", matcher.group());
 
-        //System.out.printf("1: [%s]%n", matcher.group(1));
-        //System.out.printf("2: [%s]%n", matcher.group(2));
-        //System.out.printf("3: [%s]%n", matcher.group(3));
-
         // For the first pipeline, only ignorable white space is permitted in the
         // group 1 text; for additional pipelines, the group 1 text must contain
         // the pipeline separator and may contain ignorable white space...
