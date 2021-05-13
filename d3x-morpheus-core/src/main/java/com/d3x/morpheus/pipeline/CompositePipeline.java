@@ -69,12 +69,12 @@ public class CompositePipeline implements DataPipeline {
     }
 
     @Override
-    public boolean isLengthPreserving() {
-        return pipelines.stream().allMatch(DataPipeline::isLengthPreserving);
+    public boolean isLocal() {
+        return pipelines.stream().allMatch(DataPipeline::isLocal);
     }
 
     @Override
-    public boolean isLocal() {
-        return pipelines.stream().allMatch(DataPipeline::isLocal);
+    public boolean isSizePreserving() {
+        return pipelines.stream().allMatch(DataPipeline::isSizePreserving);
     }
 }

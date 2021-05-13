@@ -24,7 +24,7 @@ import lombok.Getter;
 import lombok.NonNull;
 
 /**
- * Implements local, length-preserving data pipelines.
+ * Implements local, size-preserving data pipelines.
  *
  * @author Scott Shaffer
  */
@@ -45,12 +45,12 @@ public final class LocalPipeline implements DataPipeline {
     }
 
     @Override
-    public boolean isLengthPreserving() {
+    public boolean isLocal() {
         return true;
     }
 
     @Override
-    public boolean isLocal() {
+    public boolean isSizePreserving() {
         return true;
     }
 }

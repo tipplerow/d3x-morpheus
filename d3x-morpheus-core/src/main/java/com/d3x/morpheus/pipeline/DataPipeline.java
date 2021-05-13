@@ -61,14 +61,6 @@ public interface DataPipeline {
     }
 
     /**
-     * Identifies transformations that do not add or remove elements
-     * from the input vector.
-     *
-     * @return {@code true} iff this is a length-preserving pipeline.
-     */
-    boolean isLengthPreserving();
-
-    /**
      * Identifies <em>local</em> transformations: the result of an
      * element transformation depends only on the initial value of
      * that element and is independent of all other element values.
@@ -78,13 +70,21 @@ public interface DataPipeline {
     boolean isLocal();
 
     /**
-     * A local, length-preserving pipeline that replaces each element
+     * Identifies transformations that do not add or remove elements
+     * from the input vector.
+     *
+     * @return {@code true} iff this is a size-preserving pipeline.
+     */
+    boolean isSizePreserving();
+
+    /**
+     * A local, size-preserving pipeline that replaces each element
      * with its absolute value.
      */
     DataPipeline abs = local(Math::abs);
 
     /**
-     * A non-local, length-preserving pipeline that subtracts the mean
+     * A non-local, size-preserving pipeline that subtracts the mean
      * from each element in the DataVector, resulting in a transformed
      * vector with zero mean.
      */
@@ -96,7 +96,7 @@ public interface DataPipeline {
         }
 
         @Override
-        public boolean isLengthPreserving() {
+        public boolean isSizePreserving() {
             return true;
         }
 
@@ -107,13 +107,13 @@ public interface DataPipeline {
     };
 
     /**
-     * A local, length-preserving pipeline that applies the exponential function
+     * A local, size-preserving pipeline that applies the exponential function
      * to each element.
      */
     DataPipeline exp = local(Math::exp);
 
     /**
-     * A local, length-preserving pipeline that flips the sign of each element.
+     * A local, size-preserving pipeline that flips the sign of each element.
      */
     DataPipeline flip = local(value -> -value);
 
@@ -123,19 +123,19 @@ public interface DataPipeline {
     DataPipeline identity = local(DoubleUnaryOperator.identity());
 
     /**
-     * A local, length-preserving pipeline that replaces each element
+     * A local, size-preserving pipeline that replaces each element
      * with its reciprocal.
      */
     DataPipeline invert = local(x -> 1.0 / x);
 
     /**
-     * A local, length-preserving pipeline that replaces each element
+     * A local, size-preserving pipeline that replaces each element
      * with its natural logarithm.
      */
     DataPipeline log = local(Math::log);
 
     /**
-     * A non-local, length-preserving pipeline that rescales the vector
+     * A non-local, size-preserving pipeline that rescales the vector
      * into a normalized unit vector.
      */
     DataPipeline normalize = new DataPipeline() {
@@ -145,7 +145,7 @@ public interface DataPipeline {
         }
 
         @Override
-        public boolean isLengthPreserving() {
+        public boolean isSizePreserving() {
             return true;
         }
 
@@ -156,7 +156,7 @@ public interface DataPipeline {
     };
 
     /**
-     * A local, length-preserving pipeline that replaces each element
+     * A local, size-preserving pipeline that replaces each element
      * with its sign: {@code -1.0} if the element is negative (by an
      * amount greater than the default DoubleComparator tolerance),
      * {@code +1.0} if the element is positive (by an amount greater
@@ -166,18 +166,18 @@ public interface DataPipeline {
     DataPipeline sign = local(DoubleComparator.DEFAULT::sign);
 
     /**
-     * A local, length-preserving pipeline that replaces each element
+     * A local, size-preserving pipeline that replaces each element
      * with its square root.
      */
     DataPipeline sqrt = local(Math::sqrt);
 
     /**
-     * A local, length-preserving pipeline that squares each element.
+     * A local, size-preserving pipeline that squares each element.
      */
     DataPipeline square = local(x -> x * x);
 
     /**
-     * A non-local, length-preserving pipeline that subtracts the mean
+     * A non-local, size-preserving pipeline that subtracts the mean
      * from each element in the DataVector and divides each element by
      * the standard deviation, resulting in a transformed vector with
      * zero mean and unit variance.
@@ -190,7 +190,7 @@ public interface DataPipeline {
         }
 
         @Override
-        public boolean isLengthPreserving() {
+        public boolean isSizePreserving() {
             return true;
         }
 
@@ -201,12 +201,12 @@ public interface DataPipeline {
     };
 
     /**
-     * Returns a local, length-preserving pipeline that adds a constant
+     * Returns a local, size-preserving pipeline that adds a constant
      * value to each element.
      *
      * @param addend the constant value to add to each element.
      *
-     * @return a local, length-preserving pipeline that adds the given
+     * @return a local, size-preserving pipeline that adds the given
      * value to each element.
      */
     static DataPipeline add(double addend) {
@@ -214,7 +214,7 @@ public interface DataPipeline {
     }
 
     /**
-     * Returns a local, length-preserving pipeline that bounds each element
+     * Returns a local, size-preserving pipeline that bounds each element
      * on a fixed interval.
      *
      * @param lower the lower bound of the interval.
@@ -257,12 +257,12 @@ public interface DataPipeline {
     }
 
     /**
-     * Returns a local, length-preserving pipeline that divides each
+     * Returns a local, size-preserving pipeline that divides each
      * element by a constant factor.
      *
      * @param factor the constant factor to divide each element.
      *
-     * @return a local, length-preserving pipeline that divides each
+     * @return a local, size-preserving pipeline that divides each
      * element by the given factor.
      */
     static DataPipeline divide(double factor) {
@@ -270,9 +270,9 @@ public interface DataPipeline {
     }
 
     /**
-     * Creates a new non-local, length-preserving pipeline that rescales
-     * the elements of a vector to a target <em>leverage</em>: the sum of
-     * the absolute values in the vector.
+     * Creates a new non-local, size-preserving pipeline that rescales
+     * the elements of a vector to a target <em>leverage</em>: the sum
+     * of the absolute values in the vector.
      *
      * @param target the target leverage.
      *
@@ -296,7 +296,7 @@ public interface DataPipeline {
             }
 
             @Override
-            public boolean isLengthPreserving() {
+            public boolean isSizePreserving() {
                 return true;
             }
 
@@ -308,23 +308,23 @@ public interface DataPipeline {
     }
 
     /**
-     * Creates a new local, length-preserving pipeline for a given operator.
+     * Creates a new local, size-preserving pipeline for a given operator.
      *
      * @param operator the unary function that transforms the element values.
      *
-     * @return a new local, length-preserving pipeline with the given operator.
+     * @return a new local, size-preserving pipeline with the given operator.
      */
     static DataPipeline local(DoubleUnaryOperator operator) {
         return LocalPipeline.of(operator);
     }
 
     /**
-     * Returns a local, length-preserving pipeline that multiplies each
+     * Returns a local, size-preserving pipeline that multiplies each
      * element by a constant factor.
      *
      * @param factor the constant factor to multiply each element.
      *
-     * @return a local, length-preserving pipeline that multiplies each
+     * @return a local, size-preserving pipeline that multiplies each
      * element by the given factor.
      */
     static DataPipeline multiply(double factor) {
@@ -332,12 +332,12 @@ public interface DataPipeline {
     }
 
     /**
-     * Returns a local, length-preserving pipeline that raises each element
+     * Returns a local, size-preserving pipeline that raises each element
      * to a power.
      *
      * @param exponent the exponent of the power function.
      *
-     * @return a local, length-preserving pipeline that raises each element
+     * @return a local, size-preserving pipeline that raises each element
      * to the specified power.
      */
     static DataPipeline pow(double exponent) {
@@ -345,12 +345,12 @@ public interface DataPipeline {
     }
 
     /**
-     * Returns a local, length-preserving pipeline that replaces missing
+     * Returns a local, size-preserving pipeline that replaces missing
      * ({@code Double.NaN}) values with a fixed value.
      *
      * @param replacement the value to assign missing elements.
      *
-     * @return a local, length-preserving pipeline that replaces missing
+     * @return a local, size-preserving pipeline that replaces missing
      * values with the specified replacement.
      */
     static DataPipeline replaceNaN(double replacement) {
@@ -358,12 +358,12 @@ public interface DataPipeline {
     }
 
     /**
-     * Returns a local, length-preserving pipeline that subtracts a
-     * constant value from each element.
+     * Returns a local, size-preserving pipeline that subtracts a constant
+     * value from each element.
      *
      * @param subtrahend the constant value to subtract from each element.
      *
-     * @return a local, length-preserving pipeline that subtracts the
+     * @return a local, size-preserving pipeline that subtracts the
      * given value from each element.
      */
     static DataPipeline subtract(double subtrahend) {
@@ -371,7 +371,7 @@ public interface DataPipeline {
     }
 
     /**
-     * Returns a non-local, length-preserving pipeline that pulls outliers
+     * Returns a non-local, size-preserving pipeline that pulls outliers
      * into a location defined by a quantile value.  With a quantile value
      * of {@code 0.05}, for example, elements below the 5th percentile will
      * be raised to the 5th percentile and those above the 95th percentile
@@ -408,7 +408,7 @@ public interface DataPipeline {
             }
 
             @Override
-            public boolean isLengthPreserving() {
+            public boolean isSizePreserving() {
                 return true;
             }
 
