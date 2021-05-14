@@ -21,8 +21,6 @@ import com.d3x.morpheus.series.DoubleSeries;
 import com.d3x.morpheus.series.DoubleSeriesBuilder;
 
 import org.testng.annotations.Test;
-import org.yaml.snakeyaml.parser.ParserImpl;
-
 import static org.testng.Assert.*;
 
 public class PipelineScannerTest {
