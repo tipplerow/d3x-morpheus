@@ -142,7 +142,7 @@ public class PipelineFactory {
      */
     protected void assertArgs(String name, Object[] args, Class<?>... types) {
         if (args.length != types.length)
-            throw new MorpheusException("Expected [%d] arguments for pipeline [%s] but found [%d].", name, args.length, types.length);
+            throw new MorpheusException("Expected [%d] arguments for pipeline [%s] but found [%d].", types.length, name, args.length);
 
         for (int index = 0; index < args.length; ++index)
             if (!types[index].isInstance(args[index]))

@@ -18,10 +18,9 @@ package com.d3x.morpheus.pipeline;
 import java.util.Collection;
 import java.util.List;
 
+import com.d3x.morpheus.util.MorpheusException;
 import com.d3x.morpheus.vector.DataVector;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -30,7 +29,6 @@ import lombok.NonNull;
  *
  * @author Scott Shaffer
  */
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class CompositePipeline implements DataPipeline {
     /**
      * The pipelines to apply, in the order of application.
@@ -38,12 +36,21 @@ public class CompositePipeline implements DataPipeline {
     @Getter @NonNull
     private final List<DataPipeline> pipelines;
 
+    private CompositePipeline(List<DataPipeline> pipelines) {
+        if (pipelines.isEmpty())
+            throw new MorpheusException("At least one pipeline is required.");
+
+        this.pipelines = pipelines;
+    }
+
     /**
      * Creates a composite pipeline from a series of individual pipelines.
      *
      * @param pipelines the pipelines to compose the composite.
      *
      * @return the composite of the specified pipelines.
+     *
+     * @throws RuntimeException unless at least one pipeline is specified.
      */
     public static CompositePipeline of(DataPipeline... pipelines) {
         return new CompositePipeline(List.of(pipelines));
@@ -55,6 +62,8 @@ public class CompositePipeline implements DataPipeline {
      * @param pipelines the pipelines to compose the composite.
      *
      * @return the composite of the specified pipelines.
+     *
+     * @throws RuntimeException unless at least one pipeline is specified.
      */
     public static CompositePipeline of(Collection<DataPipeline> pipelines) {
         return new CompositePipeline(List.copyOf(pipelines));
@@ -66,6 +75,19 @@ public class CompositePipeline implements DataPipeline {
             pipeline.apply(vector);
 
         return vector;
+    }
+
+    @Override
+    public String encode() {
+        StringBuilder builder = new StringBuilder();
+        builder.append(pipelines.get(0).encode());
+
+        for (int index = 1; index < pipelines.size(); ++index) {
+            builder.append(", ");
+            builder.append(pipelines.get(index).encode());
+        }
+
+        return builder.toString();
     }
 
     @Override

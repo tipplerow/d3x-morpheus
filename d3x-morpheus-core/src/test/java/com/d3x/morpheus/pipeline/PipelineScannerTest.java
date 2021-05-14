@@ -21,6 +21,8 @@ import com.d3x.morpheus.series.DoubleSeries;
 import com.d3x.morpheus.series.DoubleSeriesBuilder;
 
 import org.testng.annotations.Test;
+import org.yaml.snakeyaml.parser.ParserImpl;
+
 import static org.testng.Assert.*;
 
 public class PipelineScannerTest {
@@ -44,6 +46,11 @@ public class PipelineScannerTest {
     private void assertScanned(String source, DataPipeline expected) {
         DataPipeline actual = PipelineScanner.scan(source);
         assertTrue(actual.apply(Integer.class, series).equalsSeries(expected.apply(Integer.class, series)));
+
+        // The encoded pipeline might not match exactly to the source string
+        // because of the argument formatting: add(3) is encoded as add(3.0)
+        DataPipeline decoded = PipelineScanner.scan(expected.encode());
+        assertTrue(decoded.apply(Integer.class, series).equalsSeries(expected.apply(Integer.class, series)));
     }
 
     @Test

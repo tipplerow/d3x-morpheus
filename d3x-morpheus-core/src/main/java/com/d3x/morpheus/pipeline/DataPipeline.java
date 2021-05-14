@@ -61,6 +61,14 @@ public interface DataPipeline {
     }
 
     /**
+     * Encodes this pipeline in a string.
+     *
+     * @return a string encoding of this pipeline which may be decoded
+     * by a pipeline parser.
+     */
+    String encode();
+
+    /**
      * Identifies <em>local</em> transformations: the result of an
      * element transformation depends only on the initial value of
      * that element and is independent of all other element values.
@@ -81,7 +89,7 @@ public interface DataPipeline {
      * A local, size-preserving pipeline that replaces each element
      * with its absolute value.
      */
-    DataPipeline abs = local(Math::abs);
+    DataPipeline abs = local("abs()", Math::abs);
 
     /**
      * A non-local, size-preserving pipeline that subtracts the mean
@@ -93,6 +101,11 @@ public interface DataPipeline {
         public <K> DataVector<K> apply(DataVector<K> vector) {
             double mean = new Mean().compute(vector);
             return subtract(mean).apply(vector);
+        }
+
+        @Override
+        public String encode() {
+            return "demean()";
         }
 
         @Override
@@ -110,29 +123,29 @@ public interface DataPipeline {
      * A local, size-preserving pipeline that applies the exponential function
      * to each element.
      */
-    DataPipeline exp = local(Math::exp);
+    DataPipeline exp = local("exp()", Math::exp);
 
     /**
      * A local, size-preserving pipeline that flips the sign of each element.
      */
-    DataPipeline flip = local(value -> -value);
+    DataPipeline flip = local("flip()", value -> -value);
 
     /**
      * The identity pipeline: all elements are unchanged.
      */
-    DataPipeline identity = local(DoubleUnaryOperator.identity());
+    DataPipeline identity = local("identity()", DoubleUnaryOperator.identity());
 
     /**
      * A local, size-preserving pipeline that replaces each element
      * with its reciprocal.
      */
-    DataPipeline invert = local(x -> 1.0 / x);
+    DataPipeline invert = local("invert()", x -> 1.0 / x);
 
     /**
      * A local, size-preserving pipeline that replaces each element
      * with its natural logarithm.
      */
-    DataPipeline log = local(Math::log);
+    DataPipeline log = local("log()", Math::log);
 
     /**
      * A non-local, size-preserving pipeline that rescales the vector
@@ -142,6 +155,11 @@ public interface DataPipeline {
         @Override
         public <K> DataVector<K> apply(DataVector<K> vector) {
             return divide(vector.norm2()).apply(vector);
+        }
+
+        @Override
+        public String encode() {
+            return "normalize()";
         }
 
         @Override
@@ -163,18 +181,18 @@ public interface DataPipeline {
      * than the default tolerance), or {@code 0.0} if the element is
      * equal to zero (within the default tolerance.
      */
-    DataPipeline sign = local(DoubleComparator.DEFAULT::sign);
+    DataPipeline sign = local("sign()", DoubleComparator.DEFAULT::sign);
 
     /**
      * A local, size-preserving pipeline that replaces each element
      * with its square root.
      */
-    DataPipeline sqrt = local(Math::sqrt);
+    DataPipeline sqrt = local("sqrt()", Math::sqrt);
 
     /**
      * A local, size-preserving pipeline that squares each element.
      */
-    DataPipeline square = local(x -> x * x);
+    DataPipeline square = local("square()", x -> x * x);
 
     /**
      * A non-local, size-preserving pipeline that subtracts the mean
@@ -187,6 +205,11 @@ public interface DataPipeline {
         public <K> DataVector<K> apply(DataVector<K> vector) {
             double sdev = new StdDev(true).compute(vector);
             return composite(demean, divide(sdev)).apply(vector);
+        }
+
+        @Override
+        public String encode() {
+            return "standardize()";
         }
 
         @Override
@@ -210,7 +233,7 @@ public interface DataPipeline {
      * value to each element.
      */
     static DataPipeline add(double addend) {
-        return local(element -> element + addend);
+        return local(String.format("add(%s)", addend), element -> element + addend);
     }
 
     /**
@@ -227,9 +250,11 @@ public interface DataPipeline {
      */
     static DataPipeline bound(double lower, double upper) {
         if (lower > upper)
-            throw new MorpheusException("Invalid bounding interval: [%f, %f].", lower, upper);
+            throw new MorpheusException("Invalid bounding interval: [%s, %s].", lower, upper);
         else
-            return local(element -> Math.max(lower, Math.min(upper, element)));
+            return local(
+                    String.format("bound(%s, %s)", lower, upper),
+                    element -> Math.max(lower, Math.min(upper, element)));
     }
 
     /**
@@ -260,13 +285,13 @@ public interface DataPipeline {
      * Returns a local, size-preserving pipeline that divides each
      * element by a constant factor.
      *
-     * @param factor the constant factor to divide each element.
+     * @param divisor the constant factor to divide each element.
      *
      * @return a local, size-preserving pipeline that divides each
      * element by the given factor.
      */
-    static DataPipeline divide(double factor) {
-        return multiply(1.0 / factor);
+    static DataPipeline divide(double divisor) {
+        return local(String.format("divide(%s)", divisor), element -> element / divisor);
     }
 
     /**
@@ -296,6 +321,11 @@ public interface DataPipeline {
             }
 
             @Override
+            public String encode() {
+                return String.format("lever(%s)", target);
+            }
+
+            @Override
             public boolean isSizePreserving() {
                 return true;
             }
@@ -310,12 +340,13 @@ public interface DataPipeline {
     /**
      * Creates a new local, size-preserving pipeline for a given operator.
      *
+     * @param encoding the string encoding for the pipeline.
      * @param operator the unary function that transforms the element values.
      *
      * @return a new local, size-preserving pipeline with the given operator.
      */
-    static DataPipeline local(DoubleUnaryOperator operator) {
-        return LocalPipeline.of(operator);
+    static DataPipeline local(String encoding, DoubleUnaryOperator operator) {
+        return LocalPipeline.of(encoding, operator);
     }
 
     /**
@@ -328,7 +359,7 @@ public interface DataPipeline {
      * element by the given factor.
      */
     static DataPipeline multiply(double factor) {
-        return local(element -> element * factor);
+        return local(String.format("multiply(%s)", factor), element -> element * factor);
     }
 
     /**
@@ -341,7 +372,7 @@ public interface DataPipeline {
      * to the specified power.
      */
     static DataPipeline pow(double exponent) {
-        return local(element -> Math.pow(element, exponent));
+        return local(String.format("pow(%s)", exponent), element -> Math.pow(element, exponent));
     }
 
     /**
@@ -354,7 +385,7 @@ public interface DataPipeline {
      * values with the specified replacement.
      */
     static DataPipeline replaceNaN(double replacement) {
-        return local(element -> Double.isNaN(element) ? replacement : element);
+        return local(String.format("replaceNaN(%s)", replacement), element -> Double.isNaN(element) ? replacement : element);
     }
 
     /**
@@ -367,7 +398,7 @@ public interface DataPipeline {
      * given value from each element.
      */
     static DataPipeline subtract(double subtrahend) {
-        return add(-subtrahend);
+        return local(String.format("subtract(%s)", subtrahend), element -> element - subtrahend);
     }
 
     /**
@@ -405,6 +436,11 @@ public interface DataPipeline {
                 double upper = new Percentile(1.0 - quantile).compute(vector);
 
                 return bound(lower, upper).apply(vector);
+            }
+
+            @Override
+            public String encode() {
+                return String.format("trim(%s)", quantile);
             }
 
             @Override

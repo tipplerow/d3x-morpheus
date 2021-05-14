@@ -31,6 +31,12 @@ import lombok.NonNull;
 @AllArgsConstructor(staticName = "of")
 public final class LocalPipeline implements DataPipeline {
     /**
+     * The string encoding for the pipeline.
+     */
+    @Getter @NonNull
+    private final String encoding;
+
+    /**
      * The local transformation applied to each element.
      */
     @Getter @NonNull
@@ -42,6 +48,11 @@ public final class LocalPipeline implements DataPipeline {
             vector.setElement(key, operator.applyAsDouble(vector.getElement(key)));
 
         return vector;
+    }
+
+    @Override
+    public String encode() {
+        return encoding;
     }
 
     @Override
