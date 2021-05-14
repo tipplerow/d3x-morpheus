@@ -18,6 +18,7 @@ package com.d3x.morpheus.pipeline;
 import java.util.Collection;
 import java.util.function.DoubleUnaryOperator;
 
+import com.d3x.morpheus.frame.DataFrame;
 import com.d3x.morpheus.series.DoubleSeries;
 import com.d3x.morpheus.stats.Mean;
 import com.d3x.morpheus.stats.Percentile;
@@ -58,6 +59,68 @@ public interface DataPipeline {
      */
     default <K> DoubleSeries<K> apply(Class<K> keyClass, DataVectorView<K> vectorView) {
         return DoubleSeries.copyOf(keyClass, apply(DataVector.copy(vectorView)));
+    }
+
+    /**
+     * Applies this size-preserving pipeline along a margin of a data
+     * frame (in place).
+     *
+     * @param frame  the frame on which to operate.
+     * @param margin the index of the axis of application: 1 for rows,
+     *               2 for columns (as in the R apply() function).
+     *
+     * @return the transformed input frame, for operator chaining.
+     *
+     * @throws RuntimeException unless this is a size-preserving pipeline
+     * and the margin is valid.
+     */
+    default <R,C> DataFrame<R,C> apply(DataFrame<R,C> frame, int margin) {
+        switch (margin) {
+            case 1:
+                return byrow(frame);
+
+            case 2:
+                return bycol(frame);
+
+            default:
+                throw new MorpheusException("Invalid data frame margin.");
+        }
+    }
+
+    /**
+     * Applies this size-preserving pipeline to each row in a data frame
+     * (in place).
+     *
+     * @param frame the frame on which to operate.
+     *
+     * @return the transformed input frame, for operator chaining.
+     *
+     * @throws RuntimeException unless this is a size-preserving pipeline.
+     */
+    default <R,C> DataFrame<R,C> byrow(DataFrame<R,C> frame) {
+        if (!isSizePreserving())
+            throw new MorpheusException("Cannot apply a size-altering pipeline to a DataFrame.");
+
+        frame.rows().stream().forEach(this::apply);
+        return frame;
+    }
+
+    /**
+     * Applies this size-preserving pipeline to each column in a data frame
+     * (in place).
+     *
+     * @param frame the frame on which to operate.
+     *
+     * @return the transformed input frame, for operator chaining.
+     *
+     * @throws RuntimeException unless this is a size-preserving pipeline.
+     */
+    default <R,C> DataFrame<R,C> bycol(DataFrame<R,C> frame) {
+        if (!isSizePreserving())
+            throw new MorpheusException("Cannot apply a size-altering pipeline to a DataFrame.");
+
+        frame.cols().stream().forEach(this::apply);
+        return frame;
     }
 
     /**

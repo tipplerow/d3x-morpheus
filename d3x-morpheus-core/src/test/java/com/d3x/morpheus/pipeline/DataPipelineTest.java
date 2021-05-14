@@ -15,9 +15,11 @@
  */
 package com.d3x.morpheus.pipeline;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import com.d3x.morpheus.frame.DataFrame;
 import com.d3x.morpheus.stats.Max;
 import com.d3x.morpheus.stats.Min;
 import com.d3x.morpheus.testng.NumericTestBase;
@@ -34,16 +36,16 @@ public class DataPipelineTest extends NumericTestBase {
     private static final DataVector<String> vector1 =
             DataVector.of(Map.of(
                     "A", -2.0,
-                    "B",  1.0,
-                    "C",   NA,
-                    "D",  3.0,
+                    "B", 1.0,
+                    "C", NA,
+                    "D", 3.0,
                     "E", -0.5));
 
     private static final DataVector<String> vector2 =
             DataVector.of(Map.of(
                     "A", 2.0,
                     "B", 1.0,
-                    "C",  NA,
+                    "C", NA,
                     "D", 3.0,
                     "E", 0.5));
 
@@ -72,7 +74,7 @@ public class DataPipelineTest extends NumericTestBase {
     public void testAbs() {
         assertPipeline1(DataPipeline.abs, 2.0, 1.0, NA, 3.0, 0.5);
     }
-    
+
     @Test
     public void testAdd() {
         assertPipeline1(DataPipeline.add(2.5), 0.5, 3.5, NA, 5.5, 2.0);
@@ -159,7 +161,7 @@ public class DataPipelineTest extends NumericTestBase {
 
     @Test
     public void testSqrt() {
-        assertPipeline2(DataPipeline.sqrt,  1.4142136, 1.0, NA, 1.7320508, 0.7071068);
+        assertPipeline2(DataPipeline.sqrt, 1.4142136, 1.0, NA, 1.7320508, 0.7071068);
     }
 
     @Test
@@ -192,5 +194,46 @@ public class DataPipelineTest extends NumericTestBase {
 
         assertEquals(min, 0.10, 0.01);
         assertEquals(max, 1.90, 0.01);
+    }
+
+    private static DataFrame<String, String> makeFrame() {
+        DataFrame<String, String> frame =
+                DataFrame.ofDoubles(List.of("R1", "R2"), List.of("C1", "C2", "C3"));
+
+        frame.setDoubleAt(0, 0, 1.0);
+        frame.setDoubleAt(0, 1, 2.0);
+        frame.setDoubleAt(0, 2, 3.0);
+        frame.setDoubleAt(1, 0, 10.0);
+        frame.setDoubleAt(1, 1, 20.0);
+        frame.setDoubleAt(1, 2, 30.0);
+
+        return frame;
+    }
+
+    @Test
+    public void testDataFrame() {
+        DataFrame<String, String> frame1 = makeFrame();
+        DataPipeline.demean.apply(frame1, 1);
+
+        assertEquals(frame1.listRowKeys(), List.of("R1", "R2"));
+        assertEquals(frame1.listColumnKeys(), List.of("C1", "C2", "C3"));
+        assertTrue(DoubleComparator.DEFAULT.equals(
+                frame1.getDoubleMatrix(),
+                new double[][] {
+                        {  -1.0, 0.0,  1.0 },
+                        { -10.0, 0.0, 10.0 }
+                }));
+
+        DataFrame<String, String> frame2 = makeFrame();
+        DataPipeline.demean.apply(frame2, 2);
+
+        assertEquals(frame2.listRowKeys(), List.of("R1", "R2"));
+        assertEquals(frame2.listColumnKeys(), List.of("C1", "C2", "C3"));
+        assertTrue(DoubleComparator.DEFAULT.equals(
+                frame2.getDoubleMatrix(),
+                new double[][] {
+                        { -4.5, -9.0, -13.5 },
+                        {  4.5,  9.0,  13.5 }
+                }));
     }
 }
