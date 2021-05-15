@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import com.d3x.morpheus.frame.DataFrame;
 
@@ -77,6 +78,14 @@ public class DataVectorTest {
         map.put("C", 3.0);
 
         runTest(DataVector.of(map));
+    }
+
+    @Test
+    public void testCollect() {
+        runTest(DataVector.collect(Stream.of(
+                DataVectorElement.of("A", 1.0),
+                DataVectorElement.of("B", 2.0),
+                DataVectorElement.of("C", 3.0))));
     }
 }
 

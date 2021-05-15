@@ -17,6 +17,7 @@ package com.d3x.morpheus.vector;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 
 public interface DataVector<K> extends DataVectorView<K> {
     /**
@@ -49,6 +50,19 @@ public interface DataVector<K> extends DataVectorView<K> {
         for (DataVectorElement<K> element : view.collectElements())
             vector.setElement(element);
 
+        return vector;
+    }
+
+    /**
+     * Collects the vector elements in a stream into a new DataVector.
+     *
+     * @param elements the elements to collect.
+     *
+     * @return a new DataVector containing the elements in the stream.
+     */
+    static <K> DataVector<K> collect(Stream<DataVectorElement<K>> elements) {
+        DataVector<K> vector = create();
+        elements.forEach(vector::setElement);
         return vector;
     }
 
