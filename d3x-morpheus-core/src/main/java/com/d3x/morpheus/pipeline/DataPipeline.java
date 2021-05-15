@@ -15,7 +15,7 @@
  */
 package com.d3x.morpheus.pipeline;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.function.DoubleUnaryOperator;
 
 import com.d3x.morpheus.frame.DataFrame;
@@ -350,7 +350,7 @@ public interface DataPipeline {
      * @return the composite of the specified pipelines.
      */
     static DataPipeline composite(DataPipeline... pipelines) {
-        return CompositePipeline.of(pipelines);
+        return composite(List.of(pipelines));
     }
 
     /**
@@ -359,10 +359,21 @@ public interface DataPipeline {
      *
      * @param pipelines the pipelines to compose the composite.
      *
-     * @return the composite of the specified pipelines.
+     * @return the composite of the specified pipelines (the identity
+     * pipeline, if the collection is empty; the single pipeline itself
+     * if the list contains only a single pipeline).
      */
-    static DataPipeline composite(Collection<DataPipeline> pipelines) {
-        return CompositePipeline.of(pipelines);
+    static DataPipeline composite(List<DataPipeline> pipelines) {
+        switch (pipelines.size()) {
+            case 0:
+                return identity;
+
+            case 1:
+                return pipelines.get(0);
+
+            default:
+                return CompositePipeline.of(pipelines);
+        }
     }
 
     /**
