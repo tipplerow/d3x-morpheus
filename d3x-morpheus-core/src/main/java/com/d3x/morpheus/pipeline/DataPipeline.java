@@ -196,7 +196,28 @@ public interface DataPipeline {
     /**
      * The identity pipeline: all elements are unchanged.
      */
-    DataPipeline identity = local("identity()", DoubleUnaryOperator.identity());
+    DataPipeline identity = new DataPipeline() {
+        @Override
+        public <K> DataVector<K> apply(DataVector<K> vector) {
+            // Do nothing...
+            return vector;
+        }
+
+        @Override
+        public String encode() {
+            return "identity()";
+        }
+
+        @Override
+        public boolean isLocal() {
+            return true;
+        }
+
+        @Override
+        public boolean isSizePreserving() {
+            return true;
+        }
+    };
 
     /**
      * A local, size-preserving pipeline that replaces each element
