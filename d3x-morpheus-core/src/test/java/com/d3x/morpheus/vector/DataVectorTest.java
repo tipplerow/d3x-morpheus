@@ -87,5 +87,25 @@ public class DataVectorTest {
                 DataVectorElement.of("B", 2.0),
                 DataVectorElement.of("C", 3.0))));
     }
+
+    @Test
+    public void testSetElements() {
+        DataVector<String> v1 = DataVector.create();
+        DataVector<String> v2 = DataVector.create();
+        DataVector<String> v3 = DataVector.create();
+
+        v1.setElement("A", 1.0);
+        v1.setElement("B", 2.0);
+
+        v2.setElement("B", 3.0);
+        v2.setElement("C", 4.0);
+
+        v3.setElement("A", 1.0);
+        v3.setElement("B", 3.0);
+        v3.setElement("C", 4.0);
+
+        v1.setElements(v2);
+        assertTrue(v1.equalsView(v3));
+    }
 }
 

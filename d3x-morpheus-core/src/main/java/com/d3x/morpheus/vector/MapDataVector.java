@@ -67,6 +67,11 @@ final class MapDataVector<K> implements DataVector<K> {
     }
 
     @Override
+    public void setElements(Stream<DataVectorElement<K>> elements) {
+        elements.sequential().forEach(this::setElement);
+    }
+
+    @Override
     public Stream<K> streamKeys() {
         return map.keySet().stream();
     }

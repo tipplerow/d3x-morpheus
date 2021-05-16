@@ -15,6 +15,7 @@
  */
 package com.d3x.morpheus.vector;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -35,6 +36,34 @@ public interface DataVector<K> extends DataVectorView<K> {
      */
     default void setElement(DataVectorElement<K> element) {
         setElement(element.getKey(), element.getValue());
+    }
+
+    /**
+     * Assigns all elements from a collection.
+     *
+     * @param elements the elements to assign.
+     */
+    default void setElements(Collection<DataVectorElement<K>> elements) {
+        for (DataVectorElement<K> element : elements)
+            setElement(element);
+    }
+
+    /**
+     * Assigns all elements from a stream.
+     *
+     * @param elements the elements to assign.
+     */
+    default void setElements(Stream<DataVectorElement<K>> elements) {
+        elements.forEach(this::setElement);
+    }
+
+    /**
+     * Assigns all elements contained in another DataVector.
+     *
+     * @param vector the vector to assign.
+     */
+    default void setElements(DataVectorView<K> vector) {
+        setElements(vector.streamElements());
     }
 
     /**
