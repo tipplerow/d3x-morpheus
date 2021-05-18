@@ -317,10 +317,8 @@ public class DataFrameTest extends DataFrameTestBase {
     public void testRemapFrame() {
         DataFrame<Integer, LocalDate> frame1 = createFrame(12000, 200);
 
-        long start = System.currentTimeMillis();
         DataFrame<String, String> frame2 = frame1.remapKeys(Object::toString, LocalDate::toString);
         DataFrame<Integer, LocalDate> frame3 = frame2.remapKeys(Integer::valueOf, LocalDate::parse);
-        System.out.println(System.currentTimeMillis() - start);
 
         assertEquals(frame3.listRowKeys(), frame1.listRowKeys());
         assertEquals(frame3.listColumnKeys(), frame1.listColumnKeys());

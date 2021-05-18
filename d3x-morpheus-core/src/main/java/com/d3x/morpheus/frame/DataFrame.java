@@ -443,19 +443,9 @@ public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperation
      */
     default <R2, C2> DataFrame<R2, C2> remapKeys(Function<R, R2> rowMapper,
                                                  Function<C, C2> colMapper) {
-        // Since we use ordinal indexing, ensure that the key streams are sequential...
-        DataFrame<R, C> source = this.sequential();
-
-        List<R2> rowKeys2 = source.rows().keys().map(rowMapper).collect(Collectors.toList());
-        List<C2> colKeys2 = source.cols().keys().map(colMapper).collect(Collectors.toList());
-        Class<?> dataType = source.isEmpty() ? Double.class : source.getValueAt(0, 0).getClass();
-        DataFrame<R2, C2> remapped = DataFrame.of(rowKeys2, colKeys2, dataType);
-
-        for (int row = 0; row < source.nrow(); ++row)
-            for (int col = 0; col < source.ncol(); ++col)
-                remapped.setValueAt(row, col, source.getValueAt(row, col));
-
-        return remapped;
+        return sequential()
+                .rows().mapKeys(row -> rowMapper.apply(row.key()))
+                .cols().mapKeys(col -> colMapper.apply(col.key()));
     }
 
     /**
