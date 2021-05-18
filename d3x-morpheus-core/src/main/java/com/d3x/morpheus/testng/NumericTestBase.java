@@ -16,7 +16,6 @@
 package com.d3x.morpheus.testng;
 
 import com.d3x.morpheus.series.DoubleSeries;
-import com.d3x.morpheus.util.Asserts;
 import com.d3x.morpheus.util.DoubleComparator;
 
 import static org.testng.Assert.*;
