@@ -30,13 +30,14 @@ import lombok.NonNull;
  * @author Scott Shaffer
  */
 final class MapDataVector<K> implements DataVector<K> {
-    @NonNull private final Map<K, Double> map;
+    @NonNull
+    private final Map<K, Double> map;
 
     MapDataVector() {
         this(new HashMap<>());
     }
 
-    MapDataVector(Map<K, Double> map) {
+    MapDataVector(@NonNull Map<K, Double> map) {
         this.map = map;
     }
 
@@ -66,6 +67,11 @@ final class MapDataVector<K> implements DataVector<K> {
     }
 
     @Override
+    public void setElements(Stream<DataVectorElement<K>> elements) {
+        elements.sequential().forEach(this::setElement);
+    }
+
+    @Override
     public Stream<K> streamKeys() {
         return map.keySet().stream();
     }
@@ -73,5 +79,10 @@ final class MapDataVector<K> implements DataVector<K> {
     @Override
     public DoubleStream streamValues() {
         return map.keySet().stream().mapToDouble(map::get);
+    }
+
+    @Override
+    public String toString() {
+        return map.toString();
     }
 }

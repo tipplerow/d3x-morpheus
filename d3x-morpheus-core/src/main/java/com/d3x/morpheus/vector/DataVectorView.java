@@ -25,6 +25,8 @@ import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
 import java.util.stream.Stream;
 
+import com.d3x.morpheus.series.DoubleSeries;
+import com.d3x.morpheus.stats.SumSquares;
 import com.d3x.morpheus.util.DoubleComparator;
 import com.d3x.morpheus.util.MorpheusException;
 
@@ -293,6 +295,23 @@ public interface DataVectorView<K> {
     }
 
     /**
+     * Computes the 1-norm of this data vector: the sum of the absolute
+     * values of each element.
+     * @return the 1-norm of this data vector.
+     */
+    default double norm1() {
+        return streamValues().filter(x -> !Double.isNaN(x)).map(Math::abs).sum();
+    }
+
+    /**
+     * Computes the 2-norm (Euclidean norm) of this data vector.
+     * @return the 2-norm (Euclidean norm) of this data vector.
+     */
+    default double norm2() {
+        return Math.sqrt(new SumSquares().compute(this));
+    }
+
+    /**
      * Ensures that this vector contains an element for a particular key.
      *
      * @param key the key of the required element.
@@ -337,5 +356,18 @@ public interface DataVectorView<K> {
      */
     default Stream<DataVectorElement<K>> streamElements() {
         return streamKeys().map(key -> DataVectorElement.of(key, getElement(key)));
+    }
+
+    /**
+     * Returns a DoubleSeries with the same elements as this view (or this view
+     * itself, if it is a DoubleSeries).
+     *
+     * @return a DoubleSeries with the same elements as this view.
+     */
+    default DoubleSeries<K> toSeries(Class<K> keyClass) {
+        if (this instanceof DoubleSeries)
+            return (DoubleSeries<K>) this;
+        else
+            return DoubleSeries.copyOf(keyClass, this);
     }
 }

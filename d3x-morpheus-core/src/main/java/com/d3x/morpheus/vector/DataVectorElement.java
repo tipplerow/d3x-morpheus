@@ -18,23 +18,33 @@ package com.d3x.morpheus.vector;
 import com.d3x.morpheus.util.DoubleComparator;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 import lombok.NonNull;
+import lombok.Value;
 
 /**
  * An immutable element in a DataVectorView.
  */
+@Value
 @AllArgsConstructor(staticName = "of")
-public final class DataVectorElement<K> {
+public class DataVectorElement<K> {
     /**
      * The key of this vector element.
      */
-    @Getter @NonNull private final K key;
+    @NonNull K key;
 
     /**
      * The value in this vector element.
      */
-    @Getter @NonNull private final double value;
+    double value;
+
+    /**
+     * Identifies elements with non-missing values.
+     *
+     * @return {@code true} unless the value of this element is {@code Double.NaN}.
+     */
+    public boolean isSet() {
+        return !Double.isNaN(value);
+    }
 
     @Override
     @SuppressWarnings("unchecked")
