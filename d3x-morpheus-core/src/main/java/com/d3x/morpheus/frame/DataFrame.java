@@ -28,6 +28,7 @@ import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
 import java.util.function.ToIntFunction;
 import java.util.function.ToLongFunction;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
@@ -430,6 +431,22 @@ public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperation
      */
     <T> DataFrame<R,C> mapToObjects(C colKey, Class<T> type, Function<DataFrameValue<R,C>,T> mapper);
 
+    /**
+     * Returns a copy of this DataFrame with row and column keys mapped to
+     * other classes.
+     *
+     * @param rowMapper a function to map row keys
+     * @param colMapper a function to map column keys
+     *
+     * @return a new data frame with the same element values as this but with
+     * row and column keys mapped by the mapping functions.
+     */
+    default <R2, C2> DataFrame<R2, C2> remapKeys(Function<R, R2> rowMapper,
+                                                 Function<C, C2> colMapper) {
+        return sequential()
+                .rows().mapKeys(row -> rowMapper.apply(row.key()))
+                .cols().mapKeys(col -> colMapper.apply(col.key()));
+    }
 
     /**
      * Returns a newly created builder initialized with the contents of this frame
