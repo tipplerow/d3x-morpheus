@@ -364,6 +364,8 @@ public class DataFrameTest extends DataFrameTestBase {
                 DataFrame.ofDoubles(rowKeys1, colKeys1,
                         value -> 10.0 * value.rowOrdinal() + value.colOrdinal());
 
+        assertFalse(frame1.equalsNumeric(null));
+
         assertTrue(frame1.equalsNumeric(frame2));
         assertTrue(frame2.equalsNumeric(frame1));
 

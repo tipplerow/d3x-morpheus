@@ -522,6 +522,9 @@ public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperation
      * default DoubleComparator.
      */
     default boolean equalsNumeric(DataFrame<R,C> that) {
+        if (that == null)
+            return false;
+
         if (!this.listRowKeys().equals(that.listRowKeys()))
             return false;
 
