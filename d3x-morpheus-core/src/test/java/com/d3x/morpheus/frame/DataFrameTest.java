@@ -347,4 +347,44 @@ public class DataFrameTest extends DataFrameTestBase {
 
         return frame;
     }
+
+    @Test
+    public void testEqualsNumeric() {
+        List<Integer> rowKeys1 = List.of(1, 2);
+        List<Integer> rowKeys2 = List.of(1, 2, 3);
+
+        List<String> colKeys1 = List.of("A", "B", "C");
+        List<String> colKeys2 = List.of("A", "B");
+
+        DataFrame<Integer, String> frame1 =
+                DataFrame.ofInts(rowKeys1, colKeys1,
+                        value -> 10 * value.rowOrdinal() + value.colOrdinal());
+
+        DataFrame<Integer, String> frame2 =
+                DataFrame.ofDoubles(rowKeys1, colKeys1,
+                        value -> 10.0 * value.rowOrdinal() + value.colOrdinal());
+
+        assertTrue(frame1.equalsNumeric(frame2));
+        assertTrue(frame2.equalsNumeric(frame1));
+
+        DataFrame<Integer, String> frame3 =
+                DataFrame.ofDoubles(rowKeys1, colKeys1,
+                        value -> 10.0 * value.rowOrdinal() + 2.0 * value.colOrdinal());
+
+        assertFalse(frame1.equalsNumeric(frame3));
+        assertFalse(frame3.equalsNumeric(frame1));
+
+        DataFrame<Integer, String> frame4 =
+                DataFrame.ofDoubles(rowKeys1, colKeys2,
+                        value -> 10.0 * value.rowOrdinal() + value.colOrdinal());
+
+        DataFrame<Integer, String> frame5 =
+                DataFrame.ofDoubles(rowKeys2, colKeys1,
+                        value -> 10.0 * value.rowOrdinal() + value.colOrdinal());
+
+        assertFalse(frame2.equalsNumeric(frame4));
+        assertFalse(frame2.equalsNumeric(frame5));
+        assertFalse(frame4.equalsNumeric(frame2));
+        assertFalse(frame5.equalsNumeric(frame2));
+    }
 }
