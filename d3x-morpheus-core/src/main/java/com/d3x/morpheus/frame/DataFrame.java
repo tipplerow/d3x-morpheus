@@ -28,7 +28,6 @@ import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
 import java.util.function.ToIntFunction;
 import java.util.function.ToLongFunction;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
@@ -39,6 +38,7 @@ import com.d3x.morpheus.matrix.D3xMatrix;
 import com.d3x.morpheus.matrix.D3xMatrixView;
 import com.d3x.morpheus.range.Range;
 import com.d3x.morpheus.stats.Stats;
+import com.d3x.morpheus.util.DoubleComparator;
 import com.d3x.morpheus.util.Resource;
 import com.d3x.morpheus.util.functions.ToBooleanFunction;
 import com.d3x.morpheus.vector.D3xVector;
@@ -504,6 +504,44 @@ public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperation
     default boolean containsRows(Iterable<R> rowKeys) {
         for (R rowKey : rowKeys) {
             if (!containsRow(rowKey))
+                return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Determines whether this numeric data frame has the same contents as
+     * another, within the tolerance of the default DoubleComparator.
+     *
+     * @param that the DataFrame to compare to this.
+     *
+     * @return {@code true} iff this frame and the input frame both contain
+     * numeric data, have exactly the same row and column keys in the same
+     * order, and all data elements are equal within the tolerance of the
+     * default DoubleComparator.
+     */
+    default boolean equalsNumeric(DataFrame<R,C> that) {
+        if (that == null)
+            return false;
+
+        if (!this.listRowKeys().equals(that.listRowKeys()))
+            return false;
+
+        if (!this.listColumnKeys().equals(that.listColumnKeys()))
+            return false;
+
+        for (C colKey : listColumnKeys()) {
+            DataFrameColumn<R, C> thisCol = this.col(colKey);
+            DataFrameColumn<R, C> thatCol = that.col(colKey);
+
+            if (!thisCol.isNumeric())
+                return false;
+
+            if (!thatCol.isNumeric())
+                return false;
+
+            if (!thisCol.equalsView(thatCol))
                 return false;
         }
 
