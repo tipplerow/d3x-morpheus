@@ -103,6 +103,15 @@ public class DoubleSeriesTests {
         });
     }
 
+    @Test
+    public void filterValues() {
+        var series1 = DoubleSeries.build(String.class, List.of("A", "B", "C"), List.of(1.0, Double.NaN, 88.8));
+        var expected1 = DoubleSeries.build(String.class, List.of("A", "C"), List.of(1.0, 88.8));
+        var expected2 = DoubleSeries.build(String.class, List.of("B", "C"), List.of(Double.NaN, 88.8));
+
+        Assert.assertTrue(series1.filterValues(Double::isFinite).equalsSeries(expected1));
+        Assert.assertTrue(series1.filterValues(x -> x > 10.0).equalsSeries(expected2));
+    }
 
     @Test()
     public void sorting1() {
