@@ -113,6 +113,13 @@ public class DoubleSeriesTests {
         Assert.assertTrue(series1.filterValues(x -> x > 10.0).equalsSeries(expected2));
     }
 
+    @Test
+    public void nonZeros() {
+        var original = DoubleSeries.build(String.class, List.of("A", "B", "C", "D"), List.of(0.0, 1.0, Double.NaN, 88.8));
+        var expected = DoubleSeries.build(String.class, List.of("B", "D"), List.of(1.0, 88.8));
+        Assert.assertTrue(original.nonZeros().equalsSeries(expected));
+    }
+
     @Test()
     public void sorting1() {
         var path = "/csv/aapl.csv";

@@ -319,6 +319,14 @@ public interface DoubleSeries<K> extends DataSeries<K,Double>, D3xVectorView, Da
         return builder.build();
     }
 
+    /**
+     * Retains only the finite and non-zero values in this series.
+     * @return a new series containing only finite and non-zero values.
+     */
+    default DoubleSeries<K> nonZeros() {
+        return filterValues(x -> Double.isFinite(x) && DoubleComparator.DEFAULT.isNonZero(x));
+    }
+
 
     /**
      * Writes these asset values to a CSV file
