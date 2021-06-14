@@ -29,6 +29,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.DoublePredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
@@ -296,6 +297,34 @@ public interface DoubleSeries<K> extends DataSeries<K,Double>, D3xVectorView, Da
             builder.putDouble(key, value);
         });
         return builder.build();
+    }
+
+
+    /**
+     * Returns a filtered version of this series.
+     *
+     * @param predicate the predicate to filter the series by value
+     *
+     * @return the filtered series.
+     */
+    default DoubleSeries<K> filterValues(DoublePredicate predicate) {
+        var length = this.size();
+        var keyType = this.keyClass();
+        var builder = DoubleSeries.builder(keyType).capacity(length);
+
+        streamElements()
+                .filter(element -> predicate.test(element.getValue()))
+                .forEach(element -> builder.putDouble(element.getKey(), element.getValue()));
+
+        return builder.build();
+    }
+
+    /**
+     * Retains only the finite and non-zero values in this series.
+     * @return a new series containing only finite and non-zero values.
+     */
+    default DoubleSeries<K> nonZeros() {
+        return filterValues(x -> Double.isFinite(x) && DoubleComparator.DEFAULT.isNonZero(x));
     }
 
 
