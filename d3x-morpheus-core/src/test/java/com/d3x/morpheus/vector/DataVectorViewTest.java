@@ -59,6 +59,18 @@ public class DataVectorViewTest extends NumericTestBase {
     }
 
     @Test
+    public void testEmpty() {
+        DataVectorView<String> view1 = DataVectorView.empty();
+        DataVectorView<Integer> view2 = DataVectorView.empty();
+
+        assertEquals(view1.length(), 0);
+        assertEquals(view2.length(), 0);
+
+        assertFalse(view1.containsElement("abc"));
+        assertFalse(view2.containsElement(88));
+    }
+
+    @Test
     public void testFrameRow() {
         runTest(DataFrame.ofDoubles("row", keyList, valueVector).row("row"));
     }
