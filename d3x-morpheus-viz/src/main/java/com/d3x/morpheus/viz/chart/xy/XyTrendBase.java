@@ -83,11 +83,12 @@ public abstract class XyTrendBase implements XyTrend {
      * @param <X>           the domain axis type
      * @return              the newly created trend line DataFrame
      */
+    @SuppressWarnings("unchecked")
     public <X extends Comparable> DataFrame<Double,Comparable> createTrendData(XyDataset<X,Comparable> source, Comparable seriesKey, Comparable trendKey) {
         final DataFrame<Integer,Object> seriesFrame = createSeriesData(source, seriesKey);
         final Optional<Bounds<Number>> regressorRange = seriesFrame.col("Regressor").bounds();
         if (!regressorRange.isPresent()) {
-            return DataFrame.empty();
+            return (DataFrame<Double,Comparable>)DataFrame.empty(Double.class, seriesKey.getClass());
         } else {
             final double minValue = regressorRange.get().lower().doubleValue();
             final double maxValue = regressorRange.get().upper().doubleValue();

@@ -52,7 +52,7 @@ public class WBCatalogSource implements DataFrameSource<Integer,String,WBCatalog
         return loader.load(url, reader -> {
             try {
                 final Gson gson = loader.builder().create();
-                final DataFrame<Integer,String> result = DataFrame.empty();
+                final DataFrame<Integer,String> result = DataFrame.empty(Integer.class, String.class);
                 while (reader.hasNext()) {
                     reader.beginObject();
 

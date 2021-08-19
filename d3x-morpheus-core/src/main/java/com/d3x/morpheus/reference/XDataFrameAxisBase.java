@@ -421,7 +421,9 @@ abstract class XDataFrameAxisBase<X,Y,R,C,V extends DataFrameVector<?,?,R,C,?>,T
     @Override
     public final DataFrame<R,C> select(int start, int length) {
         if (isEmpty()) {
-            return DataFrame.empty();
+            var rowType = frame.rows().keyClass();
+            var colType = frame.cols().keyClass();
+            return DataFrame.empty(rowType, colType);
         } else {
             var last = Math.min(start + length-1, count()-1);
             var keys = Range.of(start, last+1).map(this::key);
