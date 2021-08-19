@@ -61,13 +61,6 @@ public class XDataFrameFactory extends DataFrameFactory {
 
 
     @Override
-    @SuppressWarnings("unchecked")
-    public <R,C> DataFrame<R,C> empty() {
-        return new XDataFrame<>(Index.of((Class<R>)Object.class, 10), Index.of((Class<C>)Object.class, 10), Object.class, false);
-    }
-
-
-    @Override
     public <R,C> DataFrame<R,C> empty(Class<R> rowAxisType, Class<C> colAxisType) {
         return new XDataFrame<>(Index.of(rowAxisType, 10000), Index.of(colAxisType, 10), Object.class, false);
     }
@@ -77,7 +70,7 @@ public class XDataFrameFactory extends DataFrameFactory {
     @SuppressWarnings("unchecked")
     public <R,C> DataFrame<R,C> combineFirst(Iterator<DataFrame<R,C>> iterator) {
         if (!iterator.hasNext()) {
-            return DataFrame.empty();
+            return (DataFrame<R,C>)DataFrame.empty(String.class, String.class);
         } else {
             final DataFrame<R,C> result = iterator.next().copy();
             final DataFrameCursor<R,C> cursor = result.cursor();
@@ -108,9 +101,10 @@ public class XDataFrameFactory extends DataFrameFactory {
 
 
     @Override
+    @SuppressWarnings("unchecked")
     public <R,C> DataFrame<R,C> concatRows(Iterator<DataFrame<R,C>> iterator) {
         if (!iterator.hasNext()) {
-            return DataFrame.empty();
+            return (DataFrame<R,C>)DataFrame.empty(String.class, String.class);
         } else {
             final DataFrame<R,C> result = iterator.next().copy();
             while (iterator.hasNext()) {
@@ -125,9 +119,10 @@ public class XDataFrameFactory extends DataFrameFactory {
 
 
     @Override
+    @SuppressWarnings("unchecked")
     public <R,C> DataFrame<R,C> concatColumns(Iterator<DataFrame<R,C>> iterator) {
         if (!iterator.hasNext()) {
-            return DataFrame.empty();
+            return (DataFrame<R,C>)DataFrame.empty(String.class, String.class);
         } else {
             final DataFrame<R,C> result = iterator.next().copy();
             while (iterator.hasNext()) {

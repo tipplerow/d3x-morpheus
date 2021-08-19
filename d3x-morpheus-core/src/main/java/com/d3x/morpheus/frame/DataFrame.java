@@ -892,16 +892,6 @@ public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperation
 
     /**
      * Returns an empty DataFrame with zero length rows and columns
-     * @param <R>           the row key type
-     * @param <C>           the column key type
-     * @return              the empty DataFrame
-     */
-    static <R,C> DataFrame<R,C> empty() {
-        return DataFrame.factory().empty();
-    }
-
-    /**
-     * Returns an empty DataFrame with zero length rows and columns
      * @param rowAxisType   the row axis key type
      * @param colAxisType   the column axis key type
      * @param <R>           the row key type

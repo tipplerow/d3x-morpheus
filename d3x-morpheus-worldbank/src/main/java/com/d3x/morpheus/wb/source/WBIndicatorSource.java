@@ -129,7 +129,7 @@ public class WBIndicatorSource implements DataFrameSource<LocalDate,String,WBInd
         return reader -> {
             try {
                 if (reader.peek() == JsonToken.NULL) {
-                    return DataFrame.empty();
+                    return DataFrame.empty(LocalDate.class, String.class);
                 }
                 String name = null;
                 String country = null;

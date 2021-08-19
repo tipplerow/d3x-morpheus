@@ -103,14 +103,6 @@ public abstract class DataFrameFactory {
 
     /**
      * Returns an empty DataFrame with zero length rows and columns
-     * @param <R>           the row key type
-     * @param <C>           the column key type
-     * @return              the empty DataFrame
-     */
-    public abstract <R,C> DataFrame<R,C> empty();
-
-    /**
-     * Returns an empty DataFrame with zero length rows and columns
      * @param rowAxisType   the row axis key type
      * @param colAxisType   the column axis key type
      * @param <R>           the row key type

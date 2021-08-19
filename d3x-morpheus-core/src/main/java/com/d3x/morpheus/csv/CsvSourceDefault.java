@@ -120,7 +120,7 @@ public class CsvSourceDefault implements CsvSource {
      */
     private <R> DataFrame<R,String> parse(Class<R> rowType, Options options, InputStream stream) throws IOException {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(stream, options.getCharset()))) {
-            var handler = new CsvProcessor<R>(options);
+            var handler = new CsvProcessor<R>(options, rowType);
             var settings = new CsvParserSettings();
             settings.getFormat().setDelimiter(options.getDelimiter());
             settings.setHeaderExtractionEnabled(options.isHeader());
@@ -146,7 +146,7 @@ public class CsvSourceDefault implements CsvSource {
     /**
      * A RowProcessor that receives callbacks and incrementally builds the DataFrame.
      */
-    private class CsvProcessor<R> implements RowProcessor {
+    private static class CsvProcessor<R> implements RowProcessor {
 
         @lombok.Getter
         private int rowCounter;
@@ -155,15 +155,18 @@ public class CsvSourceDefault implements CsvSource {
         @lombok.Getter
         private long endTime;
         private List<CsvColumn> columns;
-        private Options options;
-        private Predicate<String[]> rowPredicate;
+        private final Class<R> rowType;
+        private final Options options;
+        private final Predicate<String[]> rowPredicate;
 
         /**
          * Constructor
          * @param options   the options
+         * @param rowType   the row type
          */
-        CsvProcessor(Options options) {
+        CsvProcessor(Options options, Class<R> rowType) {
             this.options = options;
+            this.rowType = rowType;
             this.rowPredicate = options.getRowPredicate();
         }
 
@@ -242,7 +245,7 @@ public class CsvSourceDefault implements CsvSource {
         private DataFrame<R,String> build() {
             try {
                 if (rowCounter == 0) {
-                    return DataFrame.empty();
+                    return DataFrame.empty(rowType, String.class);
                 } else if (options.getRowKeyColumnName() != null) {
                     var rowKeyColumn = options.getRowKeyColumnName();
                     var rowColumn = columns.stream().filter(v -> v.name.equals(rowKeyColumn)).findFirst().orElse(null);

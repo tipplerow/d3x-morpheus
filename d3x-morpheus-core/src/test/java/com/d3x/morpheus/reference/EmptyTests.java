@@ -29,12 +29,12 @@ public class EmptyTests {
 
     @Test()
     public void test() {
-        DataFrame.empty().forEach(IO::println);
-        DataFrame.empty().rows().forEach(IO::println);
-        DataFrame.empty().cols().forEach(IO::println);
-        DataFrame.empty().values().forEach(IO::println);
-        DataFrame.empty().rows().mapKeys(v -> "1");
-        DataFrame.empty().cols().mapKeys(v -> "1");
+        DataFrame.empty(String.class, String.class).forEach(IO::println);
+        DataFrame.empty(String.class, String.class).rows().forEach(IO::println);
+        DataFrame.empty(String.class, String.class).cols().forEach(IO::println);
+        DataFrame.empty(String.class, String.class).values().forEach(IO::println);
+        DataFrame.empty(String.class, String.class).rows().mapKeys(v -> "1");
+        DataFrame.empty(String.class, String.class).cols().mapKeys(v -> "1");
     }
 
     @Test()
