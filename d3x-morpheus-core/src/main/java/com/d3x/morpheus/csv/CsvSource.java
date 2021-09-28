@@ -216,5 +216,20 @@ public interface CsvSource {
                 return colIndexPredicate == null && colNamePredicate == null;
             }
         }
+
+
+        /**
+         * Returns true if col name or column index is marked as row index keys
+         * @param colName       the column name
+         * @param colIndex      the column index
+         * @return              true if column should be used for row index
+         */
+        boolean isRowIndex(String colName, int colIndex) {
+            if (rowKeyColumnIndex != null && rowKeyColumnIndex == colIndex) {
+                return true;
+            } else {
+                return colName.equals(rowKeyColumnName);
+            }
+        }
     }
 }

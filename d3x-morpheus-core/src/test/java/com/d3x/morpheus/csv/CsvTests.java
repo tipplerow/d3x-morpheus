@@ -330,12 +330,12 @@ public class CsvTests {
     @Test()
     public void testWriteFollowedByRead() {
         final File file = new File(tmpDir, "aapl.csv");
-        var frame1 = DataFrame.read("/csv/aapl.csv").csv(Integer.class, options -> {
+        var frame1 = DataFrame.read("/csv/aapl.csv").csv(LocalDate.class, options -> {
             options.setRowKeyColumnName("Date");
             options.getFormats().setParser("Volume", Long.class);
         });
         frame1.write().csv(file).apply();
-        var frame2 = DataFrame.read(file).csv(Integer.class, options -> {
+        var frame2 = DataFrame.read(file).csv(LocalDate.class, options -> {
             options.setRowKeyColumnName("DataFrame");
             options.getFormats().setParser("Volume", Long.class);
         });
@@ -345,7 +345,7 @@ public class CsvTests {
 
     @Test()
     public void testCustomParsers() {
-        var frame = DataFrame.read("/csv/aapl.csv").csv(Integer.class, options -> {
+        var frame = DataFrame.read("/csv/aapl.csv").csv(LocalDate.class, options -> {
             options.setRowKeyColumnName("Date");
             options.getFormats().copyParser(Double.class, "Volume");
             options.getFormats().copyParser(BigDecimal.class, "Close");
