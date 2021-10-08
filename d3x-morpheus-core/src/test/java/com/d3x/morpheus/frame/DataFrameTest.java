@@ -126,6 +126,13 @@ public class DataFrameTest extends DataFrameTestBase {
     }
 
     @Test
+    public void testGetDoubleDefault() {
+        assertEquals(doubleFrame.getDouble(row1, col1, 88.8), 11.0, TOLERANCE);
+        assertEquals(doubleFrame.getDouble(row1, col4, 88.8), 88.8, TOLERANCE);
+        assertEquals(doubleFrame.getDouble(row4, col1, 88.8), 88.8, TOLERANCE);
+    }
+
+    @Test
     public void testGetMatrix1() {
         double[][] actual = doubleFrame.getDoubleMatrix();
         double[][] expected = new double[][] {
