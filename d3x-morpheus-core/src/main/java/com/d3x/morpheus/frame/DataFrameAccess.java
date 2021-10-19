@@ -82,6 +82,25 @@ public interface DataFrameAccess<R,C> {
     double getDouble(R rowKey, C colKey);
 
     /**
+     * Returns the value for the row and column key coordinates provided.
+     *
+     * @param rowKey       the row key coordinate
+     * @param colKey       the column key coordinate
+     * @param defaultValue the default value, if value is missing
+     *
+     * @return the value for the specified keys, or the default value if
+     * there is no match or the value is NaN.
+     */
+    default double getDouble(R rowKey, C colKey, double defaultValue) {
+        var result = getDouble(rowKey, colKey);
+
+        if (Double.isNaN(result))
+            return defaultValue;
+        else
+            return result;
+    }
+
+    /**
      * Returns the value for the row and column ordinal coordinates provided
      * @param rowOrdinal    the row ordinal coordinate
      * @param colOrdinal    the column ordinal coordinate
