@@ -32,13 +32,14 @@ import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
 
+import com.google.common.collect.Table;
+
 import com.d3x.morpheus.db.DbSource;
 import com.d3x.morpheus.index.Index;
 import com.d3x.morpheus.matrix.D3xMatrix;
 import com.d3x.morpheus.matrix.D3xMatrixView;
 import com.d3x.morpheus.range.Range;
 import com.d3x.morpheus.stats.Stats;
-import com.d3x.morpheus.util.DoubleComparator;
 import com.d3x.morpheus.util.Resource;
 import com.d3x.morpheus.util.functions.ToBooleanFunction;
 import com.d3x.morpheus.vector.D3xVector;
@@ -786,7 +787,10 @@ public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperation
      * @param stream the stream where this frame will appear.
      */
     default void display(PrintStream stream) {
-        values().forEach(v -> stream.println(String.format("(%s, %s) => %s", v.rowKey().toString(), v.colKey().toString(), v.getValue().toString())));
+        values().forEach(v -> stream.printf("(%s, %s) => %s%n",
+                v.rowKey().toString(),
+                v.colKey().toString(),
+                v.getValue() != null ? v.getValue().toString() : "null"));
     }
 
     /**
@@ -814,6 +818,27 @@ public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperation
         var builder = new DataFrameBuilder<>(rowType, colType);
         consumer.accept(builder);
         return builder;
+    }
+
+
+    /**
+     * Creates a new DataFrame with the contents of a Guava Table.
+     *
+     * @param valueType the value class type.
+     * @param dataTable the Guava Table to copy.
+     *
+     * @return a new DataFrame with the contents of the specified table.
+     */
+    static <R,C,V> DataFrame<R,C> from(Class<V> valueType, Table<R,C,V> dataTable) {
+        var cells = dataTable.cellSet();
+        var rowKeys = dataTable.rowKeySet();
+        var colKeys = dataTable.columnKeySet();
+        var dataFrame = of(rowKeys, colKeys, valueType);
+
+        for (var cell : cells)
+            dataFrame.setValue(cell.getRowKey(), cell.getColumnKey(), cell.getValue());
+
+        return dataFrame;
     }
 
 
