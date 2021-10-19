@@ -23,6 +23,8 @@ import java.util.Random;
 import com.d3x.morpheus.matrix.D3xMatrix;
 import com.d3x.morpheus.vector.D3xVector;
 
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 import org.testng.annotations.Test;
 import static org.testng.Assert.*;
 
@@ -395,5 +397,56 @@ public class DataFrameTest extends DataFrameTestBase {
         assertFalse(frame2.equalsNumeric(frame5));
         assertFalse(frame4.equalsNumeric(frame2));
         assertFalse(frame5.equalsNumeric(frame2));
+    }
+
+    @Test
+    public void testFromStringTable() {
+        Table<RowKey, ColKey, String> table = HashBasedTable.create();
+
+        table.put(row1, col1, "11");
+        table.put(row2, col3, "23");
+
+        var frame1 = DataFrame.from(String.class, table);
+
+        assertEquals(frame1.listRowKeys(), List.of(row1, row2));
+        assertEquals(frame1.listColumnKeys(), List.of(col1, col3));
+        assertEquals(frame1.getValue(row1, col1), "11");
+        assertEquals(frame1.getValue(row2, col3), "23");
+        assertNull(frame1.getValue(row1, col3));
+        assertNull(frame1.getValue(row2, col1));
+
+        table.put(row3, col4, "34");
+
+        var frame2 = DataFrame.from(String.class, table);
+
+        table.remove(row3, col4);
+
+        assertEquals(frame2.getValue(row1, col1), "11");
+        assertEquals(frame2.getValue(row2, col3), "23");
+        assertEquals(frame2.getValue(row3, col4), "34");
+        assertNull(frame1.getValue(row3, col4));
+        assertNull(frame2.getValue(row1, col3));
+        assertNull(frame2.getValue(row1, col4));
+        assertNull(frame2.getValue(row2, col1));
+        assertNull(frame2.getValue(row2, col4));
+        assertNull(frame2.getValue(row3, col1));
+        assertNull(frame2.getValue(row3, col3));
+    }
+
+    @Test
+    public void testFromDoubleTable() {
+        Table<RowKey, ColKey, Double> table = HashBasedTable.create();
+
+        table.put(row1, col1, 11.0);
+        table.put(row2, col3, 23.0);
+
+        var frame1 = DataFrame.from(Double.class, table);
+
+        assertEquals(frame1.listRowKeys(), List.of(row1, row2));
+        assertEquals(frame1.listColumnKeys(), List.of(col1, col3));
+        assertEquals(frame1.getDouble(row1, col1), 11.0, TOLERANCE);
+        assertEquals(frame1.getDouble(row2, col3), 23.0, TOLERANCE);
+        assertTrue(Double.isNaN(frame1.getDouble(row1, col3)));
+        assertTrue(Double.isNaN(frame1.getValue(row2, col1)));
     }
 }
