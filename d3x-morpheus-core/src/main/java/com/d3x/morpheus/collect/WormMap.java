@@ -43,7 +43,7 @@ public class WormMap<K, V> extends AbstractMap<K, V> {
      * The underlying map storage.
      */
     @NonNull
-    protected Map<K, V> map;
+    protected final Map<K, V> map;
 
     /**
      * Creates an empty WORM map using a HashMap for the underlying storage.
@@ -97,14 +97,15 @@ public class WormMap<K, V> extends AbstractMap<K, V> {
      * default value if there is no match.
      */
     public V getOrAssign(@NonNull K targetKey, @NonNull V defaultValue) {
-        V result = map.get(targetKey);
+        synchronized (map) {
+            V result = map.get(targetKey);
 
-        if (result != null) {
-            return result;
-        }
-        else {
-            map.put(targetKey, defaultValue);
-            return defaultValue;
+            if (result != null) {
+                return result;
+            } else {
+                map.put(targetKey, defaultValue);
+                return defaultValue;
+            }
         }
     }
 
@@ -119,15 +120,16 @@ public class WormMap<K, V> extends AbstractMap<K, V> {
      * computed value if there is no match.
      */
     public V getOrCompute(@NonNull K key, @NonNull Function<K, V> compute) {
-        V result = map.get(key);
+        synchronized (map) {
+            V result = map.get(key);
 
-        if (result != null) {
-            return result;
-        }
-        else {
-            var value = compute.apply(key);
-            map.put(key, value);
-            return value;
+            if (result != null) {
+                return result;
+            } else {
+                var value = compute.apply(key);
+                map.put(key, value);
+                return value;
+            }
         }
     }
 
@@ -166,10 +168,12 @@ public class WormMap<K, V> extends AbstractMap<K, V> {
      */
     @Override
     public V put(@NonNull K key, @NonNull V value) {
-        if (map.containsKey(key))
-            throw new MorpheusException("Key [%s] has already been assigned.", key);
-        else
-            return map.put(key, value);
+        synchronized (map) {
+            if (map.containsKey(key))
+                throw new MorpheusException("Key [%s] has already been assigned.", key);
+            else
+                return map.put(key, value);
+        }
     }
 
     /**

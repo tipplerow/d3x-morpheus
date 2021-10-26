@@ -40,7 +40,7 @@ public class WormSet<E> extends AbstractSet<E> {
      * The underlying set storage.
      */
     @NonNull
-    protected Set<E> set;
+    protected final Set<E> set;
 
     /**
      * Creates an empty WORM set using a HashSet for the underlying storage.
@@ -97,10 +97,12 @@ public class WormSet<E> extends AbstractSet<E> {
      */
     @Override
     public boolean add(@NonNull E element) {
-        if (set.contains(element))
-            throw new MorpheusException("Element [%s] has already been added.", element);
-        else
-            return set.add(element);
+        synchronized (set) {
+            if (set.contains(element))
+                throw new MorpheusException("Element [%s] has already been added.", element);
+            else
+                return set.add(element);
+        }
     }
 
     /**

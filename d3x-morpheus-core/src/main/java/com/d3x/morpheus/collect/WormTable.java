@@ -112,14 +112,15 @@ public class WormTable<R, C, V> extends ForwardingTable<R, C, V> {
     public V getOrAssign(@NonNull R rowKey,
                          @NonNull C columnKey,
                          @NonNull V defaultValue) {
-        V result = delegate.get(rowKey, columnKey);
+        synchronized (delegate) {
+            V result = delegate.get(rowKey, columnKey);
 
-        if (result != null) {
-            return result;
-        }
-        else {
-            delegate.put(rowKey, columnKey, defaultValue);
-            return defaultValue;
+            if (result != null) {
+                return result;
+            } else {
+                delegate.put(rowKey, columnKey, defaultValue);
+                return defaultValue;
+            }
         }
     }
 
@@ -137,15 +138,16 @@ public class WormTable<R, C, V> extends ForwardingTable<R, C, V> {
     public V getOrCompute(@NonNull R rowKey,
                           @NonNull C colKey,
                           @NonNull BiFunction<R, C, V> compute) {
-        V result = delegate.get(rowKey, colKey);
+        synchronized (delegate) {
+            V result = delegate.get(rowKey, colKey);
 
-        if (result != null) {
-            return result;
-        }
-        else {
-            var value = compute.apply(rowKey, colKey);
-            delegate.put(rowKey, colKey, value);
-            return value;
+            if (result != null) {
+                return result;
+            } else {
+                var value = compute.apply(rowKey, colKey);
+                delegate.put(rowKey, colKey, value);
+                return value;
+            }
         }
     }
 
@@ -188,10 +190,12 @@ public class WormTable<R, C, V> extends ForwardingTable<R, C, V> {
      */
     @Override
     public V put(@NonNull R rowKey, @NonNull C colKey, @NonNull V value) {
-        if (delegate.contains(rowKey, colKey))
-            throw new MorpheusException("Cell [%s, %s] has already been assigned.", rowKey, colKey);
-        else
-            return delegate.put(rowKey, colKey, value);
+        synchronized (delegate) {
+            if (delegate.contains(rowKey, colKey))
+                throw new MorpheusException("Cell [%s, %s] has already been assigned.", rowKey, colKey);
+            else
+                return delegate.put(rowKey, colKey, value);
+        }
     }
 
     /**
