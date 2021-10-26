@@ -171,4 +171,10 @@
             <package name="com.d3x.morpheus.vector.*"/>
         </packages>
     </test>
+
+    <test name="Collection Tests">
+        <packages>
+            <package name="com.d3x.morpheus.collect.*"/>
+        </packages>
+    </test>
 </suite>
