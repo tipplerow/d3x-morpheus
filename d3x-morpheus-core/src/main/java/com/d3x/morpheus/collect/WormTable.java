@@ -150,6 +150,26 @@ public class WormTable<R, C, V> extends ForwardingTable<R, C, V> {
     }
 
     /**
+     * Retrieves a value from this table or throws an exception.
+     *
+     * @param rowKey the row key associated with the value.
+     * @param colKey the column key associated with the value.
+     *
+     * @return the value associated with the specified keys.
+     *
+     * @throws RuntimeException unless a value has been associated with
+     * the specified keys.
+     */
+    public V getOrThrow(@NonNull R rowKey, @NonNull C colKey) {
+        V result = delegate.get(rowKey, colKey);
+
+        if (result != null)
+            return result;
+        else
+            throw new MorpheusException("No value for row [%s] and column [%s].", rowKey, colKey);
+    }
+
+    /**
      * Permanently associates the specified value with the specified keys.
      *
      * <p>This method may be called at most once with a given row/column
@@ -172,26 +192,6 @@ public class WormTable<R, C, V> extends ForwardingTable<R, C, V> {
             throw new MorpheusException("Cell [%s, %s] has already been assigned.", rowKey, colKey);
         else
             return delegate.put(rowKey, colKey, value);
-    }
-
-    /**
-     * Retrieves a value from this table or throws an exception.
-     *
-     * @param rowKey the row key associated with the value.
-     * @param colKey the column key associated with the value.
-     *
-     * @return the value associated with the specified keys.
-     *
-     * @throws RuntimeException unless a value has been associated with
-     * the specified keys.
-     */
-    public V require(@NonNull R rowKey, @NonNull C colKey) {
-        V result = delegate.get(rowKey, colKey);
-
-        if (result != null)
-            return result;
-        else
-            throw new MorpheusException("No value for row [%s] and column [%s].", rowKey, colKey);
     }
 
     /**

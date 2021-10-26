@@ -132,6 +132,25 @@ public class WormMap<K, V> extends AbstractMap<K, V> {
     }
 
     /**
+     * Retrieves a value from this map or throws an exception.
+     *
+     * @param key the row key associated with the value.
+     *
+     * @return the value associated with the specified key.
+     *
+     * @throws RuntimeException unless a value has been associated with
+     * the specified key.
+     */
+    public V getOrThrow(@NonNull K key) {
+        V result = map.get(key);
+
+        if (result != null)
+            return result;
+        else
+            throw new MorpheusException("No value for key [%s].", key);
+    }
+
+    /**
      * Permanently assigns a key/value pair.
      *
      * <p>This method may be called at most once with a given key; calling
@@ -151,25 +170,6 @@ public class WormMap<K, V> extends AbstractMap<K, V> {
             throw new MorpheusException("Key [%s] has already been assigned.", key);
         else
             return map.put(key, value);
-    }
-
-    /**
-     * Retrieves a value from this map or throws an exception.
-     *
-     * @param key the row key associated with the value.
-     *
-     * @return the value associated with the specified key.
-     *
-     * @throws RuntimeException unless a value has been associated with
-     * the specified key.
-     */
-    public V require(@NonNull K key) {
-        V result = map.get(key);
-
-        if (result != null)
-            return result;
-        else
-            throw new MorpheusException("No value for key [%s].", key);
     }
 
     /**

@@ -117,6 +117,23 @@ public class WormTableTest {
     }
 
     @Test
+    public void testGetOrThrowPresent() {
+        Assert.assertEquals(fixed.getOrThrow(1, "two"), "1-two");
+        Assert.assertEquals(fixed.getOrThrow(3, "four"), "3-four");
+        Assert.assertEquals(fixed.getOrThrow(5, "six"), "5-six");
+    }
+
+    @Test(expectedExceptions = RuntimeException.class)
+    public void testGetOrThrowAbsent1() {
+        fixed.getOrThrow(1, "foo");
+    }
+
+    @Test(expectedExceptions = RuntimeException.class)
+    public void testGetOrThrowAbsent2() {
+        fixed.getOrThrow(2, "four");
+    }
+
+    @Test
     public void testIsEmpty() {
         Assert.assertTrue(empty.isEmpty());
         Assert.assertFalse(fixed.isEmpty());
@@ -151,23 +168,6 @@ public class WormTableTest {
     @Test(expectedExceptions = RuntimeException.class)
     public void testRemovePresent() {
         fixed.remove(1, "two");
-    }
-
-    @Test
-    public void testRequirePresent() {
-        Assert.assertEquals(fixed.require(1, "two"), "1-two");
-        Assert.assertEquals(fixed.require(3, "four"), "3-four");
-        Assert.assertEquals(fixed.require(5, "six"), "5-six");
-    }
-
-    @Test(expectedExceptions = RuntimeException.class)
-    public void testRequireAbsent1() {
-        fixed.require(1, "foo");
-    }
-
-    @Test(expectedExceptions = RuntimeException.class)
-    public void testRequireAbsent2() {
-        fixed.require(2, "four");
     }
 
     @Test(expectedExceptions = RuntimeException.class)

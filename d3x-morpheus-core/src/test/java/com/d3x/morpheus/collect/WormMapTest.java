@@ -104,6 +104,18 @@ public class WormMapTest {
     }
 
     @Test
+    public void testGetOrThrowPresent() {
+        Assert.assertEquals(fixed.getOrThrow(1), "V1");
+        Assert.assertEquals(fixed.getOrThrow(3), "V3");
+        Assert.assertEquals(fixed.getOrThrow(5), "V5");
+    }
+
+    @Test(expectedExceptions = RuntimeException.class)
+    public void testGetOrThrowAbsent() {
+        fixed.getOrThrow(2);
+    }
+
+    @Test
     public void testIsEmpty() {
         Assert.assertTrue(empty.isEmpty());
         Assert.assertFalse(fixed.isEmpty());
@@ -148,18 +160,6 @@ public class WormMapTest {
     @Test(expectedExceptions = RuntimeException.class)
     public void testRemovePresent() {
         fixed.remove(1);
-    }
-
-    @Test
-    public void testRequirePresent() {
-        Assert.assertEquals(fixed.require(1), "V1");
-        Assert.assertEquals(fixed.require(3), "V3");
-        Assert.assertEquals(fixed.require(5), "V5");
-    }
-
-    @Test(expectedExceptions = RuntimeException.class)
-    public void testRequireAbsent() {
-        fixed.require(2);
     }
 
     @Test
