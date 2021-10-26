@@ -17,6 +17,7 @@ package com.d3x.morpheus.collect;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
+
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -25,7 +26,7 @@ import org.testng.annotations.Test;
  * @author Scott Shaffer
  */
 public class WormTableTest {
-    // An empty WORM table whose contents are fixed for all tests...
+    // An empty WORM table that remains empty for all tests...
     private static final WormTable<Integer, String, String> empty = WormTable.hash();
 
     // A WORM table whose contents are fixed for all tests...
@@ -37,7 +38,7 @@ public class WormTableTest {
     }
 
     @BeforeClass
-    private void populateTable1() {
+    private void populateFixed() {
         fixed.put(1, "two", "1-two");
         fixed.put(3, "four", "3-four");
         fixed.put(5, "six", "5-six");

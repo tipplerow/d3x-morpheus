@@ -32,9 +32,9 @@ import lombok.NonNull;
 
 /**
  * A Guava Table that implements a write-once, read-many (WORM) protocol
- * for assigning cell values. The value associated with a row/column key
- * pair may be assigned at most once.  Attempting to assign a different
- * value to the same cell will trigger a runtime exception.
+ * for assigning cell values.  The value associated with a row/column key
+ * pair may be assigned at most once. A second attempt to assign the same
+ * cell will trigger a runtime exception.
  *
  * @param <R> the runtime row type.
  * @param <C> the runtime column type.
@@ -50,8 +50,17 @@ public class WormTable<R, C, V> extends ForwardingTable<R, C, V> {
     protected final Table<R, C, V> delegate;
 
     /**
+     * Creates an empty WORM table using a hash-based table for the
+     * underlying storage.
+     */
+    public WormTable() {
+        this(HashBasedTable.create());
+    }
+
+    /**
      * Creates a new WORM table using another table for the underlying
-     * storage.
+     * storage; the contents of the delegate table become the initial
+     * contents of the WORM table.
      *
      * @param delegate the underlying table.
      */
@@ -103,13 +112,13 @@ public class WormTable<R, C, V> extends ForwardingTable<R, C, V> {
     public V getOrAssign(@NonNull R rowKey,
                          @NonNull C columnKey,
                          @NonNull V defaultValue) {
-        V result = get(rowKey, columnKey);
+        V result = delegate.get(rowKey, columnKey);
 
         if (result != null) {
             return result;
         }
         else {
-            put(rowKey, columnKey, defaultValue);
+            delegate.put(rowKey, columnKey, defaultValue);
             return defaultValue;
         }
     }
@@ -128,14 +137,14 @@ public class WormTable<R, C, V> extends ForwardingTable<R, C, V> {
     public V getOrCompute(@NonNull R rowKey,
                           @NonNull C colKey,
                           @NonNull BiFunction<R, C, V> compute) {
-        V result = get(rowKey, colKey);
+        V result = delegate.get(rowKey, colKey);
 
         if (result != null) {
             return result;
         }
         else {
             var value = compute.apply(rowKey, colKey);
-            put(rowKey, colKey, value);
+            delegate.put(rowKey, colKey, value);
             return value;
         }
     }
@@ -144,7 +153,7 @@ public class WormTable<R, C, V> extends ForwardingTable<R, C, V> {
      * Permanently associates the specified value with the specified keys.
      *
      * <p>This method may be called at most once with a given row/column
-     * key pair.  Calling it more than once with the same key pair will
+     * key pair.  Calling it a second time with the same key pair will
      * trigger an exception.</p>
      *
      * @param rowKey the row key to associate with the value.
@@ -159,7 +168,7 @@ public class WormTable<R, C, V> extends ForwardingTable<R, C, V> {
      */
     @Override
     public V put(@NonNull R rowKey, @NonNull C colKey, @NonNull V value) {
-        if (contains(rowKey, colKey))
+        if (delegate.contains(rowKey, colKey))
             throw new MorpheusException("Cell [%s, %s] has already been assigned.", rowKey, colKey);
         else
             return delegate.put(rowKey, colKey, value);
@@ -177,7 +186,7 @@ public class WormTable<R, C, V> extends ForwardingTable<R, C, V> {
      * the specified keys.
      */
     public V require(@NonNull R rowKey, @NonNull C colKey) {
-        V result = get(rowKey, colKey);
+        V result = delegate.get(rowKey, colKey);
 
         if (result != null)
             return result;
