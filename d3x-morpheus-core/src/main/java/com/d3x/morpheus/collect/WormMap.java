@@ -109,7 +109,7 @@ public class WormMap<K, V> extends AbstractMap<K, V> {
     }
 
     /**
-     * Retrieves an existing value from this table or computes and
+     * Retrieves an existing value from this map or computes and
      * assigns a default.
      *
      * @param key     the key associated with the value.
@@ -173,7 +173,7 @@ public class WormMap<K, V> extends AbstractMap<K, V> {
     }
 
     /**
-     * Guaranteed to throw an exception and leave the table unmodified.
+     * Guaranteed to throw an exception and leave the map unmodified.
      * @throws RuntimeException always: entry removal is forbidden.
      */
     @Override
@@ -193,7 +193,7 @@ public class WormMap<K, V> extends AbstractMap<K, V> {
     }
 
     /**
-     * Guaranteed to throw an exception and leave the table unmodified.
+     * Guaranteed to throw an exception and leave the map unmodified.
      * @throws RuntimeException always: entry removal is forbidden.
      */
     @Override
