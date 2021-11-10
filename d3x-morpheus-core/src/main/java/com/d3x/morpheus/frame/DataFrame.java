@@ -32,8 +32,6 @@ import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
 
-import com.google.common.collect.Table;
-
 import com.d3x.morpheus.db.DbSource;
 import com.d3x.morpheus.index.Index;
 import com.d3x.morpheus.matrix.D3xMatrix;
@@ -818,27 +816,6 @@ public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperation
         var builder = new DataFrameBuilder<>(rowType, colType);
         consumer.accept(builder);
         return builder;
-    }
-
-
-    /**
-     * Creates a new DataFrame with the contents of a Guava Table.
-     *
-     * @param valueType the value class type.
-     * @param dataTable the Guava Table to copy.
-     *
-     * @return a new DataFrame with the contents of the specified table.
-     */
-    static <R,C,V> DataFrame<R,C> from(Class<V> valueType, Table<R,C,V> dataTable) {
-        var cells = dataTable.cellSet();
-        var rowKeys = dataTable.rowKeySet();
-        var colKeys = dataTable.columnKeySet();
-        var dataFrame = of(rowKeys, colKeys, valueType);
-
-        for (var cell : cells)
-            dataFrame.setValue(cell.getRowKey(), cell.getColumnKey(), cell.getValue());
-
-        return dataFrame;
     }
 
 
