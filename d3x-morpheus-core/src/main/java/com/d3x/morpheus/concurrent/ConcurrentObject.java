@@ -54,7 +54,7 @@ public abstract class ConcurrentObject {
      *
      * @return the data returned by the supplier.
      */
-    public <T, R> R read(Function<T, R> function, T argument) {
+    protected <T, R> R read(Function<T, R> function, T argument) {
         readLock.lock();
 
         try {
@@ -75,7 +75,7 @@ public abstract class ConcurrentObject {
      *
      * @return the data returned by the supplier.
      */
-    public <T, U, R> R read(BiFunction<T, U, R> func, T arg1, U arg2) {
+    protected <T, U, R> R read(BiFunction<T, U, R> func, T arg1, U arg2) {
         readLock.lock();
 
         try {
@@ -95,7 +95,7 @@ public abstract class ConcurrentObject {
      *
      * @return the data returned by the supplier.
      */
-    public <T> boolean read(Predicate<T> predicate, T argument) {
+    protected <T> boolean read(Predicate<T> predicate, T argument) {
         readLock.lock();
 
         try {
@@ -116,7 +116,7 @@ public abstract class ConcurrentObject {
      *
      * @return the data returned by the supplier.
      */
-    public <T, U> boolean read(BiPredicate<T, U> predicate, T argument1, U argument2) {
+    protected <T, U> boolean read(BiPredicate<T, U> predicate, T argument1, U argument2) {
         readLock.lock();
 
         try {
@@ -135,7 +135,7 @@ public abstract class ConcurrentObject {
      *
      * @return the data returned by the supplier.
      */
-    public <T> T read(Supplier<T> supplier) {
+    protected <T> T read(Supplier<T> supplier) {
         readLock.lock();
 
         try {
@@ -153,7 +153,7 @@ public abstract class ConcurrentObject {
      * @param consumer a consumer to write the supplied data.
      * @param data     the data item to write.
      */
-    public <T> void write(Consumer<T> consumer, T data) {
+    protected <T> void write(Consumer<T> consumer, T data) {
         writeLock.lock();
 
         try {
@@ -171,7 +171,7 @@ public abstract class ConcurrentObject {
      * @param consumer a consumer to write the supplied data.
      * @param data     the data items to write.
      */
-    public <T> void write(Consumer<T> consumer, Iterable<T> data) {
+    protected <T> void write(Consumer<T> consumer, Iterable<T> data) {
         writeLock.lock();
 
         try {
@@ -191,7 +191,7 @@ public abstract class ConcurrentObject {
      * @param key      the key to write.
      * @param value    the value to write.
      */
-    public <K, V> void write(BiConsumer<K, V> consumer, K key, V value) {
+    protected <K, V> void write(BiConsumer<K, V> consumer, K key, V value) {
         writeLock.lock();
 
         try {
@@ -211,7 +211,7 @@ public abstract class ConcurrentObject {
      * @param colKey   the column key to write.
      * @param value    the value to write.
      */
-    public <R, C, V> void write(TriConsumer<R, C, V> consumer, R rowKey, C colKey, V value) {
+    protected <R, C, V> void write(TriConsumer<R, C, V> consumer, R rowKey, C colKey, V value) {
         writeLock.lock();
 
         try {
