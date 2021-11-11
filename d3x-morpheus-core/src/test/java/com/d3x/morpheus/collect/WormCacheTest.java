@@ -51,6 +51,12 @@ public class WormCacheTest {
     }
 
     @Test
+    public void testContainsKey() {
+        Assert.assertTrue(fixed.containsKey(1));
+        Assert.assertFalse(fixed.containsKey(2));
+    }
+
+    @Test
     public void testGet() {
         Assert.assertNull(fixed.get(2));
         Assert.assertNull(fixed.get(4));

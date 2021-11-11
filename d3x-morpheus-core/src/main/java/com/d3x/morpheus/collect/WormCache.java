@@ -18,10 +18,9 @@ package com.d3x.morpheus.collect;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Function;
+
+import com.d3x.morpheus.concurrent.ConcurrentObject;
 
 import lombok.NonNull;
 
@@ -38,16 +37,12 @@ import lombok.NonNull;
  *
  * @author Scott Shaffer
  */
-public class WormCache<K, V> {
+public class WormCache<K, V> extends ConcurrentObject {
     /**
      * The underlying map storage.
      */
     @NonNull
     protected final Map<K, V> map;
-
-    private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
-    private final Lock readLock = readWriteLock.readLock();
-    private final Lock writeLock = readWriteLock.writeLock();
 
     /**
      * Creates an empty cache.
@@ -76,14 +71,7 @@ public class WormCache<K, V> {
      * @return {@code true} iff this cache contains the given key.
      */
     public boolean containsKey(@NonNull K key) {
-        readLock.lock();
-
-        try {
-            return map.containsKey(key);
-        }
-        finally {
-            readLock.unlock();
-        }
+        return read(map::containsKey, key);
     }
 
     /**
@@ -95,14 +83,7 @@ public class WormCache<K, V> {
      * {@code null} if there is no match.
      */
     public V get(@NonNull K key) {
-        readLock.lock();
-
-        try {
-            return map.get(key);
-        }
-        finally {
-            readLock.unlock();
-        }
+        return read(map::get, key);
     }
 
     /**
@@ -122,25 +103,21 @@ public class WormCache<K, V> {
             return result;
         }
         else {
-            putIfAbsent(targetKey, defaultValue);
-            // Allow for another thread to have stored a value during the
-            // interval when this thread did not hold the write lock...
+            write(this::putIfAbsent, targetKey, defaultValue);
+            // Another thread might have acquired the write lock and assigned
+            // the same key during the interval when this thread did not hold
+            // the write lock, so we must retrieve the value associated with
+            // the key again...
             return get(targetKey);
         }
     }
 
     private void putIfAbsent(@NonNull K key, @NonNull V value) {
-        writeLock.lock();
-
-        try {
-            // Allow for another thread to have stored a value during the
-            // interval when this thread did not hold the write lock...
-            if (!map.containsKey(key))
-                map.put(key, value);
-        }
-        finally {
-            writeLock.unlock();
-        }
+        // Another thread might have acquired the write lock and assigned
+        // the same key during the interval when this thread did not hold
+        // the write lock.  If so, we cannot overwrite...
+        if (!map.containsKey(key))
+            map.put(key, value);
     }
 
     /**
@@ -161,9 +138,11 @@ public class WormCache<K, V> {
         }
         else {
             var value = compute.apply(key);
-            putIfAbsent(key, value);
-            // Allow for another thread to have stored a value during the
-            // interval when this thread did not hold the write lock...
+            write(this::putIfAbsent, key, value);
+            // Another thread might have acquired the write lock and assigned
+            // the same key during the interval when this thread did not hold
+            // the write lock, so we must retrieve the value associated with
+            // the key again...
             return get(key);
         }
     }
@@ -202,20 +181,14 @@ public class WormCache<K, V> {
      * @throws IllegalStateException if this cache already contains the key.
      */
     public V put(@NonNull K key, @NonNull V value) {
-        writeLock.lock();
-
-        try {
-            return putUnique(key, value);
-        }
-        finally {
-            writeLock.unlock();
-        }
+        write(this::putUnique, key, value);
+        return null;
     }
 
-    private V putUnique(@NonNull K key, @NonNull V value) {
+    private void putUnique(@NonNull K key, @NonNull V value) {
         if (map.containsKey(key))
             throw new IllegalStateException(String.format("Key [%s] has already been assigned.", key));
         else
-            return map.put(key, value);
+            map.put(key, value);
     }
 }
