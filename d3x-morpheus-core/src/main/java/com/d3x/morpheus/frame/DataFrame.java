@@ -38,7 +38,6 @@ import com.d3x.morpheus.matrix.D3xMatrix;
 import com.d3x.morpheus.matrix.D3xMatrixView;
 import com.d3x.morpheus.range.Range;
 import com.d3x.morpheus.stats.Stats;
-import com.d3x.morpheus.util.DoubleComparator;
 import com.d3x.morpheus.util.Resource;
 import com.d3x.morpheus.util.functions.ToBooleanFunction;
 import com.d3x.morpheus.vector.D3xVector;
@@ -786,7 +785,10 @@ public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperation
      * @param stream the stream where this frame will appear.
      */
     default void display(PrintStream stream) {
-        values().forEach(v -> stream.println(String.format("(%s, %s) => %s", v.rowKey().toString(), v.colKey().toString(), v.getValue().toString())));
+        values().forEach(v -> stream.printf("(%s, %s) => %s%n",
+                v.rowKey().toString(),
+                v.colKey().toString(),
+                v.getValue() != null ? v.getValue().toString() : "null"));
     }
 
     /**
