@@ -134,16 +134,4 @@ public enum DoubleIntervalType {
      * @return the delimiter for the upper limit on intervals of this type.
      */
     public abstract char upperDelim();
-
-    /**
-     * Constructs the string representation for an interval of this type.
-     *
-     * @param lower the lower bound of the interval.
-     * @param upper the upper bound of the interval.
-     *
-     * @return the string representation of the interval.
-     */
-    public String format(double lower, double upper) {
-        return String.format("%c%f, %f%c", lowerDelim(), lower, upper, upperDelim());
-    }
 }

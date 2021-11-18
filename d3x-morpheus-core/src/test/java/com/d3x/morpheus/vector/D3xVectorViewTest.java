@@ -23,12 +23,13 @@ import org.testng.annotations.Test;
 import static org.testng.Assert.*;
 
 public class D3xVectorViewTest {
+    private static final double NAN = Double.NaN;
     private static final double TOLERANCE = 1.0E-12;
 
     @Test
     public void testAnyAll() {
         D3xVectorView view1 = D3xVectorView.of(1.0, 2.0, 3.0);
-        D3xVectorView view2 = D3xVectorView.of(1.0, Double.NaN, 3.0);
+        D3xVectorView view2 = D3xVectorView.of(1.0, NAN, 3.0);
 
         assertTrue(view1.all(Double::isFinite));
         assertTrue(view1.all(x -> x > 0.0));
@@ -61,6 +62,41 @@ public class D3xVectorViewTest {
         assertEquals(view.get(0), 1.0, TOLERANCE);
         assertEquals(view.get(1), 2.0, TOLERANCE);
         assertEquals(view.get(2), 3.0, TOLERANCE);
+    }
+
+    @Test
+    public void testCumSum() {
+        var vec1 = D3xVectorView.of(1.0, 2.0, 3.0, -4.0);
+        var vec2 = D3xVectorView.of(1.0, 3.0, 6.0, 2.0);
+        var vec3 = vec1.cumsum();
+        assertTrue(vec3.equalsView(vec2));
+    }
+
+    @Test
+    public void testCumProd() {
+        var vec1 = D3xVectorView.of(2.0, -3.0, 3.0, -0.5);
+        var vec2 = D3xVectorView.of(2.0, -6.0, -18.0, 9.0);
+        var vec3 = vec1.cumprod();
+        assertTrue(vec3.equalsView(vec2));
+    }
+
+    @Test
+    public void testDiff() {
+        var vec1 = D3xVectorView.of(1.0, 4.0, 9.0, 16.0, 25.0, 36.0);
+        var vec2 = vec1.diff();
+        var vec3 = vec1.diff(3);
+
+        assertTrue(vec2.equalsView(D3xVectorView.of(NAN, 3.0, 5.0, 7.0, 9.0, 11.0)));
+        assertTrue(vec3.equalsView(D3xVectorView.of(NAN, NAN, NAN, 15.0, 21.0, 27.0)));
+    }
+
+    @Test
+    public void testDivideEBE() {
+        var vec1 = D3xVectorView.of(1.0, 2.0, 3.0);
+        var vec2 = D3xVectorView.of(5.0, 4.0, 2.0);
+        var vec3 = D3xVectorView.of(0.2, 0.5, 1.5);
+
+        assertTrue(D3xVectorView.divideEBE(vec1, vec2).equalsView(vec3));
     }
 
     @Test
@@ -98,6 +134,33 @@ public class D3xVectorViewTest {
     @Test(expectedExceptions = NoSuchElementException.class)
     public void testIteratorException() {
         D3xVectorView.of().iterator().next();
+    }
+
+    @Test
+    public void testMultiplyEBE() {
+        var vec1 = D3xVectorView.of(1.0, 2.0, 3.0);
+        var vec2 = D3xVectorView.of(5.0, 4.0, 2.0);
+        var vec3 = D3xVectorView.of(5.0, 8.0, 6.0);
+
+        assertTrue(D3xVectorView.multiplyEBE(vec1, vec2).equalsView(vec3));
+    }
+
+    @Test
+    public void testReverse() {
+        D3xVectorView view1 = D3xVectorView.of(1.0, 2.0, 3.0, 4.0);
+        D3xVectorView view2 = D3xVectorView.of(4.0, 3.0, 2.0, 1.0);
+
+        assertEquals(view1.reverse(), view2);
+    }
+
+    @Test
+    public void testSubVectorView() {
+        D3xVectorView view1 = D3xVectorView.of(1.0, 2.0, 3.0, 4.0, 5.0, 6.0);
+        D3xVectorView view2 = view1.subVectorView(2, 3);
+        D3xVectorView view3 = view1.subVectorView(3, 2);
+
+        assertTrue(view2.equalsView(D3xVectorView.of(3.0, 4.0, 5.0)));
+        assertTrue(view3.equalsView(D3xVectorView.of(4.0, 5.0)));
     }
 }
 

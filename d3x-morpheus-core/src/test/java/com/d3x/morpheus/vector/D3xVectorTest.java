@@ -57,6 +57,16 @@ public class D3xVectorTest {
     }
 
     @Test
+    public void testApply() {
+        var vec1 = D3xVector.copyOf(1.0, 4.0, 9.0);
+        var vec2 = D3xVector.copyOf(1.0, 2.0, 3.0);
+        var vec3 = vec1.apply(Math::sqrt);
+
+        assertSame(vec3, vec1);
+        assertTrue(vec1.equalsVector(vec2));
+    }
+
+    @Test
     public void testCombine() {
         double c1 = 3.0;
         double c2 = 2.0;
@@ -314,6 +324,46 @@ public class D3xVectorTest {
         D3xVector expected = D3xVector.wrap(0.1, 0.2, 0.3, 0.4);
 
         assertTrue(actual.equalsVector(expected));
+    }
+
+    @Test
+    public void testWrapRow() {
+        var dframe = newFrame();
+        var vector = D3xVector.wrap(dframe.rowAt(1));
+
+        assertEquals(vector.length(), 4);
+        assertTrue(vector.equalsVector(D3xVector.wrap(21.0, 22.0, 23.0, 24.0)));
+
+        vector.multiplyInPlace(2.0);
+        assertTrue(vector.equalsVector(D3xVector.wrap(42.0, 44.0, 46.0, 48.0)));
+
+        // Ensure that changes to the wrapper are reflected in the underlying data frame...
+        var vector2 = D3xVector.wrap(dframe.rowAt(1));
+        assertTrue(vector2.equalsVector(D3xVector.wrap(42.0, 44.0, 46.0, 48.0)));
+
+        // Ensure that changes to the underlying data frame are reflected in the wrapper...
+        dframe.setDoubleAt(1, 1, 111.11);
+        assertTrue(vector.equalsVector(D3xVector.wrap(42.0, 111.11, 46.0, 48.0)));
+    }
+
+    @Test
+    public void testWrapColumn() {
+        var dframe = newFrame();
+        var vector = D3xVector.wrap(dframe.colAt(2));
+
+        assertEquals(vector.length(), 3);
+        assertTrue(vector.equalsVector(D3xVector.wrap(13.0, 23.0, 33.0)));
+
+        vector.multiplyInPlace(2.0);
+        assertTrue(vector.equalsVector(D3xVector.wrap(26.0, 46.0, 66.0)));
+
+        // Ensure that changes to the wrapper are reflected in the underlying data frame...
+        var vector2 = D3xVector.wrap(dframe.colAt(2));
+        assertTrue(vector2.equalsVector(D3xVector.wrap(26.0, 46.0, 66.0)));
+
+        // Ensure that changes to the underlying data frame are reflected in the wrapper...
+        dframe.setDoubleAt(2, 2, 222.22);
+        assertTrue(vector.equalsVector(D3xVector.wrap(26.0, 46.0, 222.22)));
     }
 
     @Test

@@ -63,6 +63,6 @@ public class DataVectorElement<K> {
 
     @Override
     public String toString() {
-        return key + " => " + Double.toString(value);
+        return key + " => " + value;
     }
 }

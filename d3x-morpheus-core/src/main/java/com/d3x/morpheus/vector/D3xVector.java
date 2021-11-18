@@ -15,14 +15,15 @@
  */
 package com.d3x.morpheus.vector;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.function.DoubleUnaryOperator;
 
 import com.d3x.morpheus.frame.DataFrame;
 import com.d3x.morpheus.frame.DataFrameColumn;
 import com.d3x.morpheus.frame.DataFrameException;
 import com.d3x.morpheus.frame.DataFrameRow;
+import com.d3x.morpheus.frame.DataFrameVector;
 import com.d3x.morpheus.series.DoubleSeries;
 import com.d3x.morpheus.util.DoubleComparator;
 import com.d3x.morpheus.util.MorpheusException;
@@ -46,12 +47,6 @@ public interface D3xVector extends D3xVectorView {
     void set(int index, double value);
 
     /**
-     * Creates a deep copy of this vector.
-     * @return a deep copy of this vector.
-     */
-    D3xVector copy();
-
-    /**
      * Creates a new vector with the same concrete type as this vector.
      *
      * @param length the desired length of the new vector.
@@ -69,6 +64,21 @@ public interface D3xVector extends D3xVectorView {
      */
     default D3xVector like() {
         return like(length());
+    }
+
+    /**
+     * Applies a unary operator in place: Replaces each element with the result
+     * of applying a unary operator to that element.
+     *
+     * @param operator the operator to apply.
+     *
+     * @return this vector, for operator chaining.
+     */
+    default D3xVector apply(DoubleUnaryOperator operator) {
+        for (int index = 0; index < length(); ++index)
+            set(index, operator.applyAsDouble(get(index)));
+
+        return this;
     }
 
     /**
@@ -119,16 +129,37 @@ public interface D3xVector extends D3xVectorView {
     }
 
     /**
+     * Creates a deep copy of this vector.
+     * @return a deep copy of this vector.
+     */
+    default D3xVector copy() {
+        var result = like();
+
+        for (int index = 0; index < length(); ++index)
+            result.set(index, get(index));
+
+        return result;
+    }
+
+    /**
      * Computes the dot product of this vector and another.
      *
-     * @param vector the second vector in the dot product.
+     * @param that the second vector in the dot product.
      *
      * @return the dot product of this vector and the input vector.
      *
      * @throws RuntimeException unless the input vector has the same
      * length as this vector.
      */
-    double dot(D3xVector vector);
+    default double dot(D3xVector that) {
+        validateCongruent(that);
+        double result = 0.0;
+
+        for (int index= 0; index < length(); ++index)
+            result += this.get(index) * that.get(index);
+
+        return result;
+    }
 
     /**
      * Rescales this vector (in place) so that the elements sum to one.
@@ -147,6 +178,21 @@ public interface D3xVector extends D3xVectorView {
         return divideInPlace(sum);
     }
 
+    /**
+     * Replaces missing values with a default value.
+     *
+     * @param value the replacement value.
+     *
+     * @return this vector, for operator chaining.
+     */
+    default D3xVector replaceNaN(double value) {
+        for (int index = 0; index < length(); ++index) {
+            if (Double.isNaN(get(index)))
+                set(index, value);
+        }
+
+        return this;
+    }
 
     /**
      * Computes the sum of this vector and another and returns the sum
@@ -219,7 +265,9 @@ public interface D3xVector extends D3xVectorView {
      * @return a new vector containing the product of this vector and the given
      * factor.
      */
-    D3xVector times(double scalar);
+    default D3xVector times(double scalar) {
+        return copy().multiplyInPlace(scalar);
+    }
 
     /**
      * Multiplies each element of this vector by a scalar factor and modifies
@@ -229,7 +277,12 @@ public interface D3xVector extends D3xVectorView {
      *
      * @return this vector, for operator chaining.
      */
-    D3xVector multiplyInPlace(double scalar);
+    default D3xVector multiplyInPlace(double scalar) {
+        for (int index = 0; index < length(); ++index)
+            set(index, scalar * get(index));
+
+        return this;
+    }
 
     /**
      * Divides each element of this vector by a scalar factor and modifies
@@ -322,6 +375,17 @@ public interface D3xVector extends D3xVectorView {
      */
     static D3xVector copyOf(double... values) {
         return ApacheVector.copyOf(values);
+    }
+
+    /**
+     * Creates a new vector by copying values from a vector view.
+     *
+     * @param view the view to be copied.
+     *
+     * @return a new vector containing a copy of the specified vector.
+     */
+    static D3xVector copyOf(D3xVectorView view) {
+        return ApacheVector.copyOf(view.toArray());
     }
 
     /**
@@ -523,17 +587,6 @@ public interface D3xVector extends D3xVectorView {
     }
 
     /**
-     * Creates a vector with every element equal to {@code 0.0}.
-     *
-     * @param length the length of the vector.
-     *
-     * @return a zeros-vector with the specified length.
-     */
-    static D3xVector zeros(int length) {
-        return rep(0.0, length);
-    }
-
-    /**
      * Ensures that a vector length is non-negative.
      *
      * @param length the length to validate.
@@ -547,8 +600,8 @@ public interface D3xVector extends D3xVectorView {
 
     /**
      * Creates a mutable vector view over a bare array (a shallow copy).
-     * Changes to this vector will be reflected in the input array, and
-     * changes to the array will be reflected in this vector.
+     * Changes to the returned vector will be reflected in the original
+     * array, and changes to the array will be reflected in the vector.
      *
      * @param values the values to be viewed.
      *
@@ -556,6 +609,34 @@ public interface D3xVector extends D3xVectorView {
      */
     static D3xVector wrap(double... values) {
         return ApacheVector.wrap(values);
+    }
+
+    /**
+     * Presents a row or column of a numeric data frame as a D3xVector.
+     * Changes to the returned vector will be reflected in the original
+     * data frame, and changes to the data frame will be reflected in
+     * the returned vector.
+     *
+     * @param vector the data frame row or column to present.
+     *
+     * @return a vector adapter for the specified data frame vector.
+     *
+     * @throws RuntimeException unless the row index refers to a
+     * numeric row in the data frame.
+     */
+    static D3xVector wrap(DataFrameVector<?,?,?,?,?> vector) {
+        return FrameVector.wrap(vector);
+    }
+
+    /**
+     * Creates a vector with every element equal to {@code 0.0}.
+     *
+     * @param length the length of the vector.
+     *
+     * @return a zeros-vector with the specified length.
+     */
+    static D3xVector zeros(int length) {
+        return rep(0.0, length);
     }
 
     /**
@@ -595,5 +676,4 @@ public interface D3xVector extends D3xVectorView {
     default boolean isEmpty() {
         return length() == 0;
     }
-
 }

@@ -24,6 +24,7 @@ import com.d3x.morpheus.stats.Max;
 import com.d3x.morpheus.stats.Min;
 import com.d3x.morpheus.testng.NumericTestBase;
 import com.d3x.morpheus.util.DoubleComparator;
+import com.d3x.morpheus.util.DoubleInterval;
 import com.d3x.morpheus.vector.DataVector;
 
 import org.testng.annotations.Test;
@@ -83,6 +84,7 @@ public class DataPipelineTest extends NumericTestBase {
     @Test
     public void testBound() {
         assertPipeline1(DataPipeline.bound(-1.75, 1.5), -1.75, 1.0, NA, 1.5, -0.5);
+        assertPipeline1(DataPipeline.bound(DoubleInterval.closed(-1.75, 1.5)), -1.75, 1.0, NA, 1.5, -0.5);
     }
 
     @Test
@@ -133,6 +135,11 @@ public class DataPipelineTest extends NumericTestBase {
     }
 
     @Test
+    public void testLog1P() {
+        assertPipeline2(DataPipeline.log1p, 1.0986123, 0.6931472, NA, 1.3862944, 0.4054651);
+    }
+
+    @Test
     public void testMultiply() {
         assertPipeline1(DataPipeline.multiply(2.0), -4.0, 2.0, NA, 6.0, -1.0);
     }
@@ -180,6 +187,11 @@ public class DataPipelineTest extends NumericTestBase {
     }
 
     @Test
+    public void testTanh() {
+        assertPipeline1(DataPipeline.tanh(1.0, 2.0), -0.9051483, 0.0, NA, 0.7615942, -0.6351490);
+    }
+
+    @Test
     public void testTrim() {
         Random random = new Random(20210505);
         DataVector<Integer> vector = DataVector.create();
@@ -196,44 +208,9 @@ public class DataPipelineTest extends NumericTestBase {
         assertEquals(max, 1.90, 0.01);
     }
 
-    private static DataFrame<String, String> makeFrame() {
-        DataFrame<String, String> frame =
-                DataFrame.ofDoubles(List.of("R1", "R2"), List.of("C1", "C2", "C3"));
-
-        frame.setDoubleAt(0, 0, 1.0);
-        frame.setDoubleAt(0, 1, 2.0);
-        frame.setDoubleAt(0, 2, 3.0);
-        frame.setDoubleAt(1, 0, 10.0);
-        frame.setDoubleAt(1, 1, 20.0);
-        frame.setDoubleAt(1, 2, 30.0);
-
-        return frame;
-    }
-
     @Test
-    public void testDataFrame() {
-        DataFrame<String, String> frame1 = makeFrame();
-        DataPipeline.demean.apply(frame1, 1);
-
-        assertEquals(frame1.listRowKeys(), List.of("R1", "R2"));
-        assertEquals(frame1.listColumnKeys(), List.of("C1", "C2", "C3"));
-        assertTrue(DoubleComparator.DEFAULT.equals(
-                frame1.getDoubleMatrix(),
-                new double[][] {
-                        {  -1.0, 0.0,  1.0 },
-                        { -10.0, 0.0, 10.0 }
-                }));
-
-        DataFrame<String, String> frame2 = makeFrame();
-        DataPipeline.demean.apply(frame2, 2);
-
-        assertEquals(frame2.listRowKeys(), List.of("R1", "R2"));
-        assertEquals(frame2.listColumnKeys(), List.of("C1", "C2", "C3"));
-        assertTrue(DoubleComparator.DEFAULT.equals(
-                frame2.getDoubleMatrix(),
-                new double[][] {
-                        { -4.5, -9.0, -13.5 },
-                        {  4.5,  9.0,  13.5 }
-                }));
+    public void testTruncate() {
+        assertPipeline1(DataPipeline.truncate(-1.0, 1.5), NA, 1.0, NA, NA, -0.5);
+        assertPipeline1(DataPipeline.truncate(DoubleInterval.closed(-1.0, 1.5)), NA, 1.0, NA, NA, -0.5);
     }
 }

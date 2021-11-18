@@ -41,7 +41,7 @@ public final class ApacheMatrix implements D3xMatrix {
     // but BlockRealMatrix for this size and above...
     private static final int BLOCK_THRESHOLD = 4 * BLOCK_ELEMENT_COUNT;
 
-    private ApacheMatrix(RealMatrix impl) {
+    private ApacheMatrix(@NonNull RealMatrix impl) {
         this.impl = impl;
     }
 

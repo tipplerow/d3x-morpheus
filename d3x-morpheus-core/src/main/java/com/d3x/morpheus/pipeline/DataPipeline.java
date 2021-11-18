@@ -24,6 +24,7 @@ import com.d3x.morpheus.stats.Mean;
 import com.d3x.morpheus.stats.Percentile;
 import com.d3x.morpheus.stats.StdDev;
 import com.d3x.morpheus.util.DoubleComparator;
+import com.d3x.morpheus.util.DoubleInterval;
 import com.d3x.morpheus.util.MorpheusException;
 import com.d3x.morpheus.vector.DataVector;
 import com.d3x.morpheus.vector.DataVectorView;
@@ -232,6 +233,12 @@ public interface DataPipeline {
     DataPipeline log = local("log()", Math::log);
 
     /**
+     * A local, size-preserving pipeline that replaces each element
+     * {@code x} with {@code log(1.0 + x)}.
+     */
+    DataPipeline log1p = local("log1p()", Math::log1p);
+
+    /**
      * A non-local, size-preserving pipeline that rescales the vector
      * into a normalized unit vector.
      */
@@ -318,6 +325,18 @@ public interface DataPipeline {
      */
     static DataPipeline add(double addend) {
         return local(String.format("add(%s)", addend), element -> element + addend);
+    }
+
+    /**
+     * Returns a local, size-preserving pipeline that bounds each element
+     * on a fixed interval.
+     *
+     * @param interval the bounding interval (acting as a closed interval).
+     *
+     * @return a bounding pipeline with the specified interval.
+     */
+    static DataPipeline bound(DoubleInterval interval) {
+        return bound(interval.getLower(), interval.getUpper());
     }
 
     /**
@@ -497,6 +516,29 @@ public interface DataPipeline {
     }
 
     /**
+     * Returns a local, size-preserving pipeline that applies a hyperbolic
+     * tangent filter {@code tanh((x - center) / width)} to pull outliers
+     * toward a central value.
+     *
+     * @param center the center of the hyperbolic tangent function.
+     * @param width  the width of the hyperbolic tangent function.
+     *
+     * @return a hyperbolic tangent pipeline with the specified parameters.
+     *
+     * @throws RuntimeException unless the width is positive.
+     */
+    static DataPipeline tanh(double center, double width) {
+        if (DoubleComparator.DEFAULT.isPositive(width)) {
+            return local(
+                    String.format("tanh(%s, %s)", center, width),
+                    x -> Math.tanh((x - center) / width));
+        }
+        else {
+            throw new MorpheusException("Width must be positive.");
+        }
+    }
+
+    /**
      * Returns a non-local, size-preserving pipeline that pulls outliers
      * into a location defined by a quantile value.  With a quantile value
      * of {@code 0.05}, for example, elements below the 5th percentile will
@@ -548,5 +590,35 @@ public interface DataPipeline {
                 return false;
             }
         };
+    }
+
+    /**
+     * Returns a local, size-preserving pipeline that unsets (assigns NaN)
+     * to any element that lies outside an interval of valid values.
+     *
+     * @param lower the lower bound of the valid interval (inclusive)
+     * @param upper the upper bound of the valid interval (inclusive).
+     *
+     * @return a truncating pipeline with the specified interval.
+     *
+     * @throws RuntimeException unless the interval is valid (the lower bound
+     * is less than or equal to the upper bound).
+     */
+    static DataPipeline truncate(double lower, double upper) {
+        return truncate(DoubleInterval.closed(lower, upper));
+    }
+
+    /**
+     * Returns a local, size-preserving pipeline that unsets (assigns NaN)
+     * to any element that lies outside an interval of valid values.
+     *
+     * @param interval the interval containing valid values.
+     *
+     * @return a truncating pipeline with the specified interval.
+     */
+    static DataPipeline truncate(DoubleInterval interval) {
+        return local(
+                String.format("truncate(%s, %s)", interval.getLower(), interval.getUpper()),
+                element -> interval.contains(element) ? element : Double.NaN);
     }
 }

@@ -43,7 +43,9 @@ public class PipelineScannerTest {
 
     private void assertScanned(String source, DataPipeline expected) {
         DataPipeline actual = PipelineScanner.scan(source);
-        assertTrue(actual.apply(Integer.class, series).equalsSeries(expected.apply(Integer.class, series)));
+        var actualSeries = actual.apply(Integer.class, series);
+        var expectedSeries = expected.apply(Integer.class, series);
+        assertTrue(actualSeries.equalsSeries(expectedSeries));
 
         // The encoded pipeline might not match exactly to the source string
         // because of the argument formatting: add(3) is encoded as add(3.0)
@@ -112,8 +114,27 @@ public class PipelineScannerTest {
     }
 
     @Test
+    public void testList() {
+        var pipelines = PipelineScanner.scanList("add(10.0)");
+        System.out.println(pipelines);
+        assertEquals(pipelines.size(), 1);
+        assertEquals(pipelines.get(0).encode(), "add(10.0)");
+
+        pipelines = PipelineScanner.scanList("add(10.0), sqrt(), lever(2.2)");
+        assertEquals(pipelines.size(), 3);
+        assertEquals(pipelines.get(0).encode(), "add(10.0)");
+        assertEquals(pipelines.get(1).encode(), "sqrt()");
+        assertEquals(pipelines.get(2).encode(), "lever(2.2)");
+    }
+
+    @Test
     public void testLog() {
         assertScanned("log()", DataPipeline.log);
+    }
+
+    @Test
+    public void testLog1P() {
+        assertScanned("log1p()", DataPipeline.log1p);
     }
 
     @Test
@@ -165,7 +186,17 @@ public class PipelineScannerTest {
     }
 
     @Test
+    public void testTanh() {
+        assertScanned("tanh(1.0, 2.0)", DataPipeline.tanh(1.0, 2.0));
+    }
+
+    @Test
     public void testTrim() {
         assertScanned("trim(0.05)", DataPipeline.trim(0.05));
+    }
+
+    @Test
+    public void testTruncate() {
+        assertScanned("truncate(2.0, 10.0)", DataPipeline.truncate(2.0, 10.0));
     }
 }

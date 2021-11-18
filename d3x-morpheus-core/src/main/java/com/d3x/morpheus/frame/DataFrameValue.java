@@ -199,6 +199,16 @@ public interface DataFrameValue<R,C> extends Comparable<DataFrameValue<R,C>> {
     <V> void setValue(V value);
 
     /**
+     * Replaces missing double values.
+     *
+     * @param value the replacement value.
+     */
+    default void replaceNaN(double value) {
+        if (isNumeric() && Double.isNaN(getDouble()))
+            setDouble(value);
+    }
+
+    /**
      * Returns a comparator to compare DataFrameValues based on their getDouble() method
      * @param <R>   the row key type
      * @param <C>   the column key type

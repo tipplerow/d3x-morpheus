@@ -30,6 +30,13 @@ public class Variance implements Statistic1 {
     private boolean biasCorrected;
 
     /**
+     * Creates a bias-corrected variance statistic.
+     */
+    public Variance() {
+        this(true);
+    }
+
+    /**
      * Constructor
      * @param biasCorrected true for bias corrected variance
      */

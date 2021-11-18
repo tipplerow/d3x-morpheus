@@ -29,7 +29,7 @@ final class VectorIterator implements PrimitiveIterator.OfDouble {
     @NonNull private final D3xVectorView view;
     private int index = 0;
 
-    VectorIterator(D3xVectorView view) {
+    VectorIterator(@NonNull D3xVectorView view) {
         this.view = view;
     }
 

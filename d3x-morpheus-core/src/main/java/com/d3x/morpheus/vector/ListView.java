@@ -27,7 +27,7 @@ import java.util.List;
 final class ListView implements D3xVectorView {
     @NonNull private final List<Double> list;
 
-    ListView(List<Double> list) {
+    ListView(@NonNull List<Double> list) {
         this.list = list;
     }
 

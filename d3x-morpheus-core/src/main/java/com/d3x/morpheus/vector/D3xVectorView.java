@@ -18,7 +18,9 @@ package com.d3x.morpheus.vector;
 import java.util.Arrays;
 import java.util.List;
 import java.util.PrimitiveIterator;
+import java.util.function.DoubleBinaryOperator;
 import java.util.function.DoublePredicate;
+import java.util.function.DoubleUnaryOperator;
 
 import com.d3x.morpheus.stats.Statistic1;
 import com.d3x.morpheus.stats.Sum;
@@ -111,6 +113,24 @@ public interface D3xVectorView extends Iterable<Double> {
     }
 
     /**
+     * Applies a unary operator to every element in this vector and
+     * returns the result in a new vector.
+     *
+     * @param operator the operator to apply.
+     *
+     * @return a new vector with element {@code k} equal to the result
+     * of applying the operator to element {@code k} of this vector.
+     */
+    default D3xVector apply(DoubleUnaryOperator operator) {
+        var result = D3xVector.dense(length());
+
+        for (int index = 0; index < length(); ++index)
+            result.set(index, operator.applyAsDouble(get(index)));
+
+        return result;
+    }
+
+    /**
      * Computes a statistic over the values in this view.
      *
      * @param statistic the statistic to compute.
@@ -119,6 +139,82 @@ public interface D3xVectorView extends Iterable<Double> {
      */
     default double compute(Statistic1 statistic) {
         return Statistic1.compute(statistic, this);
+    }
+
+    /**
+     * Computes the cumulative product for this view.
+     *
+     * @return a new vector containing the cumulative product of this view:
+     * element {@code k} of the result is the product of the elements {@code
+     * 0, 1, ..., k}.
+     */
+    default D3xVector cumprod() {
+        var result = D3xVector.dense(length());
+
+        if (length() > 0)
+            result.set(0, get(0));
+
+        for (int index = 1; index < length(); ++index)
+            result.set(index, result.get(index - 1) * get(index));
+
+        return result;
+    }
+
+    /**
+     * Computes the cumulative sum for this view.
+     *
+     * @return a new vector containing the cumulative sum of this view:
+     * element {@code k} of the result is the sum of the elements {@code
+     * 0, 1, ..., k}.
+     */
+    default D3xVector cumsum() {
+        var result = D3xVector.dense(length());
+
+        if (length() > 0)
+            result.set(0, get(0));
+
+        for (int index = 1; index < length(); ++index)
+            result.set(index, result.get(index - 1) + get(index));
+
+        return result;
+    }
+
+    /**
+     * Computes lagged differences for this view.
+     *
+     * @return a new vector with the same length as this vector where the
+     * first element is NaN and all other elements {@code k} are equal to
+     * {@code this.get(k) - this.get(k - 1)}.
+     */
+    default D3xVector diff() {
+        return diff(1);
+    }
+
+    /**
+     * Computes lagged differences for this view.
+     *
+     * @param lag the lag index, in the range {@code [1, length() - 1].}
+     *
+     * @return a new vector with the same length as this vector where the
+     * first {@code lag} elements are NaN and all other elements {@code k}
+     * are equal to {@code this.get(k) - this.get(k - lag)}.
+     */
+    default D3xVector diff(int lag) {
+        if (lag < 1)
+            throw new IllegalArgumentException("Lag must be positive.");
+
+        if (lag >= length())
+            throw new IllegalArgumentException("Lag must be smaller than the view length.");
+
+        var result = D3xVector.dense(length());
+
+        for (int index = 0; index < lag; ++index)
+            result.set(index, Double.NaN);
+
+        for (int index = lag; index < length(); ++index)
+            result.set(index, get(index) - get(index - lag));
+
+        return result;
     }
 
     /**
@@ -147,7 +243,7 @@ public interface D3xVectorView extends Iterable<Double> {
      * tolerance of the specified comparator.
      */
     default boolean equalsArray(double[] values, DoubleComparator comparator) {
-        return equalsView(of(values));
+        return equalsView(of(values), comparator);
     }
 
     /**
@@ -207,6 +303,30 @@ public interface D3xVectorView extends Iterable<Double> {
     }
 
     /**
+     * Returns a view of this vector in reverse order.
+     * @return a view of this vector in reverse order.
+     */
+    default D3xVectorView reverse() {
+        return new ReverseView(this);
+    }
+
+    /**
+     * Returns a view of a slice of this vector.
+     *
+     * @param start  the index of the first element in the subvector.
+     * @param length the length of the subvector.
+     *
+     * @return a view of the elements {@code [start, start + length)}
+     * of this vector.
+     *
+     * @throws RuntimeException unless the input arguments specify a
+     * valid subvector of this vector.
+     */
+    default D3xVectorView subVectorView(int start, int length) {
+        return new SubVectorView(this, start, length);
+    }
+
+    /**
      * Computes the sum of all elements in this vector.
      *
      * @return the sum of all elements in this vector.
@@ -254,5 +374,70 @@ public interface D3xVectorView extends Iterable<Double> {
     default void validateIndex(int index) {
         if (index < 0 || index >= length())
             throw new MorpheusException("Index [%d] is out of bounds [0, %d).", index, length());
+    }
+
+    /**
+     * Applies a binary operator to two congruent vectors element by element.
+     *
+     * @param vector1  the first vector.
+     * @param vector2  the second vector.
+     * @param operator the operator to apply.
+     *
+     * @return a new vector with element {@code k} equal to the result of
+     * applying the operator to elements {@code v1[k]} and {@code v2[k]}.
+     *
+     * @throws RuntimeException unless the vectors have the same length.
+     */
+    static D3xVector applyEBE(D3xVectorView vector1, D3xVectorView vector2, DoubleBinaryOperator operator) {
+        validateCongruent(vector1, vector2);
+
+        var length = vector1.length();
+        var result = D3xVector.dense(length);
+
+        for (int index = 0; index < length; ++index)
+            result.set(index, operator.applyAsDouble(vector1.get(index), vector2.get(index)));
+
+        return result;
+    }
+
+    /**
+     * Divides two congruent vectors element by element.
+     *
+     * @param v1 the first vector.
+     * @param v2 the second vector.
+     *
+     * @return a new vector {@code u} with {@code u[k] = v1[k] * v2[k]}.
+     *
+     * @throws RuntimeException unless the vectors have the same length.
+     */
+    static D3xVector divideEBE(D3xVectorView v1, D3xVectorView v2) {
+        return applyEBE(v1, v2, (x, y) -> x / y);
+    }
+
+    /**
+     * Multiplies two congruent vectors element by element.
+     *
+     * @param v1 the first vector.
+     * @param v2 the second vector.
+     *
+     * @return a new vector {@code u} with {@code u[k] = v1[k] * v2[k]}.
+     *
+     * @throws RuntimeException unless the vectors have the same length.
+     */
+    static D3xVector multiplyEBE(D3xVectorView v1, D3xVectorView v2) {
+        return applyEBE(v1, v2, (x, y) -> x * y);
+    }
+
+    /**
+     * Ensures that two vector views have the same length.
+     *
+     * @param v1 the first view to validate.
+     * @param v2 the second view to validate.
+     *
+     * @throws RuntimeException unless the specified views have the
+     * same length.
+     */
+    static void validateCongruent(D3xVectorView v1, D3xVectorView v2) {
+        v1.validateCongruent(v2);
     }
 }

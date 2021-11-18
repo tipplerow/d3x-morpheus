@@ -396,4 +396,36 @@ public class DataFrameTest extends DataFrameTestBase {
         assertFalse(frame4.equalsNumeric(frame2));
         assertFalse(frame5.equalsNumeric(frame2));
     }
+
+    @Test
+    public void testReplaceNaN() {
+        var frame = newDoubleFrame();
+
+        assertEquals(frame.getDoubleAt(0, 0), 11.0, TOLERANCE);
+        assertEquals(frame.getDoubleAt(0, 1), 12.0, TOLERANCE);
+        assertEquals(frame.getDoubleAt(0, 2), 13.0, TOLERANCE);
+        assertEquals(frame.getDoubleAt(1, 0), 21.0, TOLERANCE);
+        assertEquals(frame.getDoubleAt(1, 1), 22.0, TOLERANCE);
+        assertEquals(frame.getDoubleAt(1, 2), 23.0, TOLERANCE);
+
+        frame.setDoubleAt(0, 1, Double.NaN);
+        frame.setDoubleAt(1, 2, Double.NaN);
+
+        assertTrue(Double.isNaN(frame.getDoubleAt(0, 1)));
+        assertTrue(Double.isNaN(frame.getDoubleAt(1, 2)));
+
+        assertEquals(frame.getDoubleAt(0, 0), 11.0, TOLERANCE);
+        assertEquals(frame.getDoubleAt(0, 2), 13.0, TOLERANCE);
+        assertEquals(frame.getDoubleAt(1, 0), 21.0, TOLERANCE);
+        assertEquals(frame.getDoubleAt(1, 1), 22.0, TOLERANCE);
+
+        frame.replaceNaN(88.8);
+
+        assertEquals(frame.getDoubleAt(0, 0), 11.0, TOLERANCE);
+        assertEquals(frame.getDoubleAt(0, 1), 88.8, TOLERANCE);
+        assertEquals(frame.getDoubleAt(0, 2), 13.0, TOLERANCE);
+        assertEquals(frame.getDoubleAt(1, 0), 21.0, TOLERANCE);
+        assertEquals(frame.getDoubleAt(1, 1), 22.0, TOLERANCE);
+        assertEquals(frame.getDoubleAt(1, 2), 88.8, TOLERANCE);
+    }
 }

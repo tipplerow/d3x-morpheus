@@ -15,9 +15,12 @@
  */
 package com.d3x.morpheus.collect;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.function.Function;
 
 import com.d3x.morpheus.concurrent.ConcurrentObject;
@@ -150,7 +153,7 @@ public class WormCache<K, V> extends ConcurrentObject {
     /**
      * Retrieves a value from this cache or throws an exception.
      *
-     * @param key the row key associated with the value.
+     * @param key the key associated with the value.
      *
      * @return the value associated with the specified key.
      *
@@ -158,12 +161,36 @@ public class WormCache<K, V> extends ConcurrentObject {
      * associated with the specified key.
      */
     public V getOrThrow(@NonNull K key) {
+        return getOrThrow(key, "No value for key [%s].");
+    }
+
+    /**
+     * Retrieves a value from this cache or throws an exception.
+     *
+     * @param key the key associated with the value.
+     * @param msg the formatted exception message, which must contain
+     *            exactly one format specifier for the missing key.
+     *
+     * @return the value associated with the specified key.
+     *
+     * @throws NoSuchElementException unless a value has been
+     * associated with the specified key.
+     */
+    public V getOrThrow(@NonNull K key, @NonNull String msg) {
         V result = get(key);
 
         if (result != null)
             return result;
         else
-            throw new NoSuchElementException(String.format("No value for key [%s].", key));
+            throw new NoSuchElementException(String.format(msg, key));
+    }
+
+    /**
+     * Returns a read-only set view of the keys in this cache.
+     * @return a read-only set view of the keys in this cache.
+     */
+    public Set<K> keys() {
+        return Collections.unmodifiableSet(read(map::keySet));
     }
 
     /**
@@ -190,5 +217,13 @@ public class WormCache<K, V> extends ConcurrentObject {
             throw new IllegalStateException(String.format("Key [%s] has already been assigned.", key));
         else
             map.put(key, value);
+    }
+
+    /**
+     * Returns a read-only view of the items in this cache.
+     * @return a read-only view of the items in this cache.
+     */
+    public Collection<V> values() {
+        return Collections.unmodifiableCollection(read(map::values));
     }
 }

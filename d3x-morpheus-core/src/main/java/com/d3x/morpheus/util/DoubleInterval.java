@@ -15,8 +15,10 @@
  */
 package com.d3x.morpheus.util;
 
+import java.text.DecimalFormat;
 import java.util.function.DoublePredicate;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -25,6 +27,7 @@ import lombok.NonNull;
  *
  * @author Scott Shaffer
  */
+@Builder
 public final class DoubleInterval implements DoublePredicate {
     /**
      * The enumerated type for this interval.
@@ -45,16 +48,22 @@ public final class DoubleInterval implements DoublePredicate {
     @Getter
     private final double upper;
 
-    private DoubleInterval(@NonNull DoubleIntervalType type, double lower, double upper) {
+    private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#,##0.0#######");
+
+    /**
+     * Creates a new double interval with fixed type and limits.
+     *
+     * @param type  the enumerated interval type.
+     * @param lower the lower bound of the interval.
+     * @param upper the upper bound of the interval.
+     *
+     * @throws RuntimeException unless the parameters define a valid interval.
+     */
+    public DoubleInterval(@NonNull DoubleIntervalType type, double lower, double upper) {
         this.type = type;
         this.lower = lower;
         this.upper = upper;
         validate();
-    }
-
-    private void validate() {
-        if (lower > upper)
-            throw new MorpheusException("Invalid interval: [%f, %f].", lower, upper);
     }
 
     /**
@@ -150,6 +159,48 @@ public final class DoubleInterval implements DoublePredicate {
     }
 
     /**
+     * Parses the string representation of an interval.
+     *
+     * @param str the string representation of an interval, in the
+     *            canonical format.
+     *
+     * @return the interval represented by the specified string.
+     *
+     * @throws RuntimeException unless the string is a properly formatted
+     * representation of a valid interval.
+     */
+    public static DoubleInterval parse(String str) {
+        var stripped = str.strip();
+
+        if (stripped.isEmpty())
+            throw new MorpheusException("Invalid double interval: %s", str);
+
+        var type = parseType(stripped);
+
+        stripped = stripped.substring(1, stripped.length() - 1);
+        var fields = stripped.split(",");
+
+        if (fields.length != 2)
+            throw new MorpheusException("Invalid double interval: %s", str);
+
+        var lower = Double.parseDouble(fields[0]);
+        var upper = Double.parseDouble(fields[1]);
+
+        return new DoubleInterval(type, lower, upper);
+    }
+
+    private static DoubleIntervalType parseType(String stripped) {
+        char lower = stripped.charAt(0);
+        char upper = stripped.charAt(stripped.length() - 1);
+
+        for (var type : DoubleIntervalType.values())
+            if (lower == type.lowerDelim() && upper == type.upperDelim())
+                return type;
+
+        throw new MorpheusException("No matching interval type for delimiters '%c' and '%c'.", lower, upper);
+    }
+
+    /**
      * Determines whether this interval contains a double value.
      *
      * @param value the value to test.
@@ -161,11 +212,71 @@ public final class DoubleInterval implements DoublePredicate {
     }
 
     /**
+     * Determines whether this interval entirely contains another interval.
+     *
+     * @param that the other interval to test.
+     *
+     * @return {@code true} iff this interval entirely contains the input
+     * interval.
+     */
+    public boolean contains(DoubleInterval that) {
+        return containsLower(that) && containsUpper(that);
+    }
+
+    private boolean containsLower(DoubleInterval that) {
+        // Open intervals do not contain their lower bounds,
+        // so we must also test for equivalent lower bounds...
+        return this.contains(that.lower) || this.equalsLower(that);
+    }
+
+    private boolean containsUpper(DoubleInterval that) {
+        // Open intervals do not contain their upper bounds,
+        // so we must also test for equivalent upper bounds...
+        return this.contains(that.upper) || this.equalsUpper(that);
+    }
+
+    private boolean equalsLower(DoubleInterval that) {
+        return this.type.equals(that.type) && DoubleComparator.DEFAULT.equals(this.lower, that.lower);
+    }
+
+    private boolean equalsUpper(DoubleInterval that) {
+        return this.type.equals(that.type) && DoubleComparator.DEFAULT.equals(this.upper, that.upper);
+    }
+
+    /**
+     * Writes this interval in a canonical format to a string.
+     *
+     * @return the canonical representation of this interval.
+     */
+    public String format() {
+        return type.lowerDelim() +
+                DECIMAL_FORMAT.format(lower) +
+                ", " +
+                DECIMAL_FORMAT.format(upper) +
+                type.upperDelim();
+    }
+
+    /**
      * Returns the width of this interval.
      * @return the width of this interval.
      */
     public double getWidth() {
         return upper - lower;
+    }
+
+    /**
+     * Ensures that this interval is valid.
+     *
+     * @return this object, for operator chaining.
+     *
+     * @throws RuntimeException if either bound is missing or if the lower
+     * bound exceeds the upper.
+     */
+    public DoubleInterval validate() {
+        if (Double.isNaN(lower) || Double.isNaN(upper) || lower > upper)
+            throw new MorpheusException("Invalid interval: [%f, %f].", lower, upper);
+
+        return this;
     }
 
     /**
@@ -192,12 +303,10 @@ public final class DoubleInterval implements DoublePredicate {
     }
 
     private boolean equalsInterval(DoubleInterval that) {
-        return this.type.equals(that.type)
-                && DoubleComparator.DEFAULT.equals(this.lower, that.lower)
-                && DoubleComparator.DEFAULT.equals(this.upper, that.upper);
+        return equalsLower(that) && equalsUpper(that);
     }
 
     @Override public String toString() {
-        return type.format(lower, upper);
+        return format();
     }
 }

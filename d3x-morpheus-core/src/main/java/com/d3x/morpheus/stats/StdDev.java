@@ -25,6 +25,13 @@ package com.d3x.morpheus.stats;
 public class StdDev extends Variance {
 
     /**
+     * Creates a bias-corrected standard deviation statistic.
+     */
+    public StdDev() {
+        this(true);
+    }
+
+    /**
      * Constructor
      * @param biasCorrected true for bias corrected variance
      */

@@ -208,6 +208,9 @@ public class DoubleIntervalTest {
 
         assertFalse(interval.contains(Double.NaN));
         assertTrue(Double.isInfinite(interval.getWidth()));
+
+        assertTrue(interval.contains(interval));
+        assertTrue(interval.contains(DoubleInterval.POSITIVE));
     }
 
     @Test public void testNonPositive() {
@@ -238,6 +241,9 @@ public class DoubleIntervalTest {
 
         assertFalse(interval.contains(Double.NaN));
         assertTrue(Double.isInfinite(interval.getWidth()));
+
+        assertTrue(interval.contains(interval));
+        assertFalse(interval.contains(DoubleInterval.NON_NEGATIVE));
     }
 
     @Test public void testValidateOkay() {
@@ -253,5 +259,14 @@ public class DoubleIntervalTest {
     @Test(expectedExceptions = RuntimeException.class)
     public void testValidateBad2() {
         DoubleInterval.NEGATIVE.validate(1.0, "test value");
+    }
+
+    @Test
+    public void testParse() {
+        assertEquals(DoubleInterval.parse("[-Infinity, Infinity]"), DoubleInterval.INFINITE);
+        assertEquals(DoubleInterval.parse("[-1.0, 2.0]"), DoubleInterval.closed(-1.0, 2.0));
+        assertEquals(DoubleInterval.parse("[-1.0, 2.0)"), DoubleInterval.leftClosed(-1.0, 2.0));
+        assertEquals(DoubleInterval.parse("(-1.0, 2.0]"), DoubleInterval.leftOpen(-1.0, 2.0));
+        assertEquals(DoubleInterval.parse("(-1.0, 2.0)"), DoubleInterval.open(-1.0, 2.0));
     }
 }
