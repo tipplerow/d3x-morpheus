@@ -52,6 +52,13 @@ public final class LRUCache<K, V> extends CacheBase<K, V> {
     }
 
     /**
+     * Removes all items from this cache.
+     */
+    public void clear() {
+        withWriteLock(map::clear);
+    }
+
+    /**
      * Returns the fixed capacity of this cache.
      * @return the fixed capacity of this cache.
      */

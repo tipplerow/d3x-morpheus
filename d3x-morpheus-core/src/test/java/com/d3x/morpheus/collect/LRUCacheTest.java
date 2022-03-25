@@ -61,5 +61,8 @@ public class LRUCacheTest {
 
         cache.put("F", 6);
         assertCache(cache, List.of("E", "C", "F"), List.of(5, 3, 6));
+
+        cache.clear();
+        assertCache(cache, List.of(), List.of());
     }
 }

@@ -40,6 +40,14 @@ public abstract class ConcurrentObject {
     private final Lock writeLock = readWriteLock.writeLock();
 
     /**
+     * An action to be executed with a write lock.
+     */
+    public interface Action {
+        /** Executes the action. */
+        void execute();
+    }
+
+    /**
      * The default constructor.
      */
     protected ConcurrentObject() {
@@ -143,6 +151,22 @@ public abstract class ConcurrentObject {
         }
         finally {
             readLock.unlock();
+        }
+    }
+
+    /**
+     * Acquires a write lock, executes an action, and releases the lock.
+     *
+     * @param action the action to execute.
+     */
+    protected void withWriteLock(Action action) {
+        writeLock.lock();
+
+        try {
+            action.execute();
+        }
+        finally {
+            writeLock.unlock();
         }
     }
 
