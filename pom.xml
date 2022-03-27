@@ -45,14 +45,14 @@
 
     <distributionManagement>
         <repository>
-            <id>central</id>
+            <id>releases</id>
             <name>d3xsystems-artifactory-primary-0-releases</name>
             <url>https://d3xsystems.jfrog.io/artifactory/d3x-release</url>
         </repository>
         <snapshotRepository>
             <id>snapshots</id>
             <name>d3xsystems-artifactory-primary-0-snapshots</name>
-            <url>https://d3xsystems.jfrog.io/artifactory/d3x-release</url>
+            <url>https://d3xsystems.jfrog.io/artifactory/d3x-snapshot</url>
         </snapshotRepository>
     </distributionManagement>
 
@@ -327,6 +327,7 @@
                     <version>6.0.5</version>
                     <configuration>
                         <failBuildOnCVSS>8</failBuildOnCVSS>
+                        <suppressionFile>${project.basedir}/suppression.xml</suppressionFile>
                         <excludes>
                             <exclude>org.apache.xmlgraphics:batik-all</exclude>
                             <exclude>org.apache.xmlgraphics:batik-svgpp</exclude>
