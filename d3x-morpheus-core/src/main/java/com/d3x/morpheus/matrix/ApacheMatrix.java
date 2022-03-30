@@ -182,6 +182,11 @@ public final class ApacheMatrix implements D3xMatrix {
     }
 
     @Override
+    public boolean isEmpty() {
+        return size() == 0;
+    }
+
+    @Override
     public ApacheMatrix like(int nrow, int ncol) {
         return new ApacheMatrix(impl.createMatrix(nrow, ncol));
     }

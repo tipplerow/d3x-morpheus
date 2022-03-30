@@ -241,9 +241,7 @@ public interface D3xMatrixView {
      *
      * @return {@code true} iff this matrix contains no elements.
      */
-    default boolean isEmpty() {
-        return size() == 0;
-    }
+    boolean isEmpty();
 
     /**
      * Identifies square matrices.
