@@ -15,7 +15,6 @@
  */
 package com.d3x.morpheus.stats;
 
-import com.d3x.morpheus.vector.D3xVector;
 
 /**
  * A Statistic implementation that supports incremental calculation of a sample max
@@ -27,7 +26,7 @@ import com.d3x.morpheus.vector.D3xVector;
 public class Max implements Statistic1 {
 
     private long n;
-    private double max = Double.MIN_VALUE;
+    private double max = Double.NEGATIVE_INFINITY;
 
     /**
      * Constructor
@@ -70,7 +69,7 @@ public class Max implements Statistic1 {
     @Override
     public Statistic1 reset() {
         this.n = 0;
-        this.max = Double.MIN_VALUE;
+        this.max = Double.NEGATIVE_INFINITY;
         return this;
     }
 }

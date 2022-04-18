@@ -25,6 +25,7 @@ public class Statistic1Test {
     private static final D3xVectorView vec2 = D3xVectorView.of(1.0);
     private static final D3xVectorView vec3 = D3xVectorView.of(1.0, 2.0, 3.0, 4.0);
     private static final D3xVectorView vec4 = D3xVectorView.of(1.0, -4.0, 33.0, 4.0);
+    private static final D3xVectorView vec5 = D3xVectorView.of(-0.1, -4.0, -0.33, -4.0);
 
     private static final double TOLERANCE = 1.0E-12;
 
@@ -35,6 +36,7 @@ public class Statistic1Test {
         assertEquals(max.compute(vec2), 1.0, TOLERANCE);
         assertEquals(max.compute(vec3), 4.0, TOLERANCE);
         assertEquals(max.compute(vec4), 33.0, TOLERANCE);
+        assertEquals(max.compute(vec5), -0.1, TOLERANCE);
     }
 
     @Test
@@ -44,6 +46,7 @@ public class Statistic1Test {
         assertEquals(min.compute(vec2), 1.0, TOLERANCE);
         assertEquals(min.compute(vec3), 1.0, TOLERANCE);
         assertEquals(min.compute(vec4), -4.0, TOLERANCE);
+        assertEquals(min.compute(vec5), -4.0, TOLERANCE);
 
     }
 
@@ -53,6 +56,7 @@ public class Statistic1Test {
         assertEquals(sum.compute(vec1), 0.0, TOLERANCE);
         assertEquals(sum.compute(vec2), 1.0, TOLERANCE);
         assertEquals(sum.compute(vec3), 10.0, TOLERANCE);
+        assertEquals(sum.compute(vec5), -8.43, TOLERANCE);
     }
 
     @Test
