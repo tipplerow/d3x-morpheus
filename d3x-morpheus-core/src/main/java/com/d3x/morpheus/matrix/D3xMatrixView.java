@@ -110,6 +110,36 @@ public interface D3xMatrixView {
     }
 
     /**
+     * Returns a vector view of a column in this matrix.
+     *
+     * @param colIndex the index of the column to view.
+     *
+     * @return a vector view of the specified column.
+     *
+     * @throws RuntimeException unless the column index is valid.
+     */
+    default D3xVectorView column(int colIndex) {
+        return new ColumnView(this, colIndex);
+    }
+
+    /**
+     * Returns a subvector view of a portion of a column in this matrix.
+     *
+     * @param colIndex  the index of the column to view.
+     * @param rowOffset the row index of the first element in the
+     *                  subvector view.
+     * @param colLength the total length of the subvector view.
+     *
+     * @return a subvector view of the specified column portion.
+     *
+     * @throws RuntimeException unless the subvector view defined by the
+     * input parameters lies completely within this matrix.
+     */
+    default D3xVectorView column(int colIndex, int rowOffset, int colLength) {
+        return new ColumnView(this, colIndex, rowOffset, colLength);
+    }
+
+    /**
      * Determines whether the entries in this view are equal to those in a bare
      * array <em>within the tolerance of the default DoubleComparator</em>.
      *
@@ -239,6 +269,36 @@ public interface D3xMatrixView {
                     return false;
 
         return true;
+    }
+
+    /**
+     * Returns a vector view of a row in this matrix.
+     *
+     * @param rowIndex the index of the row to view.
+     *
+     * @return a vector view of the specified row.
+     *
+     * @throws RuntimeException unless the row index is valid.
+     */
+    default D3xVectorView row(int rowIndex) {
+        return new RowView(this, rowIndex);
+    }
+
+    /**
+     * Returns a subvector view of a portion of a row in this matrix.
+     *
+     * @param rowIndex  the index of the row to view.
+     * @param colOffset the column index of the first element in the
+     *                  subvector view.
+     * @param rowLength the total length of the subvector view.
+     *
+     * @return a subvector view of the specified row portion.
+     *
+     * @throws RuntimeException unless the subvector view defined by the
+     * input parameters lies completely within this matrix.
+     */
+    default D3xVectorView row(int rowIndex, int colOffset, int rowLength) {
+        return new RowView(this, rowIndex, colOffset, rowLength);
     }
 
     /**

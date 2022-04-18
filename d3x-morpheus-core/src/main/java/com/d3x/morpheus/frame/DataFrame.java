@@ -792,6 +792,15 @@ public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperation
     }
 
     /**
+     * Replaces missing double values.
+     *
+     * @param value the replacement value.
+     */
+    default void replaceNaN(double value) {
+        values().forEach(v -> v.replaceNaN(value));
+    }
+
+    /**
      * Returns a new DataFrame builder for row and column key types
      * @param rowType   the row key type for builder
      * @param colType   the column key type for builder

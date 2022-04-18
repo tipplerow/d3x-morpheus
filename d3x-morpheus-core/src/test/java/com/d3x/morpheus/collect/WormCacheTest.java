@@ -20,6 +20,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.util.ArrayList;
+import java.util.Set;
 import java.util.stream.Stream;
 
 /**
@@ -119,6 +120,11 @@ public class WormCacheTest {
         fixed.getOrThrow(2);
     }
 
+    @Test
+    public void testKeys() {
+        Assert.assertEquals(fixed.keys(), Set.of(1, 3, 5));
+    }
+
     @Test(expectedExceptions = RuntimeException.class)
     public void testPutExisting1() {
         fixed.put(1, "foo");
@@ -138,5 +144,12 @@ public class WormCacheTest {
         cache.put(1, "foo");
         Assert.assertTrue(cache.containsKey(1));
         Assert.assertEquals(cache.get(1), "foo");
+    }
+
+    @Test
+    public void testValues() {
+        var actual = Set.copyOf(fixed.values());
+        var expected = Set.of("V1", "V3", "V5");
+        Assert.assertEquals(actual, expected);
     }
 }

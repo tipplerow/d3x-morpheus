@@ -15,15 +15,13 @@
  */
 package com.d3x.morpheus.matrix;
 
-import lombok.NonNull;
-
 /**
  * Wraps a bare array in a vector view.
  *
  * @author Scott Shaffer
  */
 final class ArrayView implements D3xMatrixView {
-    @NonNull private final double[][] array;
+    private final double[][] array;
 
     ArrayView(double[][] array) {
         this.array = array;

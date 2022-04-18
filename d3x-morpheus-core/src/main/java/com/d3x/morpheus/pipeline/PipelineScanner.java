@@ -44,6 +44,7 @@ public class PipelineScanner {
         this.factory = factory;
         this.scanner = scanner;
         this.matcher = PIPELINE_PATTERN.matcher(source);
+        scan();
     }
 
     /**
@@ -103,15 +104,50 @@ public class PipelineScanner {
      * formatted and the factory can create every encoded pipeline.
      */
     public static DataPipeline scan(String source, PipelineFactory factory, ArgumentScanner scanner) {
-        return new PipelineScanner(source, factory, scanner).scan();
+        var runner = new PipelineScanner(source, factory, scanner);
+        return runner.resolvePipeline();
     }
 
-    private DataPipeline scan() {
+    /**
+     * Parses a pipeline string using the default pipeline factory and
+     * argument scanner.
+     *
+     * @param source the string containing encoded pipelines.
+     *
+     * @return the pipelines encoded in the given source string.
+     *
+     * @throws RuntimeException unless the input string is properly
+     * formatted and the factory can create every encoded pipeline.
+     */
+    public static List<DataPipeline> scanList(String source) {
+        return scanList(source, PipelineFactory.DEFAULT, ArgumentScanner.DEFAULT);
+    }
+
+    /**
+     * Parses a pipeline string using a customized pipeline factory and
+     * argument scanner.
+     *
+     * @param source  the string containing encoded pipelines.
+     * @param factory a factory able to create the encoded pipelines.
+     * @param scanner a customized scanner for argument parsing.
+     *
+     * @return the pipelines encoded in the given source string.
+     *
+     * @throws RuntimeException unless the input string is properly
+     * formatted and the factory can create every encoded pipeline.
+     */
+    public static List<DataPipeline> scanList(String source,
+                                              PipelineFactory factory,
+                                              ArgumentScanner scanner) {
+        var runner = new PipelineScanner(source, factory, scanner);
+        return List.copyOf(runner.pipelines);
+    }
+
+    private void scan() {
         while (matcher.find())
             parsePipeline();
 
         validateMatchEnd();
-        return resolvePipeline();
     }
 
     private void parsePipeline() {

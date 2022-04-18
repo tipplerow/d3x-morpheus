@@ -21,10 +21,6 @@ import org.testng.annotations.Test;
 import static org.testng.Assert.*;
 
 public class Statistic1Test {
-    private static final Statistic1 max = new Max();
-    private static final Statistic1 min = new Min();
-    private static final Statistic1 sum = new Sum();
-
     private static final D3xVectorView vec1 = D3xVectorView.of();
     private static final D3xVectorView vec2 = D3xVectorView.of(1.0);
     private static final D3xVectorView vec3 = D3xVectorView.of(1.0, 2.0, 3.0, 4.0);
@@ -34,6 +30,7 @@ public class Statistic1Test {
 
     @Test
     public void testMax() {
+        var max = Statistic1.newInstance("Max");
         assertTrue(Double.isNaN(max.compute(vec1)));
         assertEquals(max.compute(vec2), 1.0, TOLERANCE);
         assertEquals(max.compute(vec3), 4.0, TOLERANCE);
@@ -42,6 +39,7 @@ public class Statistic1Test {
 
     @Test
     public void testMin() {
+        var min = Statistic1.newInstance("Min");
         assertTrue(Double.isNaN(min.compute(vec1)));
         assertEquals(min.compute(vec2), 1.0, TOLERANCE);
         assertEquals(min.compute(vec3), 1.0, TOLERANCE);
@@ -51,8 +49,18 @@ public class Statistic1Test {
 
     @Test
     public void testSum() {
+        var sum = Statistic1.newInstance("com.d3x.morpheus.stats.Sum");
         assertEquals(sum.compute(vec1), 0.0, TOLERANCE);
         assertEquals(sum.compute(vec2), 1.0, TOLERANCE);
         assertEquals(sum.compute(vec3), 10.0, TOLERANCE);
+    }
+
+    @Test
+    public void testVariance() {
+        var variance = Statistic1.newInstance("com.d3x.morpheus.stats.Variance");
+        assertTrue(Double.isNaN(variance.compute(vec1)));
+        assertEquals(variance.compute(vec2), 0.0, TOLERANCE);
+        assertEquals(variance.compute(vec3), 5.0 / 3.0, TOLERANCE);
+        assertEquals(variance.compute(vec4), 833.0 / 3.0, TOLERANCE);
     }
 }

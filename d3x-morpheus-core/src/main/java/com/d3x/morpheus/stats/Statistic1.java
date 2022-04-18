@@ -18,6 +18,7 @@ package com.d3x.morpheus.stats;
 import java.util.function.Supplier;
 import java.util.stream.DoubleStream;
 
+import com.d3x.morpheus.util.MorpheusException;
 import com.d3x.morpheus.vector.D3xVectorView;
 import com.d3x.morpheus.vector.DataVectorView;
 
@@ -29,6 +30,29 @@ import com.d3x.morpheus.vector.DataVectorView;
  * @author  Xavier Witdouck
  */
 public interface Statistic1 extends Statistic {
+    /**
+     * Creates a new instance of a univariate statistic.
+     *
+     * @param className either the simple or fully qualified class name: either
+     *                  {@code Median} or {@code com.d3x.morpheus.stats.Median}
+     *                  are acceptable.
+     *
+     * @return a new instance of the specified statistic.
+     */
+    static Statistic1 newInstance(String className) {
+        var packagePrefix = "com.d3x.morpheus.stats.";
+
+        if (!className.startsWith(packagePrefix))
+            className = packagePrefix + className;
+
+        try {
+            var classObj = Class.forName(className);
+            return (Statistic1) classObj.getConstructor().newInstance();
+        }
+        catch (Exception ex) {
+            throw new MorpheusException(ex.getMessage());
+        }
+    }
 
     /**
      * Adds a new value to the sample for this statistic

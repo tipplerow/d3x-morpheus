@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
 import java.util.stream.Stream;
 
+import com.d3x.morpheus.frame.DataFrame;
 import com.d3x.morpheus.series.DoubleSeries;
 import com.d3x.morpheus.stats.SumSquares;
 import com.d3x.morpheus.util.DoubleComparator;
@@ -112,7 +113,7 @@ public interface DataVectorView<K> {
      * @param padding  the default value to use
      */
     static <K> DataVectorView<K> pad(DataVectorView<K> view, Iterable<K> keys, double padding) {
-        DataVector<K> vector = new MapDataVector<K>();
+        DataVector<K> vector = new MapDataVector<>();
 
         for (K key : keys)
             vector.setElement(key, view.getElement(key, padding));
@@ -332,6 +333,24 @@ public interface DataVectorView<K> {
      */
     default Stream<DataVectorElement<K>> streamElements() {
         return streamKeys().map(key -> DataVectorElement.of(key, getElement(key)));
+    }
+
+    default <R> DataFrame<R, K> toDataFrameRow(R rowKey) {
+        var frame = DataFrame.ofDoubles(rowKey, collectKeys());
+
+        for (var element : collectElements())
+            frame.setDouble(rowKey, element.getKey(), element.getValue());
+
+        return frame;
+    }
+
+    default <C> DataFrame<K, C> toDataFrameColumn(C colKey) {
+        var frame = DataFrame.ofDoubles(collectKeys(), colKey);
+
+        for (var element : collectElements())
+            frame.setDouble(element.getKey(), colKey, element.getValue());
+
+        return frame;
     }
 
     /**

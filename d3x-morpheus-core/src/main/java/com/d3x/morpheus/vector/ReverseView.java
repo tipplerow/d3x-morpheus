@@ -13,36 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.d3x.morpheus.matrix;
+package com.d3x.morpheus.vector;
 
-import com.d3x.morpheus.frame.DataFrame;
-
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.NonNull;
 
 /**
- * Wraps a DataFrame in a matrix view.
+ * Reverses the order of vector elements.
  *
  * @author Scott Shaffer
  */
-final class FrameView implements D3xMatrixView {
-    @NonNull private final DataFrame<?,?> frame;
+@AllArgsConstructor(access = AccessLevel.MODULE)
+final class ReverseView implements D3xVectorView {
+    @NonNull
+    private final D3xVectorView vector;
 
-    FrameView(@NonNull DataFrame<?,?> frame) {
-        this.frame = frame;
+    @Override
+    public int length() {
+        return vector.length();
     }
 
     @Override
-    public int nrow() {
-        return frame.rowCount();
-    }
-
-    @Override
-    public int ncol() {
-        return frame.colCount();
-    }
-
-    @Override
-    public double get(int row, int col) {
-        return frame.getDoubleAt(row, col);
+    public double get(int index) {
+        return vector.get(vector.length() - index - 1);
     }
 }

@@ -64,4 +64,9 @@ public final class LocalPipeline implements DataPipeline {
     public boolean isSizePreserving() {
         return true;
     }
+
+    @Override
+    public String toString() {
+        return encode();
+    }
 }

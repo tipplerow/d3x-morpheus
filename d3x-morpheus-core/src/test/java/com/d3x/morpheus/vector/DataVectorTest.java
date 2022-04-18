@@ -89,6 +89,15 @@ public class DataVectorTest {
     }
 
     @Test
+    public void testIsEmpty() {
+        DataVector<String> vector = DataVector.of(new HashMap<>());
+        assertTrue(vector.isEmpty());
+
+        vector.setElement("A", 1.0);
+        assertFalse(vector.isEmpty());
+    }
+
+    @Test
     public void testSetElements() {
         DataVector<String> v1 = DataVector.create();
         DataVector<String> v2 = DataVector.create();
@@ -106,6 +115,23 @@ public class DataVectorTest {
 
         v1.setElements(v2);
         assertTrue(v1.equalsView(v3));
+    }
+
+    @Test
+    public void testApply() {
+        var vector1 = DataVector.create();
+        var vector2 = DataVector.create();
+
+        vector1.setElement("A", 25.0);
+        vector1.setElement("B", 36.0);
+        vector1.setElement("C", 49.0);
+
+        vector2.setElement("A", 5.0);
+        vector2.setElement("B", 6.0);
+        vector2.setElement("C", 7.0);
+
+        vector1.apply(Math::sqrt);
+        assertTrue(vector1.equalsView(vector2));
     }
 }
 

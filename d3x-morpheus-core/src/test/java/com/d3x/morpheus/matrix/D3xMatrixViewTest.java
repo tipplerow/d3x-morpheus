@@ -18,6 +18,7 @@ package com.d3x.morpheus.matrix;
 import com.d3x.morpheus.frame.DataFrame;
 import com.d3x.morpheus.vector.D3xVectorTest;
 
+import com.d3x.morpheus.vector.D3xVectorView;
 import org.testng.annotations.Test;
 import static org.testng.Assert.*;
 
@@ -169,5 +170,31 @@ public class D3xMatrixViewTest {
 
         assertTrue(matrix2.isSquare());
         assertFalse(matrix2.isSymmetric());
+    }
+
+    @Test
+    public void testColumnView() {
+        var matrix = D3xMatrix.byrow(5, 3,
+                11.0, 12.0, 13.0,
+                21.0, 22.0, 23.0,
+                31.0, 32.0, 33.0,
+                41.0, 42.0, 43.0,
+                51.0, 52.0, 53.0);
+
+        assertEquals(matrix.column(0), D3xVectorView.of(11.0, 21.0, 31.0, 41.0, 51.0));
+        assertEquals(matrix.column(1, 2, 3), D3xVectorView.of(32.0, 42.0, 52.0));
+        assertEquals(matrix.column(2, 1, 2), D3xVectorView.of(23.0, 33.0));
+    }
+
+    @Test
+    public void testRowView() {
+        var matrix = D3xMatrix.byrow(3, 5,
+                11.0, 12.0, 13.0, 14.0, 15.0,
+                21.0, 22.0, 23.0, 24.0, 25.0,
+                31.0, 32.0, 33.0, 34.0, 35.0);
+
+        assertEquals(matrix.row(0), D3xVectorView.of(11.0, 12.0, 13.0, 14.0, 15.0));
+        assertEquals(matrix.row(1, 2, 3), D3xVectorView.of(23.0, 24.0, 25.0));
+        assertEquals(matrix.row(2, 1, 2), D3xVectorView.of(32.0, 33.0));
     }
 }

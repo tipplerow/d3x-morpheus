@@ -83,6 +83,10 @@ public class PipelineFactory {
                 assertNoArgs(name, args);
                 return DataPipeline.log;
 
+            case "log1p":
+                assertNoArgs(name, args);
+                return DataPipeline.log1p;
+
             case "multiply":
                 assertArgs(name, args, Number.class);
                 return DataPipeline.multiply(doubleArg(args, 0));
@@ -120,9 +124,17 @@ public class PipelineFactory {
                 assertArgs(name, args, Number.class);
                 return DataPipeline.subtract(doubleArg(args, 0));
 
+            case "tanh":
+                assertArgs(name, args, Number.class, Number.class);
+                return DataPipeline.tanh(doubleArg(args, 0), doubleArg(args, 1));
+
             case "trim":
                 assertArgs(name, args, Number.class);
                 return DataPipeline.trim(doubleArg(args, 0));
+
+            case "truncate":
+                assertArgs(name, args, Number.class, Number.class);
+                return DataPipeline.truncate(doubleArg(args, 0), doubleArg(args, 1));
 
             default:
                 throw new MorpheusException("Unknown pipeline: [%s].", name);

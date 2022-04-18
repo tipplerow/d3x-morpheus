@@ -18,6 +18,7 @@ package com.d3x.morpheus.vector;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.DoubleUnaryOperator;
 import java.util.stream.Stream;
 
 public interface DataVector<K> extends DataVectorView<K> {
@@ -28,6 +29,33 @@ public interface DataVector<K> extends DataVectorView<K> {
      * @param value the value to assign.
      */
     void setElement(K key, double value);
+
+    /**
+     * Applies an operator to each value in this vector (in place).
+     *
+     * @param operator the operator to apply.
+     *
+     * @return this vector, for operator chaining.
+     */
+    default DataVector<K> apply(DoubleUnaryOperator operator) {
+        for (var key : collectKeys())
+            setElement(key, operator.applyAsDouble(getElement(key)));
+
+        return this;
+    }
+
+    /**
+     * Identifies empty data vectors.
+     *
+     * <p>Note that this method cannot be defined on the DataVectorView
+     * interface because it clashes with the default implementation of
+     * the isEmpty() method provided in the DoubleSeries class.</p>
+     *
+     * @return {@code true} iff this vector has zero length.
+     */
+    default boolean isEmpty() {
+        return length() == 0;
+    }
 
     /**
      * Assigns a vector element.
