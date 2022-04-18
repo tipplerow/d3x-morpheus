@@ -5,7 +5,7 @@
     <parent>
         <artifactId>d3x-morpheus</artifactId>
         <groupId>com.d3xsystems</groupId>
-        <version>1.0.47</version>
+        <version>1.0.48</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -15,11 +15,7 @@
         <dependency>
             <groupId>com.d3xsystems</groupId>
             <artifactId>d3x-morpheus-core</artifactId>
-<<<<<<< HEAD
-            <version>1.0.47</version>
-=======
             <version>${project.version}</version>
->>>>>>> 0c01e22 (upgraded deps & pinned down versions)
             <scope>compile</scope>
         </dependency>
 
