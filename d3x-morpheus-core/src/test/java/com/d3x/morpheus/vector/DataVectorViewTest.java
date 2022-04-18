@@ -23,7 +23,7 @@ import java.util.Set;
 import com.d3x.morpheus.frame.DataFrame;
 import com.d3x.morpheus.series.DoubleSeries;
 
-import com.d3x.morpheus.testng.NumericTestBase;
+import com.d3x.morpheus.numerictests.NumericTestBase;
 import org.testng.annotations.Test;
 import static org.testng.Assert.*;
 

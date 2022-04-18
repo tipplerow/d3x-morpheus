@@ -15,13 +15,18 @@
         <dependency>
             <groupId>com.d3xsystems</groupId>
             <artifactId>d3x-morpheus-core</artifactId>
+<<<<<<< HEAD
             <version>1.0.47</version>
+=======
+            <version>${project.version}</version>
+>>>>>>> 0c01e22 (upgraded deps & pinned down versions)
             <scope>compile</scope>
         </dependency>
+
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>30.1-jre</version>
+            <version>31.1-jre</version>
         </dependency>
     </dependencies>
 

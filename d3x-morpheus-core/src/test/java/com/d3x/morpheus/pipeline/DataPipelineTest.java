@@ -22,7 +22,7 @@ import java.util.Random;
 import com.d3x.morpheus.frame.DataFrame;
 import com.d3x.morpheus.stats.Max;
 import com.d3x.morpheus.stats.Min;
-import com.d3x.morpheus.testng.NumericTestBase;
+import com.d3x.morpheus.numerictests.NumericTestBase;
 import com.d3x.morpheus.util.DoubleComparator;
 import com.d3x.morpheus.util.DoubleInterval;
 import com.d3x.morpheus.vector.DataVector;
