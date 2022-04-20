@@ -84,6 +84,52 @@ public interface D3xMatrix extends D3xMatrixView {
     }
 
     /**
+     * Subtracts a scalar value from each element in this matrix and
+     * returns the result in a new matrix.
+     *
+     * @param subtrahend the scalar value to subtract.
+     *
+     * @return the difference in a new matrix.
+     */
+    D3xMatrix minus(double subtrahend);
+
+    /**
+     * Computes the matrix difference {@code A - B}, where {@code A} is
+     * this matrix and returns the result in a new matrix.
+     *
+     * @param B the matrix to subtract from this.
+     *
+     * @return the matrix difference {@code A - B} in a new matrix.
+     *
+     * @throws RuntimeException unless the input matrix has the same shape
+     * as this matrix.
+     */
+    D3xMatrix minus(D3xMatrix B);
+
+    /**
+     * Adds a scalar value to each element in this matrix and returns the
+     * result in a new matrix.
+     *
+     * @param addend the scalar value to add.
+     *
+     * @return the sum in a new matrix.
+     */
+    D3xMatrix plus(double addend);
+
+    /**
+     * Computes the matrix sum {@code A + B}, where {@code A} is
+     * this matrix and returns the result in a new matrix.
+     *
+     * @param B the matrix to add to this.
+     *
+     * @return the matrix sum {@code A + B} in a new matrix.
+     *
+     * @throws RuntimeException unless the input matrix has the same shape
+     * as this matrix.
+     */
+    D3xMatrix plus(D3xMatrix B);
+
+    /**
      * Assigns a continuous block of elements in this matrix from another matrix.
      *
      * @param startRow the first (top-most) row element in the assignment range.

@@ -232,6 +232,70 @@ public class D3xMatrixTest {
     }
 
     @Test
+    public void testMinusScalar() {
+        D3xMatrix A = D3xMatrix.wrap(testArray);
+        D3xMatrix B = A.minus(2.0);
+
+        assertEquals(B.nrow(), A.nrow());
+        assertEquals(B.ncol(), A.ncol());
+
+        for (int i = 0; i < A.nrow(); ++i) {
+            for (int j = 0; j < A.ncol(); ++j) {
+                assertEquals(A.get(i, j), testArray[i][j], TOLERANCE);
+                assertEquals(B.get(i, j), testArray[i][j] - 2.0, TOLERANCE);
+            }
+        }
+    }
+
+    @Test
+    public void testMinusMatrix() {
+        D3xMatrix A = D3xMatrix.wrap(testArray);
+        D3xMatrix B = A.minus(A.times(0.25));
+
+        assertEquals(B.nrow(), A.nrow());
+        assertEquals(B.ncol(), A.ncol());
+
+        for (int i = 0; i < A.nrow(); ++i) {
+            for (int j = 0; j < A.ncol(); ++j) {
+                assertEquals(A.get(i, j), testArray[i][j], TOLERANCE);
+                assertEquals(B.get(i, j), 0.75 * testArray[i][j], TOLERANCE);
+            }
+        }
+    }
+
+    @Test
+    public void testPlusScalar() {
+        D3xMatrix A = D3xMatrix.wrap(testArray);
+        D3xMatrix B = A.plus(2.0);
+
+        assertEquals(B.nrow(), A.nrow());
+        assertEquals(B.ncol(), A.ncol());
+
+        for (int i = 0; i < A.nrow(); ++i) {
+            for (int j = 0; j < A.ncol(); ++j) {
+                assertEquals(A.get(i, j), testArray[i][j], TOLERANCE);
+                assertEquals(B.get(i, j), testArray[i][j] + 2.0, TOLERANCE);
+            }
+        }
+    }
+
+    @Test
+    public void testPlusMatrix() {
+        D3xMatrix A = D3xMatrix.wrap(testArray);
+        D3xMatrix B = A.plus(A.times(0.25));
+
+        assertEquals(B.nrow(), A.nrow());
+        assertEquals(B.ncol(), A.ncol());
+
+        for (int i = 0; i < A.nrow(); ++i) {
+            for (int j = 0; j < A.ncol(); ++j) {
+                assertEquals(A.get(i, j), testArray[i][j], TOLERANCE);
+                assertEquals(B.get(i, j), 1.25 * testArray[i][j], TOLERANCE);
+            }
+        }
+    }
+
+    @Test
     public void testTimesMatrix() {
         double[][] arrayA = new double[][] {
                 {  1.0,  0.0, -2.0,  5.0 },

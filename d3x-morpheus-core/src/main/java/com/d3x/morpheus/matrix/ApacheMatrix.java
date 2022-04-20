@@ -211,6 +211,26 @@ public final class ApacheMatrix implements D3xMatrix {
     }
 
     @Override
+    public ApacheMatrix minus(double subtrahend) {
+        return wrap(impl.scalarAdd(-subtrahend));
+    }
+
+    @Override
+    public ApacheMatrix minus(D3xMatrix B) {
+        return wrap(impl.subtract(asOperand(B)));
+    }
+
+    @Override
+    public ApacheMatrix plus(double addend) {
+        return wrap(impl.scalarAdd(addend));
+    }
+
+    @Override
+    public ApacheMatrix plus(D3xMatrix B) {
+        return wrap(impl.add(asOperand(B)));
+    }
+
+    @Override
     public void set(int row, int col, double value) {
         impl.setEntry(row, col, value);
     }
