@@ -129,9 +129,10 @@ public interface SVD {
         //
         int M = getRowDimension();
         int N = getColumnDimension();
+        double eps = DoubleComparator.epsilon();
         double wmax = new Max().compute(getSingularValueVector());
 
-        return 0.5 * Math.sqrt(M + N + 1.0) * wmax * DoubleComparator.epsilon();
+        return Math.max(2.0 * eps, 0.5 * Math.sqrt(M + N + 1.0) * wmax * eps);
     }
 
     /**
