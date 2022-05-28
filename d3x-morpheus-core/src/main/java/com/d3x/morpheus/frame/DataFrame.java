@@ -41,6 +41,7 @@ import com.d3x.morpheus.stats.Stats;
 import com.d3x.morpheus.util.Resource;
 import com.d3x.morpheus.util.functions.ToBooleanFunction;
 import com.d3x.morpheus.vector.D3xVector;
+import com.d3x.morpheus.vector.DataVectorView;
 
 /**
  * The central interface of the Morpheus Library that defines a 2-dimensional data structure called <code>DataFrame</code>
@@ -50,24 +51,6 @@ import com.d3x.morpheus.vector.D3xVector;
  * @author  Xavier Witdouck
  */
 public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperations<R,C,DataFrame<R,C>>, DataFrameIterators<R,C>, DataFrameAlgebra<R,C>, D3xMatrixView {
-
-    /**
-     * Checks if this DataFrame is empty, according to its number of rows.
-     * @return  true if the DataFrame is empty, false otherwise
-     */
-    boolean isEmpty();
-
-    /**
-     * Returns the row count for <code>DataFrame</code>
-     * @return  the row count
-     */
-    int rowCount();
-
-    /**
-     * Returns the column count for <code>DataFrame</code>
-     * @return  the column count
-     */
-    int colCount();
 
     /**
      * Returns true if this frame operates in parallel mode
@@ -467,22 +450,6 @@ public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperation
     }
 
     /**
-     * Determines whether this DataFrame contains particular columns.
-     *
-     * @param colKeys the keys of the columns in question.
-     *
-     * @return {@code true} iff this DataFrame contains a column for every key.
-     */
-    default boolean containsColumns(Iterable<C> colKeys) {
-        for (C colKey : colKeys) {
-            if (!containsColumn(colKey))
-                return false;
-        }
-
-        return true;
-    }
-
-    /**
      * Determines whether this DataFrame contains a particular row.
      *
      * @param rowKey the key of the row in question.
@@ -491,22 +458,6 @@ public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperation
      */
     default boolean containsRow(R rowKey) {
         return rows().contains(rowKey);
-    }
-
-    /**
-     * Determines whether this DataFrame contains particular rows.
-     *
-     * @param rowKeys the keys of the rows in question.
-     *
-     * @return {@code true} iff this DataFrame contains a row for every key.
-     */
-    default boolean containsRows(Iterable<R> rowKeys) {
-        for (R rowKey : rowKeys) {
-            if (!containsRow(rowKey))
-                return false;
-        }
-
-        return true;
     }
 
     /**
@@ -562,6 +513,32 @@ public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperation
     }
 
     /**
+     * Returns a DataVectorView of a numeric column.
+     *
+     * @param colKey the key of the desired column.
+     *
+     * @return a DataVectorView of the specified column.
+     *
+     * @throws RuntimeException unless the column exists.
+     */
+    default DataVectorView<R> getDoubleColumn(C colKey) {
+        return col(colKey);
+    }
+
+    /**
+     * Returns a DataVectorView of a numeric column.
+     *
+     * @param colOrdinal the index of the desired column.
+     *
+     * @return a DataVectorView of the specified column.
+     *
+     * @throws RuntimeException unless the column index is in bounds.
+     */
+    default DataVectorView<R> getDoubleColumnAt(int colOrdinal) {
+        return colAt(colOrdinal);
+    }
+
+    /**
      * Returns a list of the row keys for this DataFrame.
      *
      * @return a list of the row keys for this DataFrame.
@@ -596,30 +573,6 @@ public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperation
     }
 
     /**
-     * Ensures that this DataFrame contains a particular column.
-     *
-     * @param colKey the required column key.
-     *
-     * @throws DataFrameException unless this DataFrame contains a column with the specified key.
-     */
-    default void requireColumn(C colKey) {
-        if (!containsColumn(colKey))
-            throw new DataFrameException("Missing column [%s].", colKey);
-    }
-
-    /**
-     * Ensures that this DataFrame contains particular columns.
-     *
-     * @param colKeys the required column keys.
-     *
-     * @throws DataFrameException unless this DataFrame contains a column for each specified key.
-     */
-    default void requireColumns(Iterable<C> colKeys) {
-        for (C colKey : colKeys)
-            requireColumn(colKey);
-    }
-
-    /**
      * Ensures that this DataFrame contains a particular column and that column
      * contains data of a particular type.
      *
@@ -639,20 +592,6 @@ public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperation
             throw new DataFrameException(
                     "Column [%s] contains data of type [%s], not [%s] as required.",
                     colKey, actual.getSimpleName(), expected.getSimpleName());
-    }
-
-    /**
-     * Ensures that this DataFrame contains a certain number of columns.
-     *
-     * @param expected the required number of columns.
-     *
-     * @throws DataFrameException unless this DataFrame contains the specified number of columns.
-     */
-    default void requireColumnCount(int expected) {
-        int actual = colCount();
-
-        if (actual != expected)
-            throw new DataFrameException("Expected [%d] columns but found [%d].", expected, actual);
     }
 
     /**
@@ -708,44 +647,6 @@ public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperation
     default void requireNumericColumns(Iterable<C> colKeys) {
         for (C colKey : colKeys)
             requireNumericColumn(colKey);
-    }
-
-    /**
-     * Ensures that this DataFrame contains a particular row.
-     *
-     * @param rowKey the required row key.
-     *
-     * @throws DataFrameException unless this DataFrame contains a row with the specified key.
-     */
-    default void requireRow(R rowKey) {
-        if (!containsRow(rowKey))
-            throw new DataFrameException("Missing row [%s].", rowKey);
-    }
-
-   /**
-     * Ensures that this DataFrame contains particular rows.
-     *
-     * @param rowKeys the required row keys.
-     *
-     * @throws DataFrameException unless this DataFrame contains a row for each specified key.
-     */
-    default void requireRows(Iterable<R> rowKeys) {
-        for (R rowKey : rowKeys)
-            requireRow(rowKey);
-    }
-
-    /**
-     * Ensures that this DataFrame contains a certain number of rows.
-     *
-     * @param expected the required number of rows.
-     *
-     * @throws DataFrameException unless this DataFrame contains the specified number of rows.
-     */
-    default void requireRowCount(int expected) {
-        int actual = rowCount();
-
-        if (actual != expected)
-            throw new DataFrameException("Expected [%d] rows but found [%d].", expected, actual);
     }
 
     /**

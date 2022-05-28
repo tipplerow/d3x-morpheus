@@ -23,107 +23,7 @@ package com.d3x.morpheus.frame;
  *
  * @author Xavier Witdouck
  */
-public interface DataFrameAccess<R,C> {
-
-    /**
-     * Returns the value for the row and column key coordinates provided
-     * @param rowKey    the row key coordinate
-     * @param colKey    the column key coordinate
-     * @return          the value for coordinates, false if no match for keys
-     */
-    boolean getBoolean(R rowKey, C colKey);
-
-    /**
-     * Returns the value for the row and column ordinal coordinates provided
-     * @param rowOrdinal    the row ordinal coordinate
-     * @param colOrdinal    the column ordinal coordinate
-     * @return              the value for coordinates
-     */
-    boolean getBooleanAt(int rowOrdinal, int colOrdinal);
-
-    /**
-     * Returns the value for the row and column key coordinates provided
-     * @param rowKey    the row key coordinate
-     * @param colKey    the column key coordinate
-     * @return          the value for coordinates, 0 if no match for keys
-     */
-    int getInt(R rowKey, C colKey);
-
-    /**
-     * Returns the value for the row and column ordinal coordinates provided
-     * @param rowOrdinal    the row ordinal coordinate
-     * @param colOrdinal    the column ordinal coordinate
-     * @return              the value for coordinates
-     */
-    int getIntAt(int rowOrdinal, int colOrdinal);
-
-    /**
-     * Returns the value for the row and column key coordinates provided
-     * @param rowKey    the row key coordinate
-     * @param colKey    the column key coordinate
-     * @return          the value for coordinates, 0L if no match for keys
-     */
-    long getLong(R rowKey, C colKey);
-
-    /**
-     * Returns the value for the row and column ordinal coordinates provided
-     * @param rowOrdinal    the row ordinal coordinate
-     * @param colOrdinal    the column ordinal coordinate
-     * @return              the value for coordinates
-     */
-    long getLongAt(int rowOrdinal, int colOrdinal);
-
-    /**
-     * Returns the value for the row and column key coordinates provided
-     * @param rowKey    the row key coordinate
-     * @param colKey    the column key coordinate
-     * @return          the value for coordinates, NaN if no match for keys
-     */
-    double getDouble(R rowKey, C colKey);
-
-    /**
-     * Returns the value for the row and column key coordinates provided.
-     *
-     * @param rowKey       the row key coordinate
-     * @param colKey       the column key coordinate
-     * @param defaultValue the default value, if value is missing
-     *
-     * @return the value for the specified keys, or the default value if
-     * there is no match or the value is NaN.
-     */
-    default double getDouble(R rowKey, C colKey, double defaultValue) {
-        var result = getDouble(rowKey, colKey);
-
-        if (Double.isNaN(result))
-            return defaultValue;
-        else
-            return result;
-    }
-
-    /**
-     * Returns the value for the row and column ordinal coordinates provided
-     * @param rowOrdinal    the row ordinal coordinate
-     * @param colOrdinal    the column ordinal coordinate
-     * @return              the value for coordinates
-     */
-    double getDoubleAt(int rowOrdinal, int colOrdinal);
-
-    /**
-     * Returns the value for the row and column key coordinates provided
-     * @param rowKey    the row key coordinate
-     * @param colKey    the column key coordinate
-     * @return          the value for coordinates, null if no match for keys
-     */
-    <T> T getValue(R rowKey, C colKey);
-
-    /**
-     * Returns the value for the row and column ordinal coordinates provided
-     * @param rowOrdinal    the row ordinal coordinate
-     * @param colOrdinal    the column ordinal coordinate
-     * @return              the value for coordinates
-     */
-    <T> T getValueAt(int rowOrdinal, int colOrdinal);
-
+public interface DataFrameAccess<R,C> extends DataFrameView<R,C> {
     /**
      * Sets the value at the row and column keys provided
      * @param rowKey    the row key coordinate
@@ -203,5 +103,4 @@ public interface DataFrameAccess<R,C> {
      * @param value         the value to set
      */
     <T> T setValueAt(int rowOrdinal, int colOrdinal, T value);
-
 }

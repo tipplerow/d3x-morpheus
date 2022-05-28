@@ -428,4 +428,11 @@ public class DataFrameTest extends DataFrameTestBase {
         assertEquals(frame.getDoubleAt(1, 1), 22.0, TOLERANCE);
         assertEquals(frame.getDoubleAt(1, 2), 88.8, TOLERANCE);
     }
+
+    public void testGetDoubleColumn() {
+        var col = doubleFrame.getDoubleColumn(col1);
+        assertEquals(col.length(), 2);
+        assertEquals(col.getElement(row1), 11.0, TOLERANCE);
+        assertEquals(col.getElement(row2), 21.0, TOLERANCE);
+    }
 }

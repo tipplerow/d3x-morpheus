@@ -32,6 +32,11 @@ final class FrameView implements D3xMatrixView {
     }
 
     @Override
+    public boolean isEmpty() {
+        return nrow() == 0;
+    }
+
+    @Override
     public int nrow() {
         return frame.rowCount();
     }

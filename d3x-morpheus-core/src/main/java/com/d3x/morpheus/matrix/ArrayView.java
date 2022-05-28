@@ -28,6 +28,11 @@ final class ArrayView implements D3xMatrixView {
     }
 
     @Override
+    public boolean isEmpty() {
+        return array.length == 0;
+    }
+
+    @Override
     public int nrow() {
         return array.length;
     }

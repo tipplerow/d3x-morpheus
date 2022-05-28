@@ -182,6 +182,11 @@ public final class ApacheMatrix implements D3xMatrix {
     }
 
     @Override
+    public boolean isEmpty() {
+        return size() == 0;
+    }
+
+    @Override
     public ApacheMatrix like(int nrow, int ncol) {
         return new ApacheMatrix(impl.createMatrix(nrow, ncol));
     }
@@ -203,6 +208,26 @@ public final class ApacheMatrix implements D3xMatrix {
     @Override
     public int ncol() {
         return impl.getColumnDimension();
+    }
+
+    @Override
+    public ApacheMatrix minus(double subtrahend) {
+        return wrap(impl.scalarAdd(-subtrahend));
+    }
+
+    @Override
+    public ApacheMatrix minus(D3xMatrix B) {
+        return wrap(impl.subtract(asOperand(B)));
+    }
+
+    @Override
+    public ApacheMatrix plus(double addend) {
+        return wrap(impl.scalarAdd(addend));
+    }
+
+    @Override
+    public ApacheMatrix plus(D3xMatrix B) {
+        return wrap(impl.add(asOperand(B)));
     }
 
     @Override
