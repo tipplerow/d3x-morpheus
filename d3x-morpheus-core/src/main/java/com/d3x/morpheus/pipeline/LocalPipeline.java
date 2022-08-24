@@ -17,6 +17,7 @@ package com.d3x.morpheus.pipeline;
 
 import java.util.function.DoubleUnaryOperator;
 
+import com.d3x.morpheus.vector.D3xVector;
 import com.d3x.morpheus.vector.DataVector;
 
 import lombok.AllArgsConstructor;
@@ -46,6 +47,14 @@ public final class LocalPipeline implements DataPipeline {
     public <K> DataVector<K> apply(DataVector<K> vector) {
         for (K key : vector.collectKeys())
             vector.setElement(key, operator.applyAsDouble(vector.getElement(key)));
+
+        return vector;
+    }
+
+    @Override
+    public D3xVector apply(D3xVector vector) {
+        for (int index = 0; index < vector.length(); ++index)
+            vector.set(index, operator.applyAsDouble(vector.get(index)));
 
         return vector;
     }

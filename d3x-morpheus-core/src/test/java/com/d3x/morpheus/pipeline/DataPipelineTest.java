@@ -15,16 +15,16 @@
  */
 package com.d3x.morpheus.pipeline;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
-import com.d3x.morpheus.frame.DataFrame;
 import com.d3x.morpheus.stats.Max;
 import com.d3x.morpheus.stats.Min;
 import com.d3x.morpheus.numerictests.NumericTestBase;
 import com.d3x.morpheus.util.DoubleComparator;
 import com.d3x.morpheus.util.DoubleInterval;
+import com.d3x.morpheus.vector.D3xVector;
 import com.d3x.morpheus.vector.DataVector;
 
 import org.testng.annotations.Test;
@@ -51,8 +51,11 @@ public class DataPipelineTest extends NumericTestBase {
                     "E", 0.5));
 
     private void assertPipeline(DataPipeline pipeline, DataVector<String> vector, double... expectedValues) {
-        DataVector<String> actualVector = pipeline.apply(DataVector.copy(vector));
-        DataVector<String> expectedVector =
+        var actualD3xVector = pipeline.apply(copyVector(vector));
+        var expectedD3xVector = D3xVector.wrap(expectedValues);
+
+        var actualDataVector = pipeline.apply(DataVector.copy(vector));
+        var expectedDataVector =
                 DataVector.of(Map.of(
                         "A", expectedValues[0],
                         "B", expectedValues[1],
@@ -60,7 +63,19 @@ public class DataPipelineTest extends NumericTestBase {
                         "D", expectedValues[3],
                         "E", expectedValues[4]));
 
-        assertTrue(actualVector.equalsView(expectedVector, comparator));
+        assertTrue(actualD3xVector.equalsVector(expectedD3xVector, comparator));
+        assertTrue(actualDataVector.equalsView(expectedDataVector, comparator));
+    }
+
+    private D3xVector copyVector(DataVector<String> dataVector) {
+        assertEquals(dataVector.collectKeys(), Set.of("A", "B", "C", "D", "E"));
+        var d3xVector = D3xVector.dense(5);
+        d3xVector.set(0, dataVector.getElement("A"));
+        d3xVector.set(1, dataVector.getElement("B"));
+        d3xVector.set(2, dataVector.getElement("C"));
+        d3xVector.set(3, dataVector.getElement("D"));
+        d3xVector.set(4, dataVector.getElement("E"));
+        return d3xVector;
     }
 
     private void assertPipeline1(DataPipeline pipeline, double... expectedValues) {

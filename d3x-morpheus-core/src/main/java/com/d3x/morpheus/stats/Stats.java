@@ -56,6 +56,13 @@ public interface Stats<T> {
     T mean();
 
     /**
+     * Returns the mean absolute value for this entity
+     * @return      the mean value
+     * @see <a href="http://en.wikipedia.org/wiki/Arithmetic_mean">Wikipedia</a>
+     */
+    T meanAbs();
+
+    /**
      * Returns the median value for this entity
      * @return      the median value
      * @see <a href="http://en.wikipedia.org/wiki/Median">Wikipedia</a>
@@ -89,6 +96,13 @@ public interface Stats<T> {
      * @see <a href="http://en.wikipedia.org/wiki/Sum">Wikipedia</a>
      */
     T sum();
+
+    /**
+     * Returns the sum of the absolute values for this entity
+     * @return      the sum of absolute values
+     * @see <a href="http://en.wikipedia.org/wiki/Sum">Wikipedia</a>
+     */
+    T sumAbs();
 
     /**
      * Returns the sum of the logs for this entity
@@ -218,6 +232,10 @@ public interface Stats<T> {
             return compute.applyAsDouble(new Mean());
         }
         @Override
+        public Double meanAbs() {
+            return compute.applyAsDouble(new MeanAbs());
+        }
+        @Override
         public Double median() {
             return compute.applyAsDouble(new Median());
         }
@@ -236,6 +254,10 @@ public interface Stats<T> {
         @Override
         public Double sum() {
             return compute.applyAsDouble(new Sum());
+        }
+        @Override
+        public Double sumAbs() {
+            return compute.applyAsDouble(new SumAbs());
         }
         @Override
         public Double sumLogs() {

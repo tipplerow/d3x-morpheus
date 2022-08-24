@@ -23,14 +23,17 @@ import com.d3x.morpheus.series.DoubleSeries;
 import com.d3x.morpheus.stats.Mean;
 import com.d3x.morpheus.stats.Percentile;
 import com.d3x.morpheus.stats.StdDev;
+import com.d3x.morpheus.stats.SumAbs;
+import com.d3x.morpheus.stats.SumSquares;
 import com.d3x.morpheus.util.DoubleComparator;
 import com.d3x.morpheus.util.DoubleInterval;
 import com.d3x.morpheus.util.MorpheusException;
+import com.d3x.morpheus.vector.D3xVector;
 import com.d3x.morpheus.vector.DataVector;
 import com.d3x.morpheus.vector.DataVectorView;
 
 /**
- * Defines an in-place transformation of a DataVector.
+ * Defines an in-place transformation of vector data.
  *
  * @author Scott Shaffer
  */
@@ -46,6 +49,19 @@ public interface DataPipeline {
      * operator chaining.
      */
     <K> DataVector<K> apply(DataVector<K> vector);
+
+    /**
+     * Applies the transformation defined by this pipeline to a vector;
+     * the vector is modified in place.
+     *
+     * @param vector the vector to transform.
+     *
+     * @return the input vector, as modified by this pipeline, for
+     * operator chaining.
+     *
+     * @throws RuntimeException unless this is a size-preserving pipeline.
+     */
+    D3xVector apply(D3xVector vector);
 
     /**
      * Creates a copy of a vector view, applies the transformation defined
@@ -168,6 +184,12 @@ public interface DataPipeline {
         }
 
         @Override
+        public D3xVector apply(D3xVector vector) {
+            double mean = new Mean().compute(vector);
+            return subtract(mean).apply(vector);
+        }
+
+        @Override
         public String encode() {
             return "demean()";
         }
@@ -200,6 +222,12 @@ public interface DataPipeline {
     DataPipeline identity = new DataPipeline() {
         @Override
         public <K> DataVector<K> apply(DataVector<K> vector) {
+            // Do nothing...
+            return vector;
+        }
+
+        @Override
+        public D3xVector apply(D3xVector vector) {
             // Do nothing...
             return vector;
         }
@@ -249,6 +277,12 @@ public interface DataPipeline {
         }
 
         @Override
+        public D3xVector apply(D3xVector vector) {
+            var norm2 = Math.sqrt(new SumSquares().compute(vector));
+            return divide(norm2).apply(vector);
+        }
+
+        @Override
         public String encode() {
             return "normalize()";
         }
@@ -263,6 +297,18 @@ public interface DataPipeline {
             return false;
         }
     };
+
+    /**
+     * A non-local, size-preserving pipeline that ranks elements onto
+     * the interval {@code [0.0, 1.0]}.
+     */
+    DataPipeline rank01 = rank(0.0, 1.0);
+
+    /**
+     * A non-local, size-preserving pipeline that ranks elements onto
+     * the interval {@code [-1.0, 1.0]}.
+     */
+    DataPipeline rank11 = rank(-1.0, 1.0);
 
     /**
      * A local, size-preserving pipeline that replaces each element
@@ -294,6 +340,12 @@ public interface DataPipeline {
     DataPipeline standardize = new DataPipeline() {
         @Override
         public <K> DataVector<K> apply(DataVector<K> vector) {
+            double sdev = new StdDev(true).compute(vector);
+            return composite(demean, divide(sdev)).apply(vector);
+        }
+
+        @Override
+        public D3xVector apply(D3xVector vector) {
             double sdev = new StdDev(true).compute(vector);
             return composite(demean, divide(sdev)).apply(vector);
         }
@@ -435,6 +487,16 @@ public interface DataPipeline {
             }
 
             @Override
+            public D3xVector apply(D3xVector vector) {
+                double norm1 = new SumAbs().compute(vector);
+
+                if (DoubleComparator.DEFAULT.isPositive(norm1))
+                    return multiply(target / norm1).apply(vector);
+                else
+                    throw new MorpheusException("Cannot apply target leverage to a vector with zero norm.");
+            }
+
+            @Override
             public String encode() {
                 return String.format("lever(%s)", target);
             }
@@ -487,6 +549,23 @@ public interface DataPipeline {
      */
     static DataPipeline pow(double exponent) {
         return local(String.format("pow(%s)", exponent), element -> Math.pow(element, exponent));
+    }
+
+    /**
+     * Returns a non-local, size-preserving pipeline that ranks elements
+     * onto a continuous interval.
+     *
+     * @param lower the minimum rank.
+     * @param upper the maximum rank.
+     *
+     * @return a non-local, size-preserving pipeline that ranks elements
+     * onto the specified interval.
+     *
+     * @throws RuntimeException unless the maximum rank is greater than
+     * the minimum.
+     */
+    static DataPipeline rank(double lower, double upper) {
+        return new RankPipeline(lower, upper);
     }
 
     /**
@@ -568,6 +647,15 @@ public interface DataPipeline {
         return new DataPipeline() {
             @Override
             public <K> DataVector<K> apply(DataVector<K> vector) {
+                // Percentile takes fractional (quantile) values...
+                double lower = new Percentile(quantile).compute(vector);
+                double upper = new Percentile(1.0 - quantile).compute(vector);
+
+                return bound(lower, upper).apply(vector);
+            }
+
+            @Override
+            public D3xVector apply(D3xVector vector) {
                 // Percentile takes fractional (quantile) values...
                 double lower = new Percentile(quantile).compute(vector);
                 double upper = new Percentile(1.0 - quantile).compute(vector);
