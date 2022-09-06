@@ -16,13 +16,14 @@
 package com.d3x.morpheus.stats;
 
 /**
- * A Statistic implementation that supports incremental calculation of a sample sum
+ * A Statistic implementation that supports incremental calculation of
+ * the mean absolute value in a sample.
  *
  * <p><strong>This is open source software released under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 License</a></strong></p>
  *
  * @author  Xavier Witdouck
  */
-public class Sum implements Statistic1 {
+public class MeanAbs implements Statistic1 {
 
     private long n;
     private double sum;
@@ -30,7 +31,7 @@ public class Sum implements Statistic1 {
     /**
      * Constructor
      */
-    public Sum() {
+    public MeanAbs() {
         super();
     }
 
@@ -41,19 +42,22 @@ public class Sum implements Statistic1 {
 
     @Override
     public double getValue() {
-        return sum;
+        if (n > 0)
+            return sum / n;
+        else
+            return Double.NaN;
     }
 
     @Override
     public StatType getType() {
-        return StatType.SUM;
+        return StatType.MEAN_ABS;
     }
 
     @Override
     public long add(double value) {
         if (!Double.isNaN(value)) {
-            this.sum += value;
-            this.n++;
+            sum += Math.abs(value);
+            ++n;
         }
         return n;
     }
@@ -67,7 +71,7 @@ public class Sum implements Statistic1 {
         }
     }
 
-    @Override
+    @Override()
     public Statistic1 reset() {
         this.n = 0L;
         this.sum = 0d;

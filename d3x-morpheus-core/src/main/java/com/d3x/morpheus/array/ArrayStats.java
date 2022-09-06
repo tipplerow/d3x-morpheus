@@ -21,6 +21,7 @@ import com.d3x.morpheus.stats.GeoMean;
 import com.d3x.morpheus.stats.Kurtosis;
 import com.d3x.morpheus.stats.Max;
 import com.d3x.morpheus.stats.Mean;
+import com.d3x.morpheus.stats.MeanAbs;
 import com.d3x.morpheus.stats.MeanAbsDev;
 import com.d3x.morpheus.stats.Median;
 import com.d3x.morpheus.stats.Min;
@@ -32,6 +33,7 @@ import com.d3x.morpheus.stats.Stats;
 import com.d3x.morpheus.stats.StdDev;
 import com.d3x.morpheus.stats.StdErrorMean;
 import com.d3x.morpheus.stats.Sum;
+import com.d3x.morpheus.stats.SumAbs;
 import com.d3x.morpheus.stats.SumLogs;
 import com.d3x.morpheus.stats.SumSquares;
 import com.d3x.morpheus.stats.Variance;
@@ -47,8 +49,8 @@ import com.d3x.morpheus.stats.Variance;
  */
 class ArrayStats<T extends Number> implements Stats<Number> {
 
-    private int offset;
-    private int length;
+    private final int offset;
+    private final int length;
     private final Array<T> array;
 
 
@@ -100,6 +102,11 @@ class ArrayStats<T extends Number> implements Stats<Number> {
     }
 
     @Override
+    public final Number meanAbs() {
+        return compute(new MeanAbs());
+    }
+
+    @Override
     public final Number median() {
         return compute(new Median());
     }
@@ -122,6 +129,11 @@ class ArrayStats<T extends Number> implements Stats<Number> {
     @Override
     public final Number sum() {
         return compute(new Sum());
+    }
+
+    @Override
+    public final Number sumAbs() {
+        return compute(new SumAbs());
     }
 
     @Override

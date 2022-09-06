@@ -19,6 +19,7 @@ import com.d3x.morpheus.frame.DataFrameException;
 import com.d3x.morpheus.frame.DataFrameValue;
 import com.d3x.morpheus.stats.AutoCorrelation;
 import com.d3x.morpheus.stats.Count;
+import com.d3x.morpheus.stats.MeanAbs;
 import com.d3x.morpheus.stats.MeanAbsDev;
 import com.d3x.morpheus.stats.StatException;
 import com.d3x.morpheus.stats.GeoMean;
@@ -35,6 +36,7 @@ import com.d3x.morpheus.stats.Stats;
 import com.d3x.morpheus.stats.StdDev;
 import com.d3x.morpheus.stats.StdErrorMean;
 import com.d3x.morpheus.stats.Sum;
+import com.d3x.morpheus.stats.SumAbs;
 import com.d3x.morpheus.stats.SumLogs;
 import com.d3x.morpheus.stats.SumSquares;
 import com.d3x.morpheus.stats.Variance;
@@ -48,8 +50,8 @@ import com.d3x.morpheus.stats.Variance;
  */
 class XDataFrameStats<R,C> implements Stats<Double> {
 
-    private boolean skipNaNs;
-    private Iterable<DataFrameValue<R,C>> values;
+    private final boolean skipNaNs;
+    private final Iterable<DataFrameValue<R,C>> values;
 
     /**
      * Constructor
@@ -103,6 +105,11 @@ class XDataFrameStats<R,C> implements Stats<Double> {
     }
 
     @Override()
+    public final Double meanAbs() {
+        return compute(new MeanAbs());
+    }
+
+    @Override()
     public final Double stdDev() {
         return compute(new StdDev(true));
     }
@@ -110,6 +117,11 @@ class XDataFrameStats<R,C> implements Stats<Double> {
     @Override()
     public final Double sum() {
         return compute(new Sum());
+    }
+
+    @Override
+    public final Double sumAbs() {
+        return compute(new SumAbs());
     }
 
     @Override

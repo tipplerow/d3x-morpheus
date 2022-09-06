@@ -33,11 +33,14 @@ import lombok.Value;
 @AllArgsConstructor
 public class FramePipeline {
     /**
-     * The axis to which the
+     * The axis to which the pipeline should be applied.
      */
     @NonNull
     DataFrameAxis.Type axis;
 
+    /**
+     * The data pipeline to apply.
+     */
     @NonNull
     DataPipeline pipeline;
 

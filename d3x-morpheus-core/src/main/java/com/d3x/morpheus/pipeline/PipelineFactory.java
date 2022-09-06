@@ -99,6 +99,18 @@ public class PipelineFactory {
                 assertArgs(name, args, Number.class);
                 return DataPipeline.pow(doubleArg(args, 0));
 
+            case "rank":
+                assertArgs(name, args, Number.class, Number.class);
+                return new RankPipeline(doubleArg(args, 0), doubleArg(args, 1));
+
+            case "rank01":
+                assertNoArgs(name, args);
+                return DataPipeline.rank01;
+
+            case "rank11":
+                assertNoArgs(name, args);
+                return DataPipeline.rank11;
+
             case "replaceNA": // Fall-through
             case "replaceNaN":
                 assertArgs(name, args, Number.class);

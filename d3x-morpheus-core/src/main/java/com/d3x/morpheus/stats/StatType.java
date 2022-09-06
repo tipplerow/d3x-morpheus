@@ -15,8 +15,6 @@
  */
 package com.d3x.morpheus.stats;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import com.d3x.morpheus.frame.DataFrameException;
@@ -40,21 +38,23 @@ public enum StatType {
     MEDIAN,
     PRODUCT,
     PERCENTILE,
+    SUM_ABS,
     SUM_LOGS,
     SUM_SQUARES,
     STD_DEV,
     VARIANCE,
     KURTOSIS,
     SKEWNESS,
+    MEAN_ABS,
     GEO_MEAN,
     COVARIANCE,
     CORRELATION,
     AUTO_CORREL;
 
 
-    private static List<StatType> univariate = Collections.unmodifiableList(Arrays.asList(
-        SUM, MIN, MAX, MAD, SEM, MEAN, COUNT, MEDIAN, PERCENTILE, SUM_LOGS, SUM_SQUARES, STD_DEV, VARIANCE, KURTOSIS, SKEWNESS, GEO_MEAN, AUTO_CORREL
-    ));
+    private static final List<StatType> univariate = List.of(
+            SUM, MIN, MAX, MAD, SEM, MEAN, COUNT, MEDIAN, PERCENTILE, SUM_ABS, SUM_LOGS,
+            SUM_SQUARES, STD_DEV, VARIANCE, KURTOSIS, SKEWNESS, MEAN_ABS, GEO_MEAN, AUTO_CORREL);
 
 
     /**
@@ -79,12 +79,14 @@ public enum StatType {
             case MEDIAN:            return stats.median();
             case MAD:               return stats.mad();
             case SUM:               return stats.sum();
+            case SUM_ABS:           return stats.sumAbs();
             case SUM_LOGS:          return stats.sumLogs();
             case SEM:               return stats.sem();
             case STD_DEV:           return stats.stdDev();
             case VARIANCE:          return stats.variance();
             case KURTOSIS:          return stats.kurtosis();
             case SKEWNESS:          return stats.skew();
+            case MEAN_ABS:          return stats.meanAbs();
             case GEO_MEAN:          return stats.geoMean();
             case COUNT:             return stats.count();
             case PRODUCT:           return stats.product();
@@ -94,7 +96,4 @@ public enum StatType {
             default:    throw new DataFrameException("Unsupported stat type: " + this.name());
         }
     }
-
-
-
-    }
+}

@@ -26,6 +26,7 @@ import com.d3x.morpheus.stats.GeoMean;
 import com.d3x.morpheus.stats.Kurtosis;
 import com.d3x.morpheus.stats.Max;
 import com.d3x.morpheus.stats.Mean;
+import com.d3x.morpheus.stats.MeanAbs;
 import com.d3x.morpheus.stats.MeanAbsDev;
 import com.d3x.morpheus.stats.Median;
 import com.d3x.morpheus.stats.Min;
@@ -37,6 +38,7 @@ import com.d3x.morpheus.stats.Stats;
 import com.d3x.morpheus.stats.StdDev;
 import com.d3x.morpheus.stats.StdErrorMean;
 import com.d3x.morpheus.stats.Sum;
+import com.d3x.morpheus.stats.SumAbs;
 import com.d3x.morpheus.stats.SumLogs;
 import com.d3x.morpheus.stats.SumSquares;
 import com.d3x.morpheus.stats.Variance;
@@ -53,8 +55,8 @@ import com.d3x.morpheus.stats.Variance;
  */
 abstract class XDataFrameStatsBase<R,C> implements Stats<DataFrame<R,C>> {
 
-    private boolean columns;
-    private boolean parallel;
+    private final boolean columns;
+    private final boolean parallel;
 
     /**
      * Constructor
@@ -112,6 +114,12 @@ abstract class XDataFrameStatsBase<R,C> implements Stats<DataFrame<R,C>> {
 
 
     @Override
+    public DataFrame<R,C> meanAbs() {
+        return compute(new MeanAbs());
+    }
+
+
+    @Override
     public DataFrame<R,C> median() {
         return compute(new Median());
     }
@@ -138,6 +146,12 @@ abstract class XDataFrameStatsBase<R,C> implements Stats<DataFrame<R,C>> {
     @Override
     public DataFrame<R,C> sum() {
         return compute(new Sum());
+    }
+
+
+    @Override
+    public DataFrame<R,C> sumAbs() {
+        return compute(new SumAbs());
     }
 
 

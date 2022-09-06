@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.List;
 
 import com.d3x.morpheus.util.MorpheusException;
+import com.d3x.morpheus.vector.D3xVector;
 import com.d3x.morpheus.vector.DataVector;
 
 import lombok.Getter;
@@ -71,6 +72,14 @@ public class CompositePipeline implements DataPipeline {
 
     @Override
     public <K> DataVector<K> apply(DataVector<K> vector) {
+        for (DataPipeline pipeline : pipelines)
+            pipeline.apply(vector);
+
+        return vector;
+    }
+
+    @Override
+    public D3xVector apply(D3xVector vector) {
         for (DataPipeline pipeline : pipelines)
             pipeline.apply(vector);
 

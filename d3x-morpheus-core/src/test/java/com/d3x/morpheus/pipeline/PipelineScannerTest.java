@@ -154,6 +154,14 @@ public class PipelineScannerTest {
     }
 
     @Test
+    public void testRank() {
+        assertScanned("rank01()", DataPipeline.rank01);
+        assertScanned("rank11()", DataPipeline.rank11);
+        assertScanned("rank(-1.0, 1.0)", DataPipeline.rank(-1.0, 1.0));
+        assertScanned("rank(0, 100)", DataPipeline.rank(0, 100));
+    }
+
+    @Test
     public void testReplaceNaN() {
         assertScanned("replaceNaN(5)", DataPipeline.replaceNaN(5));
         assertScanned("replaceNaN(7.7)", DataPipeline.replaceNaN(7.7));

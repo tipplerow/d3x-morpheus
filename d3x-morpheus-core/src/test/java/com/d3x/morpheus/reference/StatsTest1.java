@@ -118,12 +118,14 @@ public class StatsTest1 {
             case MAD:               frame.stats().mad();            break;
             case COUNT:             frame.stats().count();          break;
             case STD_DEV:           frame.stats().stdDev();         break;
+            case SUM_ABS:           frame.stats().sumAbs();         break;
             case SUM_LOGS:          frame.stats().sumLogs();        break;
             case SUM_SQUARES:       frame.stats().sumSquares();     break;
             case VARIANCE:          frame.stats().variance();       break;
             case KURTOSIS:          frame.stats().kurtosis();       break;
             case SKEWNESS:          frame.stats().skew();           break;
             case GEO_MEAN:          frame.stats().geoMean();        break;
+            case MEAN_ABS:          frame.stats().meanAbs();        break;
             case PRODUCT:           frame.stats().product();        break;
             case PERCENTILE:        frame.stats().percentile(0.5d); break;
             case AUTO_CORREL:  frame.stats().autocorr(1);      break;

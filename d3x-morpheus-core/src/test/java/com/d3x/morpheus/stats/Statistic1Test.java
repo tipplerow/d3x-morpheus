@@ -67,4 +67,24 @@ public class Statistic1Test {
         assertEquals(variance.compute(vec3), 5.0 / 3.0, TOLERANCE);
         assertEquals(variance.compute(vec4), 833.0 / 3.0, TOLERANCE);
     }
+
+    @Test
+    public void testSumAbs() {
+        var sumAbs = Statistic1.newInstance("SumAbs");
+        assertEquals(sumAbs.compute(vec1), 0.0, TOLERANCE);
+        assertEquals(sumAbs.compute(vec2), 1.0, TOLERANCE);
+        assertEquals(sumAbs.compute(vec3), 10.0, TOLERANCE);
+        assertEquals(sumAbs.compute(vec4), 42.0, TOLERANCE);
+        assertEquals(sumAbs.compute(vec5), 8.43, TOLERANCE);
+    }
+
+    @Test
+    public void testMeanAbs() {
+        var meanAbs = Statistic1.newInstance("MeanAbs");
+        assertTrue(Double.isNaN(meanAbs.compute(vec1)));
+        assertEquals(meanAbs.compute(vec2), 1.0, TOLERANCE);
+        assertEquals(meanAbs.compute(vec3), 2.5, TOLERANCE);
+        assertEquals(meanAbs.compute(vec4), 10.5, TOLERANCE);
+        assertEquals(meanAbs.compute(vec5), 2.1075, TOLERANCE);
+    }
 }
