@@ -15,6 +15,8 @@
  */
 package com.d3x.morpheus.util;
 
+import lombok.experimental.UtilityClass;
+
 /**
  * A utility class that can be used to make various assertions to trigger exceptions early.
  *
@@ -22,6 +24,7 @@ package com.d3x.morpheus.util;
  *
  * @author Xavier Witdouck
  */
+@UtilityClass
 public class Asserts {
 
     /**
@@ -132,7 +135,7 @@ public class Asserts {
      * @param delta         the delta threshold
      */
     public static void assertEquals(int actual, int expected, double delta, String message) {
-        if (Integer.compare(actual, expected) != 0) {
+        if (actual != expected) {
             if (Math.abs(expected - actual) > delta) {
                 fail(message, "Actual value," + actual + ", not equal to expected: " + expected);
             }
@@ -202,7 +205,7 @@ public class Asserts {
                 if (type1 != type2) {
                     fail(message, String.format("Type mismatch, %s != %s", type1, type2));
                 } else if (!actual.equals(expected)) {
-                    fail(message, String.format("Actual and expected value mismatch, %s != %s", type1, type2));
+                    fail(message, String.format("Actual and expected value mismatch, %s != %s", actual, expected));
                 }
             } else if (actual == null) {
                 fail(message, String.format("Actual value is null, expected value = %s", expected));
