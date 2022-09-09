@@ -257,11 +257,28 @@ public final class DoubleInterval implements DoublePredicate {
     }
 
     /**
+     * Returns the midpoint of this interval.
+     * @return the midpoint of this interval.
+     */
+    public double getMidPoint() {
+        return 0.5 * (lower + upper);
+    }
+
+    /**
      * Returns the width of this interval.
      * @return the width of this interval.
      */
     public double getWidth() {
         return upper - lower;
+    }
+
+    /**
+     * Identifies intervals with at least one finite bound.
+     *
+     * @return {@code true} iff at least one bound is finite.
+     */
+    public boolean isFinite() {
+        return Double.NEGATIVE_INFINITY < lower || upper < Double.POSITIVE_INFINITY;
     }
 
     /**

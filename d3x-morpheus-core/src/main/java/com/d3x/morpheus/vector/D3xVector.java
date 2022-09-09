@@ -27,6 +27,7 @@ import com.d3x.morpheus.frame.DataFrameVector;
 import com.d3x.morpheus.series.DoubleSeries;
 import com.d3x.morpheus.util.DoubleComparator;
 import com.d3x.morpheus.util.MorpheusException;
+import lombok.NonNull;
 
 /**
  * Represents a fixed-length vector of {@code double} values, provides static
@@ -389,6 +390,22 @@ public interface D3xVector extends D3xVectorView {
     }
 
     /**
+     * Creates a new vector by copying values from a list.
+     *
+     * @param values the list to be copied.
+     *
+     * @return a new vector containing a copy of the values in the list.
+     */
+    static D3xVector copyOf(@NonNull List<Double> values) {
+        D3xVector vector = dense(values.size());
+
+        for (int index = 0; index < values.size(); ++index)
+            vector.set(index, values.get(index));
+
+        return vector;
+    }
+
+    /**
      * Creates a new vector by copying values from a DoubleSeries.
      *
      * @param series       the series to be copied.
@@ -609,6 +626,19 @@ public interface D3xVector extends D3xVectorView {
      */
     static D3xVector wrap(double... values) {
         return ApacheVector.wrap(values);
+    }
+
+    /**
+     * Presents a Double list as a D3xVector. Changes to the returned
+     * vector will be reflected in the original list, and changes to
+     * the list will be reflected in the returned vector.
+     *
+     * @param list the list to present.
+     *
+     * @return a vector adapter for the specified list.
+     */
+    static D3xVector wrap(List<Double> list) {
+        return new ListVector(list);
     }
 
     /**

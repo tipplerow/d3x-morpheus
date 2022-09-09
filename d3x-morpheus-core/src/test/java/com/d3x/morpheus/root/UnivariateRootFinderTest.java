@@ -13,26 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.d3x.morpheus.util;
+package com.d3x.morpheus.root;
 
+import com.d3x.morpheus.util.DoubleInterval;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
 
 /**
  * @author Scott Shaffer
  */
-public final class DoubleUtilTest {
+public class UnivariateRootFinderTest {
     @Test
-    public void testRatio() {
-        Assert.assertEquals(DoubleUtil.ratio(1, 2), 0.5, 1.0E-15);
-        Assert.assertEquals(DoubleUtil.ratio(1, 3), 0.33333333, 1.0E-08);
-        Assert.assertEquals(DoubleUtil.ratio(5, 3), 1.66666667, 1.0E-08);
-    }
+    public void testBracket() {
+        var root1 = 10.0;
+        var root2 = -100.0;
 
-    @Test
-    public void testRound() {
-        Assert.assertEquals(DoubleUtil.round(0.234567, 0.01), 0.23, 1.0E-15);
-        Assert.assertEquals(DoubleUtil.round(0.234567, 0.0001), 0.2346, 1.0E-15);
-        Assert.assertEquals(DoubleUtil.round(1.234567, 0.25), 1.25, 1.0E-15);
+        var bracket1 = UnivariateRootFinder.bracket(x -> x - root1, DoubleInterval.closed(-1.0, 1.0));
+        var bracket2 = UnivariateRootFinder.bracket(x -> x - root2, DoubleInterval.closed(-1.0, 1.0));
+
+        Assert.assertTrue(bracket1.contains(root1));
+        Assert.assertTrue(bracket2.contains(root2));
     }
 }

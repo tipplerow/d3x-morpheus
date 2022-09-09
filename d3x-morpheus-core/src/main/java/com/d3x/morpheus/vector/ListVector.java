@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2021 D3X Systems - All Rights Reserved
+ * Copyright (C) 2014-2022 D3X Systems - All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,19 +15,18 @@
  */
 package com.d3x.morpheus.vector;
 
-import lombok.NonNull;
-
+import java.util.ArrayList;
 import java.util.List;
 
+import lombok.NonNull;
+
 /**
- * Wraps a Double list in a vector view.
- *
  * @author Scott Shaffer
  */
-final class ListView implements D3xVectorView {
+final class ListVector implements D3xVector {
     @NonNull private final List<Double> list;
 
-    ListView(@NonNull List<Double> list) {
+    ListVector(@NonNull List<Double> list) {
         this.list = list;
     }
 
@@ -39,5 +38,15 @@ final class ListView implements D3xVectorView {
     @Override
     public double get(int index) {
         return list.get(index);
+    }
+
+    @Override
+    public void set(int index, double value) {
+        list.set(index, value);
+    }
+
+    @Override
+    public D3xVector like(int length) {
+        return new ListVector(new ArrayList<>(list));
     }
 }

@@ -269,4 +269,15 @@ public class DoubleIntervalTest {
         assertEquals(DoubleInterval.parse("(-1.0, 2.0]"), DoubleInterval.leftOpen(-1.0, 2.0));
         assertEquals(DoubleInterval.parse("(-1.0, 2.0)"), DoubleInterval.open(-1.0, 2.0));
     }
+
+    @Test
+    public void testIsFinite() {
+        assertTrue(DoubleInterval.EMPTY.isFinite());
+        assertTrue(DoubleInterval.POSITIVE.isFinite());
+        assertTrue(DoubleInterval.NEGATIVE.isFinite());
+        assertTrue(DoubleInterval.NON_POSITIVE.isFinite());
+        assertTrue(DoubleInterval.NON_NEGATIVE.isFinite());
+        assertTrue(DoubleInterval.closed(-100.0, 100.0).isFinite());
+        assertFalse(DoubleInterval.INFINITE.isFinite());
+    }
 }

@@ -26,15 +26,24 @@ import org.testng.annotations.Test;
 public class MovingAverageFilterTest {
     private static final double NA = Double.NaN;
     private static final TimeSeriesFilter filter = new MovingAverageFilter(4);
-    private static final D3xVectorView original = D3xVectorView.of(1.0, 8.0, -3.0, 12.0, 3.0, -6.0);
-    private static final D3xVectorView expected = D3xVectorView.of( NA,  NA,   NA,  4.5, 5.0,  1.5);
 
     @Test
     public void testApply() {
+        var original = D3xVectorView.of(1.0, 8.0, -3.0, 12.0, 3.0, -6.0);
+        var expected = D3xVectorView.of( NA,  NA,   NA,  4.5, 5.0,  1.5);
+
         var filtered = filter.apply(original, false);
         var truncated = filter.apply(original, true);
 
         Assert.assertTrue(filtered.equalsView(expected));
         Assert.assertTrue(truncated.equalsView(expected.subVectorView(3, 3)));
+    }
+
+    @Test
+    public void testRenormalization() {
+        var original = D3xVectorView.of(6.0, NA, -3.0, 12.0,  NA, -6.0);
+        var expected = D3xVectorView.of( NA, NA,   NA,  5.0, 4.5,  1.0);
+        var filtered = filter.apply(original, false);
+        Assert.assertTrue(filtered.equalsView(expected));
     }
 }

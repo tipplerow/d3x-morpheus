@@ -62,9 +62,4 @@ public final class MovingAverageFilter extends AbstractFilter {
     public int getWindowLength() {
         return window;
     }
-
-    @Override
-    public boolean isNormalized() {
-        return true;
-    }
 }

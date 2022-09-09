@@ -148,6 +148,10 @@ public class PipelineFactory {
                 assertArgs(name, args, Number.class, Number.class);
                 return DataPipeline.truncate(doubleArg(args, 0), doubleArg(args, 1));
 
+            case "unitize":
+                assertNoArgs(name, args);
+                return DataPipeline.unitize;
+
             default:
                 throw new MorpheusException("Unknown pipeline: [%s].", name);
         }

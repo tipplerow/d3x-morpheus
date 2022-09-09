@@ -161,7 +161,7 @@ public class DataPipelineTest extends NumericTestBase {
 
     @Test
     public void testNormalize() {
-        assertPipeline1(DataPipeline.normalize, -0.5298129, 0.2649065, NA, 0.7947194, -0.1324532);
+        assertPipeline2(DataPipeline.normalize, 0.30769231, 0.15384615, NA, 0.46153846, 0.07692308);
     }
 
     @Test
@@ -227,5 +227,10 @@ public class DataPipelineTest extends NumericTestBase {
     public void testTruncate() {
         assertPipeline1(DataPipeline.truncate(-1.0, 1.5), NA, 1.0, NA, NA, -0.5);
         assertPipeline1(DataPipeline.truncate(DoubleInterval.closed(-1.0, 1.5)), NA, 1.0, NA, NA, -0.5);
+    }
+
+    @Test
+    public void testUnitize() {
+        assertPipeline1(DataPipeline.unitize, -0.5298129, 0.2649065, NA, 0.7947194, -0.1324532);
     }
 }

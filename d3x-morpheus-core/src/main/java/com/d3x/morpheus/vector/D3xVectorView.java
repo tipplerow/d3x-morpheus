@@ -77,7 +77,7 @@ public interface D3xVectorView extends Iterable<Double> {
      * @return a vector view over the given list.
      */
     static D3xVectorView of(List<Double> list) {
-        return new ListView(list);
+        return new ListVector(list);
     }
 
     /**
