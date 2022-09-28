@@ -94,9 +94,4 @@ public class DifferenceFilter extends CustomFilter {
     public String getName() {
         return NAME;
     }
-
-    @Override
-    public boolean isNormalized() {
-        return false;
-    }
 }

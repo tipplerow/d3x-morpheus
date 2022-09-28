@@ -22,6 +22,20 @@ package com.d3x.morpheus.util;
  */
 public final class DoubleUtil {
     /**
+     * Computes the floating-point ratio of two integers.
+     *
+     * @param numer the integral numerator.
+     * @param denom the integral denominator.
+     *
+     * @return the floating-point ratio of the two integers.
+     */
+    public static double ratio(int numer, int denom) {
+        // Must cast to double because int / int is computed using
+        // integer arithmetic with a remainder...
+        return ((double) numer) / ((double) denom);
+    }
+
+    /**
      * Rounds a double precision value to the nearest whole number of units
      * with a given magnitude.
      *

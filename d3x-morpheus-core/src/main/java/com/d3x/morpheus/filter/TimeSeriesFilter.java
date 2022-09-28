@@ -70,10 +70,28 @@ public interface TimeSeriesFilter {
     int getWindowLength();
 
     /**
-     * Identifies filters whose coefficients sum to one.
+     * Identifies filters whose coefficients are positive and sum to one,
+     * e.g., for weighted averaging filters.
+     *
      * @return {@code true} iff the coefficients of this filter sum to one.
      */
     boolean isNormalized();
+
+    /**
+     * Specifies whether to renormalize the normalized coefficients in the
+     * presence of missing values.
+     *
+     * <p>For example, consider a simple moving average filter with length
+     * five. The coefficients are {@code [0.2, 0.2, 0.2, 0.2, 0.2]} and the
+     * filter is normalized.  When operating on the vector {@code [1.0, 2.0,
+     * Double.NaN, 3.0, 4.0]}, the filter produces the result {@code 2.5}
+     * instead of {@code Double.NaN} or {@code 2.0} because the coefficients
+     * are renormalized to {@code [0.25, 0.25, Double.NaN, 0.25, 0.25].}
+     *
+     * @return {@code true} iff the coefficients are renormalized in the
+     * presence of missing values.
+     */
+    boolean renormalize();
 
     /**
      * Applies a filter to a single observation in a univariate time series.
@@ -164,6 +182,13 @@ public interface TimeSeriesFilter {
      * the filter parser.
      */
     String encode();
+
+    /**
+     * Validates the coefficients of this filter.
+     *
+     * @throws RuntimeException unless this filter is properly defined.
+     */
+    void validate();
 
     /**
      * Returns a linear time-series filter with arbitrary coefficients.

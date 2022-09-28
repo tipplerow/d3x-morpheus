@@ -103,9 +103,4 @@ public class EWMAFilter extends CustomFilter {
     public String getName() {
         return NAME;
     }
-
-    @Override
-    public boolean isNormalized() {
-        return true;
-    }
 }

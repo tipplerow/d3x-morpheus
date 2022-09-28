@@ -16,6 +16,7 @@
 package com.d3x.morpheus.vector;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.d3x.morpheus.frame.DataFrame;
@@ -201,6 +202,27 @@ public class D3xVectorTest {
     }
 
     @Test
+    public void testCopyOfList() {
+        var list = new ArrayList<Double>();
+        list.add(1.0);
+        list.add(2.0);
+        list.add(3.0);
+
+        var vector = D3xVector.copyOf(list);
+        assertEquals(vector.get(0), 1.0, TOLERANCE);
+        assertEquals(vector.get(1), 2.0, TOLERANCE);
+        assertEquals(vector.get(2), 3.0, TOLERANCE);
+
+        // The original list is unchanged after changing the vector...
+        vector.set(0, 111.111);
+        assertEquals(list.get(0), 1.0, TOLERANCE);
+
+        // The vector is unchanged after changing the list...
+        list.set(1, 222.222);
+        assertEquals(vector.get(1), 2.0, TOLERANCE);
+    }
+
+    @Test
     public void testCopyOfSeries() {
         String path = "/csv/aapl.csv";
         DoubleSeries<LocalDate> series = DoubleSeries.<LocalDate>read(path).csv("Date", "Adj Close");
@@ -367,7 +389,7 @@ public class D3xVectorTest {
     }
 
     @Test
-    public void testWrap() {
+    public void testWrapArray() {
         double[] array = new double[] { 1.0, 2.0, 3.0 };
         D3xVector vector = D3xVector.wrap(array);
 
@@ -388,6 +410,27 @@ public class D3xVectorTest {
         assertEquals(vector.get(0), 11.0, TOLERANCE);
         assertEquals(vector.get(1), 22.0, TOLERANCE);
         assertEquals(vector.get(2), 33.0, TOLERANCE);
+    }
+
+    @Test
+    public void testWrapList() {
+        var list = new ArrayList<Double>();
+        list.add(1.0);
+        list.add(2.0);
+        list.add(3.0);
+
+        var vector = D3xVector.wrap(list);
+        assertEquals(vector.get(0), 1.0, TOLERANCE);
+        assertEquals(vector.get(1), 2.0, TOLERANCE);
+        assertEquals(vector.get(2), 3.0, TOLERANCE);
+
+        // The original list is changed after changing the vector...
+        vector.set(0, 111.111);
+        assertEquals(list.get(0), 111.111, TOLERANCE);
+
+        // The vector is changed after changing the list...
+        list.set(1, 222.222);
+        assertEquals(vector.get(1), 222.222, TOLERANCE);
     }
 }
 

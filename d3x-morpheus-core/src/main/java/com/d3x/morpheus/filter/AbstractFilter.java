@@ -19,6 +19,7 @@ import java.util.List;
 
 import com.d3x.morpheus.frame.DataFrame;
 import com.d3x.morpheus.util.DoubleComparator;
+import com.d3x.morpheus.util.LazyValue;
 import com.d3x.morpheus.util.MorpheusException;
 import com.d3x.morpheus.vector.D3xVector;
 import com.d3x.morpheus.vector.D3xVectorView;
@@ -29,6 +30,13 @@ import com.d3x.morpheus.vector.D3xVectorView;
  * @author Scott Shaffer
  */
 public abstract class AbstractFilter implements TimeSeriesFilter {
+    private final LazyValue<Boolean> normalized = LazyValue.of(this::resolveNormalized);
+
+    private boolean resolveNormalized() {
+        var coeffSum = getCoefficients().sum();
+        return DoubleComparator.DEFAULT.equals(coeffSum, 1.0);
+    }
+
     /**
      * Ensures that a filter coefficient is valid.
      *
@@ -121,16 +129,28 @@ public abstract class AbstractFilter implements TimeSeriesFilter {
     @Override
     public double apply(D3xVectorView series, int index, double missing) {
         double result = 0.0;
+        double excluded = 0.0;
+        boolean renormalize = renormalize() && Double.isNaN(missing);
 
         for (int lag = 0; lag < getWindowLength(); ++lag) {
             double coeff = getCoefficient(lag);
             double value = series.get(index - lag);
 
-            if (Double.isNaN(value))
-                value = missing;
+            if (Double.isNaN(value)) {
+                if (renormalize) {
+                    excluded += coeff;
+                    continue;
+                }
+                else {
+                    value = missing;
+                }
+            }
 
             result += coeff * value;
         }
+
+        if (renormalize)
+            result /= (1.0 - excluded);
 
         return result;
     }
@@ -226,8 +246,22 @@ public abstract class AbstractFilter implements TimeSeriesFilter {
 
     @Override
     public boolean isNormalized() {
-        var coeffSum = getCoefficients().sum();
-        return DoubleComparator.DEFAULT.equals(coeffSum, 1.0);
+        return normalized.get();
+    }
+
+    @Override
+    public boolean renormalize() {
+        // By default, renormalize filters that have normalized coefficients...
+        return isNormalized();
+    }
+
+    @Override
+    public void validate() {
+        validateWindow(getWindowLength());
+        validateCoefficients(getCoefficients());
+
+        if (renormalize() && !isNormalized())
+            throw new MorpheusException("Cannot renormalize filter [%s]: coefficients are not normalized.", encode());
     }
 
     @Override

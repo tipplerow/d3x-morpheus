@@ -35,6 +35,6 @@ public final class EWMAFilterTest {
 
         actual = EWMAFilter.computeWeights(4.0, 5);
         expected = D3xVector.copyOf(1.0, 0.8408964, 0.7071068, 0.5946036, 0.5).normalize();
-        Assert.assertTrue(actual.equalsVector(expected, DoubleComparator.fixed(1.0E-06)));
+        Assert.assertTrue(actual.equalsVector(expected, DoubleComparator.fixed(TOLERANCE)));
     }
 }

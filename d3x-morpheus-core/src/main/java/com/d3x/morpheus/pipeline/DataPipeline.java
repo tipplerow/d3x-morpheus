@@ -23,6 +23,7 @@ import com.d3x.morpheus.series.DoubleSeries;
 import com.d3x.morpheus.stats.Mean;
 import com.d3x.morpheus.stats.Percentile;
 import com.d3x.morpheus.stats.StdDev;
+import com.d3x.morpheus.stats.Sum;
 import com.d3x.morpheus.stats.SumAbs;
 import com.d3x.morpheus.stats.SumSquares;
 import com.d3x.morpheus.util.DoubleComparator;
@@ -268,18 +269,18 @@ public interface DataPipeline {
 
     /**
      * A non-local, size-preserving pipeline that rescales the vector
-     * into a normalized unit vector.
+     * so that the elements sum to one.
      */
     DataPipeline normalize = new DataPipeline() {
         @Override
         public <K> DataVector<K> apply(DataVector<K> vector) {
-            return divide(vector.norm2()).apply(vector);
+            var sum = new Sum().compute(vector);
+            return divide(sum).apply(vector);
         }
 
         @Override
         public D3xVector apply(D3xVector vector) {
-            var norm2 = Math.sqrt(new SumSquares().compute(vector));
-            return divide(norm2).apply(vector);
+            return vector.normalize();
         }
 
         @Override
@@ -353,6 +354,38 @@ public interface DataPipeline {
         @Override
         public String encode() {
             return "standardize()";
+        }
+
+        @Override
+        public boolean isSizePreserving() {
+            return true;
+        }
+
+        @Override
+        public boolean isLocal() {
+            return false;
+        }
+    };
+
+    /**
+     * A non-local, size-preserving pipeline that rescales the vector
+     * into a unit vector (with 2-norm equal to one).
+     */
+    DataPipeline unitize = new DataPipeline() {
+        @Override
+        public <K> DataVector<K> apply(DataVector<K> vector) {
+            return divide(vector.norm2()).apply(vector);
+        }
+
+        @Override
+        public D3xVector apply(D3xVector vector) {
+            var norm2 = Math.sqrt(new SumSquares().compute(vector));
+            return divide(norm2).apply(vector);
+        }
+
+        @Override
+        public String encode() {
+            return "unitize()";
         }
 
         @Override
