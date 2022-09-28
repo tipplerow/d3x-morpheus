@@ -211,9 +211,30 @@ public abstract class Parser<T> extends Function1<String,T> {
     public static <O> Parser<O> forObject(Class<O> type, Function<String,O> function) {
         return new Parser<>(FunctionStyle.OBJECT, type, Objects::isNull) {
             @Override
-            public final O apply(String value) {
+            public O apply(String value) {
                 return value != null ? function.apply(value) : null;
             }
+
+            @Override
+            public boolean applyAsBoolean(String value) {
+                return value != null ? (Boolean)function.apply(value) : false;
+            }
+
+            @Override
+            public int applyAsInt(String value) {
+                return value != null ? (Integer)function.apply(value) : 0;
+            }
+
+            @Override
+            public long applyAsLong(String value) {
+                return value != null ? (Long)function.apply(value) : 0L;
+            }
+
+            @Override
+            public double applyAsDouble(String value) {
+                return value != null ? (Double) function.apply(value) : Double.NaN;
+            }
+
             @Override
             public Parser<O> optimize(String value) {
                 return this;
