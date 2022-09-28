@@ -89,7 +89,7 @@ public class QuandlTests {
         };
     }
 
-    @Test()
+    @Test(enabled = false)
     public void databases() {
         var frame = source.getDatabases();
         frame.out().print();
@@ -106,7 +106,7 @@ public class QuandlTests {
     }
 
 
-    @Test()
+    @Test(enabled = false)
     public void datasets() {
         final String databaseCode = "FED";
         final DataFrame<String,QuandlField> frame = source.getDatasets(databaseCode);
@@ -123,7 +123,7 @@ public class QuandlTests {
     }
 
 
-    @Test()
+    @Test(enabled = false)
     public void search() {
         final DataFrame<Integer,QuandlField> frame = source.search("crude oil");
         frame.out().print();
@@ -142,7 +142,7 @@ public class QuandlTests {
     }
 
 
-    @Test(dataProvider = "metadata1")
+    @Test(dataProvider = "metadata1", enabled = false)
     public void metadata1(String database) {
         final QuandlDatabaseInfo metaData = source.getMetaData(database);
         IO.println(metaData);
@@ -156,7 +156,7 @@ public class QuandlTests {
 
 
 
-    @Test(dataProvider = "metadata2")
+    @Test(dataProvider = "metadata2", enabled = false)
     public void metadata2(String database, String dataset) {
         final QuandlDatasetInfo metaData = source.getMetaData(database, dataset);
         IO.println(metaData);
@@ -176,7 +176,7 @@ public class QuandlTests {
     }
 
 
-    @Test(dataProvider = "wiki")
+    @Test(dataProvider = "wiki", enabled = false)
     public void series(String dataset, int expectedColCount) {
         final DataFrame<LocalDate,String> frame = source.getTimeSeries(options -> {
             options.setDatabase("WIKI");
@@ -201,7 +201,7 @@ public class QuandlTests {
     }
 
 
-    @Test()
+    @Test(enabled = false)
     public void table() {
         final DataFrame<Integer,String> frame = source.getDataTable(options -> {
             options.setDatabase("FXCM");
@@ -249,7 +249,7 @@ public class QuandlTests {
 
 
 
-    @Test(dataProvider = "libor")
+    @Test(dataProvider = "libor", enabled = false)
     public void testDailyFredLibor(String dataset, int expectedColCount) {
         final DataFrame<LocalDate,String> frame = source.getTimeSeries(options -> {
             options.setDatabase("FRED");
@@ -267,7 +267,7 @@ public class QuandlTests {
     }
 
 
-    @Test()
+    @Test(enabled = false)
     public void ukGDP() {
         final DataFrame<LocalDate,String> frame = source.getTimeSeries(options -> {
             options.setDatabase("UKONS");
@@ -284,7 +284,7 @@ public class QuandlTests {
     }
 
 
-    @Test(expectedExceptions = { QuandlException.class})
+    @Test(expectedExceptions = { QuandlException.class}, enabled = false)
     public void testMissingDatabase() {
         source.getTimeSeries(options -> {
             options.setDataset("BKVT_A");
@@ -294,7 +294,7 @@ public class QuandlTests {
     }
 
 
-    @Test(expectedExceptions = { QuandlException.class})
+    @Test(expectedExceptions = { QuandlException.class}, enabled = false)
     public void testMissingDataset() {
         source.getTimeSeries(options -> {
             options.setDatabase("UKONS");
