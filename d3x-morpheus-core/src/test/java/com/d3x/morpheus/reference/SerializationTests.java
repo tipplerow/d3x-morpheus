@@ -39,8 +39,8 @@ import org.testng.annotations.Test;
  * <p><strong>This is open source software released under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 License</a></strong></p>
  */
 public class SerializationTests {
-
-    private final File directory = new File("/tmp/morpheus/tests");
+    private static final String TMP = System.getProperty("java.io.tmpdir");
+    private final File directory = new File(TMP + "/morpheus/tests");
 
     /**
      * Constructor
