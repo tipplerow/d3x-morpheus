@@ -133,5 +133,20 @@ public class DataVectorTest {
         vector1.apply(Math::sqrt);
         assertTrue(vector1.equalsView(vector2));
     }
+
+    @Test
+    public void testFilter() {
+        var map1 = Map.of("A", 1.0, "B", 0.0, "C", -2.0);
+        var map2 = Map.of("A", 1.0);
+        var map3 = Map.of("A", 1.0, "C", -2.0);
+
+        var vector1 = DataVector.of(map1);
+        var vector2 = DataVector.filter(vector1, x -> x.getValue() > 0.5);
+        var vector3 = DataVector.nonZeros(vector1);
+
+        assertTrue(vector1.equalsView(DataVector.of(map1)));
+        assertTrue(vector2.equalsView(DataVector.of(map2)));
+        assertTrue(vector3.equalsView(DataVector.of(map3)));
+    }
 }
 
