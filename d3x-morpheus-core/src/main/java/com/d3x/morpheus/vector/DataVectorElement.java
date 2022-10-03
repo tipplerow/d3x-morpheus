@@ -38,12 +38,30 @@ public class DataVectorElement<K> {
     double value;
 
     /**
+     * Identifies elements with non-zero values.
+     *
+     * @return {@code true} iff the element value is non-zero.
+     */
+    public boolean isNonZero() {
+        return DoubleComparator.DEFAULT.isNonZero(value);
+    }
+
+    /**
      * Identifies elements with non-missing values.
      *
      * @return {@code true} unless the value of this element is {@code Double.NaN}.
      */
     public boolean isSet() {
         return !Double.isNaN(value);
+    }
+
+    /**
+     * Identifies elements with zero values.
+     *
+     * @return {@code true} iff the element value is zero.
+     */
+    public boolean isZero() {
+        return DoubleComparator.DEFAULT.isZero(value);
     }
 
     @Override

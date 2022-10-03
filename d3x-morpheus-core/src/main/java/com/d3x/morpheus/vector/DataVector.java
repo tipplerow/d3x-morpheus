@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.DoubleUnaryOperator;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 public interface DataVector<K> extends DataVectorView<K> {
@@ -132,6 +133,31 @@ public interface DataVector<K> extends DataVectorView<K> {
      */
     static <K> DataVector<K> create() {
         return new MapDataVector<>(new HashMap<>());
+    }
+
+    /**
+     * Creates a new data vector containing elements that match a predicate.
+     *
+     * @param dataVector the data vector to filter.
+     * @param predicate  the filter predicate.
+     *
+     * @return a new data vector containing only the elements of the input
+     * vector that match the predicate.
+     */
+    static <K> DataVector<K> filter(DataVectorView<K> dataVector, Predicate<DataVectorElement<K>> predicate) {
+        return collect(dataVector.streamElements().filter(predicate));
+    }
+
+    /**
+     * Creates a new data vector containing only non-zero elements.
+     *
+     * @param dataVector the data vector to filter.
+     *
+     * @return a new data vector containing only the non-zero elements
+     * from tne input vector.
+     */
+    static <K> DataVector<K> nonZeros(DataVectorView<K> dataVector) {
+        return filter(dataVector, DataVectorElement::isNonZero);
     }
 
     /**
