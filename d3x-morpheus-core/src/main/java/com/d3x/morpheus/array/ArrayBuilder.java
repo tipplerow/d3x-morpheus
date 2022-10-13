@@ -368,7 +368,7 @@ public class ArrayBuilder<T> {
             this.type = type;
             this.dataType = ArrayType.of(type);
             this.array = Array.of(type, capacity, fillPct);
-            this.checkType = this.dataType != ArrayType.OBJECT;
+            this.checkType = this.type != Object.class;
             this.capacity = array.length();
         } else if (checkType && !isMatch(type)) {
             var newArray = Array.<T>ofObjects(array.length(), fillPct);

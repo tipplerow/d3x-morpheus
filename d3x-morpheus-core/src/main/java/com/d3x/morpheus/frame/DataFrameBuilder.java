@@ -17,10 +17,15 @@ package com.d3x.morpheus.frame;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
 import java.util.stream.Stream;
+
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
 
 import com.d3x.morpheus.array.ArrayBuilder;
 import com.d3x.morpheus.array.ArrayType;
@@ -43,16 +48,16 @@ public class DataFrameBuilder<R,C> {
     private static final int DEFAULT_COL_CAPACITY = 100;
 
     /** The row key type for frame */
-    @lombok.Getter
+    @Getter
     private final Class<R> rowType;
     /** The column key type for frame */
-    @lombok.Getter
+    @Getter
     private final Class<C> colType;
     /** The function to provide the load factor for columns */
-    @lombok.Setter @lombok.NonNull
+    @Setter @NonNull
     private Function<C,Float> loadFactor = c -> 1f;
     /** The function to provide the default value for columns */
-    @lombok.Setter @lombok.NonNull
+    @Setter @NonNull
     private Function<C,Object> defaultValue = c -> null;
 
     private Lock lock;
@@ -67,8 +72,8 @@ public class DataFrameBuilder<R,C> {
      * @param colType   the column key type for frame
      */
     DataFrameBuilder(
-        @lombok.NonNull Class<R> rowType,
-        @lombok.NonNull  Class<C> colType) {
+        @NonNull Class<R> rowType,
+        @NonNull Class<C> colType) {
         this.rowType = rowType;
         this.colType = colType;
     }
@@ -78,7 +83,7 @@ public class DataFrameBuilder<R,C> {
      * Constructor
      * @param frame the frame to initialize this builder from
      */
-    DataFrameBuilder(@lombok.NonNull DataFrame<R,C> frame) {
+    DataFrameBuilder(@NonNull DataFrame<R,C> frame) {
         this(frame.rows().keyClass(), frame.cols().keyClass());
         this.capacity(frame.rowCount(), frame.colCount());
         this.putAll(frame);
@@ -213,7 +218,7 @@ public class DataFrameBuilder<R,C> {
      * @param rowKey    the row key to add
      * @return          this coordinate for row key
      */
-    private int putRow(R rowKey) {
+    private int putRow(@NonNull R rowKey) {
         this.rowKeys.add(rowKey);
         return rowKeys.getCoordinate(rowKey);
     }
@@ -225,7 +230,7 @@ public class DataFrameBuilder<R,C> {
      * @return          the array builder
      */
     @SuppressWarnings("unchecked")
-    private <T> ArrayBuilder<T> array(C colKey) {
+    private <T> ArrayBuilder<T> array(@NonNull C colKey) {
         var array = arrayMap.get(colKey);
         if (array != null) {
             return (ArrayBuilder<T>)array;
@@ -255,7 +260,7 @@ public class DataFrameBuilder<R,C> {
      * @param rowKey    the row key to check
      * @return          true if row key exists
      */
-    public boolean hasRow(R rowKey) {
+    public boolean hasRow(@NonNull R rowKey) {
         return rowKeys != null && rowKeys.contains(rowKey);
     }
 
@@ -265,7 +270,7 @@ public class DataFrameBuilder<R,C> {
      * @param colKey    the column key to check
      * @return          true if column key exists
      */
-    public boolean hasColumn(C colKey) {
+    public boolean hasColumn(@NonNull C colKey) {
         return arrayMap != null && arrayMap.containsKey(colKey);
     }
 
@@ -276,7 +281,9 @@ public class DataFrameBuilder<R,C> {
      * @param colKey        the column key
      * @return
      */
-    public boolean contains(R rowKey, C colKey) {
+    public boolean contains(
+        @NonNull R rowKey,
+        @NonNull C colKey) {
         return hasRow(rowKey) && hasColumn(colKey);
     }
 
@@ -318,7 +325,9 @@ public class DataFrameBuilder<R,C> {
      * @param replacement   the replacement key
      * @return              this builder
      */
-    public DataFrameBuilder<R,C> replaceRowKey(R existing, R replacement) {
+    public DataFrameBuilder<R,C> replaceRowKey(
+        @NonNull R existing,
+        @NonNull R replacement) {
         try {
             this.rowKeys.replace(existing, replacement);
             return this;
@@ -334,7 +343,9 @@ public class DataFrameBuilder<R,C> {
      * @param replacement   the replacement key
      * @return              this builder
      */
-    public DataFrameBuilder<R,C> replaceColKey(C existing, C replacement) {
+    public DataFrameBuilder<R,C> replaceColKey(
+        @NonNull C existing,
+        @NonNull C replacement) {
         var array = arrayMap.remove(existing);
         if (array == null) {
             return this;
@@ -352,7 +363,7 @@ public class DataFrameBuilder<R,C> {
      * @param rowKeys   the row keys to add
      * @return          this builder
      */
-    public DataFrameBuilder<R,C> addRows(Iterable<R> rowKeys) {
+    public DataFrameBuilder<R,C> addRows(@NonNull Iterable<R> rowKeys) {
         try {
             this.acquireLock();
             this.rowCapacity(DEFAULT_ROW_CAPACITY);
@@ -365,26 +376,43 @@ public class DataFrameBuilder<R,C> {
 
 
     /**
-     * Adds a column to this builder for the data type
+     * Adds a column to this builder if it does not already exist
      * @param colKey    the column key to add
      * @param dataType  the data type
      * @return          this builder
      */
+    public <T> DataFrameBuilder<R,C> addColumn(
+        @NonNull C colKey,
+        @NonNull Class<T> dataType) {
+        return addColumns(Set.of(colKey), dataType);
+    }
+
+
+    /**
+     * Adds columns to this builder if they do not already exist
+     * @param colKeys   the column keys
+     * @param dataType  the data type for columns
+     * @return          this builder
+     */
     @SuppressWarnings("unchecked")
-    public <T> DataFrameBuilder<R,C> addColumn(C colKey, Class<T> dataType) {
+    public <T> DataFrameBuilder<R,C> addColumns(
+        @NonNull Set<C> colKeys,
+        @NonNull Class<T> dataType) {
         this.acquireLock();
         this.capacity(DEFAULT_ROW_CAPACITY, DEFAULT_COL_CAPACITY);
-        var array = arrayMap.get(colKey);
-        if (array == null) {
-            var loadFactor = this.loadFactor.apply(colKey);
-            if (loadFactor < 0 || loadFactor > 1) {
-                throw new IllegalStateException("Invalid load factor for " + colKey + ", must be > 0 and <= 1, not " + loadFactor);
-            } else {
-                var defaultValue = (T)this.defaultValue.apply(colKey);
-                array = ArrayBuilder.of(rowCapacity, dataType, defaultValue, loadFactor);
-                this.arrayMap.put(colKey, array);
+        colKeys.forEach(colKey -> {
+            var array = arrayMap.get(colKey);
+            if (array == null) {
+                var loadFactor = this.loadFactor.apply(colKey);
+                if (loadFactor < 0 || loadFactor > 1) {
+                    throw new IllegalStateException("Invalid load factor for " + colKey + ", must be > 0 and <= 1, not " + loadFactor);
+                } else {
+                    var defaultValue = (T)this.defaultValue.apply(colKey);
+                    array = ArrayBuilder.of(rowCapacity, dataType, defaultValue, loadFactor);
+                    this.arrayMap.put(colKey, array);
+                }
             }
-        }
+        });
         return this;
     }
 
@@ -397,7 +425,9 @@ public class DataFrameBuilder<R,C> {
      * @param value     the value to apply
      * @return          this builder
      */
-    public DataFrameBuilder<R,C> putBoolean(R rowKey, C colKey, boolean value) {
+    public DataFrameBuilder<R,C> putBoolean(
+        @NonNull R rowKey,
+        @NonNull C colKey, boolean value) {
         try {
             this.acquireLock();
             this.capacity(1000, 10);
@@ -418,7 +448,9 @@ public class DataFrameBuilder<R,C> {
      * @param value     the value to apply
      * @return          this builder
      */
-    public DataFrameBuilder<R,C> putInt(R rowKey, C colKey, int value) {
+    public DataFrameBuilder<R,C> putInt(
+        @NonNull R rowKey,
+        @NonNull C colKey, int value) {
         try {
             this.acquireLock();
             this.capacity(1000, 10);
@@ -439,7 +471,9 @@ public class DataFrameBuilder<R,C> {
      * @param value     the value to apply
      * @return          this builder
      */
-    public DataFrameBuilder<R,C> putLong(R rowKey, C colKey, long value) {
+    public DataFrameBuilder<R,C> putLong(
+        @NonNull R rowKey,
+        @NonNull C colKey, long value) {
         try {
             this.acquireLock();
             this.capacity(1000, 10);
@@ -460,7 +494,9 @@ public class DataFrameBuilder<R,C> {
      * @param value     the value to apply
      * @return          this builder
      */
-    public DataFrameBuilder<R,C> putDouble(R rowKey, C colKey, double value) {
+    public DataFrameBuilder<R,C> putDouble(
+        @NonNull R rowKey,
+        @NonNull C colKey, double value) {
         try {
             this.acquireLock();
             this.capacity(1000, 10);
@@ -481,7 +517,9 @@ public class DataFrameBuilder<R,C> {
      * @param value     the value to apply
      * @return          this builder
      */
-    public <T> DataFrameBuilder<R,C> putValue(R rowKey, C colKey, T value) {
+    public <T> DataFrameBuilder<R,C> putValue(
+        @NonNull R rowKey,
+        @NonNull C colKey, T value) {
         try {
             this.acquireLock();
             this.capacity(1000, 10);
@@ -502,7 +540,9 @@ public class DataFrameBuilder<R,C> {
      * @param value     the value to add
      * @return          this builder
      */
-    public DataFrameBuilder<R,C> plusInt(R rowKey, C colKey, int value) {
+    public DataFrameBuilder<R,C> plusInt(
+        @NonNull R rowKey,
+        @NonNull C colKey, int value) {
         try {
             this.acquireLock();
             this.capacity(1000, 10);
@@ -523,7 +563,9 @@ public class DataFrameBuilder<R,C> {
      * @param value     the value to add
      * @return          this builder
      */
-    public DataFrameBuilder<R,C> plusLong(R rowKey, C colKey, long value) {
+    public DataFrameBuilder<R,C> plusLong(
+        @NonNull R rowKey,
+        @NonNull C colKey, long value) {
         try {
             this.acquireLock();
             this.capacity(1000, 10);
@@ -544,7 +586,9 @@ public class DataFrameBuilder<R,C> {
      * @param value     the value to add
      * @return          this builder
      */
-    public DataFrameBuilder<R,C> plusDouble(R rowKey, C colKey, double value) {
+    public DataFrameBuilder<R,C> plusDouble(
+        @NonNull R rowKey,
+        @NonNull C colKey, double value) {
         try {
             this.acquireLock();
             this.capacity(1000, 10);
@@ -563,7 +607,7 @@ public class DataFrameBuilder<R,C> {
      * @param other the other frame to extract data from
      * @return      this builder
      */
-    public DataFrameBuilder<R,C> putAll(DataFrame<R,C> other) {
+    public DataFrameBuilder<R,C> putAll(@NonNull DataFrame<R,C> other) {
         other.cols().forEach(column -> {
             var dataClass = column.dataClass();
             var dataType = ArrayType.of(dataClass);
