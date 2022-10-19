@@ -224,7 +224,7 @@ class XDataFrame<R,C> implements DataFrame<R,C>, Serializable, Cloneable {
 
     @Override
     public boolean isEmpty() {
-        return rowCount() == 0;
+        return rowCount() == 0 || colCount() == 0;
     }
 
     @Override()
