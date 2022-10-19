@@ -21,6 +21,7 @@ import java.time.Period;
 import java.util.List;
 import java.util.Set;
 
+import com.d3x.morpheus.util.IO;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -215,5 +216,49 @@ public class DataFrameBuilderTests {
                 }
             }
         });
+    }
+
+
+    @Test()
+    public void plusDoubles() {
+        var rows = List.of("R1", "R2");
+        var cols1 = List.of("C1", "C2");
+        var cols2 = List.of("C2", "C3");
+        var df1 = DataFrame.ofDoubles(rows, cols1, v -> Math.random());
+        var df2 = DataFrame.ofDoubles(rows, cols2, v -> Math.random());
+        var df = DataFrame.builder(String.class, String.class)
+            .defaultValue(v -> 0d)
+            .loadFactor(v -> 1f)
+            .plusDoubles(df1)
+            .plusDoubles(df2)
+            .build();
+
+        df1.out().print();  IO.println("");
+        df2.out().print();  IO.println("");
+        df.out().print();  IO.println("");
+        df.forEach(v -> {
+            var rowKey = v.rowKey();
+            var colKey = v.colKey();
+            var actual = v.getDouble();
+            var v1 = df1.getDouble(rowKey, colKey);
+            var v2 = df2.getDouble(rowKey, colKey);
+            switch (colKey) {
+                case "C1":
+                    Assert.assertEquals(actual, v1);
+                    Assert.assertEquals(v2, Double.NaN);
+                    break;
+                case "C2":
+                    Assert.assertEquals(actual, v1 + v2);
+                    break;
+                case "C3":
+                    Assert.assertEquals(actual, v2);
+                    Assert.assertEquals(v1, Double.NaN);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Unexpected col: " + colKey);
+            }
+
+        });
+
     }
 }

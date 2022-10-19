@@ -149,6 +149,28 @@ public class DataFrameBuilder<R,C> {
 
 
     /**
+     * Sets the load factor for builder
+     * @param loadFactor    the load factor for builder
+     * @return              this builder
+     */
+    public DataFrameBuilder<R,C> loadFactor(@NonNull Function<C,Float> loadFactor) {
+        this.loadFactor = loadFactor;
+        return this;
+    }
+
+
+    /**
+     * Sets the default value function for builder
+     * @param defaultValue  the default value function
+     * @return              this builder
+     */
+    public DataFrameBuilder<R,C> defaultValue(@NonNull Function<C,Object> defaultValue) {
+        this.defaultValue = defaultValue;
+        return this;
+    }
+
+
+    /**
      * Returns the current row count for builder
      * @return  the current row count
      */
@@ -595,6 +617,28 @@ public class DataFrameBuilder<R,C> {
             var coord = this.putRow(rowKey);
             var array = this.array(colKey);
             array.plusDouble(coord, value);
+            return this;
+        } finally {
+            this.releaseLock();
+        }
+    }
+
+
+    /**
+     * Adds all double values from the input frame to this builder
+     * @param other     the other frame to add doubles from
+     * @return          this builder
+     */
+    public DataFrameBuilder<R,C> plusDoubles(
+        @NonNull DataFrame<R,C> other) {
+        try {
+            this.acquireLock();
+            this.capacity(1000, 10);
+            other.values().filter(DataFrameValue::isDouble).forEach(v -> {
+                var rowKey = v.rowKey();
+                var colKey = v.colKey();
+                this.plusDouble(rowKey, colKey, v.getDouble());
+            });
             return this;
         } finally {
             this.releaseLock();
