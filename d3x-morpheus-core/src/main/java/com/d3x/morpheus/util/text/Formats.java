@@ -29,9 +29,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
@@ -379,12 +377,13 @@ public class Formats {
      * @param <T>       the data type
      * @return          the resulting value
      */
+    @SuppressWarnings("unchecked")
     public final <T> T parse(Object key, String text) {
         if (text == null) {
             return null;
         } else {
             var parser = this.<T>getParserOrFail(key);
-            return parser.apply(text);
+            return (T)parser.apply(text);
         }
     }
 
@@ -453,17 +452,16 @@ public class Formats {
     /**
      * Returns a Parser for the key specified
      * @param key   the parser key
-     * @param <T>   the type for parser
      * @return      the Parser match, null if no match
      */
     @SuppressWarnings("unchecked")
-    public <T> Parser<T> getParser(Object key) {
-        final Parser<T> parser = (Parser<T>)parserMap.get(key);
+    public Parser<?> getParser(Object key) {
+        var parser = parserMap.get(key);
         if (parser != null) {
             return parser;
-        } else if (key instanceof Class && ((Class)key).isEnum()) {
-            final Class<Enum> enumClass = (Class<Enum>)key;
-            final Parser<T> enumParser = (Parser<T>)Parser.ofEnum(enumClass).withNullChecker(nullCheck);
+        } else if (key instanceof Class && ((Class<?>)key).isEnum()) {
+            var enumClass = (Class<Enum<?>>)key;
+            var enumParser = Parser.ofEnum(enumClass).withNullChecker(nullCheck);
             this.parserMap.put(key, enumParser);
             return enumParser;
         } else {
@@ -474,13 +472,12 @@ public class Formats {
     /**
      * Returns a Parser for the key specified
      * @param key   the parser key
-     * @param <T>   the type for parser
      * @return      the Parser match
      * @throws IllegalArgumentException   if no parser exists for key
      */
     @SuppressWarnings("unchecked")
-    public <T> Parser<T> getParserOrFail(Object key) {
-        final Parser<T> parser = getParser(key);
+    public Parser<?> getParserOrFail(Object key) {
+        var parser = getParser(key);
         if (parser != null) {
             return parser;
         } else {

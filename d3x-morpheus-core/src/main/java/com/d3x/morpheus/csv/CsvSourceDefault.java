@@ -185,12 +185,11 @@ public class CsvSourceDefault implements CsvSource {
                     var formats = options.getFormats();
                     var buffer = options.getReadBatchSize();
                     var capacity = options.getRowCapacity();
-                    var parser = options.getParser(colName).orElse(null);
-                    if (parser == null) {
-                        parser = options.getFormats().getParser(colIndex);
-                        if (parser == null && options.isRowIndex(colName, colIndex)) {
-                            parser = options.getFormats().getParser(rowType);
-                        }
+                    var parser = options.getFormats().getParser(colIndex);
+                    if (parser == null && options.isRowIndex(colName, colIndex)) {
+                        parser = options.getFormats().getParser(rowType);
+                    } else if (parser == null) {
+                        parser = options.getParser(colName).orElse(null);
                     }
                     var column = new CsvColumn(colName, colIndex, capacity, buffer, formats, parser);
                     this.columns.add(column);
