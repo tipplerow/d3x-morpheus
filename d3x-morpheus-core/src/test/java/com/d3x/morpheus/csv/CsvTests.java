@@ -103,7 +103,7 @@ public class CsvTests {
      */
     private <T> void readAndValidate(DataFrame<T,String> original, Class<T> rowType, File file) {
         var formats = new Formats();
-        var parser = formats.<T>getParserOrFail(rowType);
+        var parser = formats.getParserOrFail(rowType);
         var result = DataFrame.read(file).csv(rowType, options -> {
             options.setFormats(formats);
             options.setRowKeyColumnName("DataFrame");
