@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.d3xsystems</groupId>
     <artifactId>d3x-morpheus</artifactId>
-    <version>1.0.56</version>
+    <version>1.1.0</version>
     <packaging>pom</packaging>
 
     <modules>
@@ -65,9 +65,9 @@
 
 
     <properties>
-        <jdk.version>11</jdk.version>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
+        <jdk.version>17</jdk.version>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -117,7 +117,7 @@
         <dependency>
             <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
-            <version>1.32</version>
+            <version>1.33</version>
         </dependency>
 
         <dependency>
@@ -245,6 +245,8 @@
                     <version>3.10.1</version>
 
                     <configuration>
+                        <source>${jdk.version}</source>
+                        <target>${jdk.version}</target>
                         <release>${jdk.version}</release>
                         <fork>false</fork>
                         <showWarnings>true</showWarnings>
