@@ -15,6 +15,7 @@
  */
 package com.d3x.morpheus.vector;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -105,6 +106,14 @@ public final class DataVectorMerge<R extends Comparable<R>, C> {
         }
 
         return this;
+    }
+
+    /**
+     * Returns a read-only view of the merged row keys.
+     * @return a read-only view of the merged row keys.
+     */
+    public Set<R> getRowKeys() {
+        return Collections.unmodifiableSet(rowKeys);
     }
 
     /**
