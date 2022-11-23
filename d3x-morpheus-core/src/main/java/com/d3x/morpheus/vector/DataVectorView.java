@@ -77,9 +77,9 @@ public interface DataVectorView<K> {
     Stream<K> streamKeys();
 
     /**
-     * Returns a stream containing the keys in this view.
+     * Returns a stream containing the values in this view.
      *
-     * @return a stream containing the keys in this view.
+     * @return a stream containing the values in this view.
      */
     DoubleStream streamValues();
 
@@ -335,6 +335,13 @@ public interface DataVectorView<K> {
         return streamKeys().map(key -> DataVectorElement.of(key, getElement(key)));
     }
 
+    /**
+     * Creates a copy of this vector as a data frame row.
+     *
+     * @param rowKey the key for the data frame row.
+     *
+     * @return the elements of this vector as a data frame row.
+     */
     default <R> DataFrame<R, K> toDataFrameRow(R rowKey) {
         var frame = DataFrame.ofDoubles(rowKey, collectKeys());
 
@@ -344,6 +351,13 @@ public interface DataVectorView<K> {
         return frame;
     }
 
+    /**
+     * Creates a copy of this vector as a data frame column.
+     *
+     * @param colKey the key for the data frame column.
+     *
+     * @return the elements of this vector as a data frame column.
+     */
     default <C> DataFrame<K, C> toDataFrameColumn(C colKey) {
         var frame = DataFrame.ofDoubles(collectKeys(), colKey);
 

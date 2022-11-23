@@ -18,6 +18,7 @@ package com.d3x.morpheus.vector;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.DoubleUnaryOperator;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -170,5 +171,18 @@ public interface DataVector<K> extends DataVectorView<K> {
      */
     static <K> DataVector<K> of(Map<K, Double> map) {
         return new MapDataVector<>(map);
+    }
+
+    /**
+     * Creates a DataVector as a subset of an existing view.
+     *
+     * @param view the existing vector view.
+     * @param keys the keys to retain in the subset.
+     *
+     * @return a DataVector containing the elements whose keys are
+     * present in the input set.
+     */
+    static <K> DataVector<K> subset(DataVectorView<K> view, Set<K> keys) {
+        return filter(view, element -> keys.contains(element.getKey()));
     }
 }

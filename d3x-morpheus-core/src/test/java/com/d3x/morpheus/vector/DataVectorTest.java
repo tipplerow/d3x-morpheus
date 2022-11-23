@@ -148,5 +148,22 @@ public class DataVectorTest {
         assertTrue(vector2.equalsView(DataVector.of(map2)));
         assertTrue(vector3.equalsView(DataVector.of(map3)));
     }
+
+    @Test
+    public void testSubset() {
+        var map1 = Map.of("A", 1.0, "B", 0.0, "C", -2.0);
+        var map2 = Map.of("A", 1.0);
+        var map3 = Map.of("A", 1.0, "C", -2.0);
+
+        var vector1 = DataVector.of(map1);
+        var vector2 = DataVector.subset(vector1, Set.of("A"));
+        var vector3 = DataVector.subset(vector1, Set.of("A", "C"));
+        var vector4 = DataVector.subset(vector1, Set.of("D", "E"));
+
+        assertTrue(vector1.equalsView(DataVector.of(map1)));
+        assertTrue(vector2.equalsView(DataVector.of(map2)));
+        assertTrue(vector3.equalsView(DataVector.of(map3)));
+        assertTrue(vector4.isEmpty());
+    }
 }
 
