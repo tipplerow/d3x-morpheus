@@ -71,13 +71,26 @@ public class DataVectorTest {
 
     @Test
     public void testMap() {
-        Map<String, Double> map = new HashMap<>();
+        var map = Map.of("A", 1.0, "B", 0.0, "C", -2.0);
+        var vec = DataVector.of(map);
 
-        map.put("A", 1.0);
-        map.put("B", 2.0);
-        map.put("C", 3.0);
+        assertEquals(vec.getElement("A"), 1.0, TOLERANCE);
+        assertEquals(vec.getElement("B"), 0.0, TOLERANCE);
+        assertEquals(vec.getElement("C"), -2.0, TOLERANCE);
+        assertTrue(Double.isNaN(vec.getElement("D")));
+        assertTrue(Double.isNaN(vec.getElement("E")));
 
-        runTest(DataVector.of(map));
+        vec.setElement("A", 5.0);
+        vec.setElement("B", 6.0);
+        vec.setElement("C", 7.0);
+        vec.setElement("D", 8.0);
+        vec.setElement("E", 9.0);
+
+        assertEquals(vec.getElement("A"), 5.0, TOLERANCE);
+        assertEquals(vec.getElement("B"), 6.0, TOLERANCE);
+        assertEquals(vec.getElement("C"), 7.0, TOLERANCE);
+        assertEquals(vec.getElement("D"), 8.0, TOLERANCE);
+        assertEquals(vec.getElement("E"), 9.0, TOLERANCE);
     }
 
     @Test

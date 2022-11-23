@@ -202,21 +202,21 @@ public class DoubleSeriesTests {
 
     @Test
     public void testCopyOf() {
-        Map<String, Double> map = new HashMap<>();
-        DataVectorView<String> view = DataVectorView.of(map);
-        DoubleSeries<String> expected = DoubleSeries.build(String.class, Map.of("A", 1.0, "B", 2.0, "C", 3.0));
-
+        var map = new HashMap<String, Double>();
         map.put("A", 1.0);
         map.put("B", 2.0);
         map.put("C", 3.0);
 
-        DoubleSeries<String> series1 = DoubleSeries.copyOf(String.class, view);
-        Assert.assertTrue(series1.equalsSeries(expected));
+        var view = DataVectorView.of(map);
+        var actual = DoubleSeries.copyOf(String.class, view);
+        var expected = DoubleSeries.build(String.class, Map.of("A", 1.0, "B", 2.0, "C", 3.0));
+
+        Assert.assertTrue(actual.equalsSeries(expected));
 
         map.put("B", 22.0);
         map.put("D", 44.0);
 
-        Assert.assertTrue(series1.equalsSeries(expected));
+        Assert.assertTrue(actual.equalsSeries(expected));
     }
 
     @Test
