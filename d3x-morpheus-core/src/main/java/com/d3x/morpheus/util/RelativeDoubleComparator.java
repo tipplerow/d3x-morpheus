@@ -81,4 +81,14 @@ public final class RelativeDoubleComparator implements DoubleComparator {
     public int compareFinite(double x, double y) {
         return FixedDoubleComparator.compareFinite(x, y, computeTolerance(x, y, toleranceFactor));
     }
+
+    @Override
+    public double nextDown(double x) {
+        return Math.nextDown(x - computeTolerance(x, (1.0 + toleranceFactor) / (1.0 - toleranceFactor) * x, toleranceFactor));
+    }
+
+    @Override
+    public double nextUp(double x) {
+        return Math.nextUp(x + computeTolerance(x, (1.0 + toleranceFactor) / (1.0 - toleranceFactor) * x, toleranceFactor));
+    }
 }
