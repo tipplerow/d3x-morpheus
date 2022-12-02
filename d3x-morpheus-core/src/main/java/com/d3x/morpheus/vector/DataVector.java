@@ -17,6 +17,7 @@ package com.d3x.morpheus.vector;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.DoubleUnaryOperator;
@@ -126,6 +127,33 @@ public interface DataVector<K> extends DataVectorView<K> {
     }
 
     /**
+     * Forms the linear combination of two data vectors.
+     *
+     * @param a the first constant factor.
+     * @param x the first data vector.
+     * @param b the second constant factor.
+     * @param y the second data vector.
+     *
+     * @return the linear combination {@code a * x + b * y}, whose
+     * key set is the union of the vector key sets.
+     */
+    static <K> DataVector<K> combine(double a, DataVectorView<K> x,
+                                     double b, DataVectorView<K> y) {
+        var keys = new HashSet<K>();
+        keys.addAll(x.collectKeys());
+        keys.addAll(y.collectKeys());
+        var result = DataVector.<K>create();
+
+        for (var key : keys) {
+            double xk = x.getElement(key, 0.0);
+            double yk = y.getElement(key, 0.0);
+            result.setElement(key, a * xk + b * yk);
+        }
+
+        return result;
+    }
+
+    /**
      * Creates a new, empty data vector.
      *
      * @param <K> the runtime key type.
@@ -134,6 +162,17 @@ public interface DataVector<K> extends DataVectorView<K> {
      */
     static <K> DataVector<K> create() {
         return new MapDataVector<>(new HashMap<>());
+    }
+
+    /**
+     * Creates a new, empty data vector.
+     *
+     * @param keyClass the key class.
+     *
+     * @return a new, empty data vector with the specified key class.
+     */
+    static <K> DataVector<K> create(Class<K> keyClass) {
+        return create();
     }
 
     /**

@@ -98,6 +98,35 @@ public class DataVectorViewTest extends NumericTestBase {
     }
 
     @Test
+    public void testPlusMinus() {
+        var v1 = DataVector.create(String.class);
+        var v2 = DataVector.create(String.class);
+
+        v1.setElement("A", 11.0);
+        v1.setElement("B", 12.0);
+        v2.setElement("B", 22.0);
+        v2.setElement("C", 23.0);
+
+        var v3 = v1.plus(v2);
+        var v4 = v1.minus(v2);
+
+        assertEquals(v1.collectKeys(), Set.of("A", "B"));
+        assertEquals(v2.collectKeys(), Set.of("B", "C"));
+        assertEquals(v3.collectKeys(), Set.of("A", "B", "C"));
+        assertEquals(v4.collectKeys(), Set.of("A", "B", "C"));
+        assertEquals(v1.getElement("A"), 11.0, TOLERANCE);
+        assertEquals(v1.getElement("B"), 12.0, TOLERANCE);
+        assertEquals(v2.getElement("B"), 22.0, TOLERANCE);
+        assertEquals(v2.getElement("C"), 23.0, TOLERANCE);
+        assertEquals(v3.getElement("A"), 11.0, TOLERANCE);
+        assertEquals(v3.getElement("B"), 34.0, TOLERANCE);
+        assertEquals(v3.getElement("C"), 23.0, TOLERANCE);
+        assertEquals(v4.getElement("A"), 11.0, TOLERANCE);
+        assertEquals(v4.getElement("B"), -10.0, TOLERANCE);
+        assertEquals(v4.getElement("C"), -23.0, TOLERANCE);
+    }
+
+    @Test
     public void testSeries() {
         runTest(DoubleSeries.build(String.class, keyList, valueList));
     }

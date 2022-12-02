@@ -81,6 +81,30 @@ public class DataVectorTest {
     }
 
     @Test
+    public void testCombine() {
+        var v1 = DataVector.create(String.class);
+        var v2 = DataVector.create(String.class);
+
+        v1.setElement("A", 11.0);
+        v1.setElement("B", 12.0);
+        v2.setElement("B", 22.0);
+        v2.setElement("C", 23.0);
+
+        var v3 = DataVector.combine(3.0, v1, -2.0, v2);
+
+        assertEquals(v1.collectKeys(), Set.of("A", "B"));
+        assertEquals(v2.collectKeys(), Set.of("B", "C"));
+        assertEquals(v3.collectKeys(), Set.of("A", "B", "C"));
+        assertEquals(v1.getElement("A"), 11.0, TOLERANCE);
+        assertEquals(v1.getElement("B"), 12.0, TOLERANCE);
+        assertEquals(v2.getElement("B"), 22.0, TOLERANCE);
+        assertEquals(v2.getElement("C"), 23.0, TOLERANCE);
+        assertEquals(v3.getElement("A"), 33.0, TOLERANCE);
+        assertEquals(v3.getElement("B"), -8.0, TOLERANCE);
+        assertEquals(v3.getElement("C"), -46.0, TOLERANCE);
+    }
+
+    @Test
     public void testCollect() {
         runTest(DataVector.collect(Stream.of(
                 DataVectorElement.of("A", 1.0),
