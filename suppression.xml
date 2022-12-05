@@ -10,4 +10,10 @@
         <cve>CVE-2021-40111</cve>
         <cve>CVE-2021-40525</cve>
     </suppress>
+    <suppress base="true">
+        <notes><![CDATA[org.yaml:snakeyaml]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
+        <cve>CVE-2022-41854</cve>
+        <cve>CVE-2022-1471</cve>
+    </suppress>
 </suppressions>
