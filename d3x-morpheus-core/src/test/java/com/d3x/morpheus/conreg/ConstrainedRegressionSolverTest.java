@@ -68,6 +68,13 @@ public class ConstrainedRegressionSolverTest extends ConstrainedRegressionTestBa
 
         assertTrue(comparator0001.equals(fittedActual, fittedExpected));
 
+        for (var obsKey : model.getObservationKeys()) {
+            double residualActual = result.getResiduals().getDouble(obsKey);
+            double residualExpected =
+                    model.getRegressandSeries().getDouble(obsKey) - result.getFittedValues().getDouble(obsKey);
+            assertEquals(residualActual, residualExpected, 1.0E-08);
+        }
+
         // The pseudo-inverse is actually not used to determine the beta coefficients
         // and dual values, but it is necessary to extract the "hat" matrix or compute
         // the leverage of an observation...
