@@ -272,6 +272,19 @@ public interface DataVectorView<K> {
     }
 
     /**
+     * Computes the difference of this data vector and another data
+     * vector and returns the result in a new data vector.
+     *
+     * @param subtrahend the data vector to subtract from this.
+     *
+     * @return the difference of this vector and the subtrahend, in a
+     * new vector.
+     */
+    default DataVector<K> minus(DataVectorView<K> subtrahend) {
+        return DataVector.combine(1.0, this, -1.0, subtrahend);
+    }
+
+    /**
      * Computes the 1-norm of this data vector: the sum of the absolute
      * values of each element.
      * @return the 1-norm of this data vector.
@@ -286,6 +299,18 @@ public interface DataVectorView<K> {
      */
     default double norm2() {
         return Math.sqrt(new SumSquares().compute(this));
+    }
+
+    /**
+     * Computes the sum of this data vector and another data vector
+     * and returns the result in a new data vector.
+     *
+     * @param addend the data vector to add to this.
+     *
+     * @return the sum of this vector and the addend, in a new vector.
+     */
+    default DataVector<K> plus(DataVectorView<K> addend) {
+        return DataVector.combine(1.0, this, 1.0, addend);
     }
 
     /**
