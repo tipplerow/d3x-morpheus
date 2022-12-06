@@ -86,4 +86,14 @@ public final class FixedDoubleComparator implements DoubleComparator {
     public int compareFinite(double x, double y) {
         return compareFinite(x, y, tolerance);
     }
+
+    @Override
+    public double nextDown(double x) {
+        return Math.nextDown(x - tolerance);
+    }
+
+    @Override
+    public double nextUp(double x) {
+        return Math.nextUp(x + tolerance);
+    }
 }

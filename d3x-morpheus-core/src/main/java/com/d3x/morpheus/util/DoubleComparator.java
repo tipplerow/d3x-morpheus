@@ -42,6 +42,30 @@ public interface DoubleComparator extends Comparator<Double> {
     int compareFinite(double x, double y);
 
     /**
+     * Returns the double precision value adjacent to {@code x} in the
+     * direction of negative infinity.  This is the maximum value that
+     * this comparator will classify as <em>less than</em> {@code x}.
+     *
+     * @param x the value to compare.
+     *
+     * @return the double precision value adjacent to {@code x} in the
+     * direction of negative infinity.
+     */
+    double nextDown(double x);
+
+    /**
+     * Returns the double precision value adjacent to {@code x} in the
+     * direction of positive infinity.  This is the minimum value that
+     * this comparator will classify as <em>greater than</em> {@code x}.
+     *
+     * @param x the value to compare.
+     *
+     * @return the double precision value adjacent to {@code x} in the
+     * direction of positive infinity.
+     */
+    double nextUp(double x);
+
+    /**
      * Compares two double precision values, allowing for the finite
      * tolerance of this comparator.
      *

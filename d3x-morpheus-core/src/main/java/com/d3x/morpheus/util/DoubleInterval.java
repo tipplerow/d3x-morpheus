@@ -201,6 +201,18 @@ public final class DoubleInterval implements DoublePredicate {
     }
 
     /**
+     * Bounds a floating-point value within this interval.
+     *
+     * @param value the value to bound.
+     *
+     * @return the value nearest to the input value that lies within
+     * this interval.
+     */
+    public double bound(double value) {
+        return type.bound(value, lower, upper);
+    }
+
+    /**
      * Determines whether this interval contains a double value.
      *
      * @param value the value to test.

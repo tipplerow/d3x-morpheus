@@ -28,7 +28,19 @@ public enum DoubleIntervalType {
         @Override
         public boolean contains(double value, double lower, double upper) {
             return comparator.compare(value, lower) >= 0
-                && comparator.compare(value, upper) <= 0;
+                    && comparator.compare(value, upper) <= 0;
+        }
+
+        @Override
+        public double getMax(double upper) {
+            // The interval includes the upper bound...
+            return upper;
+        }
+
+        @Override
+        public double getMin(double lower) {
+            // The interval includes the lower bound...
+            return lower;
         }
 
         @Override
@@ -53,6 +65,18 @@ public enum DoubleIntervalType {
         }
 
         @Override
+        public double getMax(double upper) {
+            // The interval excludes the upper bound...
+            return comparator.nextDown(upper);
+        }
+
+        @Override
+        public double getMin(double lower) {
+            // The interval includes the lower bound...
+            return lower;
+        }
+
+        @Override
         public char lowerDelim() {
             return LOWER_CLOSED_DELIM;
         }
@@ -74,6 +98,18 @@ public enum DoubleIntervalType {
         }
 
         @Override
+        public double getMax(double upper) {
+            // The interval includes the upper bound...
+            return upper;
+        }
+
+        @Override
+        public double getMin(double lower) {
+            // The interval excludes the lower bound...
+            return comparator.nextUp(lower);
+        }
+
+        @Override
         public char lowerDelim() {
             return LOWER_OPEN_DELIM;
         }
@@ -92,6 +128,18 @@ public enum DoubleIntervalType {
         public boolean contains(double value, double lower, double upper) {
             return comparator.compare(value, lower) > 0
                 && comparator.compare(value, upper) < 0;
+        }
+
+        @Override
+        public double getMax(double upper) {
+            // The interval excludes the upper bound...
+            return comparator.nextDown(upper);
+        }
+
+        @Override
+        public double getMin(double lower) {
+            // The interval excludes the lower bound...
+            return comparator.nextUp(lower);
         }
 
         @Override
@@ -124,6 +172,28 @@ public enum DoubleIntervalType {
     public abstract boolean contains(double value, double lower, double upper);
 
     /**
+     * Returns the maximum value that lies within an interval of this type
+     * with a given upper bound.
+     *
+     * @param upper the upper bound of the interval.
+     *
+     * @return the maximum value that lies within an interval of this type
+     * with the given upper bound.
+     */
+    public abstract double getMax(double upper);
+
+    /**
+     * Returns the minimum value that lies within an interval of this type
+     * with a given lower bound.
+     *
+     * @param lower the lower bound of the interval.
+     *
+     * @return the minimum value that lies within an interval of this type
+     * with the given lower bound.
+     */
+    public abstract double getMin(double lower);
+
+    /**
      * Returns the delimiter for the lower limit on intervals of this type.
      * @return the delimiter for the lower limit on intervals of this type.
      */
@@ -134,4 +204,20 @@ public enum DoubleIntervalType {
      * @return the delimiter for the upper limit on intervals of this type.
      */
     public abstract char upperDelim();
+
+    /**
+     * Bounds a value within an interval of this type.
+     *
+     * @param value the value to bound.
+     * @param lower the lower bound of the interval.
+     * @param upper the upper bound of the interval.
+     *
+     * @return the closest value to the input value that lies within an
+     * interval of this type with the given bounds.
+     */
+    public double bound(double value, double lower, double upper) {
+        value = Math.max(value, getMin(lower));
+        value = Math.min(value, getMax(upper));
+        return value;
+    }
 }

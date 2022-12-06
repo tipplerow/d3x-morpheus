@@ -16,6 +16,9 @@
 package com.d3x.morpheus.util;
 
 import org.testng.annotations.Test;
+
+import java.util.List;
+
 import static org.testng.Assert.*;
 
 /**
@@ -28,99 +31,132 @@ public class DoubleIntervalTest {
     private static final double SMALL = 1.0E-08;
     private static final double TINY  = 1.0E-15;
 
+    private static final DoubleInterval CLOSED = DoubleInterval.closed(LOWER, UPPER);
+    private static final DoubleInterval LEFT_CLOSED = DoubleInterval.leftClosed(LOWER, UPPER);
+    private static final DoubleInterval LEFT_OPEN = DoubleInterval.leftOpen(LOWER, UPPER);
+    private static final DoubleInterval OPEN = DoubleInterval.open(LOWER, UPPER);
+
     private static final double TOLERANCE = 1.0E-12;
 
     @Test
+    public void testBound() {
+        var intervals = List.of(CLOSED, LEFT_CLOSED, LEFT_OPEN, OPEN);
+        var values = new double[] { -100.0, -2.1, -2.0, -1.9, 0.0, 0.9, 1.0, 1.1, 100.0 };
+
+        for (var interval : intervals) {
+            for (var value : values) {
+                assertTrue(interval.contains(interval.bound(value)));
+            }
+        }
+
+        assertEquals(CLOSED.bound(-100.0), -2.0, TOLERANCE);
+        assertEquals(CLOSED.bound(-1.9), -1.9, TOLERANCE);
+        assertEquals(CLOSED.bound(0.9), 0.9, TOLERANCE);
+        assertEquals(CLOSED.bound(100.0), 1.0, TOLERANCE);
+
+        assertEquals(LEFT_CLOSED.bound(-100.0), -2.0, TOLERANCE);
+        assertEquals(LEFT_CLOSED.bound(-1.9), -1.9, TOLERANCE);
+        assertEquals(LEFT_CLOSED.bound(0.9), 0.9, TOLERANCE);
+        assertTrue(LEFT_CLOSED.bound(100.0) < 1.0);
+        assertTrue(LEFT_CLOSED.bound(100.0) > 0.99999999);
+
+        assertTrue(LEFT_OPEN.bound(-100.0) > -2.0);
+        assertTrue(LEFT_OPEN.bound(-100.0) < -1.99999999);
+        assertEquals(LEFT_OPEN.bound(-1.9), -1.9, TOLERANCE);
+        assertEquals(LEFT_OPEN.bound(0.9), 0.9, TOLERANCE);
+        assertEquals(LEFT_OPEN.bound(100.0), 1.0, TOLERANCE);
+
+        assertTrue(OPEN.bound(-100.0) > -2.0);
+        assertTrue(OPEN.bound(-100.0) < -1.99999999);
+        assertEquals(OPEN.bound(-1.9), -1.9, TOLERANCE);
+        assertEquals(OPEN.bound(0.9), 0.9, TOLERANCE);
+        assertTrue(OPEN.bound(100.0) < 1.0);
+        assertTrue(OPEN.bound(100.0) > 0.99999999);
+    }
+
+    @Test
     public void testClosed() {
-        DoubleInterval interval = DoubleInterval.closed(LOWER, UPPER);
+        assertFalse(CLOSED.contains(LOWER - SMALL));
+        assertTrue(CLOSED.contains(LOWER - TINY));
+        assertTrue(CLOSED.contains(LOWER));
+        assertTrue(CLOSED.contains(LOWER + TINY));
+        assertTrue(CLOSED.contains(LOWER + SMALL));
 
-        assertFalse(interval.contains(LOWER - SMALL));
-        assertTrue(interval.contains(LOWER - TINY));
-        assertTrue(interval.contains(LOWER));
-        assertTrue(interval.contains(LOWER + TINY));
-        assertTrue(interval.contains(LOWER + SMALL));
+        assertTrue(CLOSED.contains(UPPER - SMALL));
+        assertTrue(CLOSED.contains(UPPER - TINY));
+        assertTrue(CLOSED.contains(UPPER));
+        assertTrue(CLOSED.contains(UPPER + TINY));
+        assertFalse(CLOSED.contains(UPPER + SMALL));
 
-        assertTrue(interval.contains(UPPER - SMALL));
-        assertTrue(interval.contains(UPPER - TINY));
-        assertTrue(interval.contains(UPPER));
-        assertTrue(interval.contains(UPPER + TINY));
-        assertFalse(interval.contains(UPPER + SMALL));
+        assertTrue(CLOSED.contains(0.0));
+        assertFalse(CLOSED.contains(Double.NaN));
+        assertFalse(CLOSED.contains(Double.NEGATIVE_INFINITY));
+        assertFalse(CLOSED.contains(Double.POSITIVE_INFINITY));
 
-        assertTrue(interval.contains(0.0));
-        assertFalse(interval.contains(Double.NaN));
-        assertFalse(interval.contains(Double.NEGATIVE_INFINITY));
-        assertFalse(interval.contains(Double.POSITIVE_INFINITY));
-
-        assertEquals(interval.getWidth(), 3.0, TOLERANCE);
+        assertEquals(CLOSED.getWidth(), 3.0, TOLERANCE);
     }
 
     @Test public void testLeftClosed() {
-        DoubleInterval interval = DoubleInterval.leftClosed(LOWER, UPPER);
+        assertFalse(LEFT_CLOSED.contains(LOWER - SMALL));
+        assertTrue(LEFT_CLOSED.contains(LOWER - TINY));
+        assertTrue(LEFT_CLOSED.contains(LOWER));
+        assertTrue(LEFT_CLOSED.contains(LOWER + TINY));
+        assertTrue(LEFT_CLOSED.contains(LOWER + SMALL));
 
-        assertFalse(interval.contains(LOWER - SMALL));
-        assertTrue(interval.contains(LOWER - TINY));
-        assertTrue(interval.contains(LOWER));
-        assertTrue(interval.contains(LOWER + TINY));
-        assertTrue(interval.contains(LOWER + SMALL));
+        assertTrue(LEFT_CLOSED.contains(UPPER - SMALL));
+        assertFalse(LEFT_CLOSED.contains(UPPER - TINY));
+        assertFalse(LEFT_CLOSED.contains(UPPER));
+        assertFalse(LEFT_CLOSED.contains(UPPER + TINY));
+        assertFalse(LEFT_CLOSED.contains(UPPER + SMALL));
 
-        assertTrue(interval.contains(UPPER - SMALL));
-        assertFalse(interval.contains(UPPER - TINY));
-        assertFalse(interval.contains(UPPER));
-        assertFalse(interval.contains(UPPER + TINY));
-        assertFalse(interval.contains(UPPER + SMALL));
+        assertTrue(LEFT_CLOSED.contains(0.0));
+        assertFalse(LEFT_CLOSED.contains(Double.NaN));
+        assertFalse(LEFT_CLOSED.contains(Double.NEGATIVE_INFINITY));
+        assertFalse(LEFT_CLOSED.contains(Double.POSITIVE_INFINITY));
 
-        assertTrue(interval.contains(0.0));
-        assertFalse(interval.contains(Double.NaN));
-        assertFalse(interval.contains(Double.NEGATIVE_INFINITY));
-        assertFalse(interval.contains(Double.POSITIVE_INFINITY));
-
-        assertEquals(interval.getWidth(), 3.0, TOLERANCE);
+        assertEquals(LEFT_CLOSED.getWidth(), 3.0, TOLERANCE);
     }
 
     @Test public void testLeftOpen() {
-        DoubleInterval interval = DoubleInterval.leftOpen(LOWER, UPPER);
+        assertFalse(LEFT_OPEN.contains(LOWER - SMALL));
+        assertFalse(LEFT_OPEN.contains(LOWER - TINY));
+        assertFalse(LEFT_OPEN.contains(LOWER));
+        assertFalse(LEFT_OPEN.contains(LOWER + TINY));
+        assertTrue(LEFT_OPEN.contains(LOWER + SMALL));
 
-        assertFalse(interval.contains(LOWER - SMALL));
-        assertFalse(interval.contains(LOWER - TINY));
-        assertFalse(interval.contains(LOWER));
-        assertFalse(interval.contains(LOWER + TINY));
-        assertTrue(interval.contains(LOWER + SMALL));
+        assertTrue(LEFT_OPEN.contains(UPPER - SMALL));
+        assertTrue(LEFT_OPEN.contains(UPPER - TINY));
+        assertTrue(LEFT_OPEN.contains(UPPER));
+        assertTrue(LEFT_OPEN.contains(UPPER + TINY));
+        assertFalse(LEFT_OPEN.contains(UPPER + SMALL));
 
-        assertTrue(interval.contains(UPPER - SMALL));
-        assertTrue(interval.contains(UPPER - TINY));
-        assertTrue(interval.contains(UPPER));
-        assertTrue(interval.contains(UPPER + TINY));
-        assertFalse(interval.contains(UPPER + SMALL));
+        assertTrue(LEFT_OPEN.contains(0.0));
+        assertFalse(LEFT_OPEN.contains(Double.NaN));
+        assertFalse(LEFT_OPEN.contains(Double.NEGATIVE_INFINITY));
+        assertFalse(LEFT_OPEN.contains(Double.POSITIVE_INFINITY));
 
-        assertTrue(interval.contains(0.0));
-        assertFalse(interval.contains(Double.NaN));
-        assertFalse(interval.contains(Double.NEGATIVE_INFINITY));
-        assertFalse(interval.contains(Double.POSITIVE_INFINITY));
-
-        assertEquals(interval.getWidth(), 3.0, TOLERANCE);
+        assertEquals(LEFT_OPEN.getWidth(), 3.0, TOLERANCE);
     }
 
     @Test public void testOpen() {
-        DoubleInterval interval = DoubleInterval.open(LOWER, UPPER);
+        assertFalse(OPEN.contains(LOWER - SMALL));
+        assertFalse(OPEN.contains(LOWER - TINY));
+        assertFalse(OPEN.contains(LOWER));
+        assertFalse(OPEN.contains(LOWER + TINY));
+        assertTrue(OPEN.contains(LOWER + SMALL));
 
-        assertFalse(interval.contains(LOWER - SMALL));
-        assertFalse(interval.contains(LOWER - TINY));
-        assertFalse(interval.contains(LOWER));
-        assertFalse(interval.contains(LOWER + TINY));
-        assertTrue(interval.contains(LOWER + SMALL));
+        assertTrue(OPEN.contains(UPPER - SMALL));
+        assertFalse(OPEN.contains(UPPER - TINY));
+        assertFalse(OPEN.contains(UPPER));
+        assertFalse(OPEN.contains(UPPER + TINY));
+        assertFalse(OPEN.contains(UPPER + SMALL));
 
-        assertTrue(interval.contains(UPPER - SMALL));
-        assertFalse(interval.contains(UPPER - TINY));
-        assertFalse(interval.contains(UPPER));
-        assertFalse(interval.contains(UPPER + TINY));
-        assertFalse(interval.contains(UPPER + SMALL));
+        assertTrue(OPEN.contains(0.0));
+        assertFalse(OPEN.contains(Double.NaN));
+        assertFalse(OPEN.contains(Double.NEGATIVE_INFINITY));
+        assertFalse(OPEN.contains(Double.POSITIVE_INFINITY));
 
-        assertTrue(interval.contains(0.0));
-        assertFalse(interval.contains(Double.NaN));
-        assertFalse(interval.contains(Double.NEGATIVE_INFINITY));
-        assertFalse(interval.contains(Double.POSITIVE_INFINITY));
-
-        assertEquals(interval.getWidth(), 3.0, TOLERANCE);
+        assertEquals(OPEN.getWidth(), 3.0, TOLERANCE);
     }
 
     @Test public void testEmpty() {

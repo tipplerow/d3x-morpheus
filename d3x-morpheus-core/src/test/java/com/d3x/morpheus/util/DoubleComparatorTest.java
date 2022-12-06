@@ -19,6 +19,9 @@ import com.d3x.morpheus.matrix.D3xMatrix;
 import com.d3x.morpheus.vector.D3xVector;
 
 import org.testng.annotations.Test;
+
+import java.util.List;
+
 import static org.testng.Assert.*;
 
 public class DoubleComparatorTest {
@@ -148,6 +151,23 @@ public class DoubleComparatorTest {
         assertFalse(fixed2.equals(x, z1));
         assertFalse(fixed2.equals(x, z2));
         assertTrue(fixed2.equals(x, z3));
+    }
+
+    @Test
+    public void testNext() {
+        var comparators = List.of(fixed1, fixed2, relative1, relative2);
+        var values = new double[] { -100.0, -1.0, -0.01, 0.01, 1.0, 100.0 };
+
+        for (var comp : comparators) {
+            for (var value : values) {
+                var nextUp = comp.nextUp(value);
+                var nextDown = comp.nextDown(value);
+                assertTrue(comp.compare(value, nextUp) < 0);
+                assertTrue(comp.compare(value, nextDown) > 0);
+                assertEquals(comp.compare(value, comp.nextDown(nextUp)), 0);
+                assertEquals(comp.compare(value, comp.nextUp(nextDown)), 0);
+            }
+        }
     }
 
     @Test
