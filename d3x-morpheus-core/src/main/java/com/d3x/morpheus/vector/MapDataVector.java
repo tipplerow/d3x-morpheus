@@ -34,11 +34,11 @@ final class MapDataVector<K> implements DataVector<K> {
     private final Map<K, Double> map;
 
     MapDataVector() {
-        this(new HashMap<>());
+        this.map = new HashMap<>();
     }
 
     MapDataVector(@NonNull Map<K, Double> map) {
-        this.map = map;
+        this.map = new HashMap<>(map);
     }
 
     @Override

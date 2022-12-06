@@ -23,6 +23,12 @@ import java.util.function.DoubleUnaryOperator;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+/**
+ * Provides a collection of modifiable double values indexed by a fixed
+ * set of keys.
+ *
+ * @author Scott Shaffer
+ */
 public interface DataVector<K> extends DataVectorView<K> {
     /**
      * Assigns a vector element.
@@ -162,12 +168,14 @@ public interface DataVector<K> extends DataVectorView<K> {
     }
 
     /**
-     * Returns a DataVector backed by a Double map; changes to the map
-     * will be reflected in the returned vector.
+     * Creates a DataVector and copies values from a map.
      *
-     * @param map the underlying Double map.
+     * <p><em>Subsequent modifications to the input map will not be
+     * reflected in the returned DataVector.</em></p>
      *
-     * @return a DataVector backed by specified Double map.
+     * @param map the map of values.
+     *
+     * @return a new DataVector with the contents of the given map.
      */
     static <K> DataVector<K> of(Map<K, Double> map) {
         return new MapDataVector<>(map);
