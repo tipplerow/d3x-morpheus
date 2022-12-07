@@ -143,7 +143,7 @@ public final class ConstrainedRegressionSolver<R,C> {
         D3xMatrix designMatrix = system.get().getDesignMatrix();
         D3xVector observations = system.get().getRegressandVector();
         D3xVector fittedVector = designMatrix.times(betaVector);
-        D3xVector residualVector = fittedVector.minus(observations);
+        D3xVector residualVector = observations.minus(fittedVector);
 
         Class<R> rowClass = regressionModel.getObservationClass();
         Class<C> colClass = regressionModel.getRegressorClass();
