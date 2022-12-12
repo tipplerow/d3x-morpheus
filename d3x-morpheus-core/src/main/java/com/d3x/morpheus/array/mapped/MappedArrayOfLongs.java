@@ -24,9 +24,6 @@ import java.nio.LongBuffer;
 import java.nio.channels.FileChannel;
 import java.util.function.Predicate;
 
-import gnu.trove.set.TLongSet;
-import gnu.trove.set.hash.TLongHashSet;
-
 import com.d3x.morpheus.array.Array;
 import com.d3x.morpheus.array.ArrayBase;
 import com.d3x.morpheus.array.ArrayBuilder;
@@ -34,6 +31,7 @@ import com.d3x.morpheus.array.ArrayCursor;
 import com.d3x.morpheus.array.ArrayException;
 import com.d3x.morpheus.array.ArrayStyle;
 import com.d3x.morpheus.array.ArrayValue;
+import org.eclipse.collections.impl.factory.primitive.LongSets;
 
 /**
  * An Array implementation designed to represent a dense array of int values in a memory-mapped file.
@@ -368,8 +366,8 @@ class MappedArrayOfLongs extends ArrayBase<Long> {
     @Override
     public final Array<Long> distinct(int limit) {
         var capacity = limit < Integer.MAX_VALUE ? limit : 100;
-        final TLongSet set = new TLongHashSet(capacity);
-        final ArrayBuilder<Long> builder = ArrayBuilder.of(capacity, Long.class);
+        var set = LongSets.mutable.withInitialCapacity(capacity);
+        var builder = ArrayBuilder.of(capacity, Long.class);
         for (int i=0; i<length(); ++i) {
             final long value = getLong(i);
             if (set.add(value)) {

@@ -43,8 +43,8 @@ suggests the entire object requires more like 500MB of RAM.
 
 The additional 120MB in this case is likely to be almost entirely attributable to the row and column 
 axis of the frame, and obviously much more the former than the latter. The row and column axis is 
-each backed by a [Trove](http://trove.starlight-systems.com/) map of an appropriate type which maintains 
-the index, as well as a Morpheus array that defines the order. A Trove `TIntIntHashMap` initialized with 
+each backed by a [Eclipse Collections](https://www.eclipse.org/collections/) map of an appropriate type which maintains 
+the index, as well as a Morpheus array that defines the order. A `IntIntMap` initialized with 
 a capacity of 5 million elements consumes 62MB according to Java Instrumentation, so together this 
 explains over 90% of the memory used by this frame. This implies very little object overhead by the 
 supporting classes that make up the `DataFrame`, and also suggests that garbage collection times 

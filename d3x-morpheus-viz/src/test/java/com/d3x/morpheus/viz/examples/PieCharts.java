@@ -43,8 +43,6 @@ public class PieCharts {
             value -> Math.random() * 10d
         );
 
-        Chart.create().swingMode();
-
         Chart.create().withPiePlot(frame, false, chart -> {
             chart.title().withText("Pie Chart of Random Data");
             chart.subtitle().withText("Labels with Section Percent");

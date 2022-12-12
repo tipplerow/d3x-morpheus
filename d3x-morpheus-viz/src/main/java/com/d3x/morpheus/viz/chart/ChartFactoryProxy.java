@@ -25,7 +25,6 @@ import com.d3x.morpheus.util.Collect;
 import com.d3x.morpheus.viz.chart.pie.PiePlot;
 import com.d3x.morpheus.viz.chart.xy.XyPlot;
 import com.d3x.morpheus.viz.google.GChartFactory;
-import com.d3x.morpheus.viz.jfree.JFChartFactory;
 import com.d3x.morpheus.viz.js.JsCode;
 
 /**
@@ -37,8 +36,7 @@ import com.d3x.morpheus.viz.js.JsCode;
  */
 public class ChartFactoryProxy implements ChartFactory {
 
-    private ChartFactory defaultFactory = new JFChartFactory();
-    private ChartFactory swingFactory = new JFChartFactory();
+    private ChartFactory defaultFactory = new GChartFactory();
     private ChartFactory htmlFactory = new GChartFactory();
 
     /**
@@ -55,12 +53,6 @@ public class ChartFactoryProxy implements ChartFactory {
         this.defaultFactory = htmlFactory;
     }
 
-    /**
-     * Switches the selector into Swing chart mode
-     */
-    public void swingMode() {
-        this.defaultFactory = swingFactory;
-    }
 
     /**
      * Returns the HTML based chart factory
@@ -68,14 +60,6 @@ public class ChartFactoryProxy implements ChartFactory {
      */
     public ChartFactory asHtml() {
         return htmlFactory;
-    }
-
-    /**
-     * Returns the Swing based chart factory
-     * @return      the Swing based chart factory
-     */
-    public ChartFactory asSwing() {
-        return swingFactory;
     }
 
 
@@ -113,8 +97,6 @@ public class ChartFactoryProxy implements ChartFactory {
                     chart.accept(jsCode, functionName, divId);
                 }
             });
-        } else if (containsSwingCharts(charts)) {
-            return swingFactory.javascript(charts);
         } else if (containsHtmlCharts(charts)) {
             return htmlFactory.javascript(charts);
         } else if (charts.iterator().hasNext()) {
@@ -132,8 +114,6 @@ public class ChartFactoryProxy implements ChartFactory {
             final Chart<?> first = iterator.next();
             if (htmlFactory.isSupported(first)) {
                 htmlFactory.show(columns, charts);
-            } else if (swingFactory.isSupported(first)) {
-                swingFactory.show(columns, charts);
             }
         }
     }
@@ -147,8 +127,6 @@ public class ChartFactoryProxy implements ChartFactory {
             final Chart<?> first = iterator.next();
             if (htmlFactory.isSupported(first)) {
                 htmlFactory.show(columns, chartList);
-            } else if (swingFactory.isSupported(first)) {
-                swingFactory.show(columns, chartList);
             }
         }
     }
@@ -171,7 +149,7 @@ public class ChartFactoryProxy implements ChartFactory {
      * @return          true if mixed content
      */
     private boolean isMixedCharts(Iterable<Chart<?>> charts) {
-        return containsHtmlCharts(charts) && containsSwingCharts(charts);
+        return containsHtmlCharts(charts);
     }
 
 
@@ -189,18 +167,4 @@ public class ChartFactoryProxy implements ChartFactory {
         return false;
     }
 
-
-    /**
-     * Returns true if the charts include swing charts
-     * @param charts    the iterable of charts
-     * @return          true if swing charts
-     */
-    private boolean containsSwingCharts(Iterable<Chart<?>> charts) {
-        for (Chart<?> chart : charts) {
-            if (swingFactory.isSupported(chart)) {
-                return true;
-            }
-        }
-        return false;
-    }
 }

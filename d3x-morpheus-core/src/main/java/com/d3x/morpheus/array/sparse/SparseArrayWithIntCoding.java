@@ -20,11 +20,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.function.Predicate;
 
-import gnu.trove.map.TIntIntMap;
-import gnu.trove.map.hash.TIntIntHashMap;
-import gnu.trove.set.TIntSet;
-import gnu.trove.set.hash.TIntHashSet;
-
 import com.d3x.morpheus.array.Array;
 import com.d3x.morpheus.array.ArrayBase;
 import com.d3x.morpheus.array.ArrayBuilder;
@@ -33,6 +28,9 @@ import com.d3x.morpheus.array.ArrayException;
 import com.d3x.morpheus.array.ArrayStyle;
 import com.d3x.morpheus.array.ArrayValue;
 import com.d3x.morpheus.array.coding.IntCoding;
+import org.eclipse.collections.api.map.primitive.MutableIntIntMap;
+import org.eclipse.collections.impl.factory.primitive.IntIntMaps;
+import org.eclipse.collections.impl.factory.primitive.IntSets;
 
 /**
  * A sparse array implementation that maintains a primitive int array of codes that apply to Object values exposed through the Coding interface.
@@ -48,7 +46,7 @@ class SparseArrayWithIntCoding<T> extends ArrayBase<T> {
     private int length;
     private T defaultValue;
     private int defaultCode;
-    private TIntIntMap codes;
+    private MutableIntIntMap codes;
     private IntCoding<T> coding;
 
 
@@ -65,7 +63,7 @@ class SparseArrayWithIntCoding<T> extends ArrayBase<T> {
         this.coding = coding;
         this.defaultValue = defaultValue;
         this.defaultCode = coding.getCode(defaultValue);
-        this.codes = new TIntIntHashMap((int)Math.max(length * fillPct, 5d), SparseArrayConstructor.DEFAULT_LOAD_FACTOR, -1, defaultCode);
+        this.codes = IntIntMaps.mutable.withInitialCapacity((int)Math.max(length * fillPct, 5d));
     }
 
     /**
@@ -117,7 +115,7 @@ class SparseArrayWithIntCoding<T> extends ArrayBase<T> {
     public final Array<T> copy() {
         try {
             final SparseArrayWithIntCoding<T> copy = (SparseArrayWithIntCoding<T>)super.clone();
-            copy.codes = new TIntIntHashMap(codes);
+            copy.codes = IntIntMaps.mutable.withAll(codes);
             copy.defaultValue = this.defaultValue;
             copy.defaultCode = this.defaultCode;
             copy.coding = this.coding;
@@ -169,7 +167,10 @@ class SparseArrayWithIntCoding<T> extends ArrayBase<T> {
 
     @Override
     public final int compare(int i, int j) {
-        return Integer.compare(codes.get(i), codes.get(j));
+        return Integer.compare(
+            codes.getIfAbsent(i, defaultCode),
+            codes.getIfAbsent(j, defaultCode)
+        );
     }
 
 
@@ -217,9 +218,9 @@ class SparseArrayWithIntCoding<T> extends ArrayBase<T> {
     @Override
     public final Array<T> update(int toIndex, Array<T> from, int fromIndex, int length) {
         if (from instanceof SparseArrayWithIntCoding) {
-            final SparseArrayWithIntCoding other = (SparseArrayWithIntCoding)from;
+            var other = (SparseArrayWithIntCoding<T>)from;
             for (int i = 0; i < length; ++i) {
-                this.codes.put(toIndex + i, other.codes.get(fromIndex + i));
+                this.codes.put(toIndex + i, other.codes.getIfAbsent(fromIndex + i, defaultCode));
             }
         } else {
             for (int i=0; i<length; ++i) {
@@ -233,7 +234,7 @@ class SparseArrayWithIntCoding<T> extends ArrayBase<T> {
 
     @Override
     public final Array<T> expand(int newLength) {
-        this.length = newLength > length ? newLength : length;
+        this.length = Math.max(newLength, length);
         return this;
     }
 
@@ -254,7 +255,7 @@ class SparseArrayWithIntCoding<T> extends ArrayBase<T> {
 
     @Override
     public final boolean isNull(int index) {
-        return codes.get(index) == coding.getCode(null);
+        return codes.getIfAbsent(index, defaultCode) == coding.getCode(null);
     }
 
 
@@ -264,7 +265,7 @@ class SparseArrayWithIntCoding<T> extends ArrayBase<T> {
             return isNull(index);
         } else {
             var code = coding.getCode(value);
-            return code == codes.get(index);
+            return code == codes.getIfAbsent(index, defaultCode);
         }
     }
 
@@ -272,14 +273,14 @@ class SparseArrayWithIntCoding<T> extends ArrayBase<T> {
     @Override
     public final int getInt(int index) {
         this.checkBounds(index, length);
-        return codes.get(index);
+        return codes.getIfAbsent(index, defaultCode);
     }
 
 
     @Override
     public final T getValue(int index) {
         this.checkBounds(index, length);
-        var code = codes.get(index);
+        var code = codes.getIfAbsent(index, defaultCode);
         return coding.getValue(code);
     }
 
@@ -312,7 +313,7 @@ class SparseArrayWithIntCoding<T> extends ArrayBase<T> {
     @Override
     public Array<T> distinct(int limit) {
         var capacity = limit < Integer.MAX_VALUE ? limit : 100;
-        final TIntSet set = new TIntHashSet(capacity);
+        var set = IntSets.mutable.withInitialCapacity(capacity);
         final ArrayBuilder<T> builder = ArrayBuilder.of(capacity, type());
         for (int i=0; i<length(); ++i) {
             var code = getInt(i);

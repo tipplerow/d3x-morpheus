@@ -19,6 +19,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import lombok.NonNull;
+
 import com.d3x.morpheus.array.Array;
 import com.d3x.morpheus.array.ArrayBuilder;
 import com.d3x.morpheus.array.coding.IntCoding;
@@ -26,10 +28,12 @@ import com.d3x.morpheus.array.coding.LongCoding;
 import com.d3x.morpheus.util.IntComparator;
 import com.d3x.morpheus.util.SortAlgorithm;
 import com.d3x.morpheus.util.Swapper;
-import gnu.trove.map.TIntObjectMap;
-import gnu.trove.map.TLongObjectMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
-import gnu.trove.map.hash.TLongObjectHashMap;
+import org.eclipse.collections.api.map.primitive.IntObjectMap;
+import org.eclipse.collections.api.map.primitive.LongObjectMap;
+import org.eclipse.collections.api.map.primitive.MutableIntObjectMap;
+import org.eclipse.collections.api.map.primitive.MutableLongObjectMap;
+import org.eclipse.collections.impl.factory.primitive.IntObjectMaps;
+import org.eclipse.collections.impl.factory.primitive.LongObjectMaps;
 
 /**
  * An interface to a Builder for DataSeries
@@ -39,8 +43,6 @@ import gnu.trove.map.hash.TLongObjectHashMap;
  * @param <K>   the series key
  */
 public interface DataSeriesBuilder<K,V> {
-
-    float DEFAULT_LOAD_FACTOR = 0.85f;
 
     /**
      * Returns a newly created DoubleSeries from the state of this builder
@@ -105,7 +107,7 @@ public interface DataSeriesBuilder<K,V> {
      * @param value     the entry value
      * @return          this builder
      */
-    default DataSeriesBuilder<K,V> putValue(@lombok.NonNull K key, V value) {
+    default DataSeriesBuilder<K,V> putValue(@NonNull K key, V value) {
         throw new UnsupportedOperationException("Type not supported by this builder");
     }
 
@@ -120,10 +122,10 @@ public interface DataSeriesBuilder<K,V> {
         if (valueType.equals(Double.class)) {
             return (DataSeriesBuilder<K,V>)DoubleSeriesBuilder.builder(keyType);
         } else if (LongCoding.Support.includes(keyType)) {
-            var coding = LongCoding.Support.getCoding(keyType).orElse(null);
+            var coding = LongCoding.Support.getCoding(keyType).orElseThrow();
             return new LongCodingDataSeriesBuilder<>(keyType, valueType, coding);
         } else if (IntCoding.Support.includes(keyType)) {
-            var coding = IntCoding.Support.getCoding(keyType).orElse(null);
+            var coding = IntCoding.Support.getCoding(keyType).orElseThrow();
             return new IntCodingDataSeriesBuilder<>(keyType, valueType, coding);
         } else {
             return new DefaultDataSeriesBuilder<>(keyType, valueType);
@@ -136,8 +138,8 @@ public interface DataSeriesBuilder<K,V> {
      */
     class DefaultDataSeriesBuilder<K,V> implements DataSeriesBuilder<K,V> {
 
-        private Class<K> keyType;
-        private Class<V> valueType;
+        private final Class<K> keyType;
+        private final Class<V> valueType;
         private ArrayBuilder<K> keys;
         private Map<K,V> values;
 
@@ -190,7 +192,7 @@ public interface DataSeriesBuilder<K,V> {
         private Class<V> valueType;
         private IntCoding<K> coding;
         private ArrayBuilder<K> keys;
-        private TIntObjectMap<V> values;
+        private MutableIntObjectMap<V> values;
 
         /**
          * Constructor
@@ -218,13 +220,13 @@ public interface DataSeriesBuilder<K,V> {
                 return this;
             } else {
                 this.keys = ArrayBuilder.of(capacity, keyType);
-                this.values = new TIntObjectHashMap<>(capacity, DEFAULT_LOAD_FACTOR);
+                this.values = IntObjectMaps.mutable.withInitialCapacity(capacity);
                 return this;
             }
         }
 
         @Override
-        public DataSeriesBuilder<K,V> putValue(K key, V value) {
+        public DataSeriesBuilder<K,V> putValue(@NonNull K key, V value) {
             this.capacity(100);
             this.keys.append(key);
             this.values.put(coding.getCode(key), value);
@@ -245,7 +247,7 @@ public interface DataSeriesBuilder<K,V> {
         private Class<V> valueType;
         private LongCoding<K> coding;
         private ArrayBuilder<K> keys;
-        private TLongObjectMap<V> values;
+        private MutableLongObjectMap<V> values;
 
         /**
          * Constructor
@@ -273,13 +275,13 @@ public interface DataSeriesBuilder<K,V> {
                 return this;
             } else {
                 this.keys = ArrayBuilder.of(capacity, keyType);
-                this.values = new TLongObjectHashMap<>(capacity, DEFAULT_LOAD_FACTOR);
+                this.values = LongObjectMaps.mutable.withInitialCapacity(capacity);
                 return this;
             }
         }
 
         @Override
-        public DataSeriesBuilder<K,V> putValue(K key, V value) {
+        public DataSeriesBuilder<K,V> putValue(@NonNull K key, V value) {
             this.capacity(100);
             this.keys.append(key);
             this.values.put(coding.getCode(key), value);
@@ -297,8 +299,8 @@ public interface DataSeriesBuilder<K,V> {
     abstract class DataSeriesBase<K,V> implements DataSeries<K,V> {
 
         private boolean parallel;
-        private Class<K> keyClass;
-        private Class<V> valueClass;
+        private final Class<K> keyClass;
+        private final Class<V> valueClass;
 
         /**
          * Constructor
@@ -377,8 +379,8 @@ public interface DataSeriesBuilder<K,V> {
      */
     class DefaultDataSeries<K,V> extends DataSeriesBase<K,V> implements Swapper {
 
-        private Array<K> keys;
-        private Map<K,V> values;
+        private final Array<K> keys;
+        private final Map<K,V> values;
         private Object[] temp;
 
         /**
@@ -464,9 +466,9 @@ public interface DataSeriesBuilder<K,V> {
      */
     class IntCodingDataSeries<K,V> extends DataSeriesBase<K,V> implements Swapper {
 
-        private IntCoding<K> coding;
-        private Array<K> keys;
-        private TIntObjectMap<V> values;
+        private final IntCoding<K> coding;
+        private final Array<K> keys;
+        private final IntObjectMap<V> values;
         private Object[] temp;
 
         /**
@@ -479,7 +481,7 @@ public interface DataSeriesBuilder<K,V> {
             @lombok.NonNull Class<V> valueClass,
             @lombok.NonNull IntCoding<K> coding,
             @lombok.NonNull Array<K> keys,
-            @lombok.NonNull TIntObjectMap<V> values) {
+            @lombok.NonNull IntObjectMap<V> values) {
             super(coding.getType(), valueClass);
             this.coding = coding;
             this.keys = keys;
@@ -553,9 +555,9 @@ public interface DataSeriesBuilder<K,V> {
      */
     class LongCodingDataSeries<K,V> extends DataSeriesBase<K,V> implements Swapper {
 
-        private Array<K> keys;
-        private LongCoding<K> coding;
-        private TLongObjectMap<V> values;
+        private final Array<K> keys;
+        private final LongCoding<K> coding;
+        private final LongObjectMap<V> values;
         private Object[] temp;
 
         /**
@@ -568,7 +570,7 @@ public interface DataSeriesBuilder<K,V> {
             @lombok.NonNull Class<V> valueClass,
             @lombok.NonNull LongCoding<K> coding,
             @lombok.NonNull Array<K> keys,
-            @lombok.NonNull TLongObjectMap<V> values) {
+            @lombok.NonNull LongObjectMap<V> values) {
             super(coding.getType(), valueClass);
             this.coding = coding;
             this.keys = keys;

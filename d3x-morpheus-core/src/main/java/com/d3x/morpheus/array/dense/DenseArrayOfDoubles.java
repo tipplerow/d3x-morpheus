@@ -21,15 +21,13 @@ import java.io.ObjectOutputStream;
 import java.util.Arrays;
 import java.util.function.Predicate;
 
-import gnu.trove.set.TDoubleSet;
-import gnu.trove.set.hash.TDoubleHashSet;
-
 import com.d3x.morpheus.array.ArrayBuilder;
 import com.d3x.morpheus.array.ArrayException;
 import com.d3x.morpheus.array.Array;
 import com.d3x.morpheus.array.ArrayBase;
 import com.d3x.morpheus.array.ArrayStyle;
 import com.d3x.morpheus.array.ArrayValue;
+import org.eclipse.collections.impl.factory.primitive.DoubleSets;
 
 /**
  * An Array implementation designed to hold a dense array of double values
@@ -282,9 +280,9 @@ class DenseArrayOfDoubles extends ArrayBase<Double> {
 
     @Override
     public final Array<Double> distinct(int limit) {
-        final int capacity = limit < Integer.MAX_VALUE ? limit : 100;
-        final TDoubleSet set = new TDoubleHashSet(capacity);
-        final ArrayBuilder<Double> builder = ArrayBuilder.of(capacity, Double.class);
+        var capacity = limit < Integer.MAX_VALUE ? limit : 100;
+        var set = DoubleSets.mutable.withInitialCapacity(capacity);
+        var builder = ArrayBuilder.of(capacity, Double.class);
         for (int i=0; i<length(); ++i) {
             var value = getDouble(i);
             if (set.add(value)) {

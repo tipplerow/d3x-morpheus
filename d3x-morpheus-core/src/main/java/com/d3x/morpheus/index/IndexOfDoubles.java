@@ -19,8 +19,8 @@ import java.util.function.Predicate;
 
 import com.d3x.morpheus.array.Array;
 import com.d3x.morpheus.array.ArrayBuilder;
-import gnu.trove.map.TDoubleIntMap;
-import gnu.trove.map.hash.TDoubleIntHashMap;
+import org.eclipse.collections.api.map.primitive.MutableDoubleIntMap;
+import org.eclipse.collections.impl.factory.primitive.DoubleIntMaps;
 
 /**
  * An Index implementation designed to efficiently store Double values
@@ -33,7 +33,7 @@ class IndexOfDoubles extends IndexBase<Double> {
 
     private static final long serialVersionUID = 1L;
 
-    private TDoubleIntMap indexMap;
+    private MutableDoubleIntMap indexMap;
 
     /**
      * Constructor
@@ -41,7 +41,7 @@ class IndexOfDoubles extends IndexBase<Double> {
      */
     IndexOfDoubles(int initialSize) {
         super(Array.of(Double.class, initialSize));
-        this.indexMap = new TDoubleIntHashMap(initialSize, DEFAULT_LOAD_FACTOR, -1, -1);
+        this.indexMap = DoubleIntMaps.mutable.withInitialCapacity(initialSize);
     }
 
     /**
@@ -50,12 +50,13 @@ class IndexOfDoubles extends IndexBase<Double> {
      */
     IndexOfDoubles(Iterable<Double> iterable) {
         super(iterable);
-        this.indexMap = new TDoubleIntHashMap(keyArray().length(), DEFAULT_LOAD_FACTOR, -1, -1);
+        this.indexMap = DoubleIntMaps.mutable.withInitialCapacity(keyArray().length());
         this.keyArray().sequential().forEachValue(v -> {
             final int index = v.index();
             final double key = v.getDouble();
-            final int existing = indexMap.put(key, index);
-            if (existing >= 0) {
+            final int size = indexMap.size();
+            indexMap.put(key, index);
+            if (indexMap.size() <= size) {
                 throw new IndexException("Cannot have duplicate keys in index: " + v.getValue());
             }
         });
@@ -68,13 +69,14 @@ class IndexOfDoubles extends IndexBase<Double> {
      */
     private IndexOfDoubles(Iterable<Double> iterable, IndexOfDoubles parent) {
         super(iterable, parent);
-        this.indexMap = new TDoubleIntHashMap(keyArray().length(), DEFAULT_LOAD_FACTOR, -1, -1);
+        this.indexMap = DoubleIntMaps.mutable.withInitialCapacity(keyArray().length());
         this.keyArray().sequential().forEachValue(v -> {
             final double key = v.getDouble();
-            final int index = parent.indexMap.get(key);
+            final int index = parent.indexMap.getIfAbsent(key, -1);
             if (index < 0) throw new IndexException("No match for key: " + v.getValue());
-            final int existing = indexMap.put(key, index);
-            if (existing >= 0) {
+            final int size = indexMap.size();
+            indexMap.put(key, index);
+            if (indexMap.size() <= size) {
                 throw new IndexException("Cannot have duplicate keys in index: " + v.getValue());
             }
         });
@@ -128,8 +130,9 @@ class IndexOfDoubles extends IndexBase<Double> {
                     final int index = indexMap.size();
                     this.ensureCapacity(index + 1);
                     this.keyArray().setDouble(index, keyAsDouble);
-                    final int existing = indexMap.put(keyAsDouble, index);
-                    if (!ignoreDuplicates && existing >= 0) {
+                    final int size = indexMap.size();
+                    indexMap.put(keyAsDouble, index);
+                    if (!ignoreDuplicates && indexMap.size() <= size) {
                         throw new IndexException("Attempt to add duplicate key to index: " + key);
                     }
                     count[0]++;
@@ -143,7 +146,7 @@ class IndexOfDoubles extends IndexBase<Double> {
     public final Index<Double> copy(boolean deep) {
         try {
             var clone = (IndexOfDoubles)super.copy(deep);
-            if (deep) clone.indexMap = new TDoubleIntHashMap(indexMap);
+            if (deep) clone.indexMap = DoubleIntMaps.mutable.withAll(indexMap);
             return clone;
         } catch (Exception ex) {
             throw new IndexException("Failed to clone index", ex);
@@ -157,7 +160,7 @@ class IndexOfDoubles extends IndexBase<Double> {
 
     @Override
     public final int getCoordinate(Double key) {
-        return indexMap.get(key);
+        return indexMap.getIfAbsent(key, -1);
     }
 
     @Override
@@ -167,7 +170,7 @@ class IndexOfDoubles extends IndexBase<Double> {
 
     @Override
     public final int replace(Double existing, Double replacement) {
-        final int index = indexMap.remove(existing);
+        final int index = indexMap.removeKeyIfAbsent(existing, -1);
         if (index == -1) {
             throw new IndexException("No match key for " + existing);
         } else {
@@ -187,7 +190,7 @@ class IndexOfDoubles extends IndexBase<Double> {
         final int size = size();
         for (int i=0; i<size; ++i) {
             final Double key = keyArray().getValue(i);
-            final int index = indexMap.get(key);
+            final int index = indexMap.getIfAbsent(key, -1);
             consumer.accept(key, index);
         }
     }

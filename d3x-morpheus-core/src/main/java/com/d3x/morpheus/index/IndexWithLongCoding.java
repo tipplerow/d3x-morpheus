@@ -21,9 +21,8 @@ import com.d3x.morpheus.array.Array;
 import com.d3x.morpheus.array.ArrayBuilder;
 import com.d3x.morpheus.array.coding.LongCoding;
 import com.d3x.morpheus.array.coding.WithLongCoding;
-
-import gnu.trove.map.TLongIntMap;
-import gnu.trove.map.hash.TLongIntHashMap;
+import org.eclipse.collections.api.map.primitive.MutableLongIntMap;
+import org.eclipse.collections.impl.factory.primitive.LongIntMaps;
 
 /**
  * An Index implementation designed to efficiently store Object values that can be coded as a long value
@@ -36,8 +35,8 @@ class IndexWithLongCoding<T> extends IndexBase<T> implements WithLongCoding<T> {
 
     private static final long serialVersionUID = 1L;
 
-    private TLongIntMap indexMap;
-    private LongCoding<T> coding;
+    private MutableLongIntMap indexMap;
+    private final LongCoding<T> coding;
 
     /**
      * Constructor for empty index with initial capacity
@@ -48,7 +47,7 @@ class IndexWithLongCoding<T> extends IndexBase<T> implements WithLongCoding<T> {
     IndexWithLongCoding(Class<T> type, LongCoding<T> coding, int capacity) {
         super(Array.of(type, capacity));
         this.coding = coding;
-        this.indexMap = new TLongIntHashMap(capacity, DEFAULT_LOAD_FACTOR, -1L, -1);
+        this.indexMap = LongIntMaps.mutable.withInitialCapacity(capacity);
     }
 
     /**
@@ -59,12 +58,13 @@ class IndexWithLongCoding<T> extends IndexBase<T> implements WithLongCoding<T> {
     IndexWithLongCoding(Iterable<T> iterable, LongCoding<T> coding) {
         super(iterable);
         this.coding = coding;
-        this.indexMap = new TLongIntHashMap(keyArray().length(), DEFAULT_LOAD_FACTOR, -1L, -1);
+        this.indexMap = LongIntMaps.mutable.withInitialCapacity(keyArray().length());
         this.keyArray().sequential().forEachValue(v -> {
             final int index = v.index();
             final long code = v.getLong();
-            final int existing = indexMap.put(code, index);
-            if (existing >= 0) {
+            final int size = indexMap.size();
+            indexMap.put(code, index);
+            if (indexMap.size() == size) {
                 throw new IndexException("Cannot have duplicate keys in index: " + v.getValue());
             }
         });
@@ -79,13 +79,14 @@ class IndexWithLongCoding<T> extends IndexBase<T> implements WithLongCoding<T> {
     private IndexWithLongCoding(Iterable<T> iterable, LongCoding<T> coding, IndexWithLongCoding<T> parent) {
         super(iterable, parent);
         this.coding = coding;
-        this.indexMap = new TLongIntHashMap(keyArray().length(), DEFAULT_LOAD_FACTOR, -1L, -1);
+        this.indexMap = LongIntMaps.mutable.withInitialCapacity(keyArray().length());
         this.keyArray().sequential().forEachValue(v -> {
             final long code = v.getLong();
-            final int index = parent.indexMap.get(code);
+            final int index = parent.indexMap.getIfAbsent(code, -1);
             if (index < 0) throw new IndexException("No match for key: " + v.getValue());
-            final int existing = indexMap.put(code, index);
-            if (existing >= 0) {
+            final int size = indexMap.size();
+            indexMap.put(code, index);
+            if (indexMap.size() == size) {
                 throw new IndexException("Cannot have duplicate keys in index: " + v.getValue());
             }
         });
@@ -148,8 +149,9 @@ class IndexWithLongCoding<T> extends IndexBase<T> implements WithLongCoding<T> {
                     final int index = indexMap.size();
                     this.ensureCapacity(index + 1);
                     this.keyArray().setValue(index, key);
-                    final int existing = indexMap.put(code, index);
-                    if (!ignoreDuplicates && existing >= 0) {
+                    final int size = indexMap.size();
+                    indexMap.put(code, index);
+                    if (!ignoreDuplicates && size == indexMap.size()) {
                         throw new IndexException("Attempt to add duplicate key to index: " + key);
                     }
                     count[0]++;
@@ -160,11 +162,10 @@ class IndexWithLongCoding<T> extends IndexBase<T> implements WithLongCoding<T> {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public final Index<T> copy(boolean deep) {
         try {
             var clone = (IndexWithLongCoding<T>)super.copy(deep);
-            if (deep) clone.indexMap = new TLongIntHashMap(indexMap);
+            if (deep) clone.indexMap = LongIntMaps.mutable.withAll(indexMap);
             return clone;
         } catch (Exception ex) {
             throw new IndexException("Failed to clone index", ex);
@@ -179,7 +180,7 @@ class IndexWithLongCoding<T> extends IndexBase<T> implements WithLongCoding<T> {
     @Override
     public final int getCoordinate(T key) {
         final long code = coding.getCode(key);
-        return indexMap.get(code);
+        return indexMap.getIfAbsent(code, -1);
     }
 
     @Override
@@ -191,7 +192,7 @@ class IndexWithLongCoding<T> extends IndexBase<T> implements WithLongCoding<T> {
     @Override
     public final int replace(T existing, T replacement) {
         final long code = coding.getCode(existing);
-        final int index = indexMap.remove(code);
+        final int index = indexMap.removeKeyIfAbsent(code, -1);
         if (index == -1) {
             throw new IndexException("No match key for " + existing);
         } else {
@@ -213,7 +214,7 @@ class IndexWithLongCoding<T> extends IndexBase<T> implements WithLongCoding<T> {
         for (int i=0; i<size; ++i) {
             final T key = keyArray().getValue(i);
             final long code = coding.getCode(key);
-            final int index = indexMap.get(code);
+            final int index = indexMap.getIfAbsent(code, -1);
             consumer.accept(key, index);
         }
     }

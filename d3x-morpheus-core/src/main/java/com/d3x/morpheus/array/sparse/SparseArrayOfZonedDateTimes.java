@@ -25,17 +25,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Predicate;
 
-import gnu.trove.map.TIntLongMap;
-import gnu.trove.map.TIntShortMap;
-import gnu.trove.map.hash.TIntLongHashMap;
-import gnu.trove.map.hash.TIntShortHashMap;
-
 import com.d3x.morpheus.array.Array;
 import com.d3x.morpheus.array.ArrayBase;
 import com.d3x.morpheus.array.ArrayCursor;
 import com.d3x.morpheus.array.ArrayException;
 import com.d3x.morpheus.array.ArrayStyle;
 import com.d3x.morpheus.array.ArrayValue;
+import org.eclipse.collections.api.map.primitive.MutableIntLongMap;
+import org.eclipse.collections.api.map.primitive.MutableIntShortMap;
+import org.eclipse.collections.impl.factory.primitive.IntLongMaps;
+import org.eclipse.collections.impl.factory.primitive.IntShortMaps;
 
 /**
  * An Array implementation containing a sparse array of LocalDateTine values stored as a long of epoch milliseconds.
@@ -69,8 +68,8 @@ class SparseArrayOfZonedDateTimes extends ArrayBase<ZonedDateTime> {
     private static final short UTC_ZONE = zoneIdMap1.get(ZoneId.of("UTC"));
 
     private int length;
-    private TIntLongMap values;
-    private TIntShortMap zoneIds;
+    private MutableIntLongMap values;
+    private MutableIntShortMap zoneIds;
     private ZonedDateTime defaultValue;
     private final short defaultZoneId;
     private long defaultValueAsLong;
@@ -86,8 +85,8 @@ class SparseArrayOfZonedDateTimes extends ArrayBase<ZonedDateTime> {
         this.defaultValue = defaultValue;
         this.defaultValueAsLong = defaultValue != null ? defaultValue.toInstant().toEpochMilli() : nullValue;
         this.defaultZoneId = defaultValue != null ? zoneIdMap1.get(defaultValue.getZone()) : NULL_ZONE;
-        this.values = new TIntLongHashMap((int)Math.max(length * fillPct, 5d), SparseArrayConstructor.DEFAULT_LOAD_FACTOR, -1, defaultValueAsLong);
-        this.zoneIds = new TIntShortHashMap((int)Math.max(length * fillPct, 5d), SparseArrayConstructor.DEFAULT_LOAD_FACTOR, -1, defaultZoneId);
+        this.values = IntLongMaps.mutable.withInitialCapacity((int)Math.max(length * fillPct, 5d));
+        this.zoneIds = IntShortMaps.mutable.withInitialCapacity((int)Math.max(length * fillPct, 5d));
     }
 
     /**
@@ -139,8 +138,8 @@ class SparseArrayOfZonedDateTimes extends ArrayBase<ZonedDateTime> {
     public final Array<ZonedDateTime> copy() {
         try {
             final SparseArrayOfZonedDateTimes copy = (SparseArrayOfZonedDateTimes)super.clone();
-            copy.values = new TIntLongHashMap(values);
-            copy.zoneIds = new TIntShortHashMap(zoneIds);
+            copy.values = IntLongMaps.mutable.withAll(values);
+            copy.zoneIds = IntShortMaps.mutable.withAll(zoneIds);
             copy.defaultValue = this.defaultValue;
             copy.defaultValueAsLong = this.defaultValueAsLong;
             return copy;
@@ -158,7 +157,7 @@ class SparseArrayOfZonedDateTimes extends ArrayBase<ZonedDateTime> {
             var value = getLong(indexes[i]);
             if (value != defaultValueAsLong) {
                 clone.values.put(i, value);
-                clone.zoneIds.put(i, this.zoneIds.get(i));
+                clone.zoneIds.put(i, this.zoneIds.getIfAbsent(i, defaultZoneId));
             }
         }
         return clone;
@@ -173,7 +172,7 @@ class SparseArrayOfZonedDateTimes extends ArrayBase<ZonedDateTime> {
             var value = getLong(indexes.getInt(i));
             if (value != defaultValueAsLong) {
                 clone.values.put(i, value);
-                clone.zoneIds.put(i, this.zoneIds.get(i));
+                clone.zoneIds.put(i, this.zoneIds.getIfAbsent(i, defaultZoneId));
             }
         }
         return clone;
@@ -188,7 +187,7 @@ class SparseArrayOfZonedDateTimes extends ArrayBase<ZonedDateTime> {
         for (int i=0; i<length; ++i) {
             var value = getLong(start+i);
             if (value != defaultValueAsLong) {
-                var zoneId = zoneIds.get(start+i);
+                var zoneId = zoneIds.getIfAbsent(start+i, defaultZoneId);
                 clone.setLong(i, value);
                 clone.zoneIds.put(i, zoneId);
             }
@@ -200,8 +199,8 @@ class SparseArrayOfZonedDateTimes extends ArrayBase<ZonedDateTime> {
     @Override
     protected final Array<ZonedDateTime> sort(int start, int end, int multiplier) {
         return doSort(start, end, (i, j) -> {
-            final long v1 = values.get(i);
-            final long v2 = values.get(j);
+            final long v1 = values.getIfAbsent(i, defaultValueAsLong);
+            final long v2 = values.getIfAbsent(j, defaultValueAsLong);
             return multiplier * Long.compare(v1, v2);
         });
     }
@@ -209,16 +208,19 @@ class SparseArrayOfZonedDateTimes extends ArrayBase<ZonedDateTime> {
 
     @Override
     public final int compare(int i, int j) {
-        return Long.compare(values.get(i), values.get(j));
+        return Long.compare(
+            values.getIfAbsent(i, defaultValueAsLong),
+            values.getIfAbsent(j, defaultValueAsLong)
+        );
     }
 
 
     @Override
     public final Array<ZonedDateTime> swap(int i, int j) {
-        final long v1 = values.get(i);
-        final long v2 = values.get(j);
-        final short z1 = zoneIds.get(i);
-        final short z2 = zoneIds.get(j);
+        final long v1 = values.getIfAbsent(i, defaultValueAsLong);
+        final long v2 = values.getIfAbsent(j, defaultValueAsLong);
+        final short z1 = zoneIds.getIfAbsent(i, defaultZoneId);
+        final short z2 = zoneIds.getIfAbsent(j, defaultZoneId);
         if (v1 == defaultValueAsLong) {
             this.values.remove(j);
             this.zoneIds.remove(j);
@@ -273,8 +275,8 @@ class SparseArrayOfZonedDateTimes extends ArrayBase<ZonedDateTime> {
         if (from instanceof SparseArrayOfZonedDateTimes) {
             final SparseArrayOfZonedDateTimes other = (SparseArrayOfZonedDateTimes)from;
             for (int i=0; i<length; ++i) {
-                this.values.put(toIndex + i, other.values.get(fromIndex + i));
-                this.zoneIds.put(toIndex + i, other.zoneIds.get(fromIndex + i));
+                this.values.put(toIndex + i, other.values.getIfAbsent(fromIndex + i, defaultValueAsLong));
+                this.zoneIds.put(toIndex + i, other.zoneIds.getIfAbsent(fromIndex + i, defaultZoneId));
             }
         } else {
             for (int i=0; i<length; ++i) {
@@ -312,7 +314,7 @@ class SparseArrayOfZonedDateTimes extends ArrayBase<ZonedDateTime> {
 
     @Override
     public boolean isNull(int index) {
-        return values.get(index) == nullValue;
+        return values.getIfAbsent(index, nullValue) == nullValue;
     }
 
 
@@ -322,12 +324,12 @@ class SparseArrayOfZonedDateTimes extends ArrayBase<ZonedDateTime> {
             return isNull(index);
         } else {
             final long epochMills = value.toInstant().toEpochMilli();
-            if (epochMills != values.get(index)) {
+            if (epochMills != values.getIfAbsent(index, defaultValueAsLong)) {
                 return false;
             } else {
                 final ZoneId zoneId = value.getZone();
                 final short code1 = zoneIdMap1.get(zoneId);
-                final short code2 = zoneIds.get(index);
+                final short code2 = zoneIds.getIfAbsent(index, defaultZoneId);
                 return code1 == code2;
             }
         }
@@ -337,18 +339,18 @@ class SparseArrayOfZonedDateTimes extends ArrayBase<ZonedDateTime> {
     @Override
     public final long getLong(int index) {
         this.checkBounds(index, length);
-        return values.get(index);
+        return values.getIfAbsent(index, defaultValueAsLong);
     }
 
 
     @Override
     public final ZonedDateTime getValue(int index) {
         this.checkBounds(index, length);
-        final long value = values.get(index);
+        final long value = values.getIfAbsent(index, defaultValueAsLong);
         if (value == nullValue) {
             return null;
         } else {
-            final ZoneId zone = zoneIdMap2.get(zoneIds.get(index));
+            final ZoneId zone = zoneIdMap2.get(zoneIds.getIfAbsent(index, defaultZoneId));
             final Instant instant = Instant.ofEpochMilli(value);
             return ZonedDateTime.ofInstant(instant, zone);
         }
@@ -364,7 +366,7 @@ class SparseArrayOfZonedDateTimes extends ArrayBase<ZonedDateTime> {
             this.zoneIds.remove(index);
             return oldValue;
         } else {
-            final short zoneId = zoneIds.get(index);
+            final short zoneId = zoneIds.getIfAbsent(index, defaultZoneId);
             this.values.put(index, value);
             this.zoneIds.put(index, zoneId != NULL_ZONE ? zoneId : UTC_ZONE);
             return oldValue;
@@ -430,7 +432,7 @@ class SparseArrayOfZonedDateTimes extends ArrayBase<ZonedDateTime> {
             final long value = getLong(index);
             os.writeLong(value);
             if (value != defaultValueAsLong) {
-                final short zoneId = zoneIds.get(index);
+                final short zoneId = zoneIds.getIfAbsent(index, defaultZoneId);
                 os.writeShort(zoneId);
             }
         }

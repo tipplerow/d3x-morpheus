@@ -17,6 +17,8 @@ package com.d3x.morpheus.series;
 
 import java.util.stream.Stream;
 
+import lombok.NonNull;
+
 import com.d3x.morpheus.array.Array;
 import com.d3x.morpheus.array.ArrayBuilder;
 import com.d3x.morpheus.array.coding.IntCoding;
@@ -24,13 +26,15 @@ import com.d3x.morpheus.array.coding.LongCoding;
 import com.d3x.morpheus.util.IntComparator;
 import com.d3x.morpheus.util.SortAlgorithm;
 import com.d3x.morpheus.util.Swapper;
-import gnu.trove.map.TIntDoubleMap;
-import gnu.trove.map.TLongDoubleMap;
-import gnu.trove.map.TObjectDoubleMap;
-import gnu.trove.map.hash.TIntDoubleHashMap;
-import gnu.trove.map.hash.TLongDoubleHashMap;
-import gnu.trove.map.hash.TObjectDoubleHashMap;
-import lombok.NonNull;
+import org.eclipse.collections.api.map.primitive.IntDoubleMap;
+import org.eclipse.collections.api.map.primitive.LongDoubleMap;
+import org.eclipse.collections.api.map.primitive.MutableIntDoubleMap;
+import org.eclipse.collections.api.map.primitive.MutableLongDoubleMap;
+import org.eclipse.collections.api.map.primitive.MutableObjectDoubleMap;
+import org.eclipse.collections.api.map.primitive.ObjectDoubleMap;
+import org.eclipse.collections.impl.factory.primitive.IntDoubleMaps;
+import org.eclipse.collections.impl.factory.primitive.LongDoubleMaps;
+import org.eclipse.collections.impl.factory.primitive.ObjectDoubleMaps;
 
 /**
  * An interface to a Builder for DoubleSeries
@@ -40,8 +44,6 @@ import lombok.NonNull;
  * @param <K>   the series key
  */
 public interface DoubleSeriesBuilder<K> extends DataSeriesBuilder<K,Double> {
-
-    float DEFAULT_LOAD_FACTOR = 0.85f;
 
     /**
      * Returns a newly created DoubleSeries from the state of this builder
@@ -114,7 +116,7 @@ public interface DoubleSeriesBuilder<K> extends DataSeriesBuilder<K,Double> {
 
         private Class<K> keyType;
         private ArrayBuilder<K> keys;
-        private TObjectDoubleMap<K> values;
+        private MutableObjectDoubleMap<K> values;
 
         /**
          * Constructor
@@ -136,7 +138,7 @@ public interface DoubleSeriesBuilder<K> extends DataSeriesBuilder<K,Double> {
                 return this;
             } else {
                 this.keys = ArrayBuilder.of(capacity, keyType);
-                this.values = new TObjectDoubleHashMap<>(capacity, DEFAULT_LOAD_FACTOR, Double.NaN);
+                this.values = ObjectDoubleMaps.mutable.withInitialCapacity(capacity);
                 return this;
             }
         }
@@ -155,7 +157,7 @@ public interface DoubleSeriesBuilder<K> extends DataSeriesBuilder<K,Double> {
             if (!values.containsKey(key)) {
                 return putDouble(key ,value);
             } else if (!Double.isNaN(value)) {
-                var existing = values.get(key);
+                var existing = values.getIfAbsent(key, Double.NaN);
                 var v1 = Double.isNaN(existing) ? 0d : existing;
                 this.values.put(key, v1 + value);
                 return this;
@@ -175,7 +177,7 @@ public interface DoubleSeriesBuilder<K> extends DataSeriesBuilder<K,Double> {
         private Class<K> keyType;
         private IntCoding<K> coding;
         private ArrayBuilder<K> keys;
-        private TIntDoubleMap values;
+        private MutableIntDoubleMap values;
 
         /**
          * Constructor
@@ -201,13 +203,13 @@ public interface DoubleSeriesBuilder<K> extends DataSeriesBuilder<K,Double> {
                 return this;
             } else {
                 this.keys = ArrayBuilder.of(capacity, keyType);
-                this.values = new TIntDoubleHashMap(capacity, DEFAULT_LOAD_FACTOR, Integer.MIN_VALUE, Double.NaN);
+                this.values = IntDoubleMaps.mutable.withInitialCapacity(capacity);
                 return this;
             }
         }
 
         @Override
-        public DoubleSeriesBuilder<K> putDouble(K key, double value) {
+        public DoubleSeriesBuilder<K> putDouble(@NonNull K key, double value) {
             this.capacity(100);
             this.keys.append(key);
             this.values.put(coding.getCode(key), value);
@@ -221,7 +223,7 @@ public interface DoubleSeriesBuilder<K> extends DataSeriesBuilder<K,Double> {
             if (!values.containsKey(code)) {
                 return putDouble(key ,value);
             } else if (!Double.isNaN(value)) {
-                var existing = values.get(code);
+                var existing = values.getIfAbsent(code, Double.NaN);
                 var v1 = Double.isNaN(existing) ? 0d : existing;
                 this.values.put(code, v1 + value);
                 return this;
@@ -241,7 +243,7 @@ public interface DoubleSeriesBuilder<K> extends DataSeriesBuilder<K,Double> {
         private Class<K> keyType;
         private LongCoding<K> coding;
         private ArrayBuilder<K> keys;
-        private TLongDoubleMap values;
+        private MutableLongDoubleMap values;
 
         /**
          * Constructor
@@ -267,13 +269,13 @@ public interface DoubleSeriesBuilder<K> extends DataSeriesBuilder<K,Double> {
                 return this;
             } else {
                 this.keys = ArrayBuilder.of(capacity, keyType);
-                this.values = new TLongDoubleHashMap(capacity, DEFAULT_LOAD_FACTOR, Long.MIN_VALUE, Double.NaN);
+                this.values = LongDoubleMaps.mutable.withInitialCapacity(capacity);
                 return this;
             }
         }
 
         @Override
-        public DoubleSeriesBuilder<K> putDouble(K key, double value) {
+        public DoubleSeriesBuilder<K> putDouble(@NonNull K key, double value) {
             this.capacity(100);
             this.keys.append(key);
             this.values.put(coding.getCode(key), value);
@@ -287,7 +289,7 @@ public interface DoubleSeriesBuilder<K> extends DataSeriesBuilder<K,Double> {
             if (!values.containsKey(code)) {
                 return putDouble(key ,value);
             } else if (!Double.isNaN(value)) {
-                var existing = values.get(code);
+                var existing = values.getIfAbsent(code, Double.NaN);
                 var v1 = Double.isNaN(existing) ? 0d : existing;
                 this.values.put(code, v1 + value);
                 return this;
@@ -304,7 +306,7 @@ public interface DoubleSeriesBuilder<K> extends DataSeriesBuilder<K,Double> {
      */
     abstract class DoubleSeriesBase<K> implements DoubleSeries<K> {
 
-        private Class<K> keyClass;
+        private final Class<K> keyClass;
         private boolean parallel;
 
         /**
@@ -383,8 +385,8 @@ public interface DoubleSeriesBuilder<K> extends DataSeriesBuilder<K,Double> {
      */
     class DefaultDoubleSeries<K> extends DoubleSeriesBase<K> implements Swapper {
 
-        private Array<K> keys;
-        private TObjectDoubleMap<K> values;
+        private final Array<K> keys;
+        private final ObjectDoubleMap<K> values;
         private double[] temp;
 
         /**
@@ -394,7 +396,7 @@ public interface DoubleSeriesBuilder<K> extends DataSeriesBuilder<K,Double> {
          */
         DefaultDoubleSeries(
             @lombok.NonNull Array<K> keys,
-            @lombok.NonNull TObjectDoubleMap<K> values) {
+            @lombok.NonNull ObjectDoubleMap<K> values) {
             super(keys.type());
             this.keys = keys;
             this.values = values;
@@ -422,7 +424,7 @@ public interface DoubleSeriesBuilder<K> extends DataSeriesBuilder<K,Double> {
 
         @Override
         public final double getDouble(K key) {
-            return values.get(key);
+            return values.getIfAbsent(key, Double.NaN);
         }
 
         @Override
@@ -431,7 +433,7 @@ public interface DoubleSeriesBuilder<K> extends DataSeriesBuilder<K,Double> {
                 return temp[index];
             } else {
                 var key = keys.getValue(index);
-                return values.get(key);
+                return values.getIfAbsent(key, Double.NaN);
             }
         }
 
@@ -439,7 +441,7 @@ public interface DoubleSeriesBuilder<K> extends DataSeriesBuilder<K,Double> {
         public final void sort(IntComparator comparator) {
             try {
                 this.temp = new double[keys.length()];
-                keys.forEachValue(v -> temp[v.index()] = values.get(v.getValue()));
+                keys.forEachValue(v -> temp[v.index()] = values.getIfAbsent(v.getValue(), Double.NaN));
                 SortAlgorithm.getDefault(isParallel()).sort(0, size(), comparator, this);
             } finally {
                 this.temp = null;
@@ -467,7 +469,7 @@ public interface DoubleSeriesBuilder<K> extends DataSeriesBuilder<K,Double> {
 
         private IntCoding<K> coding;
         private Array<K> keys;
-        private TIntDoubleMap values;
+        private IntDoubleMap values;
         private double[] temp;
 
         /**
@@ -479,7 +481,7 @@ public interface DoubleSeriesBuilder<K> extends DataSeriesBuilder<K,Double> {
         IntCodingDoubleSeries(
             @lombok.NonNull IntCoding<K> coding,
             @lombok.NonNull Array<K> keys,
-            @lombok.NonNull TIntDoubleMap values) {
+            @lombok.NonNull IntDoubleMap values) {
             super(keys.type());
             this.coding = coding;
             this.keys = keys;
@@ -508,7 +510,7 @@ public interface DoubleSeriesBuilder<K> extends DataSeriesBuilder<K,Double> {
 
         @Override
         public final double getDouble(K key) {
-            return values.get(coding.getCode(key));
+            return values.getIfAbsent(coding.getCode(key), Double.NaN);
         }
 
         @Override
@@ -517,7 +519,7 @@ public interface DoubleSeriesBuilder<K> extends DataSeriesBuilder<K,Double> {
                 return temp[index];
             } else {
                 var key = keys.getInt(index);
-                return values.get(key);
+                return values.getIfAbsent(key, Double.NaN);
             }
         }
 
@@ -525,7 +527,7 @@ public interface DoubleSeriesBuilder<K> extends DataSeriesBuilder<K,Double> {
         public final void sort(IntComparator comparator) {
             try {
                 this.temp = new double[keys.length()];
-                keys.forEachValue(v -> temp[v.index()] = values.get(v.getInt()));
+                keys.forEachValue(v -> temp[v.index()] = values.getIfAbsent(v.getInt(), Double.NaN));
                 SortAlgorithm.getDefault(isParallel()).sort(0, size(), comparator, this);
             } finally {
                 this.temp = null;
@@ -551,9 +553,9 @@ public interface DoubleSeriesBuilder<K> extends DataSeriesBuilder<K,Double> {
      */
     class LongCodingDoubleSeries<K> extends DoubleSeriesBase<K> implements Swapper {
 
-        private Array<K> keys;
-        private LongCoding<K> coding;
-        private TLongDoubleMap values;
+        private final Array<K> keys;
+        private final LongCoding<K> coding;
+        private final LongDoubleMap values;
         private double[] temp;
 
         /**
@@ -565,7 +567,7 @@ public interface DoubleSeriesBuilder<K> extends DataSeriesBuilder<K,Double> {
         LongCodingDoubleSeries(
             @lombok.NonNull LongCoding<K> coding,
             @lombok.NonNull Array<K> keys,
-            @lombok.NonNull TLongDoubleMap values) {
+            @lombok.NonNull LongDoubleMap values) {
             super(keys.type());
             this.coding = coding;
             this.keys = keys;
@@ -594,7 +596,7 @@ public interface DoubleSeriesBuilder<K> extends DataSeriesBuilder<K,Double> {
 
         @Override
         public final double getDouble(K key) {
-            return values.get(coding.getCode(key));
+            return values.getIfAbsent(coding.getCode(key), Double.NaN);
         }
 
         @Override
@@ -603,7 +605,7 @@ public interface DoubleSeriesBuilder<K> extends DataSeriesBuilder<K,Double> {
                 return temp[index];
             } else {
                 var key = keys.getLong(index);
-                return values.get(key);
+                return values.getIfAbsent(key, Double.NaN);
             }
         }
 
@@ -611,7 +613,7 @@ public interface DoubleSeriesBuilder<K> extends DataSeriesBuilder<K,Double> {
         public final void sort(IntComparator comparator) {
             try {
                 this.temp = new double[keys.length()];
-                keys.forEachValue(v -> temp[v.index()] = values.get(v.getLong()));
+                keys.forEachValue(v -> temp[v.index()] = values.getIfAbsent(v.getLong(), Double.NaN));
                 SortAlgorithm.getDefault(isParallel()).sort(0, size(), comparator, this);
             } finally {
                 this.temp = null;

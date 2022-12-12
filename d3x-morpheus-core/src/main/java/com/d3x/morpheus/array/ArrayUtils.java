@@ -30,15 +30,14 @@ import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
-import gnu.trove.set.TDoubleSet;
-import gnu.trove.set.TIntSet;
-import gnu.trove.set.TLongSet;
-import gnu.trove.set.hash.TDoubleHashSet;
-import gnu.trove.set.hash.TIntHashSet;
-import gnu.trove.set.hash.TLongHashSet;
-
 import com.d3x.morpheus.index.Index;
 import com.d3x.morpheus.range.Range;
+import org.eclipse.collections.api.set.primitive.MutableDoubleSet;
+import org.eclipse.collections.api.set.primitive.MutableIntSet;
+import org.eclipse.collections.api.set.primitive.MutableLongSet;
+import org.eclipse.collections.impl.factory.primitive.DoubleSets;
+import org.eclipse.collections.impl.factory.primitive.IntSets;
+import org.eclipse.collections.impl.factory.primitive.LongSets;
 
 /**
  * A utility class that provides various useful functions to operate on Morpheus arrays
@@ -53,7 +52,6 @@ public class ArrayUtils {
      * Returns a collector that collects items in a Morpheus array
      * @return                  the newly created collector
      */
-    @SuppressWarnings("unchecked")
     public static <T> Collector<T,ArrayBuilder<T>,Array<T>> toArray() {
         return ArrayUtils.toArray(null, 1000);
     }
@@ -63,7 +61,6 @@ public class ArrayUtils {
      * @param expectedLength    an estimate of the expected length, does not have to be exact
      * @return                  the newly created collector
      */
-    @SuppressWarnings("unchecked")
     public static <T> Collector<T,ArrayBuilder<T>,Array<T>> toArray(int expectedLength) {
         return ArrayUtils.toArray(null, expectedLength);
     }
@@ -89,7 +86,6 @@ public class ArrayUtils {
      * @param values    the iterable collection of values
      * @return          the array containing values from the iterable
      */
-    @SuppressWarnings("unchecked")
     public static <V> Array<V> toArray(Iterable<V> values) {
         if (values instanceof Array) {
             return (Array<V>)values;
@@ -98,7 +94,7 @@ public class ArrayUtils {
         } else if (values instanceof Range) {
             return ((Range<V>) values).toArray();
         } else if (values instanceof Collection) {
-            final ArrayBuilder<V> builder = ArrayBuilder.of(((Collection)values).size());
+            final ArrayBuilder<V> builder = ArrayBuilder.of(((Collection<?>)values).size());
             return builder.appendAll(values).toArray();
         } else {
             final ArrayBuilder<V> builder = ArrayBuilder.of(1000);
@@ -218,8 +214,8 @@ public class ArrayUtils {
      */
     private static class DistinctInts extends DistinctCalculator<Integer> {
 
-        private int limit;
-        private TIntSet distinctSet;
+        private final int limit;
+        private final MutableIntSet distinctSet;
 
         /**
          * Constructor
@@ -228,7 +224,7 @@ public class ArrayUtils {
         DistinctInts(int limit) {
             super(Integer.class, limit);
             this.limit = limit;
-            this.distinctSet = new TIntHashSet(limit < Integer.MAX_VALUE ? limit : 1000);
+            this.distinctSet = IntSets.mutable.withInitialCapacity(limit < Integer.MAX_VALUE ? limit : 1000);
         }
 
         /**
@@ -249,8 +245,8 @@ public class ArrayUtils {
      */
     private static class DistinctLongs extends DistinctCalculator<Long> {
 
-        private int limit;
-        private TLongSet distinctSet;
+        private final int limit;
+        private final MutableLongSet distinctSet;
 
         /**
          * Constructor
@@ -259,7 +255,7 @@ public class ArrayUtils {
         DistinctLongs(int limit) {
             super(Long.class, limit);
             this.limit = limit;
-            this.distinctSet = new TLongHashSet(limit < Integer.MAX_VALUE ? limit : 1000);
+            this.distinctSet = LongSets.mutable.withInitialCapacity(limit < Integer.MAX_VALUE ? limit : 1000);
         }
 
         /**
@@ -279,8 +275,8 @@ public class ArrayUtils {
      */
     private static class DistinctDoubles extends DistinctCalculator<Double> {
 
-        private int limit;
-        private TDoubleSet distinctSet;
+        private final int limit;
+        private final MutableDoubleSet distinctSet;
 
         /**
          * Constructor
@@ -289,7 +285,7 @@ public class ArrayUtils {
         DistinctDoubles(int limit) {
             super(Double.class, limit);
             this.limit = limit;
-            this.distinctSet = new TDoubleHashSet(limit < Integer.MAX_VALUE ? limit : 1000);
+            this.distinctSet = DoubleSets.mutable.withInitialCapacity(limit < Integer.MAX_VALUE ? limit : 1000);
         }
 
         /**
@@ -309,8 +305,8 @@ public class ArrayUtils {
      */
     private static class DistinctValues<V> extends DistinctCalculator<V> {
 
-        private int limit;
-        private Set<V> distinctSet;
+        private final int limit;
+        private final Set<V> distinctSet;
 
         /**
          * Constructor

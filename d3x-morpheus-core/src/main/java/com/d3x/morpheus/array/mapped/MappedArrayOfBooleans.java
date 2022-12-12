@@ -24,9 +24,6 @@ import java.nio.ShortBuffer;
 import java.nio.channels.FileChannel;
 import java.util.function.Predicate;
 
-import gnu.trove.set.TShortSet;
-import gnu.trove.set.hash.TShortHashSet;
-
 import com.d3x.morpheus.array.ArrayBuilder;
 import com.d3x.morpheus.array.ArrayCursor;
 import com.d3x.morpheus.array.ArrayException;
@@ -34,6 +31,7 @@ import com.d3x.morpheus.array.Array;
 import com.d3x.morpheus.array.ArrayBase;
 import com.d3x.morpheus.array.ArrayStyle;
 import com.d3x.morpheus.array.ArrayValue;
+import org.eclipse.collections.impl.factory.primitive.ShortSets;
 
 /**
  * An Array implementation designed to hold a mapped array of boolean values
@@ -361,8 +359,8 @@ class MappedArrayOfBooleans extends ArrayBase<Boolean> {
 
     @Override
     public Array<Boolean> distinct(int limit) {
-        final TShortSet set = new TShortHashSet(limit);
-        final ArrayBuilder<Boolean> builder = ArrayBuilder.of(2, Boolean.class);
+        var set = ShortSets.mutable.withInitialCapacity(limit);
+        var builder = ArrayBuilder.of(2, Boolean.class);
         for (int i=0; i<length(); ++i) {
             final boolean value = getBoolean(i);
             if (set.add(value ? (short)1 : (short)0)) {

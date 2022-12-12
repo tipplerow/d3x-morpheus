@@ -24,9 +24,6 @@ import java.nio.IntBuffer;
 import java.nio.channels.FileChannel;
 import java.util.function.Predicate;
 
-import gnu.trove.set.TIntSet;
-import gnu.trove.set.hash.TIntHashSet;
-
 import com.d3x.morpheus.array.Array;
 import com.d3x.morpheus.array.ArrayBase;
 import com.d3x.morpheus.array.ArrayBuilder;
@@ -34,6 +31,7 @@ import com.d3x.morpheus.array.ArrayCursor;
 import com.d3x.morpheus.array.ArrayException;
 import com.d3x.morpheus.array.ArrayStyle;
 import com.d3x.morpheus.array.ArrayValue;
+import org.eclipse.collections.impl.factory.primitive.IntSets;
 
 /**
  * An Array implementation designed to represent a dense array of int values in a memory-mapped file.
@@ -374,8 +372,8 @@ class MappedArrayOfInts extends ArrayBase<Integer> {
     @Override
     public final Array<Integer> distinct(int limit) {
         var capacity = limit < Integer.MAX_VALUE ? limit : 100;
-        final TIntSet set = new TIntHashSet(capacity);
-        final ArrayBuilder<Integer> builder = ArrayBuilder.of(capacity, Integer.class);
+        var set = IntSets.mutable.withInitialCapacity(capacity);
+        var builder = ArrayBuilder.of(capacity, Integer.class);
         for (int i=0; i<length(); ++i) {
             var value = getInt(i);
             if (set.add(value)) {

@@ -21,10 +21,6 @@ import com.d3x.morpheus.frame.DataFrame;
 import com.d3x.morpheus.frame.DataFrameAsserts;
 import com.d3x.morpheus.index.Index;
 import com.d3x.morpheus.range.Range;
-import gnu.trove.map.TLongIntMap;
-import gnu.trove.map.TObjectIntMap;
-import gnu.trove.map.hash.TLongIntHashMap;
-import gnu.trove.map.hash.TObjectIntHashMap;
 import org.testng.annotations.Test;
 
 /**
@@ -78,17 +74,6 @@ public class CreateTests {
         DataFrameAsserts.assertEqualsByIndex(frame1, frame2);
         DataFrameAsserts.assertEqualsByIndex(frame1, frame3);
         DataFrameAsserts.assertEqualsByIndex(frame2, frame3);
-    }
-
-
-    @Test()
-    public void testMapCreateTest() {
-        final long t1 = System.nanoTime();
-        final TObjectIntMap<String> map1 = new TObjectIntHashMap<>(5000000, 0.8f, -1);
-        final long t2 = System.nanoTime();
-        final TLongIntMap map2 = new TLongIntHashMap();
-        final long t3 = System.nanoTime();
-        System.out.println("Map1:" + ((t2-t1)/1000000d) + " Map2:" + ((t3-t2)/100000d));
     }
 
 

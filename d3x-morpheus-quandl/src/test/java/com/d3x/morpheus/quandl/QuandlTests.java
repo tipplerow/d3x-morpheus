@@ -20,7 +20,6 @@ import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 
-import com.d3x.morpheus.frame.DataFrame;
 import com.d3x.morpheus.frame.DataFrameValue;
 import com.d3x.morpheus.util.IO;
 import org.testng.Assert;
@@ -48,7 +47,6 @@ import static com.d3x.morpheus.quandl.QuandlField.START_DATE;
  */
 public class QuandlTests {
 
-    private final QuandlSource source = new QuandlSource();
 
     @DataProvider(name="wiki")
     public Object[][] wiki() {
@@ -91,6 +89,7 @@ public class QuandlTests {
 
     @Test(enabled = false)
     public void databases() {
+        var source = new QuandlSource();
         var frame = source.getDatabases();
         frame.out().print();
         Assert.assertTrue(frame.rowCount() > 0);
@@ -108,8 +107,9 @@ public class QuandlTests {
 
     @Test(enabled = false)
     public void datasets() {
-        final String databaseCode = "FED";
-        final DataFrame<String,QuandlField> frame = source.getDatasets(databaseCode);
+        var source = new QuandlSource();
+        var databaseCode = "FED";
+        var frame = source.getDatasets(databaseCode);
         frame.out().print();
         Assert.assertTrue(frame.rowCount() > 0);
         Assert.assertEquals(frame.colCount(), 4);
@@ -125,7 +125,8 @@ public class QuandlTests {
 
     @Test(enabled = false)
     public void search() {
-        final DataFrame<Integer,QuandlField> frame = source.search("crude oil");
+        var source = new QuandlSource();
+        var frame = source.search("crude oil");
         frame.out().print();
         Assert.assertTrue(frame.rowCount() > 0);
         Assert.assertEquals(frame.colCount(), 12);
@@ -144,7 +145,8 @@ public class QuandlTests {
 
     @Test(dataProvider = "metadata1", enabled = false)
     public void metadata1(String database) {
-        final QuandlDatabaseInfo metaData = source.getMetaData(database);
+        var source = new QuandlSource();
+        var metaData = source.getMetaData(database);
         IO.println(metaData);
         Assert.assertNotNull(metaData, "Meta-data is not null");
         Assert.assertEquals(metaData.getCode(), database, "Database coded match");
@@ -158,7 +160,8 @@ public class QuandlTests {
 
     @Test(dataProvider = "metadata2", enabled = false)
     public void metadata2(String database, String dataset) {
-        final QuandlDatasetInfo metaData = source.getMetaData(database, dataset);
+        var source = new QuandlSource();
+        var metaData = source.getMetaData(database, dataset);
         IO.println(metaData);
         Assert.assertNotNull(metaData, "Meta-data is not null");
         Assert.assertEquals(metaData.getDatabaseCode(), database, "Database codes match");
@@ -178,7 +181,8 @@ public class QuandlTests {
 
     @Test(dataProvider = "wiki", enabled = false)
     public void series(String dataset, int expectedColCount) {
-        final DataFrame<LocalDate,String> frame = source.getTimeSeries(options -> {
+        var source = new QuandlSource();
+        var frame = source.getTimeSeries(options -> {
             options.setDatabase("WIKI");
             options.setDataset(dataset);
             options.setStartDate(LocalDate.of(2014, 1, 6));
@@ -203,7 +207,8 @@ public class QuandlTests {
 
     @Test(enabled = false)
     public void table() {
-        final DataFrame<Integer,String> frame = source.getDataTable(options -> {
+        var source = new QuandlSource();
+        var frame = source.getDataTable(options -> {
             options.setDatabase("FXCM");
             options.setDataset("H1");
             options.setPageSize(10000);
@@ -230,7 +235,8 @@ public class QuandlTests {
 
     @Test(enabled = false)
     public void testDataTableQueryColumnSelection() {
-        final DataFrame<Integer,String> frame = source.getDataTable(options -> {
+        var source = new QuandlSource();
+        var frame = source.getDataTable(options -> {
             options.setDatabase("FXCM");
             options.setDataset("H1");
             options.addColumns("symbol", "date", "hour", "closebid", "askbid", "totalticks");
@@ -251,7 +257,8 @@ public class QuandlTests {
 
     @Test(dataProvider = "libor", enabled = false)
     public void testDailyFredLibor(String dataset, int expectedColCount) {
-        final DataFrame<LocalDate,String> frame = source.getTimeSeries(options -> {
+        var source = new QuandlSource();
+        var frame = source.getTimeSeries(options -> {
             options.setDatabase("FRED");
             options.setDataset(dataset);
             options.startDate("2000-01-04");
@@ -269,7 +276,8 @@ public class QuandlTests {
 
     @Test(enabled = false)
     public void ukGDP() {
-        final DataFrame<LocalDate,String> frame = source.getTimeSeries(options -> {
+        var source = new QuandlSource();
+        var frame = source.getTimeSeries(options -> {
             options.setDatabase("UKONS");
             options.setDataset("BKVT_A");
             options.startDate("2000-01-04");
@@ -286,6 +294,7 @@ public class QuandlTests {
 
     @Test(expectedExceptions = { QuandlException.class}, enabled = false)
     public void testMissingDatabase() {
+        var source = new QuandlSource();
         source.getTimeSeries(options -> {
             options.setDataset("BKVT_A");
             options.startDate("2000-01-04");
@@ -296,6 +305,7 @@ public class QuandlTests {
 
     @Test(expectedExceptions = { QuandlException.class}, enabled = false)
     public void testMissingDataset() {
+        var source = new QuandlSource();
         source.getTimeSeries(options -> {
             options.setDatabase("UKONS");
             options.startDate("2000-01-04");

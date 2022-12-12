@@ -19,7 +19,7 @@ import com.d3x.morpheus.array.Array;
 import com.d3x.morpheus.frame.DataFrame;
 import com.d3x.morpheus.range.Range;
 import com.d3x.morpheus.util.IO;
-import gnu.trove.map.hash.TIntDoubleHashMap;
+import org.eclipse.collections.impl.factory.primitive.IntDoubleMaps;
 import org.testng.annotations.Test;
 
 /**
@@ -48,9 +48,9 @@ public class SparseTests {
 
 
     @Test()
-    public void trove() {
+    public void eclipse() {
 
-        var data = new TIntDoubleHashMap(10, 1f, -1, Double.NaN);
+        var data = IntDoubleMaps.mutable.withInitialCapacity(10);
         data.put(25, 10000000d);
         data.put(45, 0.3434d);
         data.put(100000, 0.2344d);

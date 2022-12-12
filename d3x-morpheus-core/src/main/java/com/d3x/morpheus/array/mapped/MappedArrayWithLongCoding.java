@@ -24,9 +24,6 @@ import java.nio.LongBuffer;
 import java.nio.channels.FileChannel;
 import java.util.function.Predicate;
 
-import gnu.trove.set.TLongSet;
-import gnu.trove.set.hash.TLongHashSet;
-
 import com.d3x.morpheus.array.Array;
 import com.d3x.morpheus.array.ArrayBase;
 import com.d3x.morpheus.array.ArrayBuilder;
@@ -35,6 +32,7 @@ import com.d3x.morpheus.array.ArrayException;
 import com.d3x.morpheus.array.ArrayStyle;
 import com.d3x.morpheus.array.ArrayValue;
 import com.d3x.morpheus.array.coding.LongCoding;
+import org.eclipse.collections.impl.factory.primitive.LongSets;
 
 /**
  * A sparse array implementation that maintains a primitive long array of codes that apply to Object values exposed through the Coding interface.
@@ -345,8 +343,8 @@ class MappedArrayWithLongCoding<T> extends ArrayBase<T> {
     @Override
     public Array<T> distinct(int limit) {
         var capacity = limit < Integer.MAX_VALUE ? limit : 100;
-        final TLongSet set = new TLongHashSet(capacity);
-        final ArrayBuilder<T> builder = ArrayBuilder.of(capacity, type());
+        var set = LongSets.mutable.withInitialCapacity(capacity);
+        var builder = ArrayBuilder.of(capacity, type());
         for (int i=0; i<length(); ++i) {
             final long code = getLong(i);
             if (set.add(code)) {

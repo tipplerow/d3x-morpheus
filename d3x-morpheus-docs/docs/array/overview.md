@@ -19,11 +19,11 @@ mapped (off heap) backing stores is included to enable flexible memory allocatio
 circumstances. Adding support for additional `Array` types is also fairly straightforward, and is 
 described in a later section.
 
-Primitive collections libraries such as [Trove](http://trove.starlight-systems.com/) and [Goldman Sachs Collections](https://github.com/goldmansachs/gs-collections) 
+Primitive collections libraries such as [Goldman Sachs Collections](https://github.com/goldmansachs/gs-collections) 
 provide very effective high performance data structures, and the Morpheus `Array` interface is not intended 
-to compete with these libraries. In fact, sparse Morpheus Array implementations leverage the Trove library 
-under the covers. A feature of Trove however is that each typed collection is represented by its own interface, 
-such as `TIntList` for primitive integers and `TDoubleList` for primitive doubles, and they do not share a 
+to compete with these libraries. In fact, sparse Morpheus Array implementations leverage the Goldman Sachs library 
+under the covers. A feature of Goldman Sachs Collections however is that each typed collection is represented 
+by its own interface, such as `IntList` for primitive integers and `DoubleList` for primitive doubles, and they do not share a 
 common interface. This makes it inconvenient to build generic APIs that can operate on multiple types of 
 primitive collections, without creating lots of overloaded methods.
 

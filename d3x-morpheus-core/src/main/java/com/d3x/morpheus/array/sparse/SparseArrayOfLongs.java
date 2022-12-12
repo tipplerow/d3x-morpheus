@@ -27,11 +27,9 @@ import com.d3x.morpheus.array.Array;
 import com.d3x.morpheus.array.ArrayBase;
 import com.d3x.morpheus.array.ArrayStyle;
 import com.d3x.morpheus.array.ArrayValue;
-
-import gnu.trove.map.TIntLongMap;
-import gnu.trove.map.hash.TIntLongHashMap;
-import gnu.trove.set.TLongSet;
-import gnu.trove.set.hash.TLongHashSet;
+import org.eclipse.collections.api.map.primitive.MutableIntLongMap;
+import org.eclipse.collections.impl.factory.primitive.IntLongMaps;
+import org.eclipse.collections.impl.factory.primitive.LongSets;
 
 /**
  * An Array implementation designed to hold a sparse array of long values
@@ -45,7 +43,7 @@ class SparseArrayOfLongs extends ArrayBase<Long> {
     private static final long serialVersionUID = 1L;
 
     private int length;
-    private TIntLongMap values;
+    private MutableIntLongMap values;
     private long defaultValue;
 
     /**
@@ -58,7 +56,7 @@ class SparseArrayOfLongs extends ArrayBase<Long> {
         super(Long.class, ArrayStyle.SPARSE, false);
         this.length = length;
         this.defaultValue = defaultValue != null ? defaultValue : 0L;
-        this.values = new TIntLongHashMap((int)Math.max(length * fillPct, 5d), SparseArrayConstructor.DEFAULT_LOAD_FACTOR, -1, this.defaultValue);
+        this.values = IntLongMaps.mutable.withInitialCapacity((int)Math.max(length * fillPct, 5d));
     }
 
     /**
@@ -108,7 +106,7 @@ class SparseArrayOfLongs extends ArrayBase<Long> {
     public final Array<Long> copy() {
         try {
             final SparseArrayOfLongs copy = (SparseArrayOfLongs)super.clone();
-            copy.values = new TIntLongHashMap(values);
+            copy.values = IntLongMaps.mutable.withAll(values);
             copy.defaultValue = this.defaultValue;
             return copy;
         } catch (Exception ex) {
@@ -159,8 +157,8 @@ class SparseArrayOfLongs extends ArrayBase<Long> {
     @Override
     protected final Array<Long> sort(int start, int end, int multiplier) {
         return doSort(start, end, (i, j) -> {
-            final long v1 = values.get(i);
-            final long v2 = values.get(j);
+            final long v1 = values.getIfAbsent(i, defaultValue);
+            final long v2 = values.getIfAbsent(j, defaultValue);
             return multiplier * Long.compare(v1, v2);
         });
     }
@@ -168,7 +166,10 @@ class SparseArrayOfLongs extends ArrayBase<Long> {
 
     @Override
     public final int compare(int i, int j) {
-        return Long.compare(values.get(i), values.get(j));
+        return Long.compare(
+            values.getIfAbsent(i, defaultValue),
+            values.getIfAbsent(j, defaultValue)
+        );
     }
 
 
@@ -252,28 +253,28 @@ class SparseArrayOfLongs extends ArrayBase<Long> {
 
     @Override
     public final boolean isEqualTo(int index, Long value) {
-        return value == null ? isNull(index) : value == values.get(index);
+        return value == null ? isNull(index) : value == values.getIfAbsent(index, defaultValue);
     }
 
 
     @Override
     public final long getLong(int index) {
         this.checkBounds(index, length);
-        return values.get(index);
+        return values.getIfAbsent(index, defaultValue);
     }
 
 
     @Override
     public double getDouble(int index) {
         this.checkBounds(index, length);
-        return values.get(index);
+        return values.getIfAbsent(index, defaultValue);
     }
 
 
     @Override
     public final Long getValue(int index) {
         this.checkBounds(index, length);
-        return values.get(index);
+        return values.getIfAbsent(index, defaultValue);
     }
 
 
@@ -328,8 +329,8 @@ class SparseArrayOfLongs extends ArrayBase<Long> {
     @Override
     public final Array<Long> distinct(int limit) {
         var capacity = limit < Integer.MAX_VALUE ? limit : 100;
-        final TLongSet set = new TLongHashSet(capacity);
-        final ArrayBuilder<Long> builder = ArrayBuilder.of(capacity, Long.class);
+        var set = LongSets.mutable.withInitialCapacity(capacity);
+        var builder = ArrayBuilder.of(capacity, Long.class);
         for (int i=0; i<length(); ++i) {
             final long value = getLong(i);
             if (set.add(value)) {
@@ -347,10 +348,10 @@ class SparseArrayOfLongs extends ArrayBase<Long> {
     public final Array<Long> cumSum() {
         var length = length();
         final Array<Long> result = Array.of(Long.class, length);
-        result.setLong(0, values.get(0));
+        result.setLong(0, values.getIfAbsent(0, defaultValue));
         for (int i=1; i<length; ++i) {
             final long prior = result.getLong(i-1);
-            final long current = values.get(i);
+            final long current = values.getIfAbsent(i, defaultValue);
             result.setLong(i, prior + current);
         }
         return result;

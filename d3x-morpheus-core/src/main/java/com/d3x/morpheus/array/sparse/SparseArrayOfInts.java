@@ -27,11 +27,9 @@ import com.d3x.morpheus.array.Array;
 import com.d3x.morpheus.array.ArrayBase;
 import com.d3x.morpheus.array.ArrayStyle;
 import com.d3x.morpheus.array.ArrayValue;
-
-import gnu.trove.map.TIntIntMap;
-import gnu.trove.map.hash.TIntIntHashMap;
-import gnu.trove.set.TIntSet;
-import gnu.trove.set.hash.TIntHashSet;
+import org.eclipse.collections.api.map.primitive.MutableIntIntMap;
+import org.eclipse.collections.impl.factory.primitive.IntIntMaps;
+import org.eclipse.collections.impl.factory.primitive.IntSets;
 
 /**
  * An Array implementation designed to hold a sparse array of int values
@@ -45,7 +43,7 @@ class SparseArrayOfInts extends ArrayBase<Integer> {
     private static final long serialVersionUID = 1L;
 
     private int length;
-    private TIntIntMap values;
+    private MutableIntIntMap values;
     private int defaultValue;
 
     /**
@@ -58,7 +56,7 @@ class SparseArrayOfInts extends ArrayBase<Integer> {
         super(Integer.class, ArrayStyle.SPARSE, false);
         this.length = length;
         this.defaultValue = defaultValue != null ? defaultValue : 0;
-        this.values = new TIntIntHashMap((int)Math.max(length * fillPct, 5d), SparseArrayConstructor.DEFAULT_LOAD_FACTOR, -1, this.defaultValue);
+        this.values = IntIntMaps.mutable.withInitialCapacity((int)Math.max(length * fillPct, 5d));
     }
 
     /**
@@ -108,7 +106,7 @@ class SparseArrayOfInts extends ArrayBase<Integer> {
     public final Array<Integer> copy() {
         try {
             final SparseArrayOfInts copy = (SparseArrayOfInts)super.clone();
-            copy.values = new TIntIntHashMap(values);
+            copy.values = IntIntMaps.mutable.withAll(values);
             copy.defaultValue = this.defaultValue;
             return copy;
         } catch (Exception ex) {
@@ -159,8 +157,8 @@ class SparseArrayOfInts extends ArrayBase<Integer> {
     @Override
     protected final Array<Integer> sort(int start, int end, int multiplier) {
         return doSort(start, end, (i, j) -> {
-            var v1 = values.get(i);
-            var v2 = values.get(j);
+            var v1 = values.getIfAbsent(i, defaultValue);
+            var v2 = values.getIfAbsent(j, defaultValue);
             return multiplier * Integer.compare(v1, v2);
         });
     }
@@ -168,7 +166,10 @@ class SparseArrayOfInts extends ArrayBase<Integer> {
 
     @Override
     public final int compare(int i, int j) {
-        return Integer.compare(values.get(i), values.get(j));
+        return Integer.compare(
+            values.getIfAbsent(i, defaultValue),
+            values.getIfAbsent(j, defaultValue)
+        );
     }
 
 
@@ -225,7 +226,7 @@ class SparseArrayOfInts extends ArrayBase<Integer> {
 
     @Override
     public final Array<Integer> expand(int newLength) {
-        this.length = newLength > length ? newLength : length;
+        this.length = Math.max(newLength, length);
         return this;
     }
 
@@ -252,32 +253,32 @@ class SparseArrayOfInts extends ArrayBase<Integer> {
 
     @Override
     public final boolean isEqualTo(int index, Integer value) {
-        return value == null ? isNull(index) : value == values.get(index);
+        return value == null ? isNull(index) : value == values.getIfAbsent(index, defaultValue);
     }
 
 
     @Override
     public final int getInt(int index) {
         this.checkBounds(index, length);
-        return values.get(index);
+        return values.getIfAbsent(index, defaultValue);
     }
 
     @Override
     public final long getLong(int index) {
         this.checkBounds(index, length);
-        return values.get(index);
+        return values.getIfAbsent(index, defaultValue);
     }
 
     @Override
     public final double getDouble(int index) {
         this.checkBounds(index, length);
-        return values.get(index);
+        return values.getIfAbsent(index, defaultValue);
     }
 
     @Override
     public final Integer getValue(int index) {
         this.checkBounds(index, length);
-        return values.get(index);
+        return values.getIfAbsent(index, defaultValue);
     }
 
 
@@ -331,9 +332,9 @@ class SparseArrayOfInts extends ArrayBase<Integer> {
 
     @Override
     public final Array<Integer> distinct(int limit) {
-        final int capacity = limit < Integer.MAX_VALUE ? limit : 100;
-        final TIntSet set = new TIntHashSet(capacity);
-        final ArrayBuilder<Integer> builder = ArrayBuilder.of(capacity, Integer.class);
+        var capacity = limit < Integer.MAX_VALUE ? limit : 100;
+        var set = IntSets.mutable.withInitialCapacity(capacity);
+        var builder = ArrayBuilder.of(capacity, Integer.class);
         for (int i=0; i<length(); ++i) {
             final int value = getInt(i);
             if (set.add(value)) {
@@ -351,10 +352,10 @@ class SparseArrayOfInts extends ArrayBase<Integer> {
     public final Array<Integer> cumSum() {
         var length = length();
         final Array<Integer> result = Array.of(Integer.class, length);
-        result.setInt(0, values.get(0));
+        result.setInt(0, values.getIfAbsent(0, defaultValue));
         for (int i=1; i<length; ++i) {
             final int prior = result.getInt(i-1);
-            final int current = values.get(i);
+            final int current = values.getIfAbsent(i, defaultValue);
             result.setInt(i, prior + current);
         }
         return result;
