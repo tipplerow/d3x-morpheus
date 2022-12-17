@@ -19,8 +19,8 @@ import java.util.function.Predicate;
 
 import com.d3x.morpheus.array.Array;
 import com.d3x.morpheus.array.ArrayBuilder;
-import gnu.trove.map.TObjectIntMap;
-import gnu.trove.map.hash.TObjectIntHashMap;
+import org.eclipse.collections.api.map.primitive.MutableObjectIntMap;
+import org.eclipse.collections.impl.factory.primitive.ObjectIntMaps;
 
 /**
  * An Index implementation designed to store any object type.
@@ -33,7 +33,7 @@ class IndexOfObjects<K> extends IndexBase<K> {
 
     private static final long serialVersionUID = 1L;
 
-    private TObjectIntMap<K> indexMap;
+    private MutableObjectIntMap<K> indexMap;
 
     /**
      * Constructor
@@ -42,7 +42,7 @@ class IndexOfObjects<K> extends IndexBase<K> {
      */
     IndexOfObjects(Class<K> type, int initialSize) {
         super(Array.of(type, initialSize));
-        this.indexMap = new TObjectIntHashMap<>(initialSize, DEFAULT_LOAD_FACTOR, -1);
+        this.indexMap = ObjectIntMaps.mutable.withInitialCapacity(initialSize);
     }
 
     /**
@@ -51,12 +51,13 @@ class IndexOfObjects<K> extends IndexBase<K> {
      */
     IndexOfObjects(Iterable<K> iterable) {
         super(iterable);
-        this.indexMap = new TObjectIntHashMap<>(keyArray().length(), DEFAULT_LOAD_FACTOR, -1);
+        this.indexMap = ObjectIntMaps.mutable.withInitialCapacity(keyArray().length());
         this.keyArray().sequential().forEachValue(v -> {
             final int index = v.index();
             final K key = v.getValue();
-            final int existing = indexMap.put(key, index);
-            if (existing >= 0) {
+            final int size = indexMap.size();
+            indexMap.put(key, index);
+            if (indexMap.size() <= size) {
                 throw new IndexException("Cannot have duplicate keys in index: " + v.getValue());
             }
         });
@@ -69,13 +70,14 @@ class IndexOfObjects<K> extends IndexBase<K> {
      */
     private IndexOfObjects(Iterable<K> iterable, IndexOfObjects<K> parent) {
         super(iterable, parent);
-        this.indexMap = new TObjectIntHashMap<>(keyArray().length(), DEFAULT_LOAD_FACTOR, -1);
+        this.indexMap = ObjectIntMaps.mutable.withInitialCapacity(keyArray().length());
         this.keyArray().sequential().forEachValue(v -> {
             final K key = v.getValue();
-            final int index = parent.indexMap.get(key);
+            final int index = parent.indexMap.getIfAbsent(key, -1);
             if (index < 0) throw new IndexException("No match for key: " + v.getValue());
-            final int existing = indexMap.put(key, index);
-            if (existing >= 0) {
+            final int size = indexMap.size();
+            indexMap.put(key, index);
+            if (indexMap.size() <= size) {
                 throw new IndexException("Cannot have duplicate keys in index: " + v.getValue());
             }
         });
@@ -129,8 +131,9 @@ class IndexOfObjects<K> extends IndexBase<K> {
                     final int index = indexMap.size();
                     this.ensureCapacity(index + 1);
                     this.keyArray().setValue(index, key);
-                    final int existing = indexMap.put(key, index);
-                    if (!ignoreDuplicates && existing >= 0) {
+                    final int size = indexMap.size();
+                    indexMap.put(key, index);
+                    if (!ignoreDuplicates && indexMap.size() <= size) {
                         throw new IndexException("Attempt to add duplicate key to index: " + key);
                     }
                     ++count[0];
@@ -145,7 +148,7 @@ class IndexOfObjects<K> extends IndexBase<K> {
     public final Index<K> copy(boolean deep) {
         try {
             final IndexOfObjects<K> clone = (IndexOfObjects<K>)super.copy(deep);
-            if (deep) clone.indexMap = new TObjectIntHashMap<>(indexMap);
+            if (deep) clone.indexMap = ObjectIntMaps.mutable.withAll(indexMap);
             return clone;
         } catch (Exception ex) {
             throw new IndexException("Failed to clone index", ex);
@@ -159,7 +162,7 @@ class IndexOfObjects<K> extends IndexBase<K> {
 
     @Override
     public final int getCoordinate(K key) {
-        return indexMap.get(key);
+        return indexMap.getIfAbsent(key, -1);
     }
 
     @Override
@@ -169,7 +172,7 @@ class IndexOfObjects<K> extends IndexBase<K> {
 
     @Override
     public final int replace(K existing, K replacement) {
-        final int index = indexMap.remove(existing);
+        final int index = indexMap.removeKeyIfAbsent(existing, -1);
         if (index == -1) {
             throw new IndexException("No match key for " + existing);
         } else {
@@ -189,7 +192,7 @@ class IndexOfObjects<K> extends IndexBase<K> {
         final int size = size();
         for (int i=0; i<size; ++i) {
             final K key = keyArray().getValue(i);
-            final int index = indexMap.get(key);
+            final int index = indexMap.getIfAbsent(key, -1);
             consumer.accept(key, index);
         }
     }

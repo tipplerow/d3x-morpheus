@@ -20,15 +20,14 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.function.Predicate;
 
-import gnu.trove.map.TIntObjectMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
-
 import com.d3x.morpheus.array.Array;
 import com.d3x.morpheus.array.ArrayBase;
 import com.d3x.morpheus.array.ArrayCursor;
 import com.d3x.morpheus.array.ArrayException;
 import com.d3x.morpheus.array.ArrayStyle;
 import com.d3x.morpheus.array.ArrayValue;
+import org.eclipse.collections.api.map.primitive.MutableIntObjectMap;
+import org.eclipse.collections.impl.factory.primitive.IntObjectMaps;
 
 /**
  * An Array implementation designed to hold a sparse array of Object values
@@ -43,7 +42,7 @@ class SparseArrayOfObjects<T> extends ArrayBase<T> {
 
     private int length;
     private T defaultValue;
-    private TIntObjectMap<Object> values;
+    private MutableIntObjectMap<Object> values;
 
     /**
      * Constructor
@@ -56,7 +55,7 @@ class SparseArrayOfObjects<T> extends ArrayBase<T> {
         super(type, ArrayStyle.SPARSE, false);
         this.length = length;
         this.defaultValue = defaultValue;
-        this.values = new TIntObjectHashMap<>((int)Math.max(length * fillPct, 5d), SparseArrayConstructor.DEFAULT_LOAD_FACTOR, -1);
+        this.values = IntObjectMaps.mutable.withInitialCapacity((int)Math.max(length * fillPct, 5d));
     }
 
     /**
@@ -106,7 +105,7 @@ class SparseArrayOfObjects<T> extends ArrayBase<T> {
     public final Array<T> copy() {
         try {
             final SparseArrayOfObjects<T> copy = (SparseArrayOfObjects<T>)super.clone();
-            copy.values = new TIntObjectHashMap<>(values);
+            copy.values = IntObjectMaps.mutable.withAll(this.values);
             copy.defaultValue = this.defaultValue;
             return copy;
         } catch (Exception ex) {
@@ -217,7 +216,7 @@ class SparseArrayOfObjects<T> extends ArrayBase<T> {
 
     @Override
     public final Array<T> expand(int newLength) {
-        this.length = newLength > length ? newLength : length;
+        this.length = Math.max(newLength, length);
         return this;
     }
 

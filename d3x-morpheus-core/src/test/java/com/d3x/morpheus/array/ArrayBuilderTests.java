@@ -34,6 +34,8 @@ import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
 import com.d3x.morpheus.range.Range;
+import org.eclipse.collections.api.factory.primitive.DoubleSets;
+import org.eclipse.collections.impl.factory.primitive.ObjectDoubleMaps;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -624,5 +626,27 @@ public class ArrayBuilderTests {
             var builder = ArrayBuilder.of(100, type);
             Assert.assertTrue(IntStream.range(0, 100).allMatch(builder::isNull));
         }
+    }
+
+
+    @Test
+    public void eclipseMap() {
+        var map = ObjectDoubleMaps.mutable.withInitialCapacity(10);
+        map.put("One", 1.234d);
+        map.put("Two", 22.34d);
+        map.put("X", 33d);
+        Assert.assertEquals(map.get("One"), 1.234d);
+        Assert.assertEquals(map.get("Two"), 22.34d);
+        Assert.assertEquals(map.get("X"), 33d);
+        Assert.assertEquals(map.get("Y"), 0d);
+        Assert.assertEquals(map.getIfAbsent("Y", Double.NaN), Double.NaN);
+    }
+
+    @Test
+    public void eclipseSet() {
+        var set = DoubleSets.mutable.withInitialCapacity(10);
+        Assert.assertTrue(set.add(1.2d));
+        Assert.assertFalse(set.add(1.2d));
+        Assert.assertTrue(set.add(1.3d));
     }
 }

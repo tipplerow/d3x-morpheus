@@ -20,9 +20,8 @@ import java.util.function.Predicate;
 import com.d3x.morpheus.array.Array;
 import com.d3x.morpheus.array.ArrayBuilder;
 import com.d3x.morpheus.util.IntComparator;
-
-import gnu.trove.map.TIntIntMap;
-import gnu.trove.map.hash.TIntIntHashMap;
+import org.eclipse.collections.api.map.primitive.MutableIntIntMap;
+import org.eclipse.collections.impl.factory.primitive.IntIntMaps;
 
 /**
  * An Index implementation designed to efficiently store integer values
@@ -35,7 +34,7 @@ class IndexOfInts extends IndexBase<Integer> {
 
     private static final long serialVersionUID = 1L;
 
-    private TIntIntMap indexMap;
+    private MutableIntIntMap indexMap;
 
     /**
      * Constructor
@@ -44,7 +43,7 @@ class IndexOfInts extends IndexBase<Integer> {
      */
     IndexOfInts(int initialSize) {
         super(Array.of(Integer.class, initialSize));
-        this.indexMap = new TIntIntHashMap(initialSize, DEFAULT_LOAD_FACTOR, -1, -1);
+        this.indexMap = IntIntMaps.mutable.withInitialCapacity(initialSize);
     }
 
     /**
@@ -54,12 +53,13 @@ class IndexOfInts extends IndexBase<Integer> {
      */
     IndexOfInts(Iterable<Integer> iterable) {
         super(iterable);
-        this.indexMap = new TIntIntHashMap(keyArray().length(), DEFAULT_LOAD_FACTOR, -1, -1);
+        this.indexMap = IntIntMaps.mutable.withInitialCapacity(keyArray().length());
         this.keyArray().sequential().forEachValue(v -> {
             final int index = v.index();
             final int key = v.getInt();
-            final int existing = indexMap.put(key, index);
-            if (existing >= 0) {
+            final int size = indexMap.size();
+            indexMap.put(key, index);
+            if (indexMap.size() <= size) {
                 throw new IndexException("Cannot have duplicate keys in index: " + v.getValue());
             }
         });
@@ -73,13 +73,14 @@ class IndexOfInts extends IndexBase<Integer> {
      */
     private IndexOfInts(Iterable<Integer> iterable, IndexOfInts parent) {
         super(iterable, parent);
-        this.indexMap = new TIntIntHashMap(keyArray().length(), DEFAULT_LOAD_FACTOR, -1, -1);
+        this.indexMap = IntIntMaps.mutable.withInitialCapacity(keyArray().length());
         this.keyArray().sequential().forEachValue(v -> {
             final int key = v.getInt();
-            final int index = parent.indexMap.get(key);
+            final int index = parent.indexMap.getIfAbsent(key, -1);
             if (index < 0) throw new IndexException("No match for key: " + v.getValue());
-            final int existing = indexMap.put(key, index);
-            if (existing >= 0) {
+            final int size = indexMap.size();
+            indexMap.put(key, index);
+            if (indexMap.size() <= size) {
                 throw new IndexException("Cannot have duplicate keys in index: " + v.getValue());
             }
         });
@@ -133,8 +134,9 @@ class IndexOfInts extends IndexBase<Integer> {
                     final int index = indexMap.size();
                     this.ensureCapacity(index + 1);
                     this.keyArray().setValue(index, keyAsInt);
-                    final int existing = indexMap.put(keyAsInt, index);
-                    if (!ignoreDuplicates && existing >= 0) {
+                    final int size = indexMap.size();
+                    indexMap.put(keyAsInt, index);
+                    if (!ignoreDuplicates && indexMap.size() <= size) {
                         throw new IndexException("Attempt to add duplicate key to index: " + key);
                     }
                     count[0]++;
@@ -148,7 +150,7 @@ class IndexOfInts extends IndexBase<Integer> {
     public final Index<Integer> copy(boolean deep) {
         try {
             var clone = (IndexOfInts)super.copy(deep);
-            if (deep) clone.indexMap = new TIntIntHashMap(indexMap);
+            if (deep) clone.indexMap = IntIntMaps.mutable.withAll(indexMap);
             return clone;
         } catch (Exception ex) {
             throw new IndexException("Failed to clone index", ex);
@@ -162,7 +164,7 @@ class IndexOfInts extends IndexBase<Integer> {
 
     @Override
     public final int getCoordinate(Integer key) {
-        return indexMap.get(key);
+        return indexMap.getIfAbsent(key, -1);
     }
 
     @Override
@@ -172,7 +174,7 @@ class IndexOfInts extends IndexBase<Integer> {
 
     @Override
     public final int replace(Integer existing, Integer replacement) {
-        final int index = indexMap.remove(existing);
+        final int index = indexMap.removeKeyIfAbsent(existing, -1);
         if (index == -1) {
             throw new IndexException("No match key for " + existing);
         } else {
@@ -192,7 +194,7 @@ class IndexOfInts extends IndexBase<Integer> {
         final int size = size();
         for (int i = 0; i < size; ++i) {
             var key = keyArray().getValue(i);
-            final int index = indexMap.get(key);
+            final int index = indexMap.getIfAbsent(key, -1);
             consumer.accept(key, index);
         }
     }
@@ -201,9 +203,8 @@ class IndexOfInts extends IndexBase<Integer> {
     @Override
     public final Index<Integer> resetOrder() {
         final Array<Integer> keys = keyArray();
-        this.indexMap.forEachEntry((key, index) -> {
+        this.indexMap.forEachKeyValue((key, index) -> {
             keys.setInt(index, key);
-            return true;
         });
         return this;
     }
@@ -214,9 +215,8 @@ class IndexOfInts extends IndexBase<Integer> {
         super.sort(parallel, comparator);
         if (comparator == null) {
             final Array<Integer> keys = keyArray();
-            this.indexMap.forEachEntry((key, index) -> {
+            this.indexMap.forEachKeyValue((key, index) -> {
                 keys.setInt(index, key);
-                return true;
             });
         }
    }

@@ -20,11 +20,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.function.Predicate;
 
-import gnu.trove.map.TIntLongMap;
-import gnu.trove.map.hash.TIntLongHashMap;
-import gnu.trove.set.TLongSet;
-import gnu.trove.set.hash.TLongHashSet;
-
 import com.d3x.morpheus.array.Array;
 import com.d3x.morpheus.array.ArrayBase;
 import com.d3x.morpheus.array.ArrayBuilder;
@@ -33,6 +28,9 @@ import com.d3x.morpheus.array.ArrayException;
 import com.d3x.morpheus.array.ArrayStyle;
 import com.d3x.morpheus.array.ArrayValue;
 import com.d3x.morpheus.array.coding.LongCoding;
+import org.eclipse.collections.api.map.primitive.MutableIntLongMap;
+import org.eclipse.collections.impl.factory.primitive.IntLongMaps;
+import org.eclipse.collections.impl.factory.primitive.LongSets;
 
 /**
  * A sparse array implementation that maintains a primitive long array of codes that apply to Object values exposed through the Coding interface.
@@ -48,7 +46,7 @@ class SparseArrayWithLongCoding<T> extends ArrayBase<T> {
     private int length;
     private T defaultValue;
     private long defaultCode;
-    private TIntLongMap codes;
+    private MutableIntLongMap codes;
     private LongCoding<T> coding;
 
 
@@ -65,7 +63,7 @@ class SparseArrayWithLongCoding<T> extends ArrayBase<T> {
         this.coding = coding;
         this.defaultValue = defaultValue;
         this.defaultCode = coding.getCode(defaultValue);
-        this.codes = new TIntLongHashMap((int)Math.max(length * fillPct, 5d), SparseArrayConstructor.DEFAULT_LOAD_FACTOR, -1, defaultCode);
+        this.codes = IntLongMaps.mutable.withInitialCapacity((int)Math.max(length * fillPct, 5d));
     }
 
     /**
@@ -117,8 +115,8 @@ class SparseArrayWithLongCoding<T> extends ArrayBase<T> {
     @SuppressWarnings("unchecked")
     public final Array<T> copy() {
         try {
-            final SparseArrayWithLongCoding<T> copy = (SparseArrayWithLongCoding<T>)super.clone();
-            copy.codes = new TIntLongHashMap(codes);
+            var copy = (SparseArrayWithLongCoding<T>)super.clone();
+            copy.codes = IntLongMaps.mutable.withAll(codes);
             copy.defaultValue = this.defaultValue;
             copy.defaultCode = this.defaultCode;
             copy.coding = this.coding;
@@ -170,7 +168,10 @@ class SparseArrayWithLongCoding<T> extends ArrayBase<T> {
 
     @Override
     public final int compare(int i, int j) {
-        return Long.compare(codes.get(i), codes.get(j));
+        return Long.compare(
+            codes.getIfAbsent(i, defaultCode),
+            codes.getIfAbsent(j, defaultCode)
+        );
     }
 
 
@@ -218,9 +219,9 @@ class SparseArrayWithLongCoding<T> extends ArrayBase<T> {
     @Override
     public final Array<T> update(int toIndex, Array<T> from, int fromIndex, int length) {
         if (from instanceof SparseArrayWithLongCoding) {
-            final SparseArrayWithLongCoding other = (SparseArrayWithLongCoding) from;
+            var other = (SparseArrayWithLongCoding<T>) from;
             for (int i = 0; i < length; ++i) {
-                this.codes.put(toIndex + i, other.codes.get(fromIndex + i));
+                this.codes.put(toIndex + i, other.codes.getIfAbsent(fromIndex + i, defaultCode));
             }
         } else {
             for (int i=0; i<length; ++i) {
@@ -234,7 +235,7 @@ class SparseArrayWithLongCoding<T> extends ArrayBase<T> {
 
     @Override
     public final Array<T> expand(int newLength) {
-        this.length = newLength > length ? newLength : length;
+        this.length = Math.max(newLength, length);
         return this;
     }
 
@@ -255,7 +256,7 @@ class SparseArrayWithLongCoding<T> extends ArrayBase<T> {
 
     @Override
     public final boolean isNull(int index) {
-        return codes.get(index) == coding.getCode(null);
+        return codes.getIfAbsent(index, defaultCode) == coding.getCode(null);
     }
 
 
@@ -265,7 +266,7 @@ class SparseArrayWithLongCoding<T> extends ArrayBase<T> {
             return isNull(index);
         } else {
             final long code = coding.getCode(value);
-            return code == codes.get(index);
+            return code == codes.getIfAbsent(index, defaultCode);
         }
     }
 
@@ -273,21 +274,21 @@ class SparseArrayWithLongCoding<T> extends ArrayBase<T> {
     @Override
     public final long getLong(int index) {
         this.checkBounds(index, length);
-        return codes.get(index);
+        return codes.getIfAbsent(index, defaultCode);
     }
 
 
     @Override
     public final T getValue(int index) {
         this.checkBounds(index, length);
-        final long code = codes.get(index);
+        final long code = codes.getIfAbsent(index, defaultCode);
         return coding.getValue(code);
     }
 
 
     @Override
     public final long setLong(int index, long value) {
-        final long oldValue = codes.remove(index);
+        final long oldValue = codes.removeKeyIfAbsent(index, defaultCode);
         if (value != defaultCode) {
             this.codes.put(index, value);
         }
@@ -312,9 +313,9 @@ class SparseArrayWithLongCoding<T> extends ArrayBase<T> {
 
     @Override
     public Array<T> distinct(int limit) {
-        final int capacity = limit < Integer.MAX_VALUE ? limit : 100;
-        final TLongSet set = new TLongHashSet(capacity);
-        final ArrayBuilder<T> builder = ArrayBuilder.of(capacity, type());
+        var capacity = limit < Integer.MAX_VALUE ? limit : 100;
+        var set = LongSets.mutable.withInitialCapacity(capacity);
+        var builder = ArrayBuilder.of(capacity, type());
         for (int i=0; i<length(); ++i) {
             final long code = getLong(i);
             if (set.add(code)) {

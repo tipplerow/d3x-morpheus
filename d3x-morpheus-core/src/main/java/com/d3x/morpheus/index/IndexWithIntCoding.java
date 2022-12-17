@@ -21,9 +21,8 @@ import com.d3x.morpheus.array.Array;
 import com.d3x.morpheus.array.ArrayBuilder;
 import com.d3x.morpheus.array.coding.IntCoding;
 import com.d3x.morpheus.array.coding.WithIntCoding;
-
-import gnu.trove.map.TIntIntMap;
-import gnu.trove.map.hash.TIntIntHashMap;
+import org.eclipse.collections.api.map.primitive.MutableIntIntMap;
+import org.eclipse.collections.impl.factory.primitive.IntIntMaps;
 
 /**
  * An Index implementation designed to efficiently store Object values that can be coded as a long value
@@ -36,8 +35,8 @@ class IndexWithIntCoding<T> extends IndexBase<T> implements WithIntCoding<T> {
 
     private static final long serialVersionUID = 1L;
 
-    private TIntIntMap indexMap;
-    private IntCoding<T> coding;
+    private MutableIntIntMap indexMap;
+    private final IntCoding<T> coding;
 
     /**
      * Constructor for empty index with initial capacity
@@ -48,7 +47,7 @@ class IndexWithIntCoding<T> extends IndexBase<T> implements WithIntCoding<T> {
     IndexWithIntCoding(Class<T> type, IntCoding<T> coding, int capacity) {
         super(Array.of(type, capacity));
         this.coding = coding;
-        this.indexMap = new TIntIntHashMap(capacity, DEFAULT_LOAD_FACTOR, -1, -1);
+        this.indexMap = IntIntMaps.mutable.withInitialCapacity(capacity);
     }
 
     /**
@@ -59,12 +58,13 @@ class IndexWithIntCoding<T> extends IndexBase<T> implements WithIntCoding<T> {
     IndexWithIntCoding(Iterable<T> iterable, IntCoding<T> coding) {
         super(iterable);
         this.coding = coding;
-        this.indexMap = new TIntIntHashMap(keyArray().length(), DEFAULT_LOAD_FACTOR, -1, -1);
+        this.indexMap = IntIntMaps.mutable.withInitialCapacity(keyArray().length());
         this.keyArray().sequential().forEachValue(v -> {
             final int index = v.index();
             final int code = v.getInt();
-            final int existing = indexMap.put(code, index);
-            if (existing >= 0) {
+            final int size = indexMap.size();
+            indexMap.put(code, index);
+            if (indexMap.size() <= size) {
                 throw new IndexException("Cannot have duplicate keys in index: " + v.getValue());
             }
         });
@@ -79,13 +79,14 @@ class IndexWithIntCoding<T> extends IndexBase<T> implements WithIntCoding<T> {
     private IndexWithIntCoding(Iterable<T> iterable, IntCoding<T> coding, IndexWithIntCoding<T> parent) {
         super(iterable, parent);
         this.coding = coding;
-        this.indexMap = new TIntIntHashMap(keyArray().length(), DEFAULT_LOAD_FACTOR, -1, -1);
+        this.indexMap = IntIntMaps.mutable.withInitialCapacity(keyArray().length());
         this.keyArray().sequential().forEachValue(v -> {
             final int code = v.getInt();
             final int index = parent.indexMap.get(code);
             if (index < 0) throw new IndexException("No match for key: " + v.getValue());
-            final int existing = indexMap.put(code, index);
-            if (existing >= 0) {
+            final int size = indexMap.size();
+            indexMap.put(code, index);
+            if (indexMap.size() <= size) {
                 throw new IndexException("Cannot have duplicate keys in index: " + v.getValue());
             }
         });
@@ -148,8 +149,9 @@ class IndexWithIntCoding<T> extends IndexBase<T> implements WithIntCoding<T> {
                     final int index = indexMap.size();
                     this.ensureCapacity(index + 1);
                     this.keyArray().setValue(index, key);
-                    final int existing = indexMap.put(code, index);
-                    if (!ignoreDuplicates && existing >= 0) {
+                    final int size = indexMap.size();
+                    indexMap.put(code, index);
+                    if (!ignoreDuplicates && indexMap.size() <= size) {
                         throw new IndexException("Attempt to add duplicate key to index: " + key);
                     }
                     count[0]++;
@@ -164,7 +166,7 @@ class IndexWithIntCoding<T> extends IndexBase<T> implements WithIntCoding<T> {
     public final Index<T> copy(boolean deep) {
         try {
             var clone = (IndexWithIntCoding<T>)super.copy(deep);
-            if (deep) clone.indexMap = new TIntIntHashMap(indexMap);
+            if (deep) clone.indexMap = IntIntMaps.mutable.withAll(indexMap);
             return clone;
         } catch (Exception ex) {
             throw new IndexException("Failed to clone index", ex);
@@ -179,7 +181,7 @@ class IndexWithIntCoding<T> extends IndexBase<T> implements WithIntCoding<T> {
     @Override
     public final int getCoordinate(T key) {
         final int code = coding.getCode(key);
-        return indexMap.get(code);
+        return indexMap.getIfAbsent(code, -1);
     }
 
     @Override
@@ -191,7 +193,7 @@ class IndexWithIntCoding<T> extends IndexBase<T> implements WithIntCoding<T> {
     @Override
     public final int replace(T existing, T replacement) {
         final int existingCode = coding.getCode(existing);
-        final int index = indexMap.remove(existingCode);
+        final int index = indexMap.removeKeyIfAbsent(existingCode, -1);
         if (index == -1) {
             throw new IndexException("No match key for " + existing);
         } else {
@@ -213,7 +215,7 @@ class IndexWithIntCoding<T> extends IndexBase<T> implements WithIntCoding<T> {
         for (int i=0; i<size; ++i) {
             final T key = keyArray().getValue(i);
             final int code = coding.getCode(key);
-            final int index = indexMap.get(code);
+            final int index = indexMap.getIfAbsent(code, -1);
             consumer.accept(key, index);
         }
     }

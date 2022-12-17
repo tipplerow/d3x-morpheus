@@ -61,8 +61,8 @@ primitive arrays have to be used wherever possible, which is the fundamental des
 behind the Morpheus Array package. 
 
 This is by no means an attempt to compete with excellent primitive collections libraries such as 
-[Trove](http://trove.starlight-systems.com/) and [Goldman Sachs Collections](https://github.com/goldmansachs/gs-collections), 
-and in fact, sparse implementations of Morpheus arrays use the Trove library internally. The 
+[Goldman Sachs Collections](https://github.com/goldmansachs/gs-collections), 
+and in fact, sparse implementations of Morpheus arrays use these prevailing libraries internally. The 
 Morpheus Array interface is a much more narrowly focused data structure, whose design was ultimately 
 motivated by the desire to build an efficient in-memory column store called a `DataFrame`.
  

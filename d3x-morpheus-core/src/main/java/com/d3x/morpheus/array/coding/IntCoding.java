@@ -18,6 +18,7 @@ package com.d3x.morpheus.array.coding;
 import java.time.Year;
 import java.time.ZoneId;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Currency;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,8 +28,8 @@ import java.util.stream.IntStream;
 
 import com.d3x.morpheus.util.IntComparator;
 import com.d3x.morpheus.util.SortAlgorithm;
-import gnu.trove.map.TObjectIntMap;
-import gnu.trove.map.hash.TObjectIntHashMap;
+import org.eclipse.collections.api.map.primitive.MutableObjectIntMap;
+import org.eclipse.collections.impl.factory.primitive.ObjectIntMaps;
 
 /**
  * An interface that exposes a coding between object values and corresponding int code
@@ -255,16 +256,16 @@ public interface IntCoding<T> extends Coding<T> {
         private static final long serialVersionUID = 1L;
 
         private final Currency[] currencies;
-        private final TObjectIntMap<Currency> codeMap;
+        private final MutableObjectIntMap<Currency> codeMap;
 
         /**
          * Constructor
          */
         public OfCurrency() {
             super(Currency.class);
-            this.currencies = Currency.getAvailableCurrencies().stream().toArray(Currency[]::new);
-            this.codeMap = new TObjectIntHashMap<>(currencies.length, 0.5f, -1);
-            Arrays.sort(currencies, (c1, c2) -> c1.getCurrencyCode().compareTo(c2.getCurrencyCode()));
+            this.currencies = Currency.getAvailableCurrencies().toArray(Currency[]::new);
+            this.codeMap = ObjectIntMaps.mutable.withInitialCapacity(currencies.length);
+            Arrays.sort(currencies, Comparator.comparing(Currency::getCurrencyCode));
             for (int i = 0; i< currencies.length; ++i) {
                 this.codeMap.put(currencies[i], i);
             }
@@ -272,7 +273,7 @@ public interface IntCoding<T> extends Coding<T> {
 
         @Override
         public final int getCode(Currency value) {
-            return value == null ? -1 : codeMap.get(value);
+            return value == null ? -1 : codeMap.getIfAbsent(value, -1);
         }
 
         @Override
@@ -290,7 +291,7 @@ public interface IntCoding<T> extends Coding<T> {
         private static final long serialVersionUID = 1L;
 
         private final ZoneId[] zoneIds;
-        private final TObjectIntMap<ZoneId> codeMap;
+        private final MutableObjectIntMap<ZoneId> codeMap;
 
         /**
          * Constructor
@@ -298,8 +299,8 @@ public interface IntCoding<T> extends Coding<T> {
         OfZoneId() {
             super(ZoneId.class);
             this.zoneIds = ZoneId.getAvailableZoneIds().stream().map(ZoneId::of).toArray(ZoneId[]::new);
-            this.codeMap = new TObjectIntHashMap<>(zoneIds.length, 0.5f, -1);
-            Arrays.sort(zoneIds, (z1, z2) -> z1.getId().compareTo(z2.getId()));
+            this.codeMap = ObjectIntMaps.mutable.withInitialCapacity(zoneIds.length);
+            Arrays.sort(zoneIds, Comparator.comparing(ZoneId::getId));
             for (int i=0; i<zoneIds.length; ++i) {
                 this.codeMap.put(zoneIds[i], i);
             }
@@ -307,7 +308,7 @@ public interface IntCoding<T> extends Coding<T> {
 
         @Override
         public final int getCode(ZoneId value) {
-            return value == null ? -1 : codeMap.get(value);
+            return value == null ? -1 : codeMap.getIfAbsent(value, -1);
         }
 
         @Override
@@ -325,7 +326,7 @@ public interface IntCoding<T> extends Coding<T> {
         private static final long serialVersionUID = 1L;
 
         private final TimeZone[] timeZones;
-        private final TObjectIntMap<TimeZone> codeMap;
+        private final MutableObjectIntMap<TimeZone> codeMap;
 
         /**
          * Constructor
@@ -333,8 +334,8 @@ public interface IntCoding<T> extends Coding<T> {
         OfTimeZone() {
             super(TimeZone.class);
             this.timeZones = Arrays.stream(TimeZone.getAvailableIDs()).map(TimeZone::getTimeZone).toArray(TimeZone[]::new);
-            this.codeMap = new TObjectIntHashMap<>(timeZones.length, 0.5f, -1);
-            Arrays.sort(timeZones, (tz1, tz2) -> tz1.getID().compareTo(tz2.getID()));
+            this.codeMap = ObjectIntMaps.mutable.withInitialCapacity(timeZones.length);
+            Arrays.sort(timeZones, Comparator.comparing(TimeZone::getID));
             for (int i = 0; i< timeZones.length; ++i) {
                 this.codeMap.put(timeZones[i], i);
             }
@@ -342,7 +343,7 @@ public interface IntCoding<T> extends Coding<T> {
 
         @Override
         public final int getCode(TimeZone value) {
-            return value == null ? -1 : codeMap.get(value);
+            return value == null ? -1 : codeMap.getIfAbsent(value, -1);
         }
 
         @Override

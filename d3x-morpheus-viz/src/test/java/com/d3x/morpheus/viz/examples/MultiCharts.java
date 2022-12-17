@@ -475,7 +475,6 @@ public class MultiCharts {
 
     @Test()
     public void swingCharts1() throws Exception {
-        Chart.create().swingMode();
         Chart.create().show(3, createCharts());
         Thread.currentThread().join();
     }
@@ -485,7 +484,6 @@ public class MultiCharts {
     public void smallImages() throws Exception {
         final int width = 845;
         final int height = 500;
-        Chart.create().swingMode();
         List<Chart<?>> charts = createCharts();
         AtomicInteger counter = new AtomicInteger();
         charts.forEach(chart -> {
@@ -499,7 +497,6 @@ public class MultiCharts {
 
     @Test()
     public void swingCharts2() throws Exception {
-        Chart.create().swingMode();
         List<Chart<?>> charts = createCharts();
         charts.forEach(chart -> chart.options().withPreferredSize(845, 500));
         IO.writeText(Chart.create().javascript(charts), new File("../morpheus-docs/docs/javascript/gallery2.js"));
@@ -511,7 +508,7 @@ public class MultiCharts {
                 html.newElement("head", head -> {
                     head.newElement("script", script -> {
                         script.newAttribute("type", "text/javascript");
-                        script.text(Chart.create().asSwing().javascript(charts));
+                        script.text(Chart.create().javascript(charts));
                     });
                 });
 

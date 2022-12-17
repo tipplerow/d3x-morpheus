@@ -20,11 +20,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.function.Predicate;
 
-import gnu.trove.map.TIntDoubleMap;
-import gnu.trove.map.hash.TIntDoubleHashMap;
-import gnu.trove.set.TDoubleSet;
-import gnu.trove.set.hash.TDoubleHashSet;
-
 import com.d3x.morpheus.array.Array;
 import com.d3x.morpheus.array.ArrayBase;
 import com.d3x.morpheus.array.ArrayBuilder;
@@ -32,6 +27,9 @@ import com.d3x.morpheus.array.ArrayCursor;
 import com.d3x.morpheus.array.ArrayException;
 import com.d3x.morpheus.array.ArrayStyle;
 import com.d3x.morpheus.array.ArrayValue;
+import org.eclipse.collections.api.map.primitive.MutableIntDoubleMap;
+import org.eclipse.collections.impl.factory.primitive.DoubleSets;
+import org.eclipse.collections.impl.factory.primitive.IntDoubleMaps;
 
 /**
  * An Array implementation designed to hold a sparse array of double values
@@ -45,7 +43,7 @@ class SparseArrayOfDoubles extends ArrayBase<Double> {
     private static final long serialVersionUID = 1L;
 
     private int length;
-    private TIntDoubleMap values;
+    private MutableIntDoubleMap values;
     private double defaultValue;
 
     /**
@@ -58,7 +56,7 @@ class SparseArrayOfDoubles extends ArrayBase<Double> {
         super(Double.class, ArrayStyle.SPARSE, false);
         this.length = length;
         this.defaultValue = defaultValue != null ? defaultValue : Double.NaN;
-        this.values = new TIntDoubleHashMap((int)Math.max(length * fillPct, 5d), SparseArrayConstructor.DEFAULT_LOAD_FACTOR, -1, this.defaultValue);
+        this.values = IntDoubleMaps.mutable.withInitialCapacity((int)Math.max(length * fillPct, 5d));
     }
 
     /**
@@ -108,7 +106,7 @@ class SparseArrayOfDoubles extends ArrayBase<Double> {
     public final Array<Double> copy() {
         try {
             final SparseArrayOfDoubles copy = (SparseArrayOfDoubles)super.clone();
-            copy.values = new TIntDoubleHashMap(values);
+            copy.values = IntDoubleMaps.mutable.withAll(values);
             copy.defaultValue = this.defaultValue;
             return copy;
         } catch (Exception ex) {
@@ -159,8 +157,8 @@ class SparseArrayOfDoubles extends ArrayBase<Double> {
     @Override
     protected final Array<Double> sort(int start, int end, int multiplier) {
         return doSort(start, end, (i, j) -> {
-            final double v1 = values.get(i);
-            final double v2 = values.get(j);
+            final double v1 = values.getIfAbsent(i, defaultValue);
+            final double v2 = values.getIfAbsent(j, defaultValue);
             return multiplier * Double.compare(v1, v2);
         });
     }
@@ -168,7 +166,10 @@ class SparseArrayOfDoubles extends ArrayBase<Double> {
 
     @Override
     public final int compare(int i, int j) {
-        return Double.compare(values.get(i), values.get(j));
+        return Double.compare(
+            values.getIfAbsent(i, defaultValue),
+            values.getIfAbsent(j, defaultValue)
+        );
     }
 
 
@@ -246,27 +247,27 @@ class SparseArrayOfDoubles extends ArrayBase<Double> {
 
     @Override
     public final boolean isNull(int index) {
-        return Double.isNaN(values.get(index));
+        return Double.isNaN(values.getIfAbsent(index, defaultValue));
     }
 
 
     @Override
     public final boolean isEqualTo(int index, Double value) {
-        return value == null || Double.isNaN(value) ? isNull(index) : value == values.get(index);
+        return value == null || Double.isNaN(value) ? isNull(index) : value == values.getIfAbsent(index, defaultValue);
     }
 
 
     @Override
     public final double getDouble(int index) {
         this.checkBounds(index, length);
-        return values.get(index);
+        return values.getIfAbsent(index, defaultValue);
     }
 
 
     @Override
     public final Double getValue(int index) {
         this.checkBounds(index, length);
-        return values.get(index);
+        return values.getIfAbsent(index, defaultValue);
     }
 
 
@@ -320,9 +321,9 @@ class SparseArrayOfDoubles extends ArrayBase<Double> {
 
     @Override
     public final Array<Double> distinct(int limit) {
-        final int capacity = limit < Integer.MAX_VALUE ? limit : 100;
-        final TDoubleSet set = new TDoubleHashSet(capacity);
-        final ArrayBuilder<Double> builder = ArrayBuilder.of(capacity, Double.class);
+        var capacity = limit < Integer.MAX_VALUE ? limit : 100;
+        var set = DoubleSets.mutable.withInitialCapacity(capacity);
+        var builder = ArrayBuilder.of(capacity, Double.class);
         for (int i=0; i<length(); ++i) {
             final double value = getDouble(i);
             if (set.add(value)) {
@@ -343,7 +344,7 @@ class SparseArrayOfDoubles extends ArrayBase<Double> {
         result.setDouble(0, getDouble(0));
         for (int i=1; i<length; ++i) {
             final double prior = result.getDouble(i-1);
-            final double current = values.get(i);
+            final double current = values.getIfAbsent(i, defaultValue);
             if (Double.isNaN(prior)) {
                 result.setDouble(i, current);
             } else if (Double.isNaN(current)) {
