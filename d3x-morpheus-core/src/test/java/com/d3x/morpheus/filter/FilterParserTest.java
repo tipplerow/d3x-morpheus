@@ -33,6 +33,7 @@ public class FilterParserTest {
         runParserTest(TimeSeriesFilter.difference(1), "diff(1)");
         runParserTest(TimeSeriesFilter.difference(2), "diff(2)");
         runParserTest(TimeSeriesFilter.EWMA(2.3, 4), "ewma(2.3, 4)");
+        runParserTest(TimeSeriesFilter.LWMA(4), "lwma(4)");
         runParserTest(TimeSeriesFilter.movingAverage(5), "ma(5)");
     }
 }

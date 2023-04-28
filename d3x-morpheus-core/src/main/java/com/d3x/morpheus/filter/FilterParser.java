@@ -21,7 +21,6 @@ import com.d3x.morpheus.util.MorpheusException;
 import com.d3x.morpheus.vector.D3xVectorView;
 
 import lombok.Getter;
-import lombok.NonNull;
 
 /**
  * Parses strings that encode time-series filters.
@@ -78,22 +77,14 @@ public final class FilterParser {
     }
 
     private TimeSeriesFilter build() {
-        switch (filterName) {
-            case CustomFilter.NAME:
-                return parseCustom();
-
-            case DifferenceFilter.NAME:
-                return parseDifference();
-
-            case EWMAFilter.NAME:
-                return parseEWMA();
-
-            case MovingAverageFilter.NAME:
-                return parseMovingAverage();
-
-            default:
-                throw new MorpheusException("Unknown filter name: [%s].", filterName);
-        }
+        return switch (filterName) {
+            case CustomFilter.NAME -> parseCustom();
+            case DifferenceFilter.NAME -> parseDifference();
+            case EWMAFilter.NAME -> parseEWMA();
+            case LWMAFilter.NAME -> parseLWMA();
+            case MovingAverageFilter.NAME -> parseMovingAverage();
+            default -> throw new MorpheusException("Unknown filter name: [%s].", filterName);
+        };
     }
 
     private RuntimeException invalidException() {
@@ -127,6 +118,14 @@ public final class FilterParser {
         var halfLife = parseDouble(filterArgs[0]);
         var window = parseInt(filterArgs[1]);
         return new EWMAFilter(halfLife, window);
+    }
+
+    private TimeSeriesFilter parseLWMA() {
+        if (filterArgs.length != 1)
+            throw invalidException();
+
+        var window = parseInt(filterArgs[0]);
+        return new LWMAFilter(window);
     }
 
     private TimeSeriesFilter parseMovingAverage() {

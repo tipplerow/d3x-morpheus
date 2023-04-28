@@ -59,7 +59,8 @@ public class EWMAFilter extends CustomFilter {
     }
 
     /**
-     * Computes the observation weights for a moving average.
+     * Computes the observation weights for an exponentially-weighted
+     * moving average.
      *
      * @param halfLife the half-life of the moving average.
      * @param window   the number of observations in the averaging period.
