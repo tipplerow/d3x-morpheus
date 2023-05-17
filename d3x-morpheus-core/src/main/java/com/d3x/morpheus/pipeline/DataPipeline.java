@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2021 D3X Systems - All Rights Reserved
+ * Copyright (C) 2014-2023 Talos Trading - All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,10 +21,8 @@ import java.util.function.DoubleUnaryOperator;
 import com.d3x.morpheus.frame.DataFrame;
 import com.d3x.morpheus.series.DoubleSeries;
 import com.d3x.morpheus.stats.Mean;
-import com.d3x.morpheus.stats.Percentile;
 import com.d3x.morpheus.stats.StdDev;
 import com.d3x.morpheus.stats.Sum;
-import com.d3x.morpheus.stats.SumAbs;
 import com.d3x.morpheus.stats.SumSquares;
 import com.d3x.morpheus.util.DoubleComparator;
 import com.d3x.morpheus.util.DoubleInterval;
@@ -93,16 +91,11 @@ public interface DataPipeline {
      * and the margin is valid.
      */
     default <R,C> DataFrame<R,C> apply(DataFrame<R,C> frame, int margin) {
-        switch (margin) {
-            case 1:
-                return byrow(frame);
-
-            case 2:
-                return bycol(frame);
-
-            default:
-                throw new MorpheusException("Invalid data frame margin.");
-        }
+        return switch (margin) {
+            case 1 -> byrow(frame);
+            case 2 -> bycol(frame);
+            default -> throw new MorpheusException("Invalid data frame margin.");
+        };
     }
 
     /**
@@ -317,7 +310,7 @@ public interface DataPipeline {
      * amount greater than the default DoubleComparator tolerance),
      * {@code +1.0} if the element is positive (by an amount greater
      * than the default tolerance), or {@code 0.0} if the element is
-     * equal to zero (within the default tolerance.
+     * equal to zero (within the default tolerance).
      */
     DataPipeline sign = local("sign()", DoubleComparator.DEFAULT::sign);
 
@@ -468,16 +461,11 @@ public interface DataPipeline {
      * if the list contains only a single pipeline).
      */
     static DataPipeline composite(List<DataPipeline> pipelines) {
-        switch (pipelines.size()) {
-            case 0:
-                return identity;
-
-            case 1:
-                return pipelines.get(0);
-
-            default:
-                return CompositePipeline.of(pipelines);
-        }
+        return switch (pipelines.size()) {
+            case 0 -> identity;
+            case 1 -> pipelines.get(0);
+            default -> CompositePipeline.of(pipelines);
+        };
     }
 
     /**
@@ -505,45 +493,7 @@ public interface DataPipeline {
      * @throws RuntimeException unless the target leverage is positive.
      */
     static DataPipeline lever(double target) {
-        if (!DoubleComparator.DEFAULT.isPositive(target))
-            throw new MorpheusException("Target leverage must be positive.");
-
-        return new DataPipeline() {
-            @Override
-            public <K> DataVector<K> apply(DataVector<K> vector) {
-                double norm1 = vector.norm1();
-
-                if (DoubleComparator.DEFAULT.isPositive(norm1))
-                    return multiply(target / norm1).apply(vector);
-                else
-                    throw new MorpheusException("Cannot apply target leverage to a vector with zero norm.");
-            }
-
-            @Override
-            public D3xVector apply(D3xVector vector) {
-                double norm1 = new SumAbs().compute(vector);
-
-                if (DoubleComparator.DEFAULT.isPositive(norm1))
-                    return multiply(target / norm1).apply(vector);
-                else
-                    throw new MorpheusException("Cannot apply target leverage to a vector with zero norm.");
-            }
-
-            @Override
-            public String encode() {
-                return String.format("lever(%s)", target);
-            }
-
-            @Override
-            public boolean isSizePreserving() {
-                return true;
-            }
-
-            @Override
-            public boolean isLocal() {
-                return false;
-            }
-        };
+        return new LeverPipeline(target);
     }
 
     /**
@@ -666,52 +616,8 @@ public interface DataPipeline {
      * {@code [0.0, 0.5]}.
      */
     static DataPipeline trim(double quantile) {
-        DoubleComparator comparator = DoubleComparator.DEFAULT;
-
-        if (comparator.isNegative(quantile))
-            throw new MorpheusException("Quantile must be non-negative.");
-
-        if (comparator.isZero(quantile))
-            return identity;
-
-        if (comparator.compare(quantile, 0.5) > 0)
-            throw new MorpheusException("Quantile must not exceed one-half.");
-
-        return new DataPipeline() {
-            @Override
-            public <K> DataVector<K> apply(DataVector<K> vector) {
-                // Percentile takes fractional (quantile) values...
-                double lower = new Percentile(quantile).compute(vector);
-                double upper = new Percentile(1.0 - quantile).compute(vector);
-
-                return bound(lower, upper).apply(vector);
-            }
-
-            @Override
-            public D3xVector apply(D3xVector vector) {
-                // Percentile takes fractional (quantile) values...
-                double lower = new Percentile(quantile).compute(vector);
-                double upper = new Percentile(1.0 - quantile).compute(vector);
-
-                return bound(lower, upper).apply(vector);
-            }
-
-            @Override
-            public String encode() {
-                return String.format("trim(%s)", quantile);
-            }
-
-            @Override
-            public boolean isSizePreserving() {
-                return true;
-            }
-
-            @Override
-            public boolean isLocal() {
-                return false;
-            }
-        };
-    }
+        return TrimPipeline.of(quantile);
+  }
 
     /**
      * Returns a local, size-preserving pipeline that unsets (assigns NaN)
