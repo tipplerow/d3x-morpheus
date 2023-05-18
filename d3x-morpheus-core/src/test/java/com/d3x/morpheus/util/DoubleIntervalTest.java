@@ -298,6 +298,21 @@ public class DoubleIntervalTest {
     }
 
     @Test
+    public void testFormat() {
+        var intervals = List.of(
+                DoubleInterval.INFINITE,
+                DoubleInterval.POSITIVE,
+                DoubleInterval.NEGATIVE,
+                DoubleInterval.closed(-1.0, 2.0),
+                DoubleInterval.leftClosed(-1.0, 2.0),
+                DoubleInterval.leftOpen(-1.0, 2.0),
+                DoubleInterval.open(-1.0, 2.0));
+
+        for (var interval : intervals)
+            assertEquals(DoubleInterval.parse(interval.format()), interval);
+    }
+
+    @Test
     public void testParse() {
         assertEquals(DoubleInterval.parse("[-Infinity, Infinity]"), DoubleInterval.INFINITE);
         assertEquals(DoubleInterval.parse("[-1.0, 2.0]"), DoubleInterval.closed(-1.0, 2.0));
