@@ -552,6 +552,21 @@ public interface DataPipeline {
     }
 
     /**
+     * Returns a local, size-preserving pipeline that replaces one value
+     * with another.
+     *
+     * @param replaceThis the value to be replaced.
+     * @param replacement the replacement value.
+     *
+     * @return a local, size-preserving pipeline that replaces all values
+     * equal to {@code replaceThis} with {@code replacement}.
+     */
+    static DataPipeline replace(double replaceThis, double replacement) {
+        return local(String.format("replace(%s, %s)", replaceThis, replacement),
+                element -> DoubleComparator.DEFAULT.equals(element, replaceThis) ? replacement : element);
+    }
+
+    /**
      * Returns a local, size-preserving pipeline that replaces missing
      * ({@code Double.NaN}) values with a fixed value.
      *
