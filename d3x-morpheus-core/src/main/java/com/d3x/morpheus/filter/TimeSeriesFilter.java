@@ -233,13 +233,25 @@ public interface TimeSeriesFilter {
      * @param halfLife the half-life for the exponential weight decay.
      * @param window   the number of observations in the moving average.
      *
-     * @return a moving-average time-series filter with the specified
-     * window length.
+     * @return an EWMA filter with the specified half-life and window length.
      *
      * @throws RuntimeException unless the window length is positive.
      */
     static TimeSeriesFilter EWMA(double halfLife, int window) {
         return new EWMAFilter(halfLife, window);
+    }
+
+    /**
+     * Returns a linearly-weighted moving-average time-series filter.
+     *
+     * @param window the number of observations in the moving average.
+     *
+     * @return an LWMA filter with the specified window length.
+     *
+     * @throws RuntimeException unless the window length is positive.
+     */
+    static TimeSeriesFilter LWMA(int window) {
+        return new LWMAFilter(window);
     }
 
     /**
