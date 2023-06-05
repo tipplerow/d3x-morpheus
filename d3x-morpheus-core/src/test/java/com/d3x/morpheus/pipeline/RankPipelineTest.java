@@ -63,4 +63,14 @@ public class RankPipelineTest extends NumericTestBase {
         runTest(0.0, 1.0, original, expected01);
         runTest(1.0, 6.0, original, expected16);
     }
+
+    @Test
+    public void testEquals() {
+        var pipeline1 = DataPipeline.rank(-1.0, 1.0);
+        var pipeline2 = DataPipeline.rank(-1.0, 1.0);
+        var pipeline3 = DataPipeline.rank(0.0, 100.0);
+
+        Assert.assertEquals(pipeline1, pipeline2);
+        Assert.assertNotEquals(pipeline1, pipeline3);
+    }
 }

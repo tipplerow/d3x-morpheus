@@ -30,7 +30,7 @@ import lombok.NonNull;
  *
  * @author Scott Shaffer
  */
-public class CompositePipeline implements DataPipeline {
+public class CompositePipeline extends AbstractDataPipeline implements DataPipeline {
     /**
      * The pipelines to apply, in the order of application.
      */

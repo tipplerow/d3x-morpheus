@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2022 D3X Systems - All Rights Reserved
+ * Copyright (C) 2014-2023 Talos Trading - All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ import lombok.RequiredArgsConstructor;
  *
  * @author Scott Shaffer
  */
-public final class RankPipeline implements DataPipeline {
+public final class RankPipeline extends AbstractDataPipeline {
     /**
      * The minimum rank.
      */
@@ -94,7 +94,7 @@ public final class RankPipeline implements DataPipeline {
 
     @Override
     public String encode() {
-        return String.format("rank(%f, %f)", lower, upper);
+        return "rank(" + lower + ", " + upper + ")";
     }
 
     @Override

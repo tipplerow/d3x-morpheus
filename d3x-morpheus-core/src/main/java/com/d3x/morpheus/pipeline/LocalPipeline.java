@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2021 D3X Systems - All Rights Reserved
+ * Copyright (C) 2014-2023 Talos Trading - All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ import lombok.NonNull;
  * @author Scott Shaffer
  */
 @AllArgsConstructor(staticName = "of")
-public final class LocalPipeline implements DataPipeline {
+public final class LocalPipeline extends AbstractDataPipeline implements DataPipeline {
     /**
      * The string encoding for the pipeline.
      */

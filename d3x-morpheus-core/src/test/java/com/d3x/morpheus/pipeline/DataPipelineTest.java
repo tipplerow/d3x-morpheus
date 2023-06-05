@@ -170,6 +170,13 @@ public class DataPipelineTest extends NumericTestBase {
     }
 
     @Test
+    public void testReplace() {
+        assertPipeline1(DataPipeline.replace(1.0, 9.9), -2.0, 9.9, NA, 3.0, -0.5);
+        assertPipeline1(DataPipeline.replace(3.0, Double.NaN), -2.0, 1.0, NA, NA, -0.5);
+        assertPipeline1(DataPipeline.replace(Double.NaN, 9.9), -2.0, 1.0, 9.9, 3.0, -0.5);
+    }
+
+    @Test
     public void testReplaceNaN() {
         assertPipeline1(DataPipeline.replaceNaN(8.8), -2.0, 1.0, 8.8, 3.0, -0.5);
     }

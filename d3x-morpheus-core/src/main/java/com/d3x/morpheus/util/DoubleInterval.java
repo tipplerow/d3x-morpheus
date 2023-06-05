@@ -261,11 +261,17 @@ public final class DoubleInterval implements DoublePredicate {
      * @return the canonical representation of this interval.
      */
     public String format() {
-        return type.lowerDelim() +
-                DECIMAL_FORMAT.format(lower) +
-                ", " +
-                DECIMAL_FORMAT.format(upper) +
-                type.upperDelim();
+        return type.lowerDelim() + format(lower) + ", " + format(upper) + type.upperDelim();
+    }
+
+    private static String format(double bound) {
+        // The decimal formatter actually outputs an infinity symbol for
+        // positive and negative infinity, which cannot be parsed by the
+        // Double.parseDouble() method...
+        if (Double.isFinite(bound))
+            return DECIMAL_FORMAT.format(bound);
+        else
+            return Double.toString(bound);
     }
 
     /**
