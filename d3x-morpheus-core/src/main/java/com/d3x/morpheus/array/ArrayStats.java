@@ -24,6 +24,7 @@ import com.d3x.morpheus.stats.Mean;
 import com.d3x.morpheus.stats.MeanAbs;
 import com.d3x.morpheus.stats.MeanAbsDev;
 import com.d3x.morpheus.stats.Median;
+import com.d3x.morpheus.stats.MedianAbsDev;
 import com.d3x.morpheus.stats.Min;
 import com.d3x.morpheus.stats.Percentile;
 import com.d3x.morpheus.stats.Product;
@@ -109,6 +110,11 @@ class ArrayStats<T extends Number> implements Stats<Number> {
     @Override
     public final Number median() {
         return compute(new Median());
+    }
+
+    @Override
+    public final Number medianAbsDev() {
+        return compute(new MedianAbsDev());
     }
 
     @Override

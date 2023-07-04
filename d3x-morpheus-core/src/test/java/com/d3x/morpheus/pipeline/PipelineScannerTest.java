@@ -98,6 +98,12 @@ public class PipelineScannerTest {
     }
 
     @Test
+    public void testHuber() {
+        assertScanned("huber(4)", DataPipeline.huber(4.0));
+        assertScanned("huber(5.0)", DataPipeline.huber(5.0));
+    }
+
+    @Test
     public void testIdentity() {
         assertScanned("identity()", DataPipeline.identity);
     }
@@ -206,5 +212,11 @@ public class PipelineScannerTest {
     @Test
     public void testTruncate() {
         assertScanned("truncate(2.0, 10.0)", DataPipeline.truncate(2.0, 10.0));
+    }
+
+    @Test
+    public void testWinsor() {
+        assertScanned("winsor(3)", DataPipeline.winsor(3.0));
+        assertScanned("winsor(4.0)", DataPipeline.winsor(4.0));
     }
 }

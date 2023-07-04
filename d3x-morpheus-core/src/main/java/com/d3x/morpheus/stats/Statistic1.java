@@ -15,6 +15,7 @@
  */
 package com.d3x.morpheus.stats;
 
+import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.DoubleStream;
 
@@ -99,6 +100,17 @@ public interface Statistic1 extends Statistic {
     }
 
     /**
+     * Adds new values to the sample for this statistic.
+     *
+     * @param values a list of values to add.
+     *
+     * @return the sample size after adding the values.
+     */
+    default long add(List<Double> values) {
+        return add(values.stream().mapToDouble(x -> x));
+    }
+
+    /**
      * Resets this statistic and computes the value for a given sample.
      *
      * @param sample the sample of values.
@@ -128,6 +140,17 @@ public interface Statistic1 extends Statistic {
      * @return the value of this statistic for the specified sample.
      */
     default double compute(DoubleStream sample) {
+        return compute(this, sample);
+    }
+
+    /**
+     * Resets this statistic and computes the value for a given sample.
+     *
+     * @param sample the sample of values.
+     *
+     * @return the value of this statistic for the specified sample.
+     */
+    default double compute(List<Double> sample) {
         return compute(this, sample);
     }
 
@@ -183,6 +206,18 @@ public interface Statistic1 extends Statistic {
         stat.reset();
         stat.add(sample);
         return stat.getValue();
+    }
+
+    /**
+     * Computes a univariate statistic over a given sample.
+     *
+     * @param stat      the statistic type
+     * @param sample    the sample of values
+     *
+     * @return          the value of the statistic for the given sample.
+     */
+    static double compute(Statistic1 stat, List<Double> sample) {
+        return compute(stat, sample.stream().mapToDouble(x -> x));
     }
 
     /**

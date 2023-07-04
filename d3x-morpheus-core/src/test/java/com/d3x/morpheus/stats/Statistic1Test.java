@@ -87,4 +87,14 @@ public class Statistic1Test {
         assertEquals(meanAbs.compute(vec4), 10.5, TOLERANCE);
         assertEquals(meanAbs.compute(vec5), 2.1075, TOLERANCE);
     }
+
+    @Test
+    public void testMedianAbsDev() {
+        var medianAbsDev = Statistic1.newInstance("com.d3x.morpheus.stats.MedianAbsDev");
+        assertTrue(Double.isNaN(medianAbsDev.compute(vec1)));
+        assertEquals(medianAbsDev.compute(vec2), 0.0, TOLERANCE);
+        assertEquals(medianAbsDev.compute(vec3), MedianAbsDev.DEFAULT_CONSTANT, TOLERANCE);
+        assertEquals(medianAbsDev.compute(vec4), 4.0 * MedianAbsDev.DEFAULT_CONSTANT, TOLERANCE);
+        assertEquals(medianAbsDev.compute(vec5), 1.835 * MedianAbsDev.DEFAULT_CONSTANT, TOLERANCE);
+    }
 }

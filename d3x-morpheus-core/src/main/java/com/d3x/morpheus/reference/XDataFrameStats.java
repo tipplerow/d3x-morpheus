@@ -21,6 +21,7 @@ import com.d3x.morpheus.stats.AutoCorrelation;
 import com.d3x.morpheus.stats.Count;
 import com.d3x.morpheus.stats.MeanAbs;
 import com.d3x.morpheus.stats.MeanAbsDev;
+import com.d3x.morpheus.stats.MedianAbsDev;
 import com.d3x.morpheus.stats.StatException;
 import com.d3x.morpheus.stats.GeoMean;
 import com.d3x.morpheus.stats.Kurtosis;
@@ -162,6 +163,11 @@ class XDataFrameStats<R,C> implements Stats<Double> {
     @Override()
     public final Double median() {
         return compute(new Median());
+    }
+
+    @Override()
+    public final Double medianAbsDev() {
+        return compute(new MedianAbsDev());
     }
 
     @Override

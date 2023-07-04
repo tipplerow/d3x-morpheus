@@ -482,6 +482,21 @@ public interface DataPipeline {
     }
 
     /**
+     * Returns a non-local, size-preserving pipeline that performs Huberization:
+     * elements are bound between {@code M - c * MAD} and {@code M + c * MAD}
+     * where {@code M} is the sample median, {@code MAD} is the median absolute
+     * deviation, and {@code c} is the Huberization constant.  This is a robust
+     * alternative to Winsorization.
+     *
+     * @param constant the Huberization constant described above.
+     *
+     * @return a Huberization pipeline with the specified constant.
+     */
+    static DataPipeline huber(double constant) {
+        return new HuberPipeline(constant);
+    }
+
+    /**
      * Creates a new non-local, size-preserving pipeline that rescales
      * the elements of a vector to a target <em>leverage</em>: the sum
      * of the absolute values in the vector.
@@ -662,5 +677,19 @@ public interface DataPipeline {
         return local(
                 String.format("truncate(%s, %s)", interval.getLower(), interval.getUpper()),
                 element -> interval.contains(element) ? element : Double.NaN);
+    }
+
+    /**
+     * Returns a non-local, size-preserving pipeline that performs Winsorization:
+     * elements are bound between {@code M - c * SD} and {@code M + c * SD} where
+     * {@code M} is the sample mean, {@code SD} is the standard deviation, and
+     * {@code c} is the Winsorization constant.
+     *
+     * @param constant the Winsorization constant described above.
+     *
+     * @return a Winsorization pipeline with the specified constant.
+     */
+    static DataPipeline winsor(double constant) {
+        return new WinsorPipeline(constant);
     }
 }
