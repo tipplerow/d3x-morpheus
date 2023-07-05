@@ -125,6 +125,11 @@ public class DataPipelineTest extends NumericTestBase {
     }
 
     @Test
+    public void testExpM1() {
+        assertPipeline1(DataPipeline.expm1, -0.8646647, 1.7182818, NA, 19.0855369, -0.3934693);
+    }
+
+    @Test
     public void testFlip() {
         assertPipeline1(DataPipeline.flip, 2.0, -1.0, NA, -3.0, 0.5);
     }

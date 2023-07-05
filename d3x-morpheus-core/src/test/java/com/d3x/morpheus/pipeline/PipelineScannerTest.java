@@ -93,6 +93,11 @@ public class PipelineScannerTest {
     }
 
     @Test
+    public void testExpM1() {
+        assertScanned("expm1()", DataPipeline.expm1);
+    }
+
+    @Test
     public void testFlip() {
         assertScanned("flip()", DataPipeline.flip);
     }

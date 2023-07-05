@@ -206,6 +206,12 @@ public interface DataPipeline {
     DataPipeline exp = local("exp()", Math::exp);
 
     /**
+     * A local, size-preserving pipeline that replaces each element {@code x}
+     * with {@code exp(x) - 1.0}.
+     */
+    DataPipeline expm1 = local("expm1()", Math::expm1);
+
+    /**
      * A local, size-preserving pipeline that flips the sign of each element.
      */
     DataPipeline flip = local("flip()", value -> -value);

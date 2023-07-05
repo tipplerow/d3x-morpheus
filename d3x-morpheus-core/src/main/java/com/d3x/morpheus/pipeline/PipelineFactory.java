@@ -63,6 +63,10 @@ public class PipelineFactory {
                 assertNoArgs(name, args);
                 return DataPipeline.exp;
 
+            case "expm1":
+                assertNoArgs(name, args);
+                return DataPipeline.expm1;
+
             case "flip":
                 assertNoArgs(name, args);
                 return DataPipeline.flip;
