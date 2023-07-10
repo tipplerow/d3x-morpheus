@@ -29,6 +29,7 @@ import com.d3x.morpheus.stats.Mean;
 import com.d3x.morpheus.stats.MeanAbs;
 import com.d3x.morpheus.stats.MeanAbsDev;
 import com.d3x.morpheus.stats.Median;
+import com.d3x.morpheus.stats.MedianAbsDev;
 import com.d3x.morpheus.stats.Min;
 import com.d3x.morpheus.stats.Percentile;
 import com.d3x.morpheus.stats.Product;
@@ -122,6 +123,12 @@ abstract class XDataFrameStatsBase<R,C> implements Stats<DataFrame<R,C>> {
     @Override
     public DataFrame<R,C> median() {
         return compute(new Median());
+    }
+
+
+    @Override
+    public DataFrame<R,C> medianAbsDev() {
+        return compute(new MedianAbsDev());
     }
 
 

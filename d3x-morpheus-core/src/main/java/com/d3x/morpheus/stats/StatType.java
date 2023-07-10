@@ -36,6 +36,7 @@ public enum StatType {
     MEAN,
     COUNT,
     MEDIAN,
+    MEDIAN_ABS_DEV,
     PRODUCT,
     PERCENTILE,
     SUM_ABS,
@@ -53,7 +54,7 @@ public enum StatType {
 
 
     private static final List<StatType> univariate = List.of(
-            SUM, MIN, MAX, MAD, SEM, MEAN, COUNT, MEDIAN, PERCENTILE, SUM_ABS, SUM_LOGS,
+            SUM, MIN, MAX, MAD, SEM, MEAN, COUNT, MEDIAN, MEDIAN_ABS_DEV, PERCENTILE, SUM_ABS, SUM_LOGS,
             SUM_SQUARES, STD_DEV, VARIANCE, KURTOSIS, SKEWNESS, MEAN_ABS, GEO_MEAN, AUTO_CORREL);
 
 
@@ -77,6 +78,7 @@ public enum StatType {
             case MAX:               return stats.max();
             case MEAN:              return stats.mean();
             case MEDIAN:            return stats.median();
+            case MEDIAN_ABS_DEV:    return stats.medianAbsDev();
             case MAD:               return stats.mad();
             case SUM:               return stats.sum();
             case SUM_ABS:           return stats.sumAbs();

@@ -63,9 +63,17 @@ public class PipelineFactory {
                 assertNoArgs(name, args);
                 return DataPipeline.exp;
 
+            case "expm1":
+                assertNoArgs(name, args);
+                return DataPipeline.expm1;
+
             case "flip":
                 assertNoArgs(name, args);
                 return DataPipeline.flip;
+
+            case "huber":
+                assertArgs(name, args, Number.class);
+                return DataPipeline.huber(doubleArg(args, 0));
 
             case "identity":
                 assertNoArgs(name, args);
@@ -151,6 +159,10 @@ public class PipelineFactory {
             case "unitize":
                 assertNoArgs(name, args);
                 return DataPipeline.unitize;
+
+            case "winsor":
+                assertArgs(name, args, Number.class);
+                return DataPipeline.winsor(doubleArg(args, 0));
 
             default:
                 throw new MorpheusException("Unknown pipeline: [%s].", name);

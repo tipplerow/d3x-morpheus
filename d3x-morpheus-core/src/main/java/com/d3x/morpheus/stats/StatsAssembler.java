@@ -72,6 +72,11 @@ public abstract class StatsAssembler<T> implements Stats<T> {
     }
 
     @Override
+    public T medianAbsDev() {
+        return compute(new MedianAbsDev());
+    }
+
+    @Override
     public T mad() {
         return compute(new MeanAbsDev());
     }

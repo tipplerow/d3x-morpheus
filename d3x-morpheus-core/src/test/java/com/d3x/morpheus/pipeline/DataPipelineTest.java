@@ -125,8 +125,18 @@ public class DataPipelineTest extends NumericTestBase {
     }
 
     @Test
+    public void testExpM1() {
+        assertPipeline1(DataPipeline.expm1, -0.8646647, 1.7182818, NA, 19.0855369, -0.3934693);
+    }
+
+    @Test
     public void testFlip() {
         assertPipeline1(DataPipeline.flip, 2.0, -1.0, NA, -3.0, 0.5);
+    }
+
+    @Test
+    public void testHuber() {
+        assertPipeline1(DataPipeline.huber(1.0), -1.9739, 1.0, NA, 2.4739, -0.5);
     }
 
     @Test
@@ -239,5 +249,10 @@ public class DataPipelineTest extends NumericTestBase {
     @Test
     public void testUnitize() {
         assertPipeline1(DataPipeline.unitize, -0.5298129, 0.2649065, NA, 0.7947194, -0.1324532);
+    }
+
+    @Test
+    public void testWinsor() {
+        assertPipeline1(DataPipeline.winsor(1.1), -1.974601, 1.0, NA, 2.724601, -0.5);
     }
 }

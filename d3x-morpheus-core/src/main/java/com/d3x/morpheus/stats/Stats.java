@@ -70,6 +70,12 @@ public interface Stats<T> {
     T median();
 
     /**
+     * Returns the median absolute deviation (from the median).
+     * @return the median absolute deviation (from the median).
+     */
+    T medianAbsDev();
+
+    /**
      * Returns the Mean Absolute Deviation for this entity
      * @return  the Mean Absolute Deviation
      * @see <a href="https://en.wikipedia.org/wiki/Average_absolute_deviation">Wikipedia</a>
@@ -238,6 +244,10 @@ public interface Stats<T> {
         @Override
         public Double median() {
             return compute.applyAsDouble(new Median());
+        }
+        @Override
+        public Double medianAbsDev() {
+            return compute.applyAsDouble(new MedianAbsDev());
         }
         @Override
         public Double mad() {
