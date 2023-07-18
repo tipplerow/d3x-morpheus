@@ -60,6 +60,83 @@ jobs:
         # For more details on CodeQL's query packs, refer to: https://docs.github.com/en/code-security/code-scanning/automatically-scanning-your-code-for-vulnerabilities-and-errors/configuring-code-scanning#using-queries-in-ql-packs
         # queries: security-extended,security-and-quality
 
+    - name: maven-settings-xml-action
+      uses: whelk-io/maven-settings-xml-action@v20
+      with:
+        repositories: > 
+          [
+            {
+              "id": "central",
+              "name": "central",
+              "url": "https://repo1.maven.org/maven2"
+            },
+            {
+              "id": "releases",
+              "name": "d3x-release",
+              "url": "https://d3xsystems.jfrog.io/artifactory/d3x-release",
+              "releases": {
+                "enabled": "true"
+              },
+              "snapshots": {
+                "enabled": "false"
+              }
+            },
+            {
+              "id": "snapshots",
+              "name": "d3x-snapshot",
+              "url": "https://d3xsystems.jfrog.io/artifactory/d3x-snapshot",
+              "releases": {
+                "enabled": "false"
+              },
+              "snapshots": {
+                "enabled": "true"
+              }
+            }
+          ]
+        plugin_repositories: >
+          [
+            {
+              "id": "central",
+              "name": "central",
+              "url": "https://repo1.maven.org/maven2"
+            },
+            {
+              "id": "releases",
+              "name": "d3x-release",
+              "url": "https://d3xsystems.jfrog.io/artifactory/d3x-release",
+              "releases": {
+                "enabled": "true"
+              },
+              "snapshots": {
+                "enabled": "false"
+              }
+            },
+            {
+              "id": "snapshots",
+              "name": "d3x-snapshot",
+              "url": "https://d3xsystems.jfrog.io/artifactory/d3x-snapshot",
+              "releases": {
+                "enabled": "false"
+              },
+              "snapshots": {
+                "enabled": "true"
+              }
+            }
+          ]
+        servers: >
+          [
+            {
+              "id": "releases",
+              "username": "zav@d3xsystems.com",
+              "password": "AP6rdVLuECJJX5UpA9PDLxQ2VvaLNse5SffK37"
+            },
+            {
+              "id": "snapshots",
+              "username": "zav@d3xsystems.com",
+              "password": "AP6rdVLuECJJX5UpA9PDLxQ2VvaLNse5SffK37"
+            }
+          ]
+
     - name: Compile project
       run: mvn clean package -DskipTests
 

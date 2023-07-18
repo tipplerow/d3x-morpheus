@@ -3,9 +3,18 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.d3xsystems</groupId>
+
+    <parent>
+        <groupId>com.d3xsystems</groupId>
+        <artifactId>d3x-build</artifactId>
+        <version>1.4.0</version>
+    </parent>
+
     <artifactId>d3x-morpheus</artifactId>
-    <version>1.1.3</version>
+    <name>d3x-morpheus</name>
+    <description>A data science library for the JVM</description>
+    <version>1.4.0</version>
+    <inceptionYear>2014</inceptionYear>
     <packaging>pom</packaging>
 
     <modules>
@@ -18,51 +27,12 @@
         <module>d3x-morpheus-guava</module>
     </modules>
 
-    <name>d3x-morpheus</name>
-    <description>A data science library for the JVM</description>
-    <url>https://www.d3xsystems.com/morpheus</url>
-    <inceptionYear>2014</inceptionYear>
-
-    <developers>
-        <developer>
-            <id>zav@d3xsystems.com</id>
-            <name>Xavier Witdouck</name>
-            <email>zav@d3xsystems.com</email>
-            <timezone>Europe/London</timezone>
-        </developer>
-    </developers>
-
-    <organization>
-        <name>D3X Systems</name>
-        <url>https://www.d3xsystems.com</url>
-    </organization>
-
-    <scm>
-        <url>https://github.com/d3xsystems/d3x-morpheus.git</url>
-        <connection>scm:git:https://github.com/d3xsystems/d3x-morpheus.git</connection>
-        <tag>HEAD</tag>
-    </scm>
-
-    <distributionManagement>
-        <repository>
-            <id>releases</id>
-            <name>d3xsystems-artifactory-primary-0-releases</name>
-            <url>https://d3xsystems.jfrog.io/artifactory/d3x-release</url>
-        </repository>
-        <snapshotRepository>
-            <id>snapshots</id>
-            <name>d3xsystems-artifactory-primary-0-snapshots</name>
-            <url>https://d3xsystems.jfrog.io/artifactory/d3x-snapshot</url>
-        </snapshotRepository>
-    </distributionManagement>
-
     <licenses>
         <license>
             <name>Apache License 2.0</name>
             <url>http://www.apache.org/licenses/LICENSE-2.0</url>
         </license>
     </licenses>
-
 
     <properties>
         <jdk.version>17</jdk.version>
@@ -76,372 +46,46 @@
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
-            <version>7.6.1</version>
             <scope>test</scope>
-            <exclusions>
-                <exclusion> <!-- Excluded due to CVE -->
-                    <groupId>junit</groupId>
-                    <artifactId>junit</artifactId>
-                </exclusion>
-                <exclusion> <!-- Excluded due to CVE -->
-                    <groupId>org.yaml</groupId>
-                    <artifactId>snakeyaml</artifactId>
-                </exclusion>
-                <exclusion> <!-- Excluded due to CVE -->
-                    <groupId>com.google.guava</groupId>
-                    <artifactId>guava</artifactId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>slf4j-api</artifactId>
-                    <groupId>org.slf4j</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>jsr305</artifactId>
-                    <groupId>com.google.code.findbugs</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <dependency>
             <artifactId>jsr305</artifactId>
             <groupId>com.google.code.findbugs</groupId>
-            <version>3.0.2</version>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.13.2</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.yaml</groupId>
-            <artifactId>snakeyaml</artifactId>
-            <version>1.33</version>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.24</version>
         </dependency>
 
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.7.36</version>
         </dependency>
 
         <dependency>
             <groupId>org.eclipse.collections</groupId>
             <artifactId>eclipse-collections-api</artifactId>
-            <version>11.1.0</version>
         </dependency>
 
         <dependency>
             <groupId>org.eclipse.collections</groupId>
             <artifactId>eclipse-collections</artifactId>
-            <version>11.1.0</version>
         </dependency>
 
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.2.11</version>
-            <scope>test</scope>
-            <optional>true</optional>
-            <exclusions>
-                <exclusion>
-                    <artifactId>slf4j-api</artifactId>
-                    <groupId>org.slf4j</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
     </dependencies>
-
-
-    <profiles>
-
-        <profile>
-            <id>release</id>
-            <build>
-                <plugins>
-
-                    <plugin>
-                        <groupId>org.projectlombok</groupId>
-                        <artifactId>lombok-maven-plugin</artifactId>
-                        <version>1.18.20.0</version>
-                    </plugin>
-
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>3.4.1</version>
-                        <configuration>
-                            <show>private</show>
-                            <nohelp>true</nohelp>
-                            <author>true</author>
-                            <sourcepath>${project.build.directory}/generated-sources/delombok</sourcepath>
-                            <additionalOptions>-html5</additionalOptions>
-                            <additionalOptions>-Xdoclint:none</additionalOptions>
-                            <bottom>
-                                <![CDATA[Copyright 2014-2019, <a href="https://www.d3xsystems.com">D3X Systems<a>]]>
-                            </bottom>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <phase>package</phase>
-                                <id>attach-javadocs</id>
-                                <goals>
-                                    <goal>jar</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.6</version>
-                        <executions>
-                            <execution>
-                                <id>sign-artifacts</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>sign</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-
-                    <plugin>
-                        <groupId>org.sonatype.plugins</groupId>
-                        <artifactId>nexus-staging-maven-plugin</artifactId>
-                        <version>1.6.7</version>
-                        <extensions>true</extensions>
-                        <configuration>
-                            <serverId>ossrh</serverId>
-                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                            <autoReleaseAfterClose>false</autoReleaseAfterClose>
-                        </configuration>
-                    </plugin>
-
-                </plugins>
-
-            </build>
-
-        </profile>
-
-    </profiles>
-
-
-    <build>
-
-        <pluginManagement>
-
-            <plugins>
-
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-resources-plugin</artifactId>
-                    <version>3.3.0</version>
-                    <configuration>
-                        <encoding>UTF-8</encoding>
-                    </configuration>
-                </plugin>
-
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.10.1</version>
-
-                    <configuration>
-                        <source>${jdk.version}</source>
-                        <target>${jdk.version}</target>
-                        <release>${jdk.version}</release>
-                        <fork>false</fork>
-                        <showWarnings>true</showWarnings>
-                        <debug>true</debug>
-                        <debuglevel>lines,vars,source</debuglevel>
-                        <optimize>true</optimize>
-                        <showDeprecation>true</showDeprecation>
-                        <annotationProcessorPaths>
-                            <path>
-                                <groupId>org.projectlombok</groupId>
-                                <artifactId>lombok</artifactId>
-                                <version>1.18.24</version>
-                            </path>
-                        </annotationProcessorPaths>
-                    </configuration>
-                </plugin>
-
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-source-plugin</artifactId>
-                    <version>3.2.1</version>
-                    <configuration>
-                        <outputDirectory>${project.build.directory}</outputDirectory>
-                        <finalName>${project.build.finalName}</finalName>
-                        <attach>true</attach>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <id>attach-sources</id>
-                            <phase>verify</phase>
-                            <goals>
-                                <goal>jar-no-fork</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.3.0</version>
-                    <configuration>
-                        <archive>
-                            <manifest>
-                                <addClasspath>false</addClasspath>
-                                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                                <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-                            </manifest>
-                            <manifestEntries>
-                                <Build-Time>${maven.build.timestamp}</Build-Time>
-                                <Build-OS>${os.name} ${os.arch} ${os.version}</Build-OS>
-                                <Build-JDK>${java.version} (${java.vendor} ${java.vm.version})</Build-JDK>
-                                <GIT-Commit>${buildNumber}</GIT-Commit>
-                            </manifestEntries>
-                        </archive>
-                    </configuration>
-                </plugin>
-
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>buildnumber-maven-plugin</artifactId>
-                    <version>1.3</version>
-                    <executions>
-                        <execution>
-                            <phase>validate</phase>
-                            <goals>
-                                <goal>create</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                    <configuration>
-                        <doCheck>false</doCheck>
-                        <doUpdate>false</doUpdate>
-                    </configuration>
-                </plugin>
-
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.0.0-M7</version>
-                    <configuration>
-                        <argLine>-Dfile.encoding=UTF-8</argLine>
-                        <parallel>classes</parallel>
-                        <threadCount>10</threadCount>
-                        <redirectTestOutputToFile>false</redirectTestOutputToFile>
-                        <systemProperties>
-                            <property>
-                                <name>testng.dtd.http</name>
-                                <value>true</value>
-                            </property>
-                        </systemProperties>
-                    </configuration>
-                    <dependencies>
-                        <dependency>
-                            <groupId>org.apache.maven.surefire</groupId>
-                            <artifactId>surefire-testng</artifactId>
-                            <version>3.0.0-M7</version>
-                        </dependency>
-                    </dependencies>
-                </plugin>
-
-                <plugin>
-                    <groupId>org.owasp</groupId>
-                    <artifactId>dependency-check-maven</artifactId>
-                    <version>7.3.2</version>
-                    <configuration>
-                        <failBuildOnCVSS>8</failBuildOnCVSS>
-                        <suppressionFile>${project.basedir}/suppression.xml</suppressionFile>
-                        <excludes>
-                            <exclude>org.apache.xmlgraphics:batik-all</exclude>
-                            <exclude>org.apache.xmlgraphics:batik-svgpp</exclude>
-                            <exclude>org.apache.xmlgraphics:xmlgraphics-commons</exclude>
-                        </excludes>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <goals>
-                                <goal>check</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>license-maven-plugin</artifactId>
-                    <version>2.0.0</version>
-                    <executions>
-                        <execution>
-                            <id>aggregate-download-licenses</id>
-                            <goals>
-                                <goal>aggregate-download-licenses</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-
-            </plugins>
-
-        </pluginManagement>
-
-        <plugins>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.10.1</version>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>3.3.0</version>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <version>3.2.1</version>
-            </plugin>
-
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>buildnumber-maven-plugin</artifactId>
-                <version>1.3</version>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.3.0</version>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.0.0-M7</version>
-            </plugin>
-
-        </plugins>
-
-        <defaultGoal>clean install</defaultGoal>
-
-    </build>
 
 </project>

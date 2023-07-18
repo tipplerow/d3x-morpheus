@@ -7,7 +7,7 @@
     <parent>
         <groupId>com.d3xsystems</groupId>
         <artifactId>d3x-morpheus</artifactId>
-        <version>1.1.3</version>
+        <version>1.4.0</version>
     </parent>
 
     <name>d3x-morpheus-excel</name>
@@ -22,45 +22,14 @@
             <version>${project.version}</version>
         </dependency>
 
-        <!-- version 3.14 used because it's the last version to rely on xml-beans 2.6.0 which we need for EZE / AXIS2 etc -->
-
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
-            <version>5.0.0</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>slf4j-api</artifactId>
-                    <groupId>org.slf4j</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>jcl-over-slf4j</artifactId>
-                    <groupId>org.slf4j</groupId>
-                </exclusion>
-            </exclusions>
-
         </dependency>
 
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
-            <version>5.0.0</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>slf4j-api</artifactId>
-                    <groupId>org.slf4j</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>xml-apis</artifactId>
-                    <groupId>xml-apis</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <dependency>
-            <artifactId>jcl-over-slf4j</artifactId>
-            <groupId>org.slf4j</groupId>
-            <version>1.7.36</version>
         </dependency>
 
     </dependencies>
