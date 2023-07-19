@@ -39,6 +39,10 @@ public class DataFrameTest extends DataFrameTestBase {
         assertTrue(intFrame.containsColumn(col3));
         assertFalse(intFrame.containsColumn(col4));
 
+        assertFalse(intFrame.missingColumn(col1));
+        assertFalse(intFrame.missingColumn(col2));
+        assertFalse(intFrame.missingColumn(col3));
+        assertTrue(intFrame.missingColumn(col4));
     }
 
     @Test
@@ -54,6 +58,10 @@ public class DataFrameTest extends DataFrameTestBase {
         assertTrue(intFrame.containsRow(row1));
         assertTrue(intFrame.containsRow(row2));
         assertFalse(intFrame.containsRow(row4));
+
+        assertFalse(intFrame.missingRow(row1));
+        assertFalse(intFrame.missingRow(row2));
+        assertTrue(intFrame.missingRow(row4));
     }
 
     @Test
