@@ -25,7 +25,8 @@ pipeline {
                 }
 
                 sh 'mvn -s $JENKINS_HOME/settings.xml -versions'
-                sh 'mvn -s $JENKINS_HOME/settings.xml $MAVEN_ARGS clean dependency-check:aggregate deploy'
+                sh 'mvn -s $JENKINS_HOME/settings.xml $MAVEN_ARGS clean install'
+                sh 'mvn -s $JENKINS_HOME/settings.xml $MAVEN_ARGS deploy'
             }
         }
     }
