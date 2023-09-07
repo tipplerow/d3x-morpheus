@@ -450,6 +450,17 @@ public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperation
     }
 
     /**
+     * Determines whether this DataFrame contains a particular column.
+     *
+     * @param colKey the key of the column in question.
+     *
+     * @return {@code true} unless this DataFrame contains a column with the specified key.
+     */
+    default boolean missingColumn(C colKey) {
+        return !containsColumn(colKey);
+    }
+
+    /**
      * Determines whether this DataFrame contains a particular row.
      *
      * @param rowKey the key of the row in question.
@@ -458,6 +469,17 @@ public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperation
      */
     default boolean containsRow(R rowKey) {
         return rows().contains(rowKey);
+    }
+
+    /**
+     * Determines whether this DataFrame contains a particular row.
+     *
+     * @param rowKey the key of the row in question.
+     *
+     * @return {@code true} unless this DataFrame contains a row with the specified key.
+     */
+    default boolean missingRow(R rowKey) {
+        return !containsRow(rowKey);
     }
 
     /**
