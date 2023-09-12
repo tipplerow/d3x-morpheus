@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import com.d3x.morpheus.concurrent.ConcurrentObject;
 
@@ -54,6 +55,40 @@ public abstract class CacheBase<K, V> extends ConcurrentObject {
     }
 
     /**
+     * Retrieves an existing value from this cache or assigns a value.
+     *
+     * @param targetKey the key associated with the value.
+     * @param supplier  supplies the value to assign and return if there
+     *                  is no match for the key.
+     *
+     * @return the value associated with the specified key, or the value
+     * returned by the supplier if there is no match.
+     */
+    public V getOrAssign(@NonNull K targetKey, @NonNull Supplier<V> supplier) {
+        V result = get(targetKey);
+
+        if (result != null) {
+            return result;
+        }
+        else {
+            write(this::putIfAbsent, targetKey, supplier.get());
+            // Another thread might have acquired the write-lock and assigned
+            // the same key during the interval when this thread did not hold
+            // the write-lock, so we must retrieve the value associated with
+            // the key again...
+            return get(targetKey);
+        }
+    }
+
+    private void putIfAbsent(@NonNull K key, @NonNull V value) {
+        // Another thread might have acquired the write-lock and assigned
+        // the same key during the interval when this thread did not hold
+        // the write-lock.  If so, we cannot overwrite...
+        if (!map.containsKey(key))
+            map.put(key, value);
+    }
+
+    /**
      * Retrieves an existing value from this cache or assigns a default.
      *
      * @param targetKey    the key associated with the value.
@@ -64,54 +99,21 @@ public abstract class CacheBase<K, V> extends ConcurrentObject {
      * default value if there is no match.
      */
     public V getOrAssign(@NonNull K targetKey, @NonNull V defaultValue) {
-        V result = get(targetKey);
-
-        if (result != null) {
-            return result;
-        }
-        else {
-            write(this::putIfAbsent, targetKey, defaultValue);
-            // Another thread might have acquired the write lock and assigned
-            // the same key during the interval when this thread did not hold
-            // the write lock, so we must retrieve the value associated with
-            // the key again...
-            return get(targetKey);
-        }
-    }
-
-    private void putIfAbsent(@NonNull K key, @NonNull V value) {
-        // Another thread might have acquired the write lock and assigned
-        // the same key during the interval when this thread did not hold
-        // the write lock.  If so, we cannot overwrite...
-        if (!map.containsKey(key))
-            map.put(key, value);
+        return getOrAssign(targetKey, () -> defaultValue);
     }
 
     /**
      * Retrieves an existing value from this cache or computes and
      * assigns a value.
      *
-     * @param key     the key associated with the value.
+     * @param target  the key associated with the value.
      * @param compute the function to compute missing values.
      *
      * @return the value associated with the specified keys, or the
      * computed value if there is no match.
      */
-    public V getOrCompute(@NonNull K key, @NonNull Function<K, V> compute) {
-        V result = get(key);
-
-        if (result != null) {
-            return result;
-        }
-        else {
-            var value = compute.apply(key);
-            write(this::putIfAbsent, key, value);
-            // Another thread might have acquired the write lock and assigned
-            // the same key during the interval when this thread did not hold
-            // the write lock, so we must retrieve the value associated with
-            // the key again...
-            return get(key);
-        }
+    public V getOrCompute(@NonNull K target, @NonNull Function<K, V> compute) {
+        return getOrAssign(target, () -> compute.apply(target));
     }
 
     /**

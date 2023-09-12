@@ -73,22 +73,43 @@ public abstract class UnivariateRootFinder {
      * Finds the root of a univariate function.
      *
      * @param function the function to solve.
-     * @param interval an interval known to contain the root.
+     * @param initial  an initial guess for the root.
      *
      * @return the root of the function.
+     *
+     * @throws RuntimeException unless a valid bounding interval can be found.
      */
-    public double solve(@NonNull DoubleUnaryOperator function, @NonNull DoubleInterval interval) {
-        return solve(function, interval, interval.getMidPoint());
+    public double solve(@NonNull DoubleUnaryOperator function, double initial) {
+        var interval = DoubleInterval.closed(initial - 1.0, initial + 1.0);
+        var bracketed = bracket(function, interval);
+        return solve(function, bracketed, bracketed.getMidPoint());
     }
 
     /**
      * Finds the root of a univariate function.
      *
      * @param function the function to solve.
-     * @param interval an interval known to contain the root.
+     * @param interval an initial guess for the bounding interval.
+     *
+     * @return the root of the function.
+     *
+     * @throws RuntimeException unless a valid bounding interval can be found.
+     */
+    public double solve(@NonNull DoubleUnaryOperator function, @NonNull DoubleInterval interval) {
+        var bracketed = bracket(function, interval);
+        return solve(function, bracketed, bracketed.getMidPoint());
+    }
+
+    /**
+     * Finds the root of a univariate function.
+     *
+     * @param function the function to solve.
+     * @param interval an interval containing the root.
      * @param initial  an initial guess for the location of the root.
      *
      * @return the root of the function.
+     *
+     * @throws RuntimeException unless the interval contains the root.
      */
     public abstract double solve(DoubleUnaryOperator function, DoubleInterval interval, double initial);
 }

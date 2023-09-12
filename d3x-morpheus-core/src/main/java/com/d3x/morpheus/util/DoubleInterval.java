@@ -82,6 +82,11 @@ public final class DoubleInterval implements DoublePredicate {
     public static DoubleInterval PERCENTILE = closed(0.0, 100.0);
 
     /**
+     * The interval containing real numbers: {@code [-1.0, 1.0]}.
+     */
+    public static DoubleInterval UNIT = closed(-1.0, 1.0);
+
+    /**
      * The interval containing all real numbers: {@code [-Inf, +Inf]}.
      */
     public static DoubleInterval INFINITE = closed(Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);

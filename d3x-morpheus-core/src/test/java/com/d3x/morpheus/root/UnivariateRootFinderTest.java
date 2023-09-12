@@ -16,9 +16,9 @@
 package com.d3x.morpheus.root;
 
 import com.d3x.morpheus.util.DoubleInterval;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
 
 /**
  * @author Scott Shaffer
@@ -34,5 +34,13 @@ public class UnivariateRootFinderTest {
 
         Assert.assertTrue(bracket1.contains(root1));
         Assert.assertTrue(bracket2.contains(root2));
+
+        var values = new double[] { 0.01, 0.1, 1.0, 10.0, 100.0 };
+
+        for (var value : values) {
+            var bracket = UnivariateRootFinder.bracket(x -> Math.exp(x) - value, DoubleInterval.closed(-1.0, 1.0));
+            Assert.assertTrue(Math.exp(bracket.getLower()) <= value);
+            Assert.assertTrue(Math.exp(bracket.getUpper()) >= value);
+        }
     }
 }

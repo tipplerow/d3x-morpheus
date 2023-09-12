@@ -15,8 +15,6 @@
  */
 package com.d3x.morpheus.stats;
 
-import com.d3x.morpheus.vector.D3xVector;
-
 /**
  * A Statistic implementation that supports incremental calculation of a sample min
  *
