@@ -282,6 +282,21 @@ public class DoubleIntervalTest {
         assertFalse(interval.contains(DoubleInterval.NON_NEGATIVE));
     }
 
+    @Test public void testUnit() {
+        DoubleInterval interval = DoubleInterval.UNIT;
+
+        assertFalse(interval.contains(-1.00000001));
+        assertTrue(interval.contains(-1.0));
+        assertTrue(interval.contains(1.0));
+        assertFalse(interval.contains(1.00000001));
+
+        assertFalse(interval.contains(Double.NaN));
+        assertFalse(interval.contains(Double.NEGATIVE_INFINITY));
+        assertFalse(interval.contains(Double.POSITIVE_INFINITY));
+
+        assertEquals(interval.getWidth(), 2.0, TOLERANCE);
+    }
+
     @Test public void testValidateOkay() {
         DoubleInterval.POSITIVE.validate(1.0, "test value");
         DoubleInterval.NEGATIVE.validate(-1.0, "test value");

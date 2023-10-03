@@ -17,6 +17,10 @@ package com.d3x.morpheus.numerictests;
 
 import com.d3x.morpheus.series.DoubleSeries;
 import com.d3x.morpheus.util.DoubleComparator;
+import com.d3x.morpheus.util.LazyValue;
+
+import java.util.Random;
+import java.util.random.RandomGenerator;
 
 import static org.testng.Assert.*;
 
@@ -25,6 +29,9 @@ import static org.testng.Assert.*;
  * comparisons by a {@code DoubleComparator}.
  */
 public abstract class NumericTestBase {
+    private static final long SEED = 7069067389L;
+    private final LazyValue<RandomGenerator> random = LazyValue.of(() -> new Random(SEED));
+
     /**
      * The DoubleComparator used by {@code assertDouble}.
      */
@@ -35,6 +42,15 @@ public abstract class NumericTestBase {
      */
     protected NumericTestBase() {
         this(DoubleComparator.DEFAULT);
+    }
+
+    /**
+     * Creates a new test class with a fixed numeric tolerance.
+     *
+     * @param tolerance the tolerance for numeric comparisons.
+     */
+    protected NumericTestBase(double tolerance) {
+        this(DoubleComparator.fixed(tolerance));
     }
 
     /**
@@ -99,5 +115,13 @@ public abstract class NumericTestBase {
                 fail(String.format("Expected [%s => %f] but found [%s => %f].",
                         key.toString(), expectedValue, key.toString(), actualValue));
         }
+    }
+
+    /**
+     * Returns a random number generator with a repeatable sequence.
+     * @return a random number generator with a repeatable sequence.
+     */
+    public RandomGenerator random() {
+        return random.get();
     }
 }

@@ -22,6 +22,21 @@ package com.d3x.morpheus.util;
  */
 public final class DoubleUtil {
     /**
+     * A named constant for {@code Math.log(2.0)}.
+     */
+    public static final double LOG2 = Math.log(2.0);
+
+    /**
+     * A named constant for {@code Math.sqrt(2.0)}.
+     */
+    public static final double SQRT2 = Math.sqrt(2.0);
+
+    /**
+     * A named constant for {@code Math.sqrt(2.0 * Math.PI)}.
+     */
+    public static final double SQRT_TWO_PI = Math.sqrt(2.0 * Math.PI);
+
+    /**
      * Computes the floating-point ratio of two integers.
      *
      * @param numer the integral numerator.

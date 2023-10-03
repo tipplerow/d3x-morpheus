@@ -172,6 +172,12 @@
         </packages>
     </test>
 
+    <test name="Distribution Tests">
+        <packages>
+            <package name="com.d3x.morpheus.dist.*"/>
+        </packages>
+    </test>
+
     <test name="Collection Tests">
         <packages>
             <package name="com.d3x.morpheus.collect.*"/>
