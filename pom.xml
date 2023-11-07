@@ -7,13 +7,13 @@
     <parent>
         <groupId>com.d3xsystems</groupId>
         <artifactId>d3x-build</artifactId>
-        <version>1.4.0</version>
+        <version>1.4.1</version>
     </parent>
 
     <artifactId>d3x-morpheus</artifactId>
     <name>d3x-morpheus</name>
     <description>A data science library for the JVM</description>
-    <version>1.4.0</version>
+    <version>1.4.2</version>
     <inceptionYear>2014</inceptionYear>
     <packaging>pom</packaging>
 
