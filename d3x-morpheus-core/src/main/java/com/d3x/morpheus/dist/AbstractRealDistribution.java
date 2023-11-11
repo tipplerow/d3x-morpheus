@@ -107,6 +107,9 @@ public abstract class AbstractRealDistribution implements RealDistribution {
         else if (DoubleComparator.DEFAULT.equals(F, 1.0)) {
             return upper;
         }
+        else if (Math.abs(cdf(mean) - F) < 1.0E-06) {
+            return mean;
+        }
 
         if (!Double.isFinite(lower)) {
             lower = mean;

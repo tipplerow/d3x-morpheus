@@ -167,7 +167,7 @@ public final class NormalDistribution extends AbstractRealDistribution {
     }
 
     @Override
-    public RealDistribution sum(int count) {
+    public NormalDistribution sum(int count) {
         if (count < 1) {
             throw new IllegalArgumentException("Variable count must be positive.");
         }

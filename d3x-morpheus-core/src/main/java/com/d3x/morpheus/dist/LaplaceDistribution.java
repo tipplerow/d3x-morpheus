@@ -185,6 +185,22 @@ public final class LaplaceDistribution extends AbstractRealDistribution {
     }
 
     @Override
+    public RealDistribution sum(int count) {
+        if (count < 1) {
+            throw new IllegalArgumentException("Variable count must be positive.");
+        }
+        else if (count == 1) {
+            return this;
+        }
+        else if (count <= 10) {
+            return new LaplaceSumDistribution(this, count);
+        }
+        else {
+            return new NormalDistribution(count * mean(), Math.sqrt(count * variance()));
+        }
+    }
+
+    @Override
     public DoubleInterval support() {
         return DoubleInterval.INFINITE;
     }
