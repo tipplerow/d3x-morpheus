@@ -305,6 +305,33 @@ public final class DoubleInterval implements DoublePredicate {
     }
 
     /**
+     * Generates a uniformly spaced sequence between the bounds of this interval.
+     *
+     * @param step the uniform step size.
+     *
+     * @return a uniformly spaced sequence with the given step size.
+     */
+    public double[] sequence(double step) {
+        if (step <= 0.0)
+            throw new IllegalArgumentException("Step size must be positive.");
+
+        var minX = contains(lower) ? lower : lower + step;
+        var maxX = contains(upper) ? upper : upper - 1.0E-12;
+        var numX = ((int) Math.floor((maxX - minX) / step)) + 1;
+
+        if (numX < 1)
+            throw new IllegalArgumentException("Step size is too large.");
+
+        var seq = new double[numX];
+        seq[0] = minX;
+
+        for (int k = 1; k < seq.length; ++k)
+            seq[k] = seq[k - 1] + step;
+
+        return seq;
+    }
+
+    /**
      * Ensures that this interval is valid.
      *
      * @return this object, for operator chaining.

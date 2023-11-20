@@ -71,6 +71,11 @@ public final class BiweightKernel extends AbstractRealDistribution {
     }
 
     @Override
+    public double median() {
+        return 0.0;
+    }
+
+    @Override
     public double mode() {
         return 0.0;
     }

@@ -346,4 +346,23 @@ public class DoubleIntervalTest {
         assertTrue(DoubleInterval.closed(-100.0, 100.0).isFinite());
         assertFalse(DoubleInterval.INFINITE.isFinite());
     }
+
+    @Test
+    public void testSequence() {
+        var interval1 = DoubleInterval.closed(0.0, 0.5);
+        var interval2 = DoubleInterval.leftClosed(0.0, 0.5);
+        var interval3 = DoubleInterval.leftOpen(0.0, 0.5);
+        var interval4 = DoubleInterval.open(0.0, 0.5);
+        var comparator = DoubleComparator.DEFAULT;
+
+        assertTrue(comparator.equals(interval1.sequence(0.1), new double[] { 0.0, 0.1, 0.2, 0.3, 0.4, 0.5 }));
+        assertTrue(comparator.equals(interval2.sequence(0.1), new double[] { 0.0, 0.1, 0.2, 0.3, 0.4 }));
+        assertTrue(comparator.equals(interval3.sequence(0.1), new double[] {      0.1, 0.2, 0.3, 0.4, 0.5 }));
+        assertTrue(comparator.equals(interval4.sequence(0.1), new double[] {      0.1, 0.2, 0.3, 0.4 }));
+
+        assertTrue(comparator.equals(interval1.sequence(0.15), new double[] { 0.0, 0.15, 0.3, 0.45 }));
+        assertTrue(comparator.equals(interval2.sequence(0.15), new double[] { 0.0, 0.15, 0.3, 0.45 }));
+        assertTrue(comparator.equals(interval3.sequence(0.15), new double[] {      0.15, 0.3, 0.45 }));
+        assertTrue(comparator.equals(interval4.sequence(0.15), new double[] {      0.15, 0.3, 0.45 }));
+    }
 }
