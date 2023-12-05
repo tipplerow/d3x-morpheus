@@ -77,7 +77,7 @@ public interface RealDistribution {
     double mode();
 
     /**
-     * Returns the standard deviation this distribution.
+     * Returns the standard deviation of this distribution.
      * @return the standard deviation of this distribution.
      */
     double sdev();
@@ -229,7 +229,6 @@ public interface RealDistribution {
             samples[index] = sample(generator);
 
         return samples;
-
     }
 
     /**

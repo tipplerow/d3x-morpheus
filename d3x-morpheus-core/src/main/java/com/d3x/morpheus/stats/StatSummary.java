@@ -19,9 +19,12 @@ import com.d3x.morpheus.vector.D3xVectorView;
 
 import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.NonNull;
 import lombok.Value;
 
 import org.apache.commons.math3.stat.descriptive.rank.Percentile;
+
+import java.util.Arrays;
 
 /**
  * Collects summary statistics for a data sample.
@@ -78,6 +81,17 @@ public class StatSummary {
      *
      * @return a summary for the given sample.
      */
+    public static StatSummary of(int... sample) {
+        return of(Arrays.stream(sample).asDoubleStream().toArray());
+    }
+
+    /**
+     * Creates a summary for a given sample.
+     *
+     * @param sample the empirical data sample.
+     *
+     * @return a summary for the given sample.
+     */
     public static StatSummary of(double... sample) {
         var count = sample.length;
 
@@ -112,7 +126,7 @@ public class StatSummary {
      *
      * @return a summary for the given sample.
      */
-    public static StatSummary of(D3xVectorView sample) {
+    public static StatSummary of(@NonNull D3xVectorView sample) {
         return of(sample.toArray());
     }
 
