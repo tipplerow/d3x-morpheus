@@ -32,6 +32,8 @@ import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
 
+import lombok.NonNull;
+
 import com.d3x.morpheus.db.DbSource;
 import com.d3x.morpheus.index.Index;
 import com.d3x.morpheus.matrix.D3xMatrix;
@@ -721,6 +723,19 @@ public interface DataFrame<R,C> extends DataFrameAccess<R,C>, DataFrameOperation
      */
     default void replaceNaN(double value) {
         values().forEach(v -> v.replaceNaN(value));
+    }
+
+
+    /**
+     * Returns a modified representation of this data frame
+     * @param consumer  the consumer to receive builder initialized with this frame
+     * @return          the modified DataFrame
+     */
+    default DataFrame<R,C> modify(
+        @NonNull Consumer<DataFrameBuilder<R,C>> consumer) {
+        var builder = this.toBuilder();
+        consumer.accept(builder);
+        return builder.build();
     }
 
     /**

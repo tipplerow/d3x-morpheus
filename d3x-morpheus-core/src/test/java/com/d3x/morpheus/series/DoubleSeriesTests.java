@@ -239,30 +239,17 @@ public class DoubleSeriesTests {
         Assert.assertTrue(series3.equalsSeries(series4));
     }
 
-    /*
     @Test()
-    @SuppressWarnings("unchecked")
-    public void strings() {
-        var series = DataSeries.builder(Integer.class, String.class).putValue(1, "Hello").putValue(2, "World").build();
-        Assert.assertTrue(series.size() > 0);
-        Assert.assertEquals(series.valueClass(), String.class);
-        Assert.assertEquals(series.keyClass(), Integer.class);
-        var jsonIO = jsonEngine.io(series.type());
-        var jsonString = jsonIO.toString(series);
-        IO.println(jsonString);
-        var result = ((DataSeries<Integer,String>)jsonIO.fromString(jsonString));
-        Assert.assertEquals(result.size(), series.size());
-        Assert.assertEquals(result.valueClass(), series.valueClass());
-        Assert.assertEquals(result.valueType(), series.valueType());
-        Assert.assertEquals(result.keyClass(), series.keyClass());
-        Assert.assertEquals(result.keyType(), series.keyType());
-        series.getKeys().forEach(key -> {
-            var v1 = series.getValue(key);
-            var v2 = result.getValue(key);
-            Assert.assertEquals(v2, v1);
-        });
+    public void mapWithCollisions() {
+        var keyMap = Map.of(1, "A", 2, "B", 3, "C", 4, "A");
+        var original = DoubleSeries.of(Integer.class, keyMap.keySet().stream(), v -> Math.random());
+        var mapped = original.mapKeys(String.class, keyMap::get);
+        Assert.assertEquals(original.length(), 4);
+        Assert.assertEquals(mapped.length(), 3);
+        Assert.assertEquals(mapped.getDouble("A"), original.getDouble(1) + original.getDouble(4));
+        Assert.assertEquals(mapped.getDouble("B"), original.getDouble(2));
+        Assert.assertEquals(mapped.getDouble("C"), original.getDouble(3));
     }
 
-    */
 
 }
