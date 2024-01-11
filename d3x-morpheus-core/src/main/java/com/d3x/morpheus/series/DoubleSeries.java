@@ -36,6 +36,8 @@ import java.util.function.ToDoubleFunction;
 import java.util.stream.DoubleStream;
 import java.util.stream.Stream;
 
+import lombok.NonNull;
+
 import com.d3x.morpheus.frame.DataFrame;
 import com.d3x.morpheus.stats.Stats;
 import com.d3x.morpheus.util.AssertException;
@@ -271,13 +273,15 @@ public interface DoubleSeries<K> extends DataSeries<K,Double>, D3xVectorView, Da
      * @param mapper    the mapper to apply
      * @return          the mapped vector
      */
-    default <V> DoubleSeries<V> mapKeys(Class<V> type, Function<K,V> mapper) {
+    default <V> DoubleSeries<V> mapKeys(
+        @NonNull Class<V> type,
+        @NonNull Function<K,V> mapper) {
         var length = this.size();
         var builder = DoubleSeries.builder(type).capacity(length);
         this.keys().forEach(key -> {
             var value = getDouble(key);
             var targetId = mapper.apply(key);
-            builder.putValue(targetId, value);
+            builder.plusDouble(targetId, value);
         });
         return builder.build();
     }

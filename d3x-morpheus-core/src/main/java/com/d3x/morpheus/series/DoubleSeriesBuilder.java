@@ -146,7 +146,9 @@ public interface DoubleSeriesBuilder<K> extends DataSeriesBuilder<K,Double> {
         @Override()
         public DoubleSeriesBuilder<K> putDouble(@lombok.NonNull K key, double value) {
             this.capacity(100);
-            this.keys.append(key);
+            if (!values.containsKey(key)) {
+                this.keys.append(key);
+            }
             this.values.put(key, value);
             return this;
         }
