@@ -1,0 +1,8 @@
+{
+  "aggType": "MEAN",
+  "windowLen": 6,
+  "nanPolicy": {
+    "type": "NAN",
+    "minObs": 4
+  }
+}

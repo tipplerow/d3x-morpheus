@@ -1,0 +1,8 @@
+{
+  "aggType": "MEAN",
+  "nanPolicy": {
+    "type": "REPLACE",
+    "minObs": 4,
+    "replace": 0.0
+  }
+}

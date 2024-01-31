@@ -1,0 +1,7 @@
+{
+  "aggType": "MEAN",
+  "nanPolicy": {
+    "type": "OMIT",
+    "minObs": 4
+  }
+}

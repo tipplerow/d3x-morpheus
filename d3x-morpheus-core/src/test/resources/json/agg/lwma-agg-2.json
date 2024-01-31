@@ -1,0 +1,8 @@
+{
+  "aggType": "LWMA",
+  "windowLen": 6,
+  "nanPolicy": {
+    "type": "OMIT",
+    "minObs": 4
+  }
+}

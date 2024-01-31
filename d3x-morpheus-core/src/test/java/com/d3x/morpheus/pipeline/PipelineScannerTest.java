@@ -71,6 +71,11 @@ public class PipelineScannerTest {
     }
 
     @Test
+    public void testCbrt() {
+        assertScanned("cbrt()", DataPipeline.cbrt);
+    }
+
+    @Test
     public void testComposite() {
         assertScanned("add(10.0), sqrt()", DataPipeline.composite(DataPipeline.add(10.0), DataPipeline.sqrt));
         assertScanned("sqrt(), add(10.0)", DataPipeline.composite(DataPipeline.sqrt, DataPipeline.add(10.0)));
@@ -157,6 +162,16 @@ public class PipelineScannerTest {
     @Test
     public void testNormalize() {
         assertScanned("normalize()", DataPipeline.normalize);
+    }
+
+    @Test
+    public void testPmax() {
+        assertScanned("pmax(1.23)", DataPipeline.pmax(1.23));
+    }
+
+    @Test
+    public void testPmin() {
+        assertScanned("pmin(1.23)", DataPipeline.pmin(1.23));
     }
 
     @Test

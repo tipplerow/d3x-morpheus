@@ -1,0 +1,5 @@
+{
+  "type": "REPLACE",
+  "minObs": 30,
+  "replace": 0.0
+}

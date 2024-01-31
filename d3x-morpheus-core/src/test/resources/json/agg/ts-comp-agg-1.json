@@ -1,0 +1,29 @@
+{
+  "aggType": "COMPOSITE",
+  "compositor": {
+    "aggType": "GEO_MEAN",
+    "nanPolicy": {
+      "type": "NAN",
+      "minObs": 2
+    }
+  },
+  "components": [
+    {
+      "aggType": "MEDIAN",
+      "windowLen": 90,
+      "nanPolicy": {
+        "type": "OMIT",
+        "minObs": 45
+      }
+    },
+    {
+      "aggType": "EWMA",
+      "windowLen": 4,
+      "halfLife": 2.0,
+      "nanPolicy": {
+        "type": "OMIT",
+        "minObs": 4
+      }
+    }
+  ]
+}

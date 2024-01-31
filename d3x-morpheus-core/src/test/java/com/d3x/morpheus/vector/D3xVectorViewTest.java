@@ -165,11 +165,18 @@ public class D3xVectorViewTest {
 
     @Test
     public void testStream() {
-        D3xVectorView view = D3xVectorView.of(1.0, 2.0, 3.0, 4.0);
-        assertEquals(view.stream().count(), 4);
-        assertEquals(view.stream().min().orElse(Double.NaN), 1.0, TOLERANCE);
-        assertEquals(view.stream().max().orElse(Double.NaN), 4.0, TOLERANCE);
-        assertEquals(view.stream().sum(), 10.0, TOLERANCE);
+        var vec1 = D3xVectorView.of();
+        var vec2 = D3xVectorView.of(5.0, 4.0, 8.0);
+
+        assertEquals(vec1.stream().count(), 0);
+        assertEquals(vec1.stream().sum(), 0.0, TOLERANCE);
+        assertTrue(vec1.stream().max().isEmpty());
+        assertTrue(vec1.stream().min().isEmpty());
+
+        assertEquals(vec2.stream().count(), 3);
+        assertEquals(vec2.stream().sum(), 17.0, TOLERANCE);
+        assertEquals(vec2.stream().max().orElseThrow(), 8.0, TOLERANCE);
+        assertEquals(vec2.stream().min().orElseThrow(), 4.0, TOLERANCE);
     }
 }
 

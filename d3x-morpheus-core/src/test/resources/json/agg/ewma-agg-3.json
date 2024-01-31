@@ -1,0 +1,10 @@
+{
+  "aggType": "EWMA",
+  "windowLen": 6,
+  "halfLife": 2.0,
+  "nanPolicy": {
+    "type": "REPLACE",
+    "minObs": 4,
+    "replace": 0.0
+  }
+}

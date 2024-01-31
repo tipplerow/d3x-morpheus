@@ -166,6 +166,12 @@ public interface DataPipeline {
     DataPipeline abs = local("abs()", Math::abs);
 
     /**
+     * A local, size-preserving pipeline that replaces each element
+     * with its cube root.
+     */
+    DataPipeline cbrt = local("cbrt()", Math::cbrt);
+
+    /**
      * A non-local, size-preserving pipeline that subtracts the mean
      * from each element in the DataVector, resulting in a transformed
      * vector with zero mean.
@@ -540,6 +546,30 @@ public interface DataPipeline {
      */
     static DataPipeline multiply(double factor) {
         return local(String.format("multiply(%s)", factor), element -> element * factor);
+    }
+
+    /**
+     * Returns a local, size-preserving pipeline that applies a lower
+     * bound to each element.
+     *
+     * @param lower the lower bound to apply.
+     *
+     * @return a maximum pipeline with the specified bound.
+     */
+    static DataPipeline pmax(double lower) {
+        return local(String.format("pmax(%s)", lower), element -> Math.max(lower, element));
+    }
+
+    /**
+     * Returns a local, size-preserving pipeline that applies an upper
+     * bound to each element.
+     *
+     * @param upper the upper bound to apply.
+     *
+     * @return a minimum pipeline with the specified bound.
+     */
+    static DataPipeline pmin(double upper) {
+        return local(String.format("pmin(%s)", upper), element -> Math.min(upper, element));
     }
 
     /**

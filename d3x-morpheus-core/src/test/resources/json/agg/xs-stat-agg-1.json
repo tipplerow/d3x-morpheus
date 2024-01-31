@@ -1,0 +1,7 @@
+{
+  "aggType": "MEAN",
+  "nanPolicy": {
+    "type": "NAN",
+    "minObs": 4
+  }
+}

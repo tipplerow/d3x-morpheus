@@ -1,0 +1,9 @@
+{
+  "aggType": "EWMA",
+  "windowLen": 6,
+  "halfLife": 2.0,
+  "nanPolicy": {
+    "type": "OMIT",
+    "minObs": 4
+  }
+}

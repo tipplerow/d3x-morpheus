@@ -55,6 +55,14 @@ public interface D3xVectorView extends Iterable<Double> {
     double get(int index);
 
     /**
+     * Returns a stream containing the values in order.
+     * @return a stream containing the values in order.
+     */
+    default DoubleStream stream() {
+        return StreamSupport.doubleStream(spliterator(), false);
+    }
+
+    /**
      * Returns a read-only iterator over this vector view.
      * @return a read-only iterator over this vector view.
      */
@@ -68,14 +76,6 @@ public interface D3xVectorView extends Iterable<Double> {
      */
     default Spliterator.OfDouble spliterator() {
         return Spliterators.spliterator(iterator(), length(), Spliterator.ORDERED | Spliterator.IMMUTABLE | Spliterator.NONNULL);
-    }
-
-    /**
-     * Returns a stream of the vector elements.
-     * @return a stream of the vector elements.
-     */
-    default DoubleStream stream() {
-        return StreamSupport.doubleStream(spliterator(), false);
     }
 
     /**
