@@ -172,6 +172,11 @@ public final class ApacheMatrix implements D3xMatrix {
     }
 
     @Override
+    public void add(int row, int col, double addend) {
+        impl.addToEntry(row, col, addend);
+    }
+
+    @Override
     public ApacheMatrix copy() {
         return new ApacheMatrix(impl.copy());
     }
@@ -218,6 +223,11 @@ public final class ApacheMatrix implements D3xMatrix {
     @Override
     public ApacheMatrix minus(D3xMatrix B) {
         return wrap(impl.subtract(asOperand(B)));
+    }
+
+    @Override
+    public void multiply(int row, int col, double factor) {
+        impl.multiplyEntry(row, col, factor);
     }
 
     @Override
