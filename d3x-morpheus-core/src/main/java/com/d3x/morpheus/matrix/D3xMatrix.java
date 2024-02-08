@@ -41,6 +41,28 @@ public interface D3xMatrix extends D3xMatrixView {
     void set(int row, int col, double value);
 
     /**
+     * Increments the value of an element at a given location (in place).
+     *
+     * @param row    the row index of the element to increment.
+     * @param col    the column index of the element to increment.
+     * @param addend the value to add to the given element.
+     *
+     * @throws RuntimeException if either index is out of bounds.
+     */
+    void add(int row, int col, double addend);
+
+    /**
+     * Multiplies the value of an element at a given location (in place).
+     *
+     * @param row    the row index of the element to multiply.
+     * @param col    the column index of the element to multiply.
+     * @param factor the value to multiply the given element by.
+     *
+     * @throws RuntimeException if either index is out of bounds.
+     */
+    void multiply(int row, int col, double factor);
+
+    /**
      * Creates a deep copy of this matrix.
      * @return a deep copy of this matrix.
      */

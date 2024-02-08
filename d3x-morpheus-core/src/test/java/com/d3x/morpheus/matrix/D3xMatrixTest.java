@@ -33,6 +33,13 @@ public class D3xMatrixTest {
     };
 
     @Test
+    public void testAdd() {
+        var matrix = D3xMatrix.copyOf(testArray);
+        matrix.add(1, 2, 0.456);
+        assertEquals(matrix.get(1, 2), 23.456, TOLERANCE);
+    }
+
+    @Test
     public void testByRow() {
         D3xMatrix actual = D3xMatrix.byrow(2, 3, 11.0, 12.0, 13.0, 21.0, 22.0, 23.0);
         assertTrue(actual.equalsArray(testArray));
@@ -261,6 +268,13 @@ public class D3xMatrixTest {
                 assertEquals(B.get(i, j), 0.75 * testArray[i][j], TOLERANCE);
             }
         }
+    }
+
+    @Test
+    public void testMultiply() {
+        var matrix = D3xMatrix.copyOf(testArray);
+        matrix.multiply(0, 1, 3.0);
+        assertEquals(matrix.get(0, 1), 36.0, TOLERANCE);
     }
 
     @Test
