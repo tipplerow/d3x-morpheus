@@ -72,13 +72,18 @@ final class MapDataVector<K> implements DataVector<K> {
     }
 
     @Override
+    public Stream<DataVectorElement<K>> streamElements() {
+        return map.entrySet().stream().map(e -> DataVectorElement.of(e.getKey(), e.getValue()));
+    }
+
+    @Override
     public Stream<K> streamKeys() {
         return map.keySet().stream();
     }
 
     @Override
     public DoubleStream streamValues() {
-        return map.keySet().stream().mapToDouble(map::get);
+        return map.values().stream().mapToDouble(Double::doubleValue);
     }
 
     @Override

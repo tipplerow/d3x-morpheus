@@ -15,6 +15,8 @@
  */
 package com.d3x.morpheus.vector;
 
+import java.util.stream.DoubleStream;
+
 /**
  * Wraps a bare array in a vector view.
  *
@@ -35,5 +37,10 @@ final class ArrayView implements D3xVectorView {
     @Override
     public double get(int index) {
         return array[index];
+    }
+
+    @Override
+    public DoubleStream stream() {
+        return DoubleStream.of(array);
     }
 }

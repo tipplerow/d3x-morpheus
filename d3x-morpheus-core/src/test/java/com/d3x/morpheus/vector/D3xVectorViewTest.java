@@ -162,5 +162,14 @@ public class D3xVectorViewTest {
         assertTrue(view2.equalsView(D3xVectorView.of(3.0, 4.0, 5.0)));
         assertTrue(view3.equalsView(D3xVectorView.of(4.0, 5.0)));
     }
+
+    @Test
+    public void testStream() {
+        D3xVectorView view = D3xVectorView.of(1.0, 2.0, 3.0, 4.0);
+        assertEquals(view.stream().count(), 4);
+        assertEquals(view.stream().min().orElse(Double.NaN), 1.0, TOLERANCE);
+        assertEquals(view.stream().max().orElse(Double.NaN), 4.0, TOLERANCE);
+        assertEquals(view.stream().sum(), 10.0, TOLERANCE);
+    }
 }
 

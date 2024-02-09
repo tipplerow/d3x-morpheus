@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.d3x.morpheus.frame.DataFrame;
 import com.d3x.morpheus.series.DoubleSeries;
@@ -177,6 +178,20 @@ public class DataVectorViewTest extends NumericTestBase {
         assertSame(baseView.toSeries(String.class), baseView);
         assertNotSame(view1, view2);
         assertTrue(view1.equalsView(view2));
+    }
+
+    @Test
+    public void testStream() {
+        DataVectorView<String> view = DataVector.of(Map.of("A", 1.0, "B", 2.0, "C", 3.0));
+        assertEquals(view.streamKeys().count(), 3);
+        assertEquals(view.streamValues().count(), 3);
+        assertEquals(view.streamElements().count(), 3);
+        assertEquals(view.streamKeys().collect(Collectors.toSet()), Set.of("A", "B", "C"));
+        assertEquals(view.streamValues().sum(), 6.0, TOLERANCE);
+        assertEquals(view.streamElements().collect(Collectors.toSet()),
+                Set.of(DataVectorElement.of("A", 1.0),
+                        DataVectorElement.of("B", 2.0),
+                        DataVectorElement.of("C", 3.0)));
     }
 }
 
