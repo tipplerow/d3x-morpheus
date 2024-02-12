@@ -18,9 +18,13 @@ package com.d3x.morpheus.vector;
 import java.util.Arrays;
 import java.util.List;
 import java.util.PrimitiveIterator;
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.function.DoubleBinaryOperator;
 import java.util.function.DoublePredicate;
 import java.util.function.DoubleUnaryOperator;
+import java.util.stream.DoubleStream;
+import java.util.stream.StreamSupport;
 
 import com.d3x.morpheus.stats.Statistic1;
 import com.d3x.morpheus.stats.Sum;
@@ -56,6 +60,22 @@ public interface D3xVectorView extends Iterable<Double> {
      */
     @Override default PrimitiveIterator.OfDouble iterator() {
         return new VectorIterator(this);
+    }
+
+    /**
+     * Returns a spliterator over the vector elements.
+     * @return a spliterator over the vector elements.
+     */
+    default Spliterator.OfDouble spliterator() {
+        return Spliterators.spliterator(iterator(), length(), Spliterator.ORDERED | Spliterator.IMMUTABLE | Spliterator.NONNULL);
+    }
+
+    /**
+     * Returns a stream of the vector elements.
+     * @return a stream of the vector elements.
+     */
+    default DoubleStream stream() {
+        return StreamSupport.doubleStream(spliterator(), false);
     }
 
     /**
