@@ -103,6 +103,11 @@ public class DataPipelineTest extends NumericTestBase {
     }
 
     @Test
+    public void testCbrt() {
+        assertPipeline2(DataPipeline.cbrt, 1.2599210, 1.0, NA, 1.4422496, 0.7937005);
+    }
+
+    @Test
     public void testComposite() {
         // Order matters...
         assertPipeline1(DataPipeline.composite(DataPipeline.add(0.1), DataPipeline.abs), 1.9, 1.1, NA, 3.1, 0.4);
@@ -172,6 +177,16 @@ public class DataPipelineTest extends NumericTestBase {
     @Test
     public void testNormalize() {
         assertPipeline2(DataPipeline.normalize, 0.30769231, 0.15384615, NA, 0.46153846, 0.07692308);
+    }
+
+    @Test
+    public void testPmax() {
+        assertPipeline1(DataPipeline.pmax(0.123), 0.123, 1.0, NA, 3.0, 0.123);
+    }
+
+    @Test
+    public void testPmin() {
+        assertPipeline1(DataPipeline.pmin(0.123), -2.0, 0.123, NA, 0.123, -0.5);
     }
 
     @Test

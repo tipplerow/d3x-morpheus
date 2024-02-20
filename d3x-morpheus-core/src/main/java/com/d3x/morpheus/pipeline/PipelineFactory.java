@@ -51,6 +51,10 @@ public class PipelineFactory {
                 assertArgs(name, args, Number.class, Number.class);
                 return DataPipeline.bound(doubleArg(args, 0), doubleArg(args, 1));
 
+            case "cbrt":
+                assertNoArgs(name, args);
+                return DataPipeline.cbrt;
+
             case "demean":
                 assertNoArgs(name, args);
                 return DataPipeline.demean;
@@ -102,6 +106,14 @@ public class PipelineFactory {
             case "normalize":
                 assertNoArgs(name, args);
                 return DataPipeline.normalize;
+
+            case "pmax":
+                assertArgs(name, args, Number.class);
+                return DataPipeline.pmax(doubleArg(args, 0));
+
+            case "pmin":
+                assertArgs(name, args, Number.class);
+                return DataPipeline.pmin(doubleArg(args, 0));
 
             case "pow":
                 assertArgs(name, args, Number.class);
