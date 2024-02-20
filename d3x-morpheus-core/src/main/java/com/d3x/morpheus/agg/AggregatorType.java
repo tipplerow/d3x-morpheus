@@ -18,7 +18,9 @@ package com.d3x.morpheus.agg;
 import com.d3x.morpheus.stats.GeoMean;
 import com.d3x.morpheus.stats.Mean;
 import com.d3x.morpheus.stats.Median;
+import com.d3x.morpheus.stats.Product;
 import com.d3x.morpheus.stats.Statistic1;
+import com.d3x.morpheus.stats.Sum;
 
 import java.util.function.Supplier;
 
@@ -52,6 +54,16 @@ public enum AggregatorType {
      * Equally-weighted median.
      */
     MEDIAN(Median::new),
+
+    /**
+     * The component product.
+     */
+    PRODUCT(Product::new),
+
+    /**
+     * The component sum.
+     */
+    SUM(Sum::new),
 
     /**
      * An aggregated collection of other time-series aggregators.
