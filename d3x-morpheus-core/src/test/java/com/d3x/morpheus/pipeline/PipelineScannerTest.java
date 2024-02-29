@@ -57,11 +57,17 @@ public class PipelineScannerTest {
     public void testAbs() {
         assertScanned("abs()", DataPipeline.abs);
     }
-    
+
     @Test
     public void testAdd() {
         assertScanned("add(3)", DataPipeline.add(3.0));
         assertScanned("add(1.23)", DataPipeline.add(1.23));
+    }
+
+    @Test
+    public void testAnnualize() {
+        assertScanned("annualize(12)", DataPipeline.annualize(12.0));
+        assertScanned("annualize(365.0)", DataPipeline.annualize(365.0));
     }
 
     @Test

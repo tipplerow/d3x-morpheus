@@ -97,6 +97,11 @@ public class DataPipelineTest extends NumericTestBase {
     }
 
     @Test
+    public void testAnnualize() {
+        assertPipeline2(DataPipeline.annualize(12), 6.928203, 3.464102, NA, 10.392305, 1.732051);
+    }
+
+    @Test
     public void testBound() {
         assertPipeline1(DataPipeline.bound(-1.75, 1.5), -1.75, 1.0, NA, 1.5, -0.5);
         assertPipeline1(DataPipeline.bound(DoubleInterval.closed(-1.75, 1.5)), -1.75, 1.0, NA, 1.5, -0.5);
