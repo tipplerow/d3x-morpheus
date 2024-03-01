@@ -418,6 +418,19 @@ public interface DataPipeline {
     }
 
     /**
+     * Returns a local, size-preserving pipeline that annualizes volatility
+     * measured over a period less than one year.
+     *
+     * @param perYear the number of measurement periods in one year.
+     *
+     * @return a local, size-preserving pipeline that annualizes volatility
+     * measured over the specific period.
+     */
+    static DataPipeline annualize(double perYear) {
+        return local(String.format("annualize(%s)", perYear), element -> element * Math.sqrt(perYear));
+    }
+
+    /**
      * Returns a local, size-preserving pipeline that bounds each element
      * on a fixed interval.
      *

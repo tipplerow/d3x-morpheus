@@ -47,6 +47,10 @@ public class PipelineFactory {
                 assertArgs(name, args, Number.class);
                 return DataPipeline.add(doubleArg(args, 0));
 
+            case "annualize":
+                assertArgs(name, args, Number.class);
+                return DataPipeline.annualize(doubleArg(args, 0));
+
             case "bound":
                 assertArgs(name, args, Number.class, Number.class);
                 return DataPipeline.bound(doubleArg(args, 0), doubleArg(args, 1));
