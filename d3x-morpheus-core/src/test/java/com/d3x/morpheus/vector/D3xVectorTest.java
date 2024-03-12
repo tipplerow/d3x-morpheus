@@ -141,6 +141,18 @@ public class D3xVectorTest {
     }
 
     @Test
+    public void testNorm1() {
+        var vec1 = D3xVector.wrap(-1.0, 2.0, -3.0);
+        assertEquals(vec1.norm1(), 6.0, TOLERANCE);
+    }
+
+    @Test
+    public void testNorm2() {
+        var vec1 = D3xVector.wrap(-1.0, 2.0, -3.0);
+        assertEquals(vec1.norm2(), Math.sqrt(14.0), TOLERANCE);
+    }
+
+    @Test
     public void testPlus() {
         double[] arr1 = new double[] {  1.0,  2.0,  3.0 };
         double[] arr2 = new double[] { 10.0, 20.0, 30.0 };

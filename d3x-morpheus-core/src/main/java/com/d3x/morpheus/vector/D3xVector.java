@@ -25,6 +25,7 @@ import com.d3x.morpheus.frame.DataFrameException;
 import com.d3x.morpheus.frame.DataFrameRow;
 import com.d3x.morpheus.frame.DataFrameVector;
 import com.d3x.morpheus.series.DoubleSeries;
+import com.d3x.morpheus.stats.SumSquares;
 import com.d3x.morpheus.util.DoubleComparator;
 import com.d3x.morpheus.util.MorpheusException;
 import lombok.NonNull;
@@ -160,6 +161,24 @@ public interface D3xVector extends D3xVectorView {
             result += this.get(index) * that.get(index);
 
         return result;
+    }
+
+    /**
+     * Computes the 1-norm of this vector: the sum of the absolute values of each element.
+     *
+     * @return the 1-norm of this data vector.
+     */
+    default double norm1() {
+        return stream().filter(x -> !Double.isNaN(x)).map(Math::abs).sum();
+    }
+
+    /**
+     * Computes the 2-norm (Euclidean norm) of this vector.
+     *
+     * @return the 2-norm (Euclidean norm) of this vector.
+     */
+    default double norm2() {
+        return Math.sqrt(new SumSquares().compute(this));
     }
 
     /**
