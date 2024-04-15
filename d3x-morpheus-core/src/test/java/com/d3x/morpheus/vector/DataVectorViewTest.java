@@ -23,8 +23,8 @@ import java.util.stream.Collectors;
 
 import com.d3x.morpheus.frame.DataFrame;
 import com.d3x.morpheus.series.DoubleSeries;
-
 import com.d3x.morpheus.numerictests.NumericTestBase;
+
 import org.testng.annotations.Test;
 import static org.testng.Assert.*;
 
@@ -192,6 +192,13 @@ public class DataVectorViewTest extends NumericTestBase {
                 Set.of(DataVectorElement.of("A", 1.0),
                         DataVectorElement.of("B", 2.0),
                         DataVectorElement.of("C", 3.0)));
+    }
+
+    @Test
+    public void testWeightedMean() {
+        var target = DataVector.of(Map.of("B", 1.0, "C", 3.0, "D", 5.0, "E", 7.0, "F", 88.8));
+        var weight = DataVector.of(Map.of("A", 99.9, "B", 2.0, "C", 1.5, "D", 1.0, "E", 0.5));
+        assertEquals(target.weightedMean(weight), 3.0, TOLERANCE);
     }
 }
 

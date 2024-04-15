@@ -171,5 +171,22 @@ public class D3xVectorViewTest {
         assertEquals(view.stream().max().orElse(Double.NaN), 4.0, TOLERANCE);
         assertEquals(view.stream().sum(), 10.0, TOLERANCE);
     }
+
+    @Test
+    public void testWeightedMean1() {
+        var target = D3xVectorView.of(1.0, 3.0, 5.0, 7.0);
+        var weight = D3xVectorView.of(2.0, 1.5, 1.0, 0.5);
+        assertEquals(target.weightedMean(weight), 3.0, TOLERANCE);
+    }
+
+    @Test(expectedExceptions = RuntimeException.class)
+    public void testWeightedMean2() {
+        D3xVectorView.of(1.0, 2.0, 3.0, 4.0).weightedMean(D3xVectorView.of(1.0, 2.0, 3.0));
+    }
+
+    @Test(expectedExceptions = RuntimeException.class)
+    public void testWeightedMean3() {
+        D3xVectorView.of(1.0, 2.0, 3.0, 4.0).weightedMean(D3xVectorView.of(-1.0, -2.0, -3.0, 4.0));
+    }
 }
 
