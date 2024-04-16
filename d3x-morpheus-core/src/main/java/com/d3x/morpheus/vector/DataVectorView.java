@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.PrimitiveIterator;
 import java.util.Set;
+import java.util.concurrent.atomic.DoubleAdder;
 import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
 import java.util.stream.Stream;
@@ -30,6 +31,8 @@ import com.d3x.morpheus.series.DoubleSeries;
 import com.d3x.morpheus.stats.SumSquares;
 import com.d3x.morpheus.util.DoubleComparator;
 import com.d3x.morpheus.util.MorpheusException;
+
+import lombok.NonNull;
 
 /**
  * Provides a read-only view of {@code double} values that are accessed
@@ -403,5 +406,33 @@ public interface DataVectorView<K> {
             return (DoubleSeries<K>) this;
         else
             return DoubleSeries.copyOf(keyClass, this);
+    }
+
+    /**
+     * Computes the weighted mean value of the vector elements.
+     *
+     * @param weights the weights to apply to each element (not necessarily normalized).
+     *
+     * @return the weighted mean value of the vector elements.
+     */
+    default double weightedMean(@NonNull DataVectorView<K> weights) {
+        var numerator = new DoubleAdder();
+        var denominator = new DoubleAdder();
+
+        streamElements().forEach(element -> {
+            var targetKey = element.getKey();
+            var targetValue = element.getValue();
+            var weightValue = weights.getElement(targetKey);
+
+            if (Double.isFinite(weightValue)) {
+                numerator.add(weightValue * targetValue);
+                denominator.add(weightValue);
+            }
+        });
+
+        if (!DoubleComparator.DEFAULT.isPositive(denominator.sum()))
+            throw new MorpheusException("Total weight must be positive.");
+
+        return numerator.sum() / denominator.sum();
     }
 }

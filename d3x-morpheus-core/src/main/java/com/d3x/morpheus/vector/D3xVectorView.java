@@ -31,6 +31,8 @@ import com.d3x.morpheus.stats.Sum;
 import com.d3x.morpheus.util.DoubleComparator;
 import com.d3x.morpheus.util.MorpheusException;
 
+import lombok.NonNull;
+
 /**
  * Provides a read-only view of {@code double} values that are accessed
  * by ordinal index (location).
@@ -459,5 +461,34 @@ public interface D3xVectorView extends Iterable<Double> {
      */
     static void validateCongruent(D3xVectorView v1, D3xVectorView v2) {
         v1.validateCongruent(v2);
+    }
+
+    /**
+     * Computes the weighted mean value of the vector elements.
+     *
+     * @param weights the weights to apply to each element (not necessarily normalized).
+     *
+     * @return the weighted mean value of the vector elements.
+     */
+    default double weightedMean(@NonNull D3xVectorView weights) {
+        validateCongruent(weights);
+
+        var numerator = 0.0;
+        var denominator = 0.0;
+
+        for (int index = 0; index < length(); ++index) {
+            var targetValue = this.get(index);
+            var weightValue = weights.get(index);
+
+            if (Double.isFinite(weightValue)) {
+                numerator += weightValue * targetValue;
+                denominator += weightValue;
+            }
+        }
+
+        if (!DoubleComparator.DEFAULT.isPositive(denominator))
+            throw new MorpheusException("Total weight must be positive.");
+
+        return numerator / denominator;
     }
 }

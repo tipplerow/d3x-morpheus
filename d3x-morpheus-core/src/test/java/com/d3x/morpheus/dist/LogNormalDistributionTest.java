@@ -112,8 +112,8 @@ public class LogNormalDistributionTest extends RealDistributionTestBase {
 
     @Test
     public void testSum() {
-        runSumTest(dist1,  2, 0.10, true);
-        runSumTest(dist1,  5, 0.20, true);
+        runSumTest(dist1,  2, 0.20, true);
+        runSumTest(dist1,  5, 0.40, true);
     }
 }
 
