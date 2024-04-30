@@ -23,6 +23,18 @@ import org.testng.annotations.Test;
  */
 public final class DoubleUtilTest {
     @Test
+    public void testBound() {
+        var lower = 0.0;
+        var upper = 1.0;
+        Assert.assertEquals(DoubleUtil.bound(-1.0, lower, upper), lower, 1.0E-12);
+        Assert.assertEquals(DoubleUtil.bound(0.0, lower, upper), 0.0, 1.0E-12);
+        Assert.assertEquals(DoubleUtil.bound(0.2, lower, upper), 0.2, 1.0E-12);
+        Assert.assertEquals(DoubleUtil.bound(0.8, lower, upper), 0.8, 1.0E-12);
+        Assert.assertEquals(DoubleUtil.bound(1.0, lower, upper), 1.0, 1.0E-12);
+        Assert.assertEquals(DoubleUtil.bound(2.0, lower, upper), upper, 1.0E-12);
+    }
+
+    @Test
     public void testRatio() {
         Assert.assertEquals(DoubleUtil.ratio(1, 2), 0.5, 1.0E-15);
         Assert.assertEquals(DoubleUtil.ratio(1, 3), 0.33333333, 1.0E-08);

@@ -111,6 +111,10 @@ public class PipelineFactory {
                 assertNoArgs(name, args);
                 return DataPipeline.normalize;
 
+            case "ones":
+                assertNoArgs(name, args);
+                return DataPipeline.ones;
+
             case "pmax":
                 assertArgs(name, args, Number.class);
                 return DataPipeline.pmax(doubleArg(args, 0));
@@ -163,6 +167,10 @@ public class PipelineFactory {
             case "tanh":
                 assertArgs(name, args, Number.class, Number.class);
                 return DataPipeline.tanh(doubleArg(args, 0), doubleArg(args, 1));
+
+            case "threshold":
+                assertArgs(name, args, Number.class);
+                return DataPipeline.threshold(doubleArg(args, 0));
 
             case "trim":
                 assertArgs(name, args, Number.class);

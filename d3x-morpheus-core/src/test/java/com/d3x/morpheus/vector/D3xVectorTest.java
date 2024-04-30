@@ -254,6 +254,7 @@ public class D3xVectorTest {
 
     @Test
     public void testCopyColumn() {
+        assertTrue(D3xVector.copyColumn(dataFrame, 1).equalsArray(12.0, 22.0, 32.0));
         assertTrue(D3xVector.copyColumn(dataFrame, "col2").equalsArray(12.0, 22.0, 32.0));
         assertTrue(D3xVector.copyColumn(dataFrame, List.of("row3", "row1"), "col4").equalsArray(34.0, 14.0));
     }
@@ -270,6 +271,7 @@ public class D3xVectorTest {
 
     @Test
     public void testCopyRow() {
+        assertTrue(D3xVector.copyRow(dataFrame, 1).equalsArray(21.0, 22.0, 23.0, 24.0));
         assertTrue(D3xVector.copyRow(dataFrame, "row2").equalsArray(21.0, 22.0, 23.0, 24.0));
         assertTrue(D3xVector.copyRow(dataFrame, "row3", List.of("col4", "col1")).equalsArray(34.0, 31.0));
     }

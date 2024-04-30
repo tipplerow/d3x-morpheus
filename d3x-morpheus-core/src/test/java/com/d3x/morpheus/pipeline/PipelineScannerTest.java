@@ -171,6 +171,11 @@ public class PipelineScannerTest {
     }
 
     @Test
+    public void testOnes() {
+        assertScanned("ones()", DataPipeline.ones);
+    }
+
+    @Test
     public void testPmax() {
         assertScanned("pmax(1.23)", DataPipeline.pmax(1.23));
     }
@@ -228,6 +233,12 @@ public class PipelineScannerTest {
     @Test
     public void testTanh() {
         assertScanned("tanh(1.0, 2.0)", DataPipeline.tanh(1.0, 2.0));
+    }
+
+    @Test
+    public void testThreshold() {
+        assertScanned("threshold(0.05)", DataPipeline.threshold(0.05));
+        assertScanned("threshold(1.0E-12)", DataPipeline.threshold(1.0E-12));
     }
 
     @Test

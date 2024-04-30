@@ -28,6 +28,7 @@ import com.d3x.morpheus.series.DoubleSeries;
 import com.d3x.morpheus.stats.SumSquares;
 import com.d3x.morpheus.util.DoubleComparator;
 import com.d3x.morpheus.util.MorpheusException;
+
 import lombok.NonNull;
 
 /**
@@ -450,6 +451,40 @@ public interface D3xVector extends D3xVectorView {
     }
 
     /**
+     * Creates a new vector by copying values from a row or column in a
+     * Morpheus DataFrame.
+     *
+     * @param source the data frame row or column.
+     *
+     * @return a new vector containing a copy of the row or column.
+     */
+    static <R,C> D3xVector copyOf(DataFrameVector<R,C,?,?,?> source) {
+        var vector = dense(source.length());
+
+        for (int index = 0; index < vector.length(); ++index)
+            vector.set(index, source.getDoubleAt(index));
+
+        return vector;
+    }
+
+    /**
+     * Creates a new vector by copying values from a column in a Morpheus
+     * DataFrame.
+     *
+     * @param frame the source DataFrame.
+     * @param index the index of the column to copy.
+     *
+     * @return a new vector containing a copy of the specified column in
+     * the given frame (in row order).
+     *
+     * @throws DataFrameException unless the frame contains the specified
+     * column.
+     */
+    static <R,C> D3xVector copyColumn(DataFrame<R,C> frame, int index) {
+        return copyOf(frame.colAt(index));
+    }
+
+    /**
      * Creates a new vector by copying values from a column in a Morpheus
      * DataFrame.
      *
@@ -463,7 +498,7 @@ public interface D3xVector extends D3xVectorView {
      * column.
      */
     static <R,C> D3xVector copyColumn(DataFrame<R,C> frame, C colKey) {
-        return copyColumn(frame, frame.listRowKeys(), colKey);
+        return copyOf(frame.col(colKey));
     }
 
     /**
@@ -497,6 +532,23 @@ public interface D3xVector extends D3xVectorView {
      * Creates a new vector by copying values from a row in a Morpheus
      * DataFrame.
      *
+     * @param frame the source DataFrame.
+     * @param index the index of the row to copy.
+     *
+     * @return a new vector containing a copy of the specified row in
+     * the given frame (in row order).
+     *
+     * @throws DataFrameException unless the frame contains the specified
+     * column.
+     */
+    static <R,C> D3xVector copyRow(DataFrame<R,C> frame, int index) {
+        return copyOf(frame.rowAt(index));
+    }
+
+    /**
+     * Creates a new vector by copying values from a row in a Morpheus
+     * DataFrame.
+     *
      * @param frame  the source DataFrame.
      * @param rowKey the key of the row to copy.
      *
@@ -507,7 +559,7 @@ public interface D3xVector extends D3xVectorView {
      * row.
      */
     static <R,C> D3xVector copyRow(DataFrame<R,C> frame, R rowKey) {
-        return copyRow(frame, rowKey, frame.listColumnKeys());
+        return copyOf(frame.row(rowKey));
     }
 
     /**
