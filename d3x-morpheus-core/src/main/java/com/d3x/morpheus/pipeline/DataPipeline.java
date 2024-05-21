@@ -26,6 +26,7 @@ import com.d3x.morpheus.stats.Sum;
 import com.d3x.morpheus.stats.SumSquares;
 import com.d3x.morpheus.util.DoubleComparator;
 import com.d3x.morpheus.util.DoubleInterval;
+import com.d3x.morpheus.util.DoubleUtil;
 import com.d3x.morpheus.util.MorpheusException;
 import com.d3x.morpheus.vector.D3xVector;
 import com.d3x.morpheus.vector.DataVector;
@@ -305,6 +306,12 @@ public interface DataPipeline {
     };
 
     /**
+     * A local, size-preserving pipeline that replaces each non-missing
+     * element with {@code 1.0}.
+     */
+    DataPipeline ones = local("ones()", x -> Double.isNaN(x) ? Double.NaN : 1.0);
+
+    /**
      * A non-local, size-preserving pipeline that ranks elements onto
      * the interval {@code [0.0, 1.0]}.
      */
@@ -460,7 +467,7 @@ public interface DataPipeline {
         else
             return local(
                     String.format("bound(%s, %s)", lower, upper),
-                    element -> Math.max(lower, Math.min(upper, element)));
+                    element -> DoubleUtil.bound(element, lower, upper));
     }
 
     /**
@@ -677,6 +684,19 @@ public interface DataPipeline {
         else {
             throw new MorpheusException("Width must be positive.");
         }
+    }
+
+    /**
+     * Returns a local, size-preserving pipeline that replaces small
+     * values (with absolute value below a threshold) with zero.
+     *
+     * @param threshold the non-zero threshold.
+     *
+     * @return a local, size-preserving pipeline that replaces values
+     * with magnitude smaller than the threshold with zero.
+     */
+    static DataPipeline threshold(double threshold) {
+        return local(String.format("threshold(%s)", threshold), x -> Math.abs(x) < Math.abs(threshold) ? 0.0 : x);
     }
 
     /**

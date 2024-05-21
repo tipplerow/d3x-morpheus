@@ -185,6 +185,11 @@ public class DataPipelineTest extends NumericTestBase {
     }
 
     @Test
+    public void testOnes() {
+        assertPipeline1(DataPipeline.ones, 1.0, 1.0, NA, 1.0, 1.0);
+    }
+
+    @Test
     public void testPmax() {
         assertPipeline1(DataPipeline.pmax(0.123), 0.123, 1.0, NA, 3.0, 0.123);
     }
@@ -241,6 +246,12 @@ public class DataPipelineTest extends NumericTestBase {
     @Test
     public void testTanh() {
         assertPipeline1(DataPipeline.tanh(1.0, 2.0), -0.9051483, 0.0, NA, 0.7615942, -0.6351490);
+    }
+
+    @Test
+    public void testThreshold() {
+        assertPipeline1(DataPipeline.threshold(1.5), -2.0, 0.0, NA, 3.0, 0.0);
+        assertPipeline1(DataPipeline.threshold(1.0E-12), -2.0, 1.0, NA, 3.0, -0.5);
     }
 
     @Test

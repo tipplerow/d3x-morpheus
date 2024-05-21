@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.DoubleStream;
 
+import com.d3x.morpheus.frame.DataFrame;
+import com.d3x.morpheus.frame.DataFrameValue;
 import com.d3x.morpheus.util.MorpheusException;
 import com.d3x.morpheus.vector.D3xVectorView;
 import com.d3x.morpheus.vector.DataVectorView;
@@ -111,6 +113,17 @@ public interface Statistic1 extends Statistic {
     }
 
     /**
+     * Adds new values to the sample for this statistic.
+     *
+     * @param frame a frame of values to add.
+     *
+     * @return the sample size after adding the values.
+     */
+    default long add(DataFrame<?, ?> frame) {
+        return add(frame.values().mapToDouble(DataFrameValue::getDouble));
+    }
+
+    /**
      * Resets this statistic and computes the value for a given sample.
      *
      * @param sample the sample of values.
@@ -151,6 +164,17 @@ public interface Statistic1 extends Statistic {
      * @return the value of this statistic for the specified sample.
      */
     default double compute(List<Double> sample) {
+        return compute(this, sample);
+    }
+
+    /**
+     * Resets this statistic and computes the value for a given sample.
+     *
+     * @param sample the sample of values.
+     *
+     * @return the value of this statistic for the specified sample.
+     */
+    default double compute(DataFrame<?, ?> sample) {
         return compute(this, sample);
     }
 
@@ -218,6 +242,20 @@ public interface Statistic1 extends Statistic {
      */
     static double compute(Statistic1 stat, List<Double> sample) {
         return compute(stat, sample.stream().mapToDouble(x -> x));
+    }
+
+    /**
+     * Computes a univariate statistic over a given sample.
+     *
+     * @param stat      the statistic type
+     * @param sample    the sample of values
+     *
+     * @return          the value of the statistic for the given sample.
+     */
+    static double compute(Statistic1 stat, DataFrame<?, ?> sample) {
+        stat.reset();
+        stat.add(sample);
+        return stat.getValue();
     }
 
     /**

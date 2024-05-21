@@ -37,6 +37,27 @@ public final class DoubleUtil {
     public static final double SQRT_TWO_PI = Math.sqrt(2.0 * Math.PI);
 
     /**
+     * Bounds a floating-point value between lower and upper bounds.
+     *
+     * @param value the value to bound.
+     * @param lower the lower bound.
+     * @param upper the upper bound.
+     *
+     * @return the bounded value.
+     */
+    public static double bound(double value, double lower, double upper) {
+        if (value < lower) {
+            return lower;
+        }
+        else if (value > upper) {
+            return upper;
+        }
+        else {
+            return value;
+        }
+    }
+
+    /**
      * Computes the floating-point ratio of two integers.
      *
      * @param numer the integral numerator.
